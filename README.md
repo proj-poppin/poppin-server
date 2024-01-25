@@ -22,8 +22,8 @@
 
 
 ## TEAM MEMBER
-|이름|학과|역할|
+|이름|이메일|학과|
 |----|---|---|
-|[강산아](https://github.com/gsandoo)|스포츠문화학, 컴퓨터공학|
-|[정구연](https://github.com/gouyeonch)|컴퓨터공학|
-|[조원준](https://github.com/jun6292)|컴퓨터공학|
+|강산아|https://github.com/gsandoo|스포츠문화학, 컴퓨터공학|
+|정구연|https://github.com/gouyeonch|컴퓨터공학|
+|조원준|https://github.com/jun6292|컴퓨터공학|
