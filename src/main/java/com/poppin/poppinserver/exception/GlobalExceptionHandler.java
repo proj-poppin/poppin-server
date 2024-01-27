@@ -43,6 +43,7 @@ public class GlobalExceptionHandler {
         log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MethodArgumentNotValidException : {}", e.getMessage());
         return ResponseDto.fail(e);
     }
+
     // 개발자가 직접 정의한 예외
     @ExceptionHandler(value = {CommonException.class})
     public ResponseDto<?> handleApiException(CommonException e) {

@@ -8,7 +8,10 @@ import io.micrometer.common.lang.Nullable;
 import lombok.Builder;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Builder
 public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
@@ -25,11 +28,23 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
         return new ResponseDto<>(HttpStatus.CREATED, true, data, null);
     }
 
-    public static ResponseDto<Object> fail(final HandlerMethodValidationException e) { //validation 에러
+    public static ResponseDto<Object> fail(final HandlerMethodValidationException e) { //실패한 경우
         return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.INVALID_PARAMETER));
     }
 
-    public static ResponseDto<Object> fail(final CommonException e) { // 사용자 에러
+    public static ResponseDto<Object> fail(final CommonException e) { //실패한 경우
         return new ResponseDto<>(e.getErrorCode().getHttpStatus(), false, null, new ExceptionDto(e.getErrorCode()));
+    }
+
+    public static ResponseDto<Object> fail(final MethodArgumentNotValidException e) {
+        return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ArgumentNotValidExceptionDto(e));
+    }
+
+    public static ResponseDto<Object> fail(final MethodArgumentTypeMismatchException e) {
+        return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR, false, null, new ExceptionDto(ErrorCode.INVALID_PARAMETER));
+    }
+
+    public static ResponseDto<Object> fail(final MissingServletRequestParameterException e) {
+        return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.MISSING_REQUEST_PARAMETER));
     }
 }
