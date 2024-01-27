@@ -1,9 +1,9 @@
 package com.poppin.poppinserver.dto.common;
 
 
-import com.dev.firstsnow.exception.CommonException;
-import com.dev.firstsnow.exception.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import io.micrometer.common.lang.Nullable;
 import lombok.Builder;
 import org.antlr.v4.runtime.misc.NotNull;

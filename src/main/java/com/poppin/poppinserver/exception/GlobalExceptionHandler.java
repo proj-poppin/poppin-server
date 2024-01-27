@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.exception;
 
 
-import com.dev.firstsnow.dto.common.ResponseDto;
+import com.poppin.poppinserver.dto.common.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
