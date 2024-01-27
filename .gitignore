@@ -1,3 +1,6 @@
+#application.xx
+src/main/resources/*.yml
+
 HELP.md
 .gradle
 build/
