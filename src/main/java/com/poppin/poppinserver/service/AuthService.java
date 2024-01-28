@@ -21,6 +21,10 @@ public class AuthService {
                 .ifPresent(user -> {
                     throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
                 });
+        // 비밀번호와 비밀번호 확인 일치 여부 검증
+        if (!authSignUpDto.password().equals(authSignUpDto.passwordConfirm())) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
         // 유저 생성, 패스워드 암호화
         userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password())));
     }
