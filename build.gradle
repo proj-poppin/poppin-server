@@ -30,6 +30,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	// security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	// Validation
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

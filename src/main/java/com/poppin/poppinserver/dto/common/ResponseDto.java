@@ -1,12 +1,11 @@
 package com.poppin.poppinserver.dto.common;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import io.micrometer.common.lang.Nullable;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -28,7 +27,7 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
         return new ResponseDto<>(HttpStatus.CREATED, true, data, null);
     }
 
-    public static ResponseDto<Object> fail(final HandlerMethodValidationException e) { //실패한 경우
+    public static ResponseDto<Object> fail(final HandlerMethodValidationException e) {
         return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.INVALID_PARAMETER));
     }
 
