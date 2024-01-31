@@ -29,7 +29,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
     @Column(name = "created_at", nullable = false)
@@ -84,7 +84,7 @@ public class User {
                 .eLoginProvider(ELoginProvider.DEFAULT)
                 .eUserRole(EUserRole.USER)
                 .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
-                .agreedToServiceTerms(authSignUpDto.agreedToPrivacyPolicy())
+                .agreedToServiceTerms(authSignUpDto.agreedToServiceTerms())
                 .agreedToGPS(false)
                 .build();
     }
