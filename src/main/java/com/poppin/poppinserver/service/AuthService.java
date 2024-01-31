@@ -16,7 +16,7 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void authSignUp(AuthSignUpDto authSignUpDto) {
-        // 유저 중복 확인
+        // 유저 이메일 중복 확인
         userRepository.findByEmail(authSignUpDto.email())
                 .ifPresent(user -> {
                     throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
@@ -25,6 +25,11 @@ public class AuthService {
         if (!authSignUpDto.password().equals(authSignUpDto.passwordConfirm())) {
             throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
         }
+        // 유저 닉네임 중복 확인
+        userRepository.findByNickname(authSignUpDto.nickname())
+                .ifPresent(user -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
+                });
         // 유저 생성, 패스워드 암호화
         userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password())));
     }
