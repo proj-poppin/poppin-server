@@ -16,7 +16,7 @@ public record AuthSignUpDto (
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$", message = "올바른 비밀번호 형식이 아닙니다.")
         String password,
 
-        @NotBlank
+        @NotBlank(message = "비밀번호 확인을 입력하세요.")
         String passwordConfirm,
 
         // 한글/영문 1자 이상 10자 이하(공백 포함), 공백만 입력 불가
@@ -26,10 +26,10 @@ public record AuthSignUpDto (
         String nickname,
 
         // 개인정보 보호정책 동의 여부
-        @NotNull
+        @NotNull(message = "개인정보 보호정책 동의가 필요합니다.")
         Boolean agreedToPrivacyPolicy,
 
         // 서비스 이용 약관
-        @NotNull
+        @NotNull(message = "서비스 이용 약관 동의가 필요합니다.")
         Boolean agreedToServiceTerms
 ) { }
