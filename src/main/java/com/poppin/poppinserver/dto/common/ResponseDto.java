@@ -20,6 +20,8 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
                              @Nullable ExceptionDto error) {
 
     //static 으로 인한 공용 사용 가능
+
+    //성공시
     public static <T> ResponseDto<T> ok(@Nullable T data) { //성공
         return new ResponseDto<T>(HttpStatus.OK, true, data, null);
     }
@@ -28,6 +30,7 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
         return new ResponseDto<>(HttpStatus.CREATED, true, data, null);
     }
 
+    //실패시
     public static ResponseDto<Object> fail(final HandlerMethodValidationException e) { //실패한 경우
         return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.INVALID_PARAMETER));
     }
