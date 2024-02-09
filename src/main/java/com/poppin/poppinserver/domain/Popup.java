@@ -9,6 +9,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,10 +22,6 @@ public class Popup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interested_users_id")
-    private User interestedUser;
 
     @Column(name = "poster_url")
     private String posterUrl;
@@ -78,4 +76,7 @@ public class Popup {
 
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
+
+    @OneToMany(mappedBy = "popup")
+    private Set<Intereste> interestes = new HashSet<>();
 }
