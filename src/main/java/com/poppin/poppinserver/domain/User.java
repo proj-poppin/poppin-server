@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -57,6 +59,9 @@ public class User {
 
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Intereste> interestes = new HashSet<>();
 
     @Builder
     public User(String email, String password, String nickname,
