@@ -1,4 +1,4 @@
-# popin-server
+# poppin-server
 프로젝트-팝핀 server Repository입니다. 
 
 
@@ -20,6 +20,20 @@
 |Rename|파일 혹은 폴더명을 수정하거나 옮기는 작업만인 경우|
 |Remove|파일을 삭제하는 작업만 수행한 경우|
 
+### PR Convetion
+
+| 아이콘 | 코드                       | 설명                     |
+| ------ | -------------------------- | ------------------------ |
+| 🎨     | :art                       | 코드의 구조/형태 개선    |
+| ⚡️    | :zap                       | 성능 개선                |
+| 🔥     | :fire                      | 코드/파일 삭제           |
+| 🐛     | :bug                       | 버그 수정                |
+| 🚑     | :ambulance                 | 긴급 수정                |
+| ✨     | :sparkles                  | 새 기능                  |
+| ⏪     | :rewind                    | 변경 내용 되돌리기       |
+| 🔀     | :twisted_rightwards_arrows | 브랜치 합병              |
+| 💡     | :bulb                      | 주석 추가/수정           |
+| 🗃      | :card_file_box             | 데이터베이스 관련 수정   |
 
 ## TEAM MEMBER
 |이름|이메일|학과|
