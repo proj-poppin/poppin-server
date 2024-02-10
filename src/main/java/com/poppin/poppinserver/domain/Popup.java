@@ -81,7 +81,7 @@ public class Popup {
     private String category;
 
     @Column(name = "operation_status", nullable = false)
-    private String operationStatus;
+    private String operationStatus; // 프로시저나 배치를 통한 동기화
 
     @OneToMany(mappedBy = "popup")
     private Set<Intereste> interestes = new HashSet<>();
@@ -89,8 +89,7 @@ public class Popup {
     @Builder
     public Popup(String posterUrl, String name, String introduce,
                  String location, Integer entranceFee, Integer availableAge,
-                 Boolean parkingAvailable, Integer visiterCnt, Integer reopenDemandCnt,
-                 Integer interestCnt, Integer viewCnt, LocalDateTime createdAt,
+                 Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, String category, String operationStatus) {
         this.posterUrl = posterUrl;
@@ -100,11 +99,12 @@ public class Popup {
         this.entranceFee = entranceFee;
         this.availableAge = availableAge;
         this.parkingAvailable = parkingAvailable;
-        this.visiterCnt = visiterCnt;
-        this.reopenDemandCnt = reopenDemandCnt;
-        this.interestCnt = interestCnt;
-        this.viewCnt = viewCnt;
-        this.createdAt = LocalDateTime.now();;
+        this.visiterCnt = 0;
+        this.reopenDemandCnt = 0;
+        this.interestCnt = 0;
+        this.viewCnt = 0;
+        this.createdAt = LocalDateTime.now();
+        this.editedAt = LocalDateTime.now();
         this.openDate = openDate;
         this.closeDate = closeDate;
         this.openTime = openTime;
