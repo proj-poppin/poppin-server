@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.Auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

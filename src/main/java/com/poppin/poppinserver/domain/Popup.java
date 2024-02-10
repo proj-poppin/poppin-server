@@ -2,6 +2,7 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -59,6 +60,9 @@ public class Popup {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "edited_at", nullable = false)
+    private LocalDateTime editedAt;
+
     @Column(name = "open_date", nullable = false)
     private LocalDate openDate;
 
@@ -79,4 +83,31 @@ public class Popup {
 
     @OneToMany(mappedBy = "popup")
     private Set<Intereste> interestes = new HashSet<>();
+
+    @Builder
+    public Popup(String posterUrl, String name, String introduce,
+                 String location, Integer entranceFee, Integer availableAge,
+                 Boolean parkingAvailable,
+                 LocalDate openDate, LocalDate closeDate, LocalTime openTime,
+                 LocalTime closeTime, String category, String operationStatus) {
+        this.posterUrl = posterUrl;
+        this.name = name;
+        this.introduce = introduce;
+        this.location = location;
+        this.entranceFee = entranceFee;
+        this.availableAge = availableAge;
+        this.parkingAvailable = parkingAvailable;
+        this.visiterCnt = 0; // 방문하기 버튼 api 동기화
+        this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
+        this.interestCnt = 0; // 관심등록 api 동기화
+        this.viewCnt = 0; // 상세 조회시 자동 ++
+        this.createdAt = LocalDateTime.now();
+        this.editedAt = LocalDateTime.now();
+        this.openDate = openDate;
+        this.closeDate = closeDate;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.category = category;
+        this.operationStatus = operationStatus; // 내부 동기화
+    }
 }
