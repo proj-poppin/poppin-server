@@ -1,7 +1,5 @@
 package com.poppin.poppinserver.domain;
 
-import com.poppin.poppinserver.type.ELoginProvider;
-import com.poppin.poppinserver.type.EUserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -81,7 +79,7 @@ public class Popup {
     private String category;
 
     @Column(name = "operation_status", nullable = false)
-    private String operationStatus; // 프로시저나 배치를 통한 동기화
+    private String operationStatus;
 
     @OneToMany(mappedBy = "popup")
     private Set<Intereste> interestes = new HashSet<>();
@@ -99,10 +97,10 @@ public class Popup {
         this.entranceFee = entranceFee;
         this.availableAge = availableAge;
         this.parkingAvailable = parkingAvailable;
-        this.visiterCnt = 0;
-        this.reopenDemandCnt = 0;
-        this.interestCnt = 0;
-        this.viewCnt = 0;
+        this.visiterCnt = 0; // 방문하기 버튼 api 동기화
+        this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
+        this.interestCnt = 0; // 관심등록 api 동기화
+        this.viewCnt = 0; // 상세 조회시 자동 ++
         this.createdAt = LocalDateTime.now();
         this.editedAt = LocalDateTime.now();
         this.openDate = openDate;
@@ -110,6 +108,6 @@ public class Popup {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.category = category;
-        this.operationStatus = operationStatus;
+        this.operationStatus = operationStatus; // 내부 동기화
     }
 }
