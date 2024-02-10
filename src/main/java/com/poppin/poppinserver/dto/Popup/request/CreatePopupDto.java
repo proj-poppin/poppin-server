@@ -2,16 +2,15 @@ package com.poppin.poppinserver.dto.Popup.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CreatePopupDto(
-        String posterUrl,
+        // String posterUrl,
+
         @NotNull
         String name,
         @NotNull

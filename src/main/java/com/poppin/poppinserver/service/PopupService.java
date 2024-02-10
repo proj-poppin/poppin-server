@@ -26,7 +26,7 @@ public class PopupService {
                 .openTime(createPopupDto.openTime())
                 .operationStatus(createPopupDto.operationStatus())
                 .parkingAvailable(createPopupDto.parkingAvailable())
-                .posterUrl(createPopupDto.posterUrl())
+                //.posterUrl(createPopupDto.posterUrl())
                 .build();
 
         return PopupDto.fromEntity(popupRepository.save(popup));
