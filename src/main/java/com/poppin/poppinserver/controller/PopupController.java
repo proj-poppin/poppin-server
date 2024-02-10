@@ -16,7 +16,7 @@ public class PopupController {
     private final PopupService popupService;
     @PostMapping("/create-popup")
     public ResponseDto<?> createPopup(@RequestBody CreatePopupDto createPopupDto){
-        return ResponseDto.ok(popupService.);
+        return ResponseDto.ok(popupService.createPopup(createPopupDto));
     }
 
 //    @GetMapping("/hot-list") // 인기 팝업 목록 조회
