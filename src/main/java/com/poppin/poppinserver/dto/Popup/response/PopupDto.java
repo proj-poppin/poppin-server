@@ -22,14 +22,14 @@ public record PopupDto(
         Boolean parkingAvailable,
         Integer visiterCnt,
         Integer reopenDemandCnt,
-        Integer interestCnt,
+        Integer interesteCnt,
         Integer viewCnt,
-        LocalDateTime createdAt,
-        LocalDateTime editedAt,
-        LocalDate openDate,
-        LocalDate closeDate,
-        LocalTime openTime,
-        LocalTime closeTime,
+        String createdAt,
+        String editedAt,
+        String openDate,
+        String closeDate,
+        String openTime,
+        String closeTime,
         String category,
         String operationStatus
 ) {
@@ -45,14 +45,14 @@ public record PopupDto(
                 .parkingAvailable(popup.getParkingAvailable())
                 .visiterCnt(popup.getVisiterCnt())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
-                .interestCnt(popup.getInterestCnt())
+                .interesteCnt(popup.getInteresteCnt())
                 .viewCnt(popup.getViewCnt())
-                .createdAt(popup.getCreatedAt())
-                .editedAt(popup.getEditedAt())
-                .openDate(popup.getOpenDate())
-                .closeDate(popup.getCloseDate())
-                .openTime(popup.getOpenTime())
-                .closeTime(popup.getCloseTime())
+                .createdAt(popup.getCreatedAt().toString())
+                .editedAt(popup.getEditedAt().toString())
+                .openDate(popup.getOpenDate().toString())
+                .closeDate(popup.getCloseDate().toString())
+                .openTime(popup.getOpenTime().toString())
+                .closeTime(popup.getCloseTime().toString())
                 .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
                 .build();

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class PopupController {
     private final PopupService popupService;
 
-    @PostMapping("/create-popup")
+    @PostMapping("/create-popup") // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
     public ResponseDto<?> createPopup(@RequestBody @Valid CreatePopupDto createPopupDto){
         return ResponseDto.ok(popupService.createPopup(createPopupDto));
     }

@@ -52,7 +52,7 @@ public class Popup {
     private Integer reopenDemandCnt;
 
     @Column(name = "interest_cnt", nullable = false)
-    private Integer interestCnt;
+    private Integer interesteCnt;
 
     @Column(name = "view_cnt", nullable = false)
     private Integer viewCnt;
@@ -99,7 +99,7 @@ public class Popup {
         this.parkingAvailable = parkingAvailable;
         this.visiterCnt = 0; // 방문하기 버튼 api 동기화
         this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
-        this.interestCnt = 0; // 관심등록 api 동기화
+        this.interesteCnt = 0; // 관심등록 api 동기화
         this.viewCnt = 0; // 상세 조회시 자동 ++
         this.createdAt = LocalDateTime.now();
         this.editedAt = LocalDateTime.now();
