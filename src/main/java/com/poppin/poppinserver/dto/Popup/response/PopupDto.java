@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.Popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.poppin.poppinserver.domain.Popup;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -32,16 +33,30 @@ public record PopupDto(
         String category,
         String operationStatus
 ) {
-    public static PopupDto fromEntity(Letter letter){
+    public static PopupDto fromEntity(Popup popup){
         PopupDto popupDto =
                 PopupDto.builder()
-                        .title(letter.getTitle())
-                        .content(letter.getContent())
-                        .created_date(letter.getCreatedDate().toString())
-                        .sender_id(letter.getSender().getId())
-                        .recipient_id(letter.getRecipient().getId())
-                        .letter_id(letter.getId())
+                        .id(popup.getId())
+                        .posterUrl(popup.getPosterUrl())
+                        .name(popup.getName())
+                        .introduce(popup.getIntroduce())
+                        .location(popup.getLocation())
+                        .entranceFee(popup.getEntranceFee())
+                        .availableAge(popup.getEntranceFee())
+                        .parkingAvailable(popup.getParkingAvailable())
+                        .visiterCnt(popup.getVisiterCnt())
+                        .reopenDemandCnt(popup.getReopenDemandCnt())
+                        .interestCnt(popup.getInterestCnt())
+                        .viewCnt(popup.getViewCnt())
+                        .createdAt(popup.getCreatedAt())
+                        .editedAt(popup.getEditedAt())
+                        .openDate(popup.getOpenDate())
+                        .closeDate(popup.getCloseDate())
+                        .openTime(popup.getOpenTime())
+                        .closeTime(popup.getCloseTime())
+                        .category(popup.getCategory())
+                        .operationStatus(popup.getOperationStatus())
                         .build();
-        return letterResponseDto;
+        return popupDto;
     }
 }
