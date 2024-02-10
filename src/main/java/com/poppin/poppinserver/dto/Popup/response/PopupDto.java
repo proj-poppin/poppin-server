@@ -34,29 +34,27 @@ public record PopupDto(
         String operationStatus
 ) {
     public static PopupDto fromEntity(Popup popup){
-        PopupDto popupDto =
-                PopupDto.builder()
-                        .id(popup.getId())
-                        .posterUrl(popup.getPosterUrl())
-                        .name(popup.getName())
-                        .introduce(popup.getIntroduce())
-                        .location(popup.getLocation())
-                        .entranceFee(popup.getEntranceFee())
-                        .availableAge(popup.getEntranceFee())
-                        .parkingAvailable(popup.getParkingAvailable())
-                        .visiterCnt(popup.getVisiterCnt())
-                        .reopenDemandCnt(popup.getReopenDemandCnt())
-                        .interestCnt(popup.getInterestCnt())
-                        .viewCnt(popup.getViewCnt())
-                        .createdAt(popup.getCreatedAt())
-                        .editedAt(popup.getEditedAt())
-                        .openDate(popup.getOpenDate())
-                        .closeDate(popup.getCloseDate())
-                        .openTime(popup.getOpenTime())
-                        .closeTime(popup.getCloseTime())
-                        .category(popup.getCategory())
-                        .operationStatus(popup.getOperationStatus())
-                        .build();
-        return popupDto;
+        return PopupDto.builder()
+                .id(popup.getId())
+                .posterUrl(popup.getPosterUrl())
+                .name(popup.getName())
+                .introduce(popup.getIntroduce())
+                .location(popup.getLocation())
+                .entranceFee(popup.getEntranceFee())
+                .availableAge(popup.getEntranceFee())
+                .parkingAvailable(popup.getParkingAvailable())
+                .visiterCnt(popup.getVisiterCnt())
+                .reopenDemandCnt(popup.getReopenDemandCnt())
+                .interestCnt(popup.getInterestCnt())
+                .viewCnt(popup.getViewCnt())
+                .createdAt(popup.getCreatedAt())
+                .editedAt(popup.getEditedAt())
+                .openDate(popup.getOpenDate())
+                .closeDate(popup.getCloseDate())
+                .openTime(popup.getOpenTime())
+                .closeTime(popup.getCloseTime())
+                .category(popup.getCategory())
+                .operationStatus(popup.getOperationStatus())
+                .build();
     }
 }

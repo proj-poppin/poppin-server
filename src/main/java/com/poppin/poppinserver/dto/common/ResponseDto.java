@@ -7,6 +7,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -49,5 +50,9 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
 
     public static ResponseDto<Object> fail(final MissingServletRequestParameterException e) {
         return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.MISSING_REQUEST_PARAMETER));
+    }
+
+    public static ResponseDto<Object> fail(final HttpMessageNotReadableException e) {
+        return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.MISSING_REQUEST_BODY));
     }
 }
