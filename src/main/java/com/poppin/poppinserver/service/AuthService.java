@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.Auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.UserRepository;

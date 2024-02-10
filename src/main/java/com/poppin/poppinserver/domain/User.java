@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.domain;
 
-import com.poppin.poppinserver.dto.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.Auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.type.ELoginProvider;
 import com.poppin.poppinserver.type.EUserRole;
 import jakarta.persistence.*;
