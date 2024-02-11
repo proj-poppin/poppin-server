@@ -6,8 +6,11 @@ import com.poppin.poppinserver.dto.Popup.response.PopupDto;
 import com.poppin.poppinserver.dto.Popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.repository.PopupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,5 +38,13 @@ public class PopupService {
         return PopupDto.fromEntity(popupRepository.save(popup));
     }
 
-    public List<PopupSummaryDto> read
+    public List<PopupSummaryDto> readHotList(){
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDateTime startOfDay = yesterday.atStartOfDay();
+        LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
+
+        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, PageRequest.of(0, 5));
+
+        return PopupSummaryDto.fromEntityList(popups);
+    }
 }

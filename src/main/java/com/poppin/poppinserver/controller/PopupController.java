@@ -21,8 +21,5 @@ public class PopupController {
         return ResponseDto.ok(popupService.createPopup(createPopupDto));
     }
 
-//    @GetMapping("/hot-list") // 인기 팝업 목록 조회
-//    public ResponseDto<?> readHotList(){
-//        return ResponseDto.ok();
-//    }
+
 }
