@@ -3,9 +3,12 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.Popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.Popup.response.PopupDto;
+import com.poppin.poppinserver.dto.Popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.repository.PopupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +35,5 @@ public class PopupService {
         return PopupDto.fromEntity(popupRepository.save(popup));
     }
 
-
+    public List<PopupSummaryDto> read
 }
