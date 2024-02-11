@@ -1,30 +1,32 @@
 package com.poppin.poppinserver.service;
 
+import com.poppin.poppinserver.domain.Intereste;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.Intereste.response.AddInteresteDto;
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class InteresteService {
     private final UserRepository userRepository;
-    pri
+    private final PopupRepository popupRepository;
 
     public AddInteresteDto userAddIntereste(Long userId, Long popupId){
-        // 1. 유저와 가게 엔티티 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Popup popup = po
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        // 2. 즐겨찾기 엔티티 생성
-        Favorite favorite = new Favorite();
-        favorite.setUser(user);
-        favorite.setStore(store);
+        Intereste intereste = Intereste.builder()
+                .user(user)
+                .popup(popup)
+                .build();
 
         // 3. 즐겨찾기 저장
         favoriteRepository.save(favorite);

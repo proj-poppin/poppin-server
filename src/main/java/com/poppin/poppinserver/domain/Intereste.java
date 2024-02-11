@@ -2,11 +2,14 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -59,5 +62,12 @@ public class Intereste {
         public int hashCode() {
             return Objects.hash(userId, popupId);
         }
+    }
+
+    @Builder
+    public Intereste(User user, Popup popup) {
+        this.user = user;
+        this.popup = popup;
+        this.createdAt = LocalDateTime.now();
     }
 }
