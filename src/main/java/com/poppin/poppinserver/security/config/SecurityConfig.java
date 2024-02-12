@@ -3,6 +3,8 @@ package com.poppin.poppinserver.security.config;
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.security.filter.JwtExceptionFilter;
+import com.poppin.poppinserver.security.handler.CustomSignOutProcessHandler;
+import com.poppin.poppinserver.security.handler.CustomSignOutResultHandler;
 import com.poppin.poppinserver.security.handler.DefaultSignInFailureHandler;
 import com.poppin.poppinserver.security.handler.DefaultSignInSuccessHandler;
 import com.poppin.poppinserver.security.provider.JwtAuthenticationProvider;
@@ -28,6 +30,8 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomSignOutProcessHandler customSignOutProcessHandler;
+    private final CustomSignOutResultHandler customSignOutResultHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
