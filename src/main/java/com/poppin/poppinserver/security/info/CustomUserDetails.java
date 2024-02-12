@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.security.info;
 
+import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.type.EUserRole;
 import lombok.AccessLevel;
@@ -19,11 +20,13 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private final String email;
     private final String password;
+
+    @Getter
     private final EUserRole role;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public static CustomUserDetails create(User user) {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(Constant.ROLE_PREFIX + user.getRole());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
         return CustomUserDetails.builder()
