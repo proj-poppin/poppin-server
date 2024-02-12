@@ -3,6 +3,8 @@ package com.poppin.poppinserver.security.config;
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.security.filter.JwtExceptionFilter;
+import com.poppin.poppinserver.security.handler.DefaultSignInFailureHandler;
+import com.poppin.poppinserver.security.handler.DefaultSignInSuccessHandler;
 import com.poppin.poppinserver.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.security.service.CustomUserDetailsService;
 import com.poppin.poppinserver.util.JwtUtil;
