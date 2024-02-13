@@ -47,4 +47,11 @@ public class PopupService {
 
         return PopupSummaryDto.fromEntityList(popups);
     }
+
+    public List<PopupSummaryDto> readNewList(){
+
+        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, PageRequest.of(0, 5));
+
+        return PopupSummaryDto.fromEntityList(popups);
+    }
 }
