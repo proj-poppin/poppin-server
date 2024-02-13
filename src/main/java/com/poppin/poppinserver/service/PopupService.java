@@ -1,9 +1,9 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.dto.Popup.request.CreatePopupDto;
-import com.poppin.poppinserver.dto.Popup.response.PopupDto;
-import com.poppin.poppinserver.dto.Popup.response.PopupSummaryDto;
+import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
+import com.poppin.poppinserver.dto.popup.response.PopupDto;
+import com.poppin.poppinserver.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.repository.PopupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

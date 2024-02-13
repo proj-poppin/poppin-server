@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.controller;
 
-import com.poppin.poppinserver.dto.Popup.request.CreatePopupDto;
+import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.PopupService;
 import jakarta.validation.Valid;

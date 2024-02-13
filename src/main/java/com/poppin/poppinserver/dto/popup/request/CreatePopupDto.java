@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.dto.Popup.request;
+package com.poppin.poppinserver.dto.popup.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

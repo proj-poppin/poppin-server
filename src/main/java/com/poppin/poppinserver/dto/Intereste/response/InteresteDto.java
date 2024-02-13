@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Intereste;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.Popup.response.PopupDto;
+import com.poppin.poppinserver.dto.popup.response.PopupDto;
 import com.poppin.poppinserver.dto.User.respnse.UserDto;
 import lombok.Builder;
 
