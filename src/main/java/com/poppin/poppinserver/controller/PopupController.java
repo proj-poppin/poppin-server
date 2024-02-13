@@ -24,4 +24,9 @@ public class PopupController {
     public ResponseDto<?> readHotList(){
         return ResponseDto.ok(popupService.readHotList());
     }
+
+    @GetMapping("/new-list") // 새로 오픈 팝업 목록 조회
+    public ResponseDto<?> readNewList(){
+        return ResponseDto.ok(popupService.readNewList());
+    }
 }

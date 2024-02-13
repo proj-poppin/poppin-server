@@ -50,7 +50,7 @@ public class PopupService {
 
     public List<PopupSummaryDto> readNewList(){
 
-        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, PageRequest.of(0, 5));
+        List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
     }
