@@ -3,6 +3,7 @@ package com.poppin.poppinserver.exception;
 
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -40,6 +41,13 @@ public class GlobalExceptionHandler {
     // 필수 파라미터가 누락되었을 때 발생하는 예외
     @ExceptionHandler(value = {MissingServletRequestParameterException.class})
     public ResponseDto<?> handleArgumentNotValidException(MissingServletRequestParameterException e) {
+        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MethodArgumentNotValidException : {}", e.getMessage());
+        return ResponseDto.fail(e);
+    }
+
+    // post 요청 body가 없을 때 발생하는 에러
+    @ExceptionHandler(value = {HttpMessageNotReadableException.class})
+    public ResponseDto<?> handleMessageNotReadableException(HttpMessageNotReadableException e) {
         log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MethodArgumentNotValidException : {}", e.getMessage());
         return ResponseDto.fail(e);
     }

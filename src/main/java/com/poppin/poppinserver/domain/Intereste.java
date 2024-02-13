@@ -2,10 +2,14 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -27,7 +31,11 @@ public class Intereste {
     @JoinColumn(name = "popup_id", referencedColumnName = "id")
     private Popup popup;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     // InteresteId 정적 중첩 클래스 정의
+    // 복합키 생성자
     @Embeddable
     @Getter
     public static class InteresteId implements Serializable {
@@ -54,5 +62,13 @@ public class Intereste {
         public int hashCode() {
             return Objects.hash(userId, popupId);
         }
+    }
+
+    @Builder
+    public Intereste(User user, Popup popup) {
+        this.id = new InteresteId(user.getId(), popup.getId());
+        this.user = user;
+        this.popup = popup;
+        this.createdAt = LocalDateTime.now();
     }
 }

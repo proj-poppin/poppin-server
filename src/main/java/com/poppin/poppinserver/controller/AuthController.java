@@ -22,4 +22,6 @@ public class AuthController {
         log.info("authSignUpDto : " + authSignUpDto);
         return ResponseDto.created(null);
     }
+
+    // 유저 관심등록 api
 }
