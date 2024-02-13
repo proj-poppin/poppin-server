@@ -16,10 +16,10 @@ on:
 #본인이 설정한 값을 여기서 채워넣기
 #리전,버킷 이름, CodeDeploy앱 이름, CodeDeploy배포 그룹 이름
 env:
-  AWS_REGION: ${{ seccrets.AWS_REGION }}
-  S3_BUCKET_NAME:  ${{ seccrets. S3_BUCKET_NAME }}
-  CODE_DEPLOY_APPLICATION_NAME:  ${{ seccrets. CODE_DEPLOY_APPLICATION_NAME }}
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME:  ${{ seccrets. CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  S3_BUCKET_NAME:  ${{ secrets.S3_BUCKET_NAME }}
+  CODE_DEPLOY_APPLICATION_NAME:  ${{ secrets.CODE_DEPLOY_APPLICATION_NAME }}
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME:  ${{ secrets.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
 
 jobs:
   build:
