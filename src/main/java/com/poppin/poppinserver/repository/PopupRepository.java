@@ -24,4 +24,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.openDate DESC, p.name ")
     List<Popup> findNewOpenPopupByAll(Pageable pageable);
+
+    @Query("SELECT p FROM Popup p " +
+            "WHERE p.operationStatus = 'OPERATING' " +
+            "ORDER BY p.closeDate, p.name ")
+    List<Popup> findClosingPopupByAll(Pageable pageable);
 }

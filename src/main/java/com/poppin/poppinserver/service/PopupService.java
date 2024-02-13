@@ -54,4 +54,11 @@ public class PopupService {
 
         return PopupSummaryDto.fromEntityList(popups);
     }
+
+    public List<PopupSummaryDto> readClosingList(){
+
+        List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
+
+        return PopupSummaryDto.fromEntityList(popups);
+    }
 }
