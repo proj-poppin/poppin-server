@@ -19,7 +19,7 @@ public class InteresteController {
     private final InteresteService interesteService;
 
     @PostMapping("/add-intereste")
-    public ResponseDto<?> addIntereste(@RequestBody @Valid AddInteresteDto) {
-        return ResponseDto.ok(interesteService.userAddIntereste(AddInteresteDto));
+    public ResponseDto<?> addIntereste(@RequestBody @Valid AddInteresteDto addInteresteDto){
+        return ResponseDto.ok(interesteService.userAddIntereste(addInteresteDto));
     }
 }

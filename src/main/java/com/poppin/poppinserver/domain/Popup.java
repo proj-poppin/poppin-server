@@ -110,4 +110,8 @@ public class Popup {
         this.category = category;
         this.operationStatus = operationStatus; // 내부 동기화
     }
+
+    public void addInteresteCnt(){
+        this.interesteCnt += this.interesteCnt;
+    }
 }

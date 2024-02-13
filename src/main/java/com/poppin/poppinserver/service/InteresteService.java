@@ -10,17 +10,25 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.InteresteRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class InteresteService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final InteresteRepository interesteRepository;
 
+    @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InteresteDto userAddIntereste(AddInteresteDto addInteresteDto){
+        //관심등록 중복검사
+        interesteRepository.findByUserIdAndPopupId(1L, addInteresteDto.popupId())
+                .ifPresent(() -> new CommonException(ErrorCode.));
+
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(addInteresteDto.popupId())
@@ -31,10 +39,12 @@ public class InteresteService {
                 .popup(popup)
                 .build();
 
+        log.info(intereste.toString());
         interesteRepository.save(intereste);
 
         user.getInterestes().add(intereste);
         popup.getInterestes().add(intereste);
+        popup.addInteresteCnt();
 
         return InteresteDto.fromEntity(intereste,user,popup);
     }

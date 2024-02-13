@@ -66,6 +66,7 @@ public class Intereste {
 
     @Builder
     public Intereste(User user, Popup popup) {
+        this.id = new InteresteId(user.getId(), popup.getId());
         this.user = user;
         this.popup = popup;
         this.createdAt = LocalDateTime.now();

@@ -19,8 +19,7 @@ public record UserDto(
     Boolean agreedToPrivacyPolicy,
     Boolean agreedToServiceTerms,
     Boolean agreedToGPS,
-    String createdAt,
-    Set<Intereste> interestes
+    String createdAt
 ) {
     public static UserDto fromEntity(User user){
         return UserDto.builder()
@@ -33,7 +32,6 @@ public record UserDto(
                 .agreedToServiceTerms(user.getAgreedToServiceTerms())
                 .agreedToGPS(user.getAgreedToGPS())
                 .createdAt(user.getCreatedAt().toString())
-                .interestes(user.getInterestes())
                 .build();
     }
 }
