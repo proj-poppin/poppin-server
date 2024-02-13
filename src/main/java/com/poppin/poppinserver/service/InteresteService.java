@@ -25,9 +25,11 @@ public class InteresteService {
 
     @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InteresteDto userAddIntereste(AddInteresteDto addInteresteDto){
-        //관심등록 중복검사
+        //중복검사
         interesteRepository.findByUserIdAndPopupId(1L, addInteresteDto.popupId())
-                .ifPresent(() -> new CommonException(ErrorCode.));
+                .ifPresent(intereste -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_INTERESTE);
+                });
 
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -39,7 +41,6 @@ public class InteresteService {
                 .popup(popup)
                 .build();
 
-        log.info(intereste.toString());
         interesteRepository.save(intereste);
 
         user.getInterestes().add(intereste);
