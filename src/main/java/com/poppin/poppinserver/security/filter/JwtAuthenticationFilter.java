@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getRequestURI().startsWith("/api/v1/auth/sign-in");
+        return Constant.NO_NEED_AUTH_URLS.stream().anyMatch(request.getRequestURI()::startsWith);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
         JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
                 .email(claims.get(Constant.USER_EMAIL_CLAIM_NAME, String.class))
-                .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIN_NAME, String.class)))
+                .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
                 .build();
 
         JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.email(), jwtUserInfo.role());
