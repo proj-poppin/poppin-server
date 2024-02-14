@@ -29,17 +29,17 @@ public class JwtUtil implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);   // secret 값을 디코딩
-        this.key = Keys.hmacShaKeyFor(keyBytes);    // 디코딩된 secret 값을 key로 변환, HS 방식
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String createToken(String email, EUserRole role, Integer expirationPeriod) {
         Claims claims = Jwts.claims();
         claims.put(Constant.USER_EMAIL_CLAIM_NAME, email);
-        claims.put(Constant.USER_ROLE_CLAIN_NAME, role.toString());
+        claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
 
         Date now = new Date();
-        Date tokenValidity = new Date(now.getTime() + this.accessTokenExpirationPeriod);
+        Date tokenValidity = new Date(now.getTime() + expirationPeriod);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -52,7 +52,7 @@ public class JwtUtil implements InitializingBean {
     public String createToken(Authentication authentication, Integer expirationPeriod) {
         Claims claims = Jwts.claims();
         claims.put(Constant.USER_EMAIL_CLAIM_NAME, authentication.getPrincipal());
-        claims.put(Constant.USER_ROLE_CLAIN_NAME, authentication.getCredentials());
+        claims.put(Constant.USER_ROLE_CLAIM_NAME, authentication.getCredentials());
 
         Date now = new Date();
         Date tokenValidity = new Date(now.getTime() + expirationPeriod);    // 토큰의 만료시간 설정

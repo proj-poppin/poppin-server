@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
         JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
                 .email(claims.get(Constant.USER_EMAIL_CLAIM_NAME, String.class))
-                .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIN_NAME, String.class)))
+                .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
                 .build();
 
         JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.email(), jwtUserInfo.role());
