@@ -69,8 +69,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           aws deploy create-deployment \
-          --application-name <AWS codeDeploy 애플리케이션 이름> \
-          --deployment-group-name <codeDeploy group 이름> \
+          --application-name poppin-cd-appl \
+          --deployment-group-name poppin-dg \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=<만들어 놓은 버킷 이름>,bundleType=zip,key=<자신이 만든 ZIP 파일 이름>.zip \
+          --s3-location bucket=poppin-public-test-001,bundleType=zip,key=poppin.zip \
           --region ${{ secrets.AWS_REGION }}
