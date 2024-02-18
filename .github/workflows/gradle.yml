@@ -23,10 +23,6 @@ jobs:
 
       - uses : actions/checkout@v3
       #1
-      # 해당 부분은 상당히 중요함 (글에서 부가설명)
-      # application.properties는 외부에 노출되면 안되므로 Actions가 빌드될때마다 해당 Repository의 Secret 설정을
-      # 이용하여서 설정 파일을 생성해줌 (github에 commit 되는게 아님!)
-      - run : touch ./src/main/resources/application.yml
       - run : echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
       - run : cat ./src/main/resources/application.yml
 
