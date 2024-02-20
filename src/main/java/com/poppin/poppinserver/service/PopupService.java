@@ -1,10 +1,16 @@
 package com.poppin.poppinserver.service;
 
+import com.poppin.poppinserver.domain.Intereste;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
+import com.poppin.poppinserver.dto.popup.response.InterestedPopupDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDto;
 import com.poppin.poppinserver.dto.popup.response.PopupSummaryDto;
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
+import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -12,11 +18,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class PopupService {
     private final PopupRepository popupRepository;
+    private final UserRepository userRepository;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto) {
         Popup popup = Popup.builder()
@@ -60,5 +68,14 @@ public class PopupService {
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
+    }
+
+    public List<InterestedPopupDto> readInterestedPopups(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        Set<Intereste> interestes = user.getInterestes();
+
+        return InterestedPopupDto.fromEntityList(interestes);
     }
 }

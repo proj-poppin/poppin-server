@@ -114,4 +114,8 @@ public class Popup {
     public void addInteresteCnt(){
         this.interesteCnt += this.interesteCnt;
     }
+
+    public void addIntereste(Intereste intereste){
+        this.interestes.add(intereste);
+    }
 }
