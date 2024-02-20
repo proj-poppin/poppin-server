@@ -98,4 +98,8 @@ public class User {
         this.isLogin = false;
         this.refreshToken = null;
     }
+
+    public void addIntereste(Intereste intereste){
+        this.interestes.add(intereste);
+    }
 }
