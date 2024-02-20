@@ -43,8 +43,8 @@ public class InteresteService {
 
         interesteRepository.save(intereste);
 
-        user.getInterestes().add(intereste);
-        popup.getInterestes().add(intereste);
+        user.addIntereste(intereste);
+        popup.addIntereste(intereste);
         popup.addInteresteCnt();
 
         return InteresteDto.fromEntity(intereste,user,popup);

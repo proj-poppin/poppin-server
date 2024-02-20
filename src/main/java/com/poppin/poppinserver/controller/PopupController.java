@@ -34,4 +34,10 @@ public class PopupController {
     public ResponseDto<?> readclosingList(){
         return ResponseDto.ok(popupService.readClosingList());
     }
+
+    @GetMapping("/interested-list") // 관심 팝업 목록 조회
+    public ResponseDto<?> readInterestedList() {
+        Long userId = 1L;
+        return ResponseDto.ok(popupService.readInterestedPopups(userId));
+    }
 }
