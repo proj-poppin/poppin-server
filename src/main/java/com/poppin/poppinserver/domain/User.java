@@ -34,6 +34,9 @@ public class User {
     @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
+    @Column(name = "birth_date", nullable = false)
+    private String birthDate;
+
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
 
@@ -64,13 +67,14 @@ public class User {
     private Set<Intereste> interestes = new HashSet<>();
 
     @Builder
-    public User(String email, String password, String nickname,
+    public User(String email, String password, String nickname, String birthDate,
                 ELoginProvider eLoginProvider, EUserRole eUserRole,
                 Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS)
     {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.birthDate = birthDate;
         this.provider = eLoginProvider;
         this.role = eUserRole;
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
@@ -81,12 +85,12 @@ public class User {
         this.refreshToken = null;
     }
 
-    public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword) {
+    public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
         return User.builder()
                 .email(authSignUpDto.email())
                 .password(encodedPassword)
                 .nickname(authSignUpDto.nickname())
-                .eLoginProvider(ELoginProvider.DEFAULT)
+                .eLoginProvider(eLoginProvider)
                 .eUserRole(EUserRole.USER)
                 .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
                 .agreedToServiceTerms(authSignUpDto.agreedToServiceTerms())
