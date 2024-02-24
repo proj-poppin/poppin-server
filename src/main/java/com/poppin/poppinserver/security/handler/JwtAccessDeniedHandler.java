@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.security.filter;
+package com.poppin.poppinserver.security.handler;
 
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.security.AbstractFailureResponse;
