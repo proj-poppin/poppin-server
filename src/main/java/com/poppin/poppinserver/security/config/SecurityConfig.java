@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .anyRequest().authenticated())
                 .formLogin(configurer ->
                         configurer
+                                .loginPage("/login")
                                 .loginProcessingUrl("/api/v1/auth/sign-in")
                                 .usernameParameter("email")
                                 .passwordParameter("password")
