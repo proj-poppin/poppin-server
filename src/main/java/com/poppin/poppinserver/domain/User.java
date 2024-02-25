@@ -90,6 +90,7 @@ public class User {
                 .email(authSignUpDto.email())
                 .password(encodedPassword)
                 .nickname(authSignUpDto.nickname())
+                .birthDate(authSignUpDto.birthDate())
                 .eLoginProvider(eLoginProvider)
                 .eUserRole(EUserRole.USER)
                 .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
