@@ -47,7 +47,6 @@ public class SecurityConfig {
                                 .anyRequest().authenticated())
                 .formLogin(configurer ->
                         configurer
-                                .loginPage("/login")
                                 .loginProcessingUrl("/api/v1/auth/sign-in")
                                 .usernameParameter("email")
                                 .passwordParameter("password")
@@ -56,7 +55,6 @@ public class SecurityConfig {
                 .logout(configurer ->
                         configurer
                                 .logoutUrl("/api/v1/auth/sign-out")
-                                //.logoutSuccessUrl("/")  // 로그아웃 성공 시 이동할 페이지
                                 .addLogoutHandler(customSignOutProcessHandler)
                                 .logoutSuccessHandler(customSignOutResultHandler)
                                 .deleteCookies(Constant.AUTHORIZATION_HEADER, Constant.REAUTHORIZATION))

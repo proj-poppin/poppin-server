@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ELoginProvider loginProvider;
 
     public void authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
@@ -33,6 +32,6 @@ public class AuthService {
                     throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
                 });
         // 유저 생성, 패스워드 암호화
-        userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()), loginProvider.DEFAULT));
+        userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()), ELoginProvider.DEFAULT));
     }
 }
