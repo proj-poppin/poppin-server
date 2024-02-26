@@ -118,4 +118,6 @@ public class Popup {
     public void addIntereste(Intereste intereste){
         this.interestes.add(intereste);
     }
+
+    public void updatePosterUrl(String url) {this.posterUrl = url;}
 }

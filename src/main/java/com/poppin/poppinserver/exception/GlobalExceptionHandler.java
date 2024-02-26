@@ -41,14 +41,14 @@ public class GlobalExceptionHandler {
     // 필수 파라미터가 누락되었을 때 발생하는 예외
     @ExceptionHandler(value = {MissingServletRequestParameterException.class})
     public ResponseDto<?> handleArgumentNotValidException(MissingServletRequestParameterException e) {
-        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MethodArgumentNotValidException : {}", e.getMessage());
+        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MissingServletRequestParameterException : {}", e.getMessage());
         return ResponseDto.fail(e);
     }
 
     // post 요청 body가 없을 때 발생하는 에러
     @ExceptionHandler(value = {HttpMessageNotReadableException.class})
     public ResponseDto<?> handleMessageNotReadableException(HttpMessageNotReadableException e) {
-        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MethodArgumentNotValidException : {}", e.getMessage());
+        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw HttpMessageNotReadableException : {}", e.getMessage());
         return ResponseDto.fail(e);
     }
 
