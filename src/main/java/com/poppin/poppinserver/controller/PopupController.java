@@ -17,6 +17,7 @@ public class PopupController {
 
     @PostMapping("/create-popup") // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
     public ResponseDto<?> createPopup(@RequestBody @Valid CreatePopupDto createPopupDto){
+        log.info("/create-popup");
         return ResponseDto.ok(popupService.createPopup(createPopupDto));
     }
 

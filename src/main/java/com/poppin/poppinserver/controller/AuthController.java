@@ -23,5 +23,4 @@ public class AuthController {
         return ResponseDto.created(null);
     }
 
-    // 유저 관심등록 api
 }
