@@ -14,6 +14,7 @@ import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class PopupService {
     private final PopupRepository popupRepository;
     private final UserRepository userRepository;
 
-    public PopupDto createPopup(CreatePopupDto createPopupDto) {
+    public PopupDto createPopup(CreatePopupDto createPopupDto, MultipartFile files) {
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
                 .availableAge(createPopupDto.availableAge())
@@ -42,6 +43,8 @@ public class PopupService {
                 .parkingAvailable(createPopupDto.parkingAvailable())
                 //.posterUrl(createPopupDto.posterUrl())
                 .build();
+
+        Long popupId = popup.getId();
 
         return PopupDto.fromEntity(popupRepository.save(popup));
     }

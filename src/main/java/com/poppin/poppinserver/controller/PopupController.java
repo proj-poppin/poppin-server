@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -16,9 +17,8 @@ public class PopupController {
     private final PopupService popupService;
 
     @PostMapping("/create-popup") // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
-    public ResponseDto<?> createPopup(@RequestBody @Valid CreatePopupDto createPopupDto){
-        log.info("/create-popup");
-        return ResponseDto.ok(popupService.createPopup(createPopupDto));
+    public ResponseDto<?> createPopup(@RequestBody @Valid CreatePopupDto createPopupDto, @RequestParam("files") MultipartFile files){
+        return ResponseDto.ok(popupService.createPopup(createPopupDto,files));
     }
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
