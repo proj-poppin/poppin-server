@@ -6,6 +6,7 @@ import com.poppin.poppinserver.service.PopupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,9 +19,10 @@ import java.util.List;
 public class PopupController {
     private final PopupService popupService;
 
-    @PostMapping("/create-popup") // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
+    @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
     public ResponseDto<?> createPopup(@RequestPart(value = "images", required=false) List<MultipartFile> images,
-                                      @RequestPart(value = "createPopupDto") CreatePopupDto createPopupDto){
+                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto){
+        log.info("controller.create_popup");
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images));
     }
 

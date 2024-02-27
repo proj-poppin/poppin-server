@@ -16,7 +16,7 @@ public class Constant {
             "/api/v1/popup/hot-list",   // 인기 팝업 목록 조회
             "/api/v1/popup/new-list",   // 새로 오픈 팝업 목록 조회
             "/api/v1/popup/closing-list",    // 종료 임박 팝업 목록 조회
-            "/api/v1/popup/create-popup", // 팝업 생성
+            "/api/v1/popup/create-popup", // 팝업 생성 ---- 임시
             "/"  // 루트
     );
 }

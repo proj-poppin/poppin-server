@@ -14,6 +14,7 @@ import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.PosterImageRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PopupService {
@@ -33,6 +35,8 @@ public class PopupService {
     private final S3Service s3Service;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
+        log.info("service.create_popup");
+        log.info(createPopupDto.toString());
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
@@ -51,8 +55,10 @@ public class PopupService {
 
         popup = popupRepository.save(popup);
 
+        log.info(popup.toString());
         // 팝업 이미지 처리 및 저장
-        if(images != null && !images.isEmpty()){
+        if(images != null){
+            log.info("images not empty");
             List<String> fileUrls = s3Service.upload(images, popup.getId());
 
             List<PosterImage> posterImages = new ArrayList<>();
@@ -66,7 +72,8 @@ public class PopupService {
             posterImageRepository.saveAll(posterImages);
             popup.updatePosterUrl(fileUrls.get(0));
         } else {
-            popup.updatePosterUrl(null);
+            log.info("images is empty");
+            popup.updatePosterUrl(null); // 기본 사진 url로 변경
         }
 
         popup = popupRepository.save(popup);
