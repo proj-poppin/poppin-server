@@ -19,4 +19,6 @@ public class Constant {
             "/api/v1/popup/create-popup", // 팝업 생성 ---- 임시
             "/"  // 루트
     );
+
+    public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";
 }

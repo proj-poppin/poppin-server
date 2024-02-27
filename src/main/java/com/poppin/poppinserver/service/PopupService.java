@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.poppin.poppinserver.constant.Constant.DEFAULT_POSTER;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -73,7 +75,7 @@ public class PopupService {
             popup.updatePosterUrl(fileUrls.get(0));
         } else {
             log.info("images is empty");
-            popup.updatePosterUrl(null); // 기본 사진 url로 변경
+            popup.updatePosterUrl(DEFAULT_POSTER); // 기본 사진
         }
 
         popup = popupRepository.save(popup);
