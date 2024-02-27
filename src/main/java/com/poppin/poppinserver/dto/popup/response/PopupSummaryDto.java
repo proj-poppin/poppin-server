@@ -28,7 +28,7 @@ public record PopupSummaryDto(
             PopupSummaryDto popupSummaryDto =
                     PopupSummaryDto.builder()
                             .id(popup.getId())
-                            .image_url("https://ifh.cc/v-szgh3Z") // 임시 url
+                            .image_url(popup.getPosterUrl()) // 임시 url
                             .name(popup.getName())
                             .introduce(popup.getIntroduce())
                             .build();
