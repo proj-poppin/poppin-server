@@ -50,7 +50,12 @@ public class S3Service {
 
     // 이미지파일명 중복 방지
     private String createFileName(String fileName, Long popupId) {
-        return (fileName+popupId).concat(getFileExtension(fileName));
+        // 파일 확장자 추출
+        String extension = getFileExtension(fileName);
+        // 파일 이름에서 확장자를 제외한 부분 추출
+        String baseName = fileName.substring(0, fileName.lastIndexOf("."));
+        // S3에 저장될 경로 구성: popupId 폴더 안에 원본 파일 이름으로 저장
+        return popupId + "/" + baseName + extension;
     }
 
     // 파일 유효성 검사
