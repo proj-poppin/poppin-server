@@ -32,6 +32,11 @@ public class PopupController {
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images));
     }
 
+    @GetMapping("/detail")
+    public ResponseDto<?> readDetail(@RequestParam("popup_id") Long popupId){
+        return ResponseDto.ok(popupService.readDetail(popupId));
+    }
+
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
     public ResponseDto<?> readHotList(){
         return ResponseDto.ok(popupService.readHotList());

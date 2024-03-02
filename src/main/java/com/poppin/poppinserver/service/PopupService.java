@@ -6,6 +6,7 @@ import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.response.InterestedPopupDto;
+import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDto;
 import com.poppin.poppinserver.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -75,6 +76,13 @@ public class PopupService {
         popup = popupRepository.save(popup);
 
         return PopupDto.fromEntity(popup);
+    }
+
+    public PopupDetailDto readDetail(Long popupId){
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        return PopupDetailDto.fromEntity(popup);
     }
 
     public List<PopupSummaryDto> readHotList(){
