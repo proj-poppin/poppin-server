@@ -5,10 +5,7 @@ import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
-import com.poppin.poppinserver.dto.popup.response.InterestedPopupDto;
-import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
-import com.poppin.poppinserver.dto.popup.response.PopupDto;
-import com.poppin.poppinserver.dto.popup.response.PopupSummaryDto;
+import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
@@ -17,6 +14,7 @@ import com.poppin.poppinserver.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -117,5 +115,14 @@ public class PopupService {
         Set<Intereste> interestes = user.getInterestes();
 
         return InterestedPopupDto.fromEntityList(interestes);
+    }
+
+    public List<PopupSearchingDto> readSearchingList(String text, int page, int size){
+        User user = userRepository.findById(1L)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
+
+        return PopupSearchingDto.fromEntityList(popups, user);
     }
 }

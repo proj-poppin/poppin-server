@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +30,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Pageable pageable);
+
+    @Query("SELECT p FROM Popup p WHERE p.name LIKE %:text% OR p.introduce LIKE %:text%")
+    Page<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
 }
