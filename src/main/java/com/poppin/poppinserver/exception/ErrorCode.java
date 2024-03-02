@@ -17,7 +17,8 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH("40006", HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     DUPLICATED_NICKNAME("40007", HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     MISSING_REQUEST_BODY("40008", HttpStatus.BAD_REQUEST, "요청 바디가 누락되었습니다."),
-    DUPLICATED_INTERESTE("40005", HttpStatus.NOT_FOUND, "이미 관심 등록된 팝업입니다."),
+    DUPLICATED_INTERESTE("40009", HttpStatus.NOT_FOUND, "이미 관심 등록된 팝업입니다."),
+    MISSING_REQUEST_IMAGES("40010", HttpStatus.NOT_FOUND, "이미지가 누락되었습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
@@ -38,6 +39,9 @@ public enum ErrorCode {
 
     // Access Denied Error
     ACCESS_DENIED_ERROR("40300", HttpStatus.FORBIDDEN, "액세스 권한이 없습니다."),
+
+    // UnsupportedMediaType Error
+    UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
 
     // Server, File Up/DownLoad Error
     SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
