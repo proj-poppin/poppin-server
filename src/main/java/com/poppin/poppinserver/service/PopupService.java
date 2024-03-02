@@ -13,6 +13,7 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.PosterImageRepository;
 import com.poppin.poppinserver.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -37,8 +38,6 @@ public class PopupService {
     private final S3Service s3Service;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
-        log.info("service.create_popup");
-        log.info(createPopupDto.toString());
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
@@ -60,7 +59,6 @@ public class PopupService {
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        log.info("images not empty");
         List<String> fileUrls = s3Service.upload(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
@@ -103,6 +101,7 @@ public class PopupService {
         return PopupSummaryDto.fromEntityList(popups);
     }
 
+    @Transactional
     public List<InterestedPopupDto> readInterestedPopups(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));

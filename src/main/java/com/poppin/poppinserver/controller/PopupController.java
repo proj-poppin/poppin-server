@@ -42,14 +42,14 @@ public class PopupController {
         return ResponseDto.ok(popupService.readNewList());
     }
 
-    @GetMapping("/closing-list") // 새로 오픈 팝업 목록 조회
+    @GetMapping("/closing-list") // 종료 임박 팝업 목록 조회
     public ResponseDto<?> readclosingList(){
         return ResponseDto.ok(popupService.readClosingList());
     }
 
     @GetMapping("/interested-list") // 관심 팝업 목록 조회
     public ResponseDto<?> readInterestedList() {
-        Long userId = 1L;
+        Long userId = 9L;
         return ResponseDto.ok(popupService.readInterestedPopups(userId));
     }
 }
