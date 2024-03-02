@@ -58,25 +58,21 @@ public class PopupService {
         popup = popupRepository.save(popup);
 
         log.info(popup.toString());
-        // 팝업 이미지 처리 및 저장
-        if(images != null){
-            log.info("images not empty");
-            List<String> fileUrls = s3Service.upload(images, popup.getId());
 
-            List<PosterImage> posterImages = new ArrayList<>();
-            for(String url : fileUrls){
-                PosterImage posterImage = PosterImage.builder()
-                        .posterUrl(url)
-                        .popup(popup)
-                        .build();
-                posterImages.add(posterImage);
-            }
-            posterImageRepository.saveAll(posterImages);
-            popup.updatePosterUrl(fileUrls.get(0));
-        } else {
-            log.info("images is empty");
-            popup.updatePosterUrl(DEFAULT_POSTER); // 기본 사진
+        // 팝업 이미지 처리 및 저장
+        log.info("images not empty");
+        List<String> fileUrls = s3Service.upload(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
         }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
 
         popup = popupRepository.save(popup);
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 // 에러 터지면 담당해줄 클래스 얘한테 넘겨서 에러처리 하면 됌
@@ -40,9 +41,16 @@ public class GlobalExceptionHandler {
 
     // 필수 파라미터가 누락되었을 때 발생하는 예외
     @ExceptionHandler(value = {MissingServletRequestParameterException.class})
-    public ResponseDto<?> handleArgumentNotValidException(MissingServletRequestParameterException e) {
+    public ResponseDto<?> handleServletRequestParameterException(MissingServletRequestParameterException e) {
         log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MissingServletRequestParameterException : {}", e.getMessage());
         return ResponseDto.fail(e);
+    }
+
+    // 필수 RequestPart가 누락되었을 때 발생하는 예외
+    @ExceptionHandler(value = {MissingServletRequestPartException.class})
+    public ResponseDto<?> handleServletRequestParameterException(MissingServletRequestPartException e) {
+        log.error("handleArgumentNotValidException() in GlobalExceptionHandler throw MissingServletRequestPartException : {}", e.getMessage());
+        return ResponseDto.fail(new CommonException(ErrorCode.MISSING_REQUEST_PARAMETER));
     }
 
     // post 요청 body가 없을 때 발생하는 에러

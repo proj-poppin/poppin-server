@@ -50,6 +50,9 @@ public class S3Service {
 
     // 이미지파일명 중복 방지
     private String createFileName(String fileName, Long popupId) {
+        if(fileName.isEmpty()){
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
         // 파일 확장자 추출
         String extension = getFileExtension(fileName);
         // 파일 이름에서 확장자를 제외한 부분 추출
