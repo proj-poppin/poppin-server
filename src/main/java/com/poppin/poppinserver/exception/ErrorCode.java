@@ -19,6 +19,9 @@ public enum ErrorCode {
     MISSING_REQUEST_BODY("40008", HttpStatus.BAD_REQUEST, "요청 바디가 누락되었습니다."),
     DUPLICATED_INTERESTE("40009", HttpStatus.NOT_FOUND, "이미 관심 등록된 팝업입니다."),
     MISSING_REQUEST_IMAGES("40010", HttpStatus.NOT_FOUND, "이미지가 누락되었습니다."),
+    INVALID_APPLE_IDENTITY_TOKEN_ERROR("40011", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Identity Token입니다."),
+    EXPIRED_APPLE_IDENTITY_TOKEN_ERROR("40012", HttpStatus.BAD_REQUEST, "만료된 Apple Identity Token입니다."),
+    INVALID_APPLE_PUBLIC_KEY_ERROR("40013", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Public Key입니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),

@@ -26,12 +26,12 @@ public class AuthController {
         return ResponseDto.created(null);
     }
 
-//    @PostMapping("/register")
-//    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
-//                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
-//        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
-//        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
-//    }
+    @PostMapping("/register")
+    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
+        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
+        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
+    }
 
     @PostMapping("/login/kakao")
     public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
@@ -39,4 +39,18 @@ public class AuthController {
         return ResponseDto.ok(authService.authKakaoLogin(accessToken));
     }
 
+    @PostMapping("/login/naver")
+    public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+        return ResponseDto.ok(authService.authNaverLogin(accessToken));
+    }
+
+    @PostMapping("/login/google")
+    public ResponseDto<?> authGoogleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+        return ResponseDto.ok(authService.authGoogleLogin(accessToken));
+    }
+
+    @PostMapping("/login/apple")
+    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
+        return ResponseDto.ok(authService.authAppleLogin(idToken));
+    }
 }

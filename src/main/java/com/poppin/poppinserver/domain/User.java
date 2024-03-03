@@ -120,6 +120,10 @@ public class User {
         this.role = EUserRole.USER;
     }
 
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public void logoutUser() {
         this.isLogin = false;
         this.refreshToken = null;
