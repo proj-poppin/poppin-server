@@ -36,7 +36,10 @@ public class OAuth2Util {
 
         JsonElement element = JsonParser.parseString(response.getBody());
 
-        return OAuth2UserInfo.of(element.getAsJsonObject().getAsJsonObject("kakao_account").get("email").getAsString());
+        return OAuth2UserInfo.of(
+                element.getAsJsonObject().get("id").getAsString(),
+                element.getAsJsonObject().getAsJsonObject("kakao_account").get("email").getAsString()
+        );
     }
 
     public OAuth2UserInfo getNaverUserInfo(String accessToken) {
@@ -52,7 +55,10 @@ public class OAuth2Util {
                 String.class
         );
         JsonElement element = JsonParser.parseString(response.getBody());
-        return OAuth2UserInfo.of(element.getAsJsonObject().getAsJsonObject("response").get("email").getAsString());
+        return OAuth2UserInfo.of(
+                element.getAsJsonObject().getAsJsonObject("response").get("id").getAsString(),
+                element.getAsJsonObject().getAsJsonObject("response").get("email").getAsString()
+        );
     }
 
     public OAuth2UserInfo getGoogleUserInfo(String accessToken) {
@@ -68,6 +74,26 @@ public class OAuth2Util {
                 String.class
         );
         JsonElement element = JsonParser.parseString(response.getBody());
-        return OAuth2UserInfo.of(element.getAsJsonObject().get("email").getAsString());
+        return OAuth2UserInfo.of(
+                element.getAsJsonObject().get("sub").getAsString(),
+                element.getAsJsonObject().get("email").getAsString()
+        );
     }
+
+//    // Apple의 공개키 받아오기
+//    public OAuth2UserInfo getAppleUserInfo(String accessToken) {
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
+//        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+//
+//        HttpEntity<?> appleProfileRequest = new HttpEntity<>(httpHeaders);
+//        ResponseEntity<String> response = restTemplate.exchange(
+//                "https://appleid.apple.com/auth/keys",
+//                HttpMethod.GET,
+//                appleProfileRequest,
+//                String.class
+//        );
+//        JsonElement element = JsonParser.parseString(response.getBody());
+//        return OAuth2UserInfo.of(element.getAsJsonObject().get("email").getAsString());
+//    }
 }
