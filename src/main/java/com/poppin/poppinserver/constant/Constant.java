@@ -10,6 +10,7 @@ public class Constant {
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String USER_ROLE_CLAIM_NAME = "role";
     public static final String USER_EMAIL_CLAIM_NAME = "email";
+    public static final String CONTENT_TYPE = "Content-Type";
     public static final List<String> NO_NEED_AUTH_URLS = List.of(
             "/api/v1/auth/sign-up", // 회원가입
             "/api/v1/auth/sign-in", // 로그인
@@ -20,7 +21,10 @@ public class Constant {
             "/api/v1/popup/create-popup", // 팝업 생성 ---- 임시
             "/api/v1/popup/interested-list", // ---- 임시
             "/api/v1/intereste/add-intereste", // ---- 임시
-            "/"  // 루트
+            "/api/v1/auth/login/kakao",
+            "/api/v1/auth/login/naver",
+            "/api/v1/auth/login/google",
+            "/api/v1/auth/login/apple"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";
