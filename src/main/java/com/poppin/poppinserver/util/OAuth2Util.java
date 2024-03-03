@@ -38,4 +38,20 @@ public class OAuth2Util {
 
         return OAuth2UserInfo.of(element.getAsJsonObject().getAsJsonObject("kakao_account").get("email").getAsString());
     }
+
+    public OAuth2UserInfo getNaverUserInfo(String accessToken) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
+        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<?> naverProfileRequest = new HttpEntity<>(httpHeaders);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://openapi.naver.com/v1/nid/me",
+                HttpMethod.GET,
+                naverProfileRequest,
+                String.class
+        );
+        JsonElement element = JsonParser.parseString(response.getBody());
+        return OAuth2UserInfo.of(element.getAsJsonObject().getAsJsonObject("response").get("email").getAsString());
+    }
 }

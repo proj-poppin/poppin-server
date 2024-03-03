@@ -39,4 +39,8 @@ public class AuthController {
         return ResponseDto.ok(authService.authKakaoLogin(accessToken));
     }
 
+    @PostMapping("/login/naver")
+    public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+        return ResponseDto.ok(authService.authNaverLogin(accessToken));
+    }
 }
