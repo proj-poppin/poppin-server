@@ -25,7 +25,7 @@ public class OAuth2Util {
         httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<?> kakaoProfileRequest = new HttpEntity<>(httpHeaders);
-        log.info("kakaoProfileRequest" + kakaoProfileRequest.toString());
+        log.info("kakaoProfileRequest" + kakaoProfileRequest);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 "https://kapi.kakao.com/v2/user/me",
@@ -33,6 +33,10 @@ public class OAuth2Util {
                 kakaoProfileRequest,
                 String.class
         );
+
+        if (response.getBody() == null) {
+            throw new RuntimeException("Kakao API 요청에 실패했습니다.");
+        }
 
         JsonElement element = JsonParser.parseString(response.getBody());
 
@@ -54,6 +58,11 @@ public class OAuth2Util {
                 naverProfileRequest,
                 String.class
         );
+
+        if (response.getBody() == null) {
+            throw new RuntimeException("Naver API 요청에 실패했습니다.");
+        }
+
         JsonElement element = JsonParser.parseString(response.getBody());
         return OAuth2UserInfo.of(
                 element.getAsJsonObject().getAsJsonObject("response").get("id").getAsString(),
@@ -73,6 +82,11 @@ public class OAuth2Util {
                 googleProfileRequest,
                 String.class
         );
+
+        if (response.getBody() == null) {
+            throw new RuntimeException("Google API 요청에 실패했습니다.");
+        }
+
         JsonElement element = JsonParser.parseString(response.getBody());
         return OAuth2UserInfo.of(
                 element.getAsJsonObject().get("sub").getAsString(),
