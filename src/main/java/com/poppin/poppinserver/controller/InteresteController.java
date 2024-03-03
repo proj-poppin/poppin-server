@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.controller;
 
-import com.poppin.poppinserver.dto.Intereste.requeste.AddInteresteDto;
+import com.poppin.poppinserver.dto.intereste.requeste.AddInteresteDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.InteresteService;
 import jakarta.validation.Valid;

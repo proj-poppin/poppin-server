@@ -1,12 +1,9 @@
-package com.poppin.poppinserver.dto.User.respnse;
+package com.poppin.poppinserver.dto.user.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.poppin.poppinserver.domain.Intereste;
 import com.poppin.poppinserver.domain.User;
 import lombok.Builder;
-
-import java.util.Set;
 
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
