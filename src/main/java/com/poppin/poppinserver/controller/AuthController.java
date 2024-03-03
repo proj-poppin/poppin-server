@@ -26,12 +26,12 @@ public class AuthController {
         return ResponseDto.created(null);
     }
 
-//    @PostMapping("/register")
-//    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
-//                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
-//        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
-//        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
-//    }
+    @PostMapping("/register")
+    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
+        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
+        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
+    }
 
     @PostMapping("/login/kakao")
     public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {

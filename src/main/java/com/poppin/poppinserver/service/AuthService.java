@@ -3,6 +3,7 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -13,6 +14,7 @@ import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.util.JwtUtil;
 import com.poppin.poppinserver.util.OAuth2Util;
 import com.poppin.poppinserver.util.PasswordUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,7 +50,7 @@ public class AuthService {
     }
 
     public JwtTokenDto authKakaoLogin(String accessToken) {
-        String token = accessToken.substring(Constant.BEARER_PREFIX.length());
+        String token = refineToken(accessToken);
         log.info("token: " + token);
 
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
@@ -73,5 +75,41 @@ public class AuthService {
         }
 
         return jwtTokenDto;
+    }
+
+    @Transactional
+    public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+        String token = refineToken(accessToken);
+
+        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(socialRegisterRequestDto, token);
+
+        // 소셜 회원가입 시, 등록된 이메일과 provider로 유저 정보를 찾음
+        User user = userRepository.findByEmailAndELoginProvider(oAuth2UserInfoDto.email(), socialRegisterRequestDto.provider())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 닉네임과 생년월일을 등록 -> 소셜 회원가입 완료
+        user.register(socialRegisterRequestDto.nickname(), socialRegisterRequestDto.birthDate());
+
+        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        user.updateRefreshToken(jwtTokenDto.refreshToken());
+
+        return jwtTokenDto;
+    }
+
+    private OAuth2UserInfo getOAuth2UserInfo(SocialRegisterRequestDto request, String accessToken){
+        if (request.provider().toString().equals(ELoginProvider.KAKAO.toString())){
+            return oAuth2Util.getKakaoUserInfo(accessToken);
+        } else {
+            throw new CommonException(ErrorCode.NOT_FOUND_USER);
+        }
+    }
+
+    private String refineToken(String accessToken) {
+        if (accessToken.startsWith(Constant.BEARER_PREFIX)) {
+            return accessToken.substring(Constant.BEARER_PREFIX.length());
+        }
+        else {
+            return accessToken;
+        }
     }
 }
