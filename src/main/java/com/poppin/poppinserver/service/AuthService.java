@@ -8,6 +8,7 @@ import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.oauth.OAuth2UserInfo;
+import com.poppin.poppinserver.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.repository.UserRepository;
 import com.poppin.poppinserver.type.ELoginProvider;
 import com.poppin.poppinserver.type.EUserRole;
@@ -27,8 +28,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
-    private final PasswordUtil passwordUtil;
     private final OAuth2Util oAuth2Util;
+    private final AppleOAuthService appleOAuthService;
 
     public void authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
@@ -68,6 +69,11 @@ public class AuthService {
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
     }
 
+    public JwtTokenDto authAppleLogin(String idToken) {
+        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(idToken);
+        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
+    }
+
     @Transactional
     public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         String token = refineToken(accessToken);
@@ -94,6 +100,8 @@ public class AuthService {
             return oAuth2Util.getNaverUserInfo(accessToken);
         } else if (request.provider().toString().equals(ELoginProvider.GOOGLE.toString())) {
             return oAuth2Util.getGoogleUserInfo(accessToken);
+        } else if (request.provider().toString().equals(ELoginProvider.APPLE.toString())) {
+            return appleOAuthService.getAppleUserInfo(accessToken);
         }
         else {
             throw new CommonException(ErrorCode.NOT_FOUND_USER);
@@ -110,7 +118,7 @@ public class AuthService {
     }
 
     private JwtTokenDto processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
-        JwtTokenDto jwtTokenDto = null;
+        JwtTokenDto jwtTokenDto;
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER).isPresent()) {
             jwtTokenDto = jwtUtil.generateToken(oAuth2UserInfo.email(), EUserRole.USER);
@@ -119,7 +127,7 @@ public class AuthService {
             userRepository.findByEmail(oAuth2UserInfo.email())
                     .orElseGet(() -> userRepository.save(
                             User.toGuestEntity(oAuth2UserInfo,
-                                    bCryptPasswordEncoder.encode(passwordUtil.generateRandomPassword()),
+                                    bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
                                     provider))
                     );
             // 유저에게 GUEST 권한 주기

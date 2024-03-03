@@ -49,8 +49,8 @@ public class AuthController {
         return ResponseDto.ok(authService.authGoogleLogin(accessToken));
     }
 
-//    @PostMapping("/login/apple")
-//    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
-//        return ResponseDto.ok(authService.authAppleLogin(idToken));
-//    }
+    @PostMapping("/login/apple")
+    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
+        return ResponseDto.ok(authService.authAppleLogin(idToken));
+    }
 }

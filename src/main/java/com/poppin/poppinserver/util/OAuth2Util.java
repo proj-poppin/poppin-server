@@ -93,21 +93,4 @@ public class OAuth2Util {
                 element.getAsJsonObject().get("email").getAsString()
         );
     }
-
-//    // Apple의 공개키 받아오기
-//    public OAuth2UserInfo getAppleUserInfo(String accessToken) {
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
-//        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
-//
-//        HttpEntity<?> appleProfileRequest = new HttpEntity<>(httpHeaders);
-//        ResponseEntity<String> response = restTemplate.exchange(
-//                "https://appleid.apple.com/auth/keys",
-//                HttpMethod.GET,
-//                appleProfileRequest,
-//                String.class
-//        );
-//        JsonElement element = JsonParser.parseString(response.getBody());
-//        return OAuth2UserInfo.of(element.getAsJsonObject().get("email").getAsString());
-//    }
 }
