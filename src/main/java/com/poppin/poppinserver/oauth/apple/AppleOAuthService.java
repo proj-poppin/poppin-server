@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class AppleOAuthService {
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
     private static final String APPLE_PUBLIC_KEYS_URL = "https://appleid.apple.com/auth/keys";
 
     private final AppleJwtParser appleJwtParser;
