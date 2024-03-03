@@ -43,4 +43,9 @@ public class AuthController {
     public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
         return ResponseDto.ok(authService.authNaverLogin(accessToken));
     }
+
+    @PostMapping("/login/google")
+    public ResponseDto<?> authGoogleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+        return ResponseDto.ok(authService.authGoogleLogin(accessToken));
+    }
 }

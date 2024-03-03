@@ -62,6 +62,12 @@ public class AuthService {
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.NAVER);
     }
 
+    public JwtTokenDto authGoogleLogin(String accessToken) {
+        String token = refineToken(accessToken);
+        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getGoogleUserInfo(token);
+        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
+    }
+
     @Transactional
     public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         String token = refineToken(accessToken);
@@ -86,7 +92,10 @@ public class AuthService {
             return oAuth2Util.getKakaoUserInfo(accessToken);
         } else if (request.provider().toString().equals(ELoginProvider.NAVER.toString())) {
             return oAuth2Util.getNaverUserInfo(accessToken);
-        } else {
+        } else if (request.provider().toString().equals(ELoginProvider.GOOGLE.toString())) {
+            return oAuth2Util.getGoogleUserInfo(accessToken);
+        }
+        else {
             throw new CommonException(ErrorCode.NOT_FOUND_USER);
         }
     }

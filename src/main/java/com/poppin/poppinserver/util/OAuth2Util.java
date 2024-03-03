@@ -54,4 +54,20 @@ public class OAuth2Util {
         JsonElement element = JsonParser.parseString(response.getBody());
         return OAuth2UserInfo.of(element.getAsJsonObject().getAsJsonObject("response").get("email").getAsString());
     }
+
+    public OAuth2UserInfo getGoogleUserInfo(String accessToken) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
+        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<?> googleProfileRequest = new HttpEntity<>(httpHeaders);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                HttpMethod.GET,
+                googleProfileRequest,
+                String.class
+        );
+        JsonElement element = JsonParser.parseString(response.getBody());
+        return OAuth2UserInfo.of(element.getAsJsonObject().get("email").getAsString());
+    }
 }
