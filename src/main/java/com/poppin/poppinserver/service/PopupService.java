@@ -117,8 +117,8 @@ public class PopupService {
         return InterestedPopupDto.fromEntityList(interestes);
     }
 
-    public List<PopupSearchingDto> readSearchingList(String text, int page, int size){
-        User user = userRepository.findById(1L)
+    public List<PopupSearchingDto> readSearchingList(String text, int page, int size, Long userId){
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
