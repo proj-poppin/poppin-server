@@ -26,6 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+
         resolvers.add(userIdArgumentResolver);
     }
 }
