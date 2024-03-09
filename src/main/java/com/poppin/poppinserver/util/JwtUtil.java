@@ -6,10 +6,12 @@ import com.poppin.poppinserver.type.EUserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Date;
@@ -76,5 +78,13 @@ public class JwtUtil implements InitializingBean {
     public Claims validateAndGetClaimsFromToken(String token) throws JwtException {
         final JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
         return jwtParser.parseClaimsJws(token).getBody();
+    }
+
+    public String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(Constant.AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constant.BEARER_PREFIX)) {
+            return bearerToken.substring(Constant.BEARER_PREFIX.length());
+        }
+        return null;
     }
 }
