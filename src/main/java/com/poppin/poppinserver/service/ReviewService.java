@@ -64,4 +64,13 @@ public class ReviewService {
 
         return ReviewDto.fromEntity(reviewRepository.save(review));
     }
+
+    public String addRecommendReview(Long popupId){
+        Review review = reviewRepository.findById(popupId)
+                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
+
+        review.addRecommendCnt();
+        reviewRepository.save(review);
+        return "정상적으로 반환되었습니다";
+    }
 }
