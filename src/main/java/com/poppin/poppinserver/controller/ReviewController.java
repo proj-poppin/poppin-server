@@ -20,12 +20,14 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(value = "/create-review", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/create-review", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
     public ResponseDto<?> createReview(@RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto , @RequestPart(value = "images") List<MultipartFile> images){
-
         return ResponseDto.ok(reviewService.createReview(createReviewDto, images));
+    }
 
-
+    @PostMapping("/add-recommend") // 후기 추천
+    public ResponseDto<?> addRecommendReview(@RequestParam Long popupId){
+        return ResponseDto.ok(reviewService.addRecommendReview(popupId));
     }
 
 }
