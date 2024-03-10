@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.security.config;
 
 import com.poppin.poppinserver.constant.Constant;
+import com.poppin.poppinserver.security.filter.CustomLogoutFilter;
 import com.poppin.poppinserver.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.security.filter.JwtExceptionFilter;
 import com.poppin.poppinserver.security.handler.CustomSignOutProcessHandler;
@@ -47,7 +48,7 @@ public class SecurityConfig {
                                 .anyRequest().authenticated())
                 .formLogin(configurer ->
                         configurer
-                                .loginPage("/login")
+                                .loginPage("/")
                                 .loginProcessingUrl("/api/v1/auth/sign-in")
                                 .usernameParameter("email")
                                 .passwordParameter("password")
@@ -61,6 +62,7 @@ public class SecurityConfig {
                                 .deleteCookies(Constant.AUTHORIZATION_HEADER, Constant.REAUTHORIZATION))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)), LogoutFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(), LogoutFilter.class)
                 .build();
     }
 }
