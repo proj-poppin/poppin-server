@@ -22,8 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.refreshToken = :refreshToken, u.isLogin = :loginStatus WHERE u.id = :id")
     void updateRefreshTokenAndLoginStatus(Long id, String refreshToken, boolean loginStatus);
 
-    @Query("SELECT u FROM User u WHERE u.email = :email AND u.provider = :eLoginProvider")
-    Optional<User> findByEmailAndELoginProvider(String email, ELoginProvider eLoginProvider);
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.provider = :eLoginProvider")
+    Optional<User> findByIdAndELoginProvider(Long id, ELoginProvider eLoginProvider);
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.role = :role")
     Optional<User> findByEmailAndRole(String email, EUserRole role);
