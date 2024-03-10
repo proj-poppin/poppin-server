@@ -54,7 +54,6 @@ public class AuthService {
 
     public JwtTokenDto authKakaoLogin(String accessToken) {
         String token = refineToken(accessToken);
-        log.info("token: " + token);
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
     }
@@ -78,12 +77,12 @@ public class AuthService {
 
     @Transactional
     public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
-        String token = refineToken(accessToken);
+        String token = refineToken(accessToken);    // poppin access token
 
-        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(socialRegisterRequestDto, token);
+        Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
 
-        // 소셜 회원가입 시, 등록된 이메일과 provider로 유저 정보를 찾음
-        User user = userRepository.findByEmailAndELoginProvider(oAuth2UserInfoDto.email(), socialRegisterRequestDto.provider())
+        // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
+        User user = userRepository.findByIdAndELoginProvider(userId, socialRegisterRequestDto.provider())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 닉네임과 생년월일을 등록 -> 소셜 회원가입 완료
