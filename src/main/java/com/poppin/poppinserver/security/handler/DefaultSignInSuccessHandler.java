@@ -25,10 +25,10 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getEmail(), userDetails.getRole());
+        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
         // String userAgent = request.getHeader("User-Agent");
 
-        userRepository.updateRefreshTokenAndLoginStatus(userDetails.getEmail(), jwtTokenDto.refreshToken(), true);
+        userRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), jwtTokenDto.refreshToken(), true);
         setSuccessAppResponse(response, jwtTokenDto);
 
         // 테스트용

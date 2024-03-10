@@ -4,5 +4,5 @@ import com.poppin.poppinserver.type.EUserRole;
 import lombok.Builder;
 
 @Builder
-public record JwtUserInfo(String email, EUserRole role) {
+public record JwtUserInfo(Long id, EUserRole role) {
 }

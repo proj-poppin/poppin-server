@@ -51,10 +51,10 @@ public class JwtUtil implements InitializingBean {
                 .compact();
     }
 
-    public String createToken(Authentication authentication, Integer expirationPeriod) {
+    public String createToken(Long id, EUserRole role, Integer expirationPeriod) {
         Claims claims = Jwts.claims();
-        claims.put(Constant.USER_EMAIL_CLAIM_NAME, authentication.getPrincipal());
-        claims.put(Constant.USER_ROLE_CLAIM_NAME, authentication.getCredentials());
+        claims.put(Constant.USER_ID_CLAIM_NAME, id);
+        claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
 
         Date now = new Date();
         Date tokenValidity = new Date(now.getTime() + expirationPeriod);    // 토큰의 만료시간 설정
@@ -71,8 +71,8 @@ public class JwtUtil implements InitializingBean {
         return new JwtTokenDto(createToken(email, role, accessTokenExpirationPeriod), createToken(email, role, refreshTokenExpirationPeriod));
     }
 
-    public JwtTokenDto generateToken(Authentication authentication) {
-        return new JwtTokenDto(createToken(authentication, accessTokenExpirationPeriod), createToken(authentication, refreshTokenExpirationPeriod));
+    public JwtTokenDto generateToken(Long id, EUserRole role) {
+        return new JwtTokenDto(createToken(id, role, accessTokenExpirationPeriod), createToken(id, role, refreshTokenExpirationPeriod));
     }
 
     public Claims validateAndGetClaimsFromToken(String token) throws JwtException {

@@ -42,11 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token)) {
             Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
             JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
-                    .email(claims.get(Constant.USER_EMAIL_CLAIM_NAME, String.class))
+                    .id(claims.get(Constant.USER_ID_CLAIM_NAME, Long.class))
                     .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
                     .build();
 
-            JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.email(), jwtUserInfo.role());
+            JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.id(), jwtUserInfo.role());
 
             UsernamePasswordAuthenticationToken afterAuthentication = (UsernamePasswordAuthenticationToken) jwtAuthenticationProvider.authenticate(beforeAuthentication);
             afterAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
