@@ -17,12 +17,11 @@ import java.util.Collection;
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class CustomUserDetails implements UserDetails {
-    @Getter
-    private final String email;
+    @Getter private final Long id;
+    @Getter private final String email;
     private final String password;
 
-    @Getter
-    private final EUserRole role;
+    @Getter private final EUserRole role;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public static CustomUserDetails create(User user) {
@@ -30,6 +29,7 @@ public class CustomUserDetails implements UserDetails {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
         return CustomUserDetails.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole())
@@ -49,7 +49,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.id.toString();
+        // return this.email;
     }
 
     @Override

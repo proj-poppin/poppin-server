@@ -20,6 +20,6 @@ public class CustomSignOutProcessHandler implements LogoutHandler {
             return;
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        userRepository.updateRefreshTokenAndLoginStatus(userDetails.getEmail(), null, false);
+        userRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), null, false);
     }
 }

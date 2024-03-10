@@ -29,10 +29,10 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             }
         } else if (authentication instanceof JwtAuthenticationToken) {
             JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
-                    .email((String) authentication.getPrincipal())
+                    .id((Long) authentication.getPrincipal())
                     .role((EUserRole) authentication.getCredentials())
                     .build();
-            userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(jwtUserInfo.email());
+            userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUserId(jwtUserInfo.id());
             if (userDetails.getRole() != jwtUserInfo.role()) {
                 throw new AuthenticationException("Invalid Role") {};
             }
