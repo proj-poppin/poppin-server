@@ -23,7 +23,7 @@ public class AuthController {
     public ResponseDto<?> authSignUp(@RequestBody @Valid AuthSignUpDto authSignUpDto) {
         authService.authSignUp(authSignUpDto);
         log.info("authSignUpDto : " + authSignUpDto);
-        return ResponseDto.created(null);
+        return ResponseDto.created("회원 가입 성공");
     }
 
     @PostMapping("/register")

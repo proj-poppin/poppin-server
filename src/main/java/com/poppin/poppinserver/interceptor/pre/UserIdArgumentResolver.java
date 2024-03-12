@@ -33,6 +33,6 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
         log.info("resolveArgument = {}", ((HttpServletRequest) webRequest).getAttribute("USER_ID").toString());
-        return userIdObj.toString();
+        return Long.valueOf(userIdObj.toString());
     }
 }

@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -52,7 +54,6 @@ public class AuthService {
 
     public JwtTokenDto authKakaoLogin(String accessToken) {
         String token = refineToken(accessToken);
-        log.info("token: " + token);
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
     }
@@ -76,18 +77,18 @@ public class AuthService {
 
     @Transactional
     public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
-        String token = refineToken(accessToken);
+        String token = refineToken(accessToken);    // poppin access token
 
-        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(socialRegisterRequestDto, token);
+        Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
 
-        // 소셜 회원가입 시, 등록된 이메일과 provider로 유저 정보를 찾음
-        User user = userRepository.findByEmailAndELoginProvider(oAuth2UserInfoDto.email(), socialRegisterRequestDto.provider())
+        // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
+        User user = userRepository.findByIdAndELoginProvider(userId, socialRegisterRequestDto.provider())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 닉네임과 생년월일을 등록 -> 소셜 회원가입 완료
         user.register(socialRegisterRequestDto.nickname(), socialRegisterRequestDto.birthDate());
 
-        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         return jwtTokenDto;
@@ -119,22 +120,24 @@ public class AuthService {
 
     private JwtTokenDto processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
         JwtTokenDto jwtTokenDto;
+        Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
-        if (userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER).isPresent()) {
-            jwtTokenDto = jwtUtil.generateToken(oAuth2UserInfo.email(), EUserRole.USER);
+        if (user.isPresent()) {
+            jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
+            userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
         } else {
             // 비밀번호 랜덤 생성 후 암호화해서 DB에 저장
-            userRepository.findByEmail(oAuth2UserInfo.email())
+            User newUser = userRepository.findByEmail(oAuth2UserInfo.email())
                     .orElseGet(() -> userRepository.save(
                             User.toGuestEntity(oAuth2UserInfo,
                                     bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
                                     provider))
                     );
             // 유저에게 GUEST 권한 주기
-            jwtTokenDto = jwtUtil.generateToken(oAuth2UserInfo.email(), EUserRole.GUEST);
+            jwtTokenDto = jwtUtil.generateToken(newUser.getId(), EUserRole.GUEST);
+            userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtTokenDto.refreshToken(), true);
         }
         // 유저에게 refreshToken 발급, 로그인 상태 변경
-        userRepository.updateRefreshTokenAndLoginStatus(oAuth2UserInfo.email(), jwtTokenDto.refreshToken(), true);
         return jwtTokenDto;
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -35,23 +36,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String token = HeaderUtil.refineHeader(request, Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX)
-                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_TOKEN_ERROR));
+        final String token = jwtUtil.getJwtFromRequest(request);
+//        final String token = HeaderUtil.refineHeader(request, Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX)
+//                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_TOKEN_ERROR));
+        if (StringUtils.hasText(token)) {
+            Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
+            JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
+                    .id(claims.get(Constant.USER_ID_CLAIM_NAME, Long.class))
+                    .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
+                    .build();
 
-        Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
-        JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
-                .email(claims.get(Constant.USER_EMAIL_CLAIM_NAME, String.class))
-                .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
-                .build();
+            JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.id(), jwtUserInfo.role());
 
-        JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.email(), jwtUserInfo.role());
+            UsernamePasswordAuthenticationToken afterAuthentication = (UsernamePasswordAuthenticationToken) jwtAuthenticationProvider.authenticate(beforeAuthentication);
+            afterAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        UsernamePasswordAuthenticationToken afterAuthentication = (UsernamePasswordAuthenticationToken) jwtAuthenticationProvider.authenticate(beforeAuthentication);
-        afterAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(afterAuthentication);
-        SecurityContextHolder.setContext(securityContext);
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(afterAuthentication);
+            SecurityContextHolder.setContext(securityContext);
+        }
 
         filterChain.doFilter(request, response);
     }

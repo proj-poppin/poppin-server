@@ -7,12 +7,14 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
-    private String email;
+    private Long userId;
+    // private String email;
     private EUserRole role;
 
-    public JwtAuthenticationToken(Collection<? extends GrantedAuthority> authorities, String email, EUserRole role) {
+    public JwtAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Long id, EUserRole role) {
         super(authorities);
-        this.email = email;
+        // this.email = email;
+        this.userId = id;
         this.role = role;
     }
 
@@ -23,6 +25,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return this.email;
+        // return this.email;
+        return this.userId;
     }
 }

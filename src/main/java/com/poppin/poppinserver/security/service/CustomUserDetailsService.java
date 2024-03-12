@@ -22,4 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         return CustomUserDetails.create(user);
     }
+
+    public UserDetails loadUserByUserId(Long userId) {
+        User user = userRepository.findByIdAndIsLoginAndRefreshTokenNotNull(userId, true)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        return CustomUserDetails.create(user);
+    }
 }
