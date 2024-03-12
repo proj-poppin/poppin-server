@@ -121,6 +121,11 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        log.info(text);
+        log.info(String.valueOf(page));
+        log.info(String.valueOf(size));
+        log.info(userId.toString());
+
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
 
         return PopupSearchingDto.fromEntityList(popups, user);

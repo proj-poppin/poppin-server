@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.controller;
 
+import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.intereste.requeste.AddInteresteDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.InteresteService;
@@ -19,7 +20,7 @@ public class InteresteController {
     private final InteresteService interesteService;
 
     @PostMapping("/add-intereste")
-    public ResponseDto<?> addIntereste(@RequestBody @Valid AddInteresteDto addInteresteDto){
-        return ResponseDto.ok(interesteService.userAddIntereste(addInteresteDto));
+    public ResponseDto<?> addIntereste(@RequestBody @Valid AddInteresteDto addInteresteDto, @UserId Long userId){
+        return ResponseDto.ok(interesteService.userAddIntereste(addInteresteDto, userId));
     }
 }
