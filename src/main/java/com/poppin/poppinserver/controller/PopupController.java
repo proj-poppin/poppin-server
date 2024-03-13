@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.controller;
 
+import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.dto.intereste.requeste.AddInteresteDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -53,8 +55,8 @@ public class PopupController {
     }
 
     @GetMapping("/interested-list") // 관심 팝업 목록 조회
-    public ResponseDto<?> readInterestedList() {
-        Long userId = 9L;
+    public ResponseDto<?> readInterestedList(@UserId Long userId) {
+        log.info("Controller userId: {}", userId);
         return ResponseDto.ok(popupService.readInterestedPopups(userId));
     }
 }
