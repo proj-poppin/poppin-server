@@ -41,7 +41,10 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
             "GROUP BY p.id")
     Map<String, Object> findCongestionRatioByPopupId(@Param("popupId") Long popupId, String visitDateEnum);
 
-    @Query("SELECT COUNT(v) FROM VisitorData v JOIN Popup p ON p.id = v.popup.id WHERE p.id = :popupId AND v.satisfaction = :satisfaction")
+    @Query("SELECT (SUM(CASE WHEN vd.satisfaction = :satisfaction THEN 1 ELSE 0 END) * 100) / COUNT(r) FROM VisitorData vd JOIN Review r ON vd.review.id = r.id JOIN r.popup p WHERE p.id = :popupId")
     int satisfactionRate(@Param("popupId") Long popupId, String satisfaction);
+
+
+
 
 }

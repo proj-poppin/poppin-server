@@ -32,8 +32,6 @@ public class ReviewService {
     private final VisitorDataRepository visitorDataRepository;
     private final S3Service s3Service;
 
-//    private final VisitorDataService visitorDataService;
-
     @Transactional
     public ReviewDto createReview(CreateReviewDto createReviewDto, List<MultipartFile> images) {
 
