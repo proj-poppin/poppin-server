@@ -1,6 +1,9 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.visitorData.common.Congestion;
+import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
+import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -25,9 +28,14 @@ public class ReviewService {
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+
+    private final VisitorDataRepository visitorDataRepository;
     private final S3Service s3Service;
 
-    public ReviewDto createReview(CreateReviewDto createReviewDto, List<MultipartFile> images){
+//    private final VisitorDataService visitorDataService;
+
+    @Transactional
+    public ReviewDto createReview(CreateReviewDto createReviewDto, List<MultipartFile> images) {
 
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -38,9 +46,6 @@ public class ReviewService {
                 .user(user)
                 .popup(popup)
                 .text(createReviewDto.text())
-                .visitDate(createReviewDto.visitDate())
-                .satisfaction(createReviewDto.satisfaction())
-                .congestion(createReviewDto.congestion())
                 .isCertificated(createReviewDto.isCertificated())
                 .build();
 
@@ -50,7 +55,7 @@ public class ReviewService {
         List<String> fileUrls = s3Service.upload(images, review.getId());
 
         List<ReviewImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             ReviewImage posterImage = ReviewImage.builder()
                     .imageUrl(url)
                     .review(review)
@@ -62,12 +67,21 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        return ReviewDto.fromEntity(reviewRepository.save(review));
+        VisitorData visitorData = new VisitorData(
+                VisitDate.fromValue(createReviewDto.visitDate())
+                , popup
+                , review
+                , Congestion.fromValue(createReviewDto.congestion())
+                , Satisfaction.fromValue(createReviewDto.satisfaction())
+        );
+
+        visitorDataRepository.save(visitorData);
+
+        return ReviewDto.fromEntity(reviewRepository.save(review), visitorData);
     }
 
-    public String addRecommendReview(Long popupId){
-        Review review = reviewRepository.findById(popupId)
-                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
+    public String addRecommendReview(Long reviewId, Long popupId) {
+        Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
 
         review.addRecommendCnt();
         reviewRepository.save(review);

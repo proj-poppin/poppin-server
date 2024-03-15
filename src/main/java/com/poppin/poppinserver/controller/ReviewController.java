@@ -26,8 +26,8 @@ public class ReviewController {
     }
 
     @PostMapping("/add-recommend") // 후기 추천
-    public ResponseDto<?> addRecommendReview(@RequestParam Long popupId){
-        return ResponseDto.ok(reviewService.addRecommendReview(popupId));
+    public ResponseDto<?> addRecommendReview(@RequestParam(value = "review_id") Long reviewId, @RequestParam(value = "popup_id")Long popupId){
+        return ResponseDto.ok(reviewService.addRecommendReview(reviewId, popupId));
     }
 
 }

@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Entity
 @Getter
@@ -27,6 +26,9 @@ public class Review {
     @JoinColumn(name = "user_id", referencedColumnName = "id",nullable = false)
     private User user;
 
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     @ManyToOne
     @JoinColumn(name = "popup_id", referencedColumnName = "id",nullable = false)
     private Popup popup;
@@ -36,15 +38,6 @@ public class Review {
 
     @Column(name = "text",nullable = false)
     private String text;
-
-    @Column(name = "visit_date",nullable = false)
-    private String visitDate;
-
-    @Column(name = "satisfaction",nullable = false)
-    private String satisfaction;
-
-    @Column(name = "congestion",nullable = false)
-    private String congestion;
 
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt;
@@ -56,20 +49,17 @@ public class Review {
     private int recommendCnt;
 
     @Builder
-    public Review(User user, Popup popup, String imageUrl, String text, String visitDate, String satisfaction, String congestion, boolean isCertificated, int recommendCnt) {
+    public Review(User user, Popup popup, String imageUrl, String text, boolean isCertificated) {
         this.user = user;
+        this.nickname = user.getNickname();
         this.popup = popup;
         this.imageUrl = imageUrl;
         this.text = text;
-        this.visitDate = visitDate;
-        this.satisfaction = satisfaction;
-        this.congestion = congestion;
         this.createdAt = LocalDateTime.now();
         this.isCertificated = isCertificated;
         this.recommendCnt = 0;
     }
 
     public void addRecommendCnt(){this.recommendCnt += 1;} // 추천 버튼 클릭시
-
     public void updateReviewUrl(String imageUrl){this.imageUrl = imageUrl;}
 }
