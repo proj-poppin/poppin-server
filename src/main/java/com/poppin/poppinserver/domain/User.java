@@ -64,7 +64,7 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER )
     private Set<Intereste> interestes = new HashSet<>();
 
     @Builder

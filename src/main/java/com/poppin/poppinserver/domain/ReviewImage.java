@@ -25,7 +25,7 @@ public class ReviewImage {
     @JoinColumn(name="review_id" , referencedColumnName = "id",nullable = false)
     private Review review;
 
-    @Column(name = "image_url")
+    @Column(name = "image-url")
     private  String imageUrl;
 
     @Column(name = "created_at",nullable = false)

@@ -10,8 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -81,7 +80,7 @@ public class Popup {
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
-    @OneToMany(mappedBy = "popup")
+    @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Intereste> interestes = new HashSet<>();
 
     @Builder
