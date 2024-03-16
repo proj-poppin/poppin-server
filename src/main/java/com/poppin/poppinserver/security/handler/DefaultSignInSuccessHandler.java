@@ -26,21 +26,9 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
-        // String userAgent = request.getHeader("User-Agent");
 
         userRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), jwtTokenDto.refreshToken(), true);
         setSuccessAppResponse(response, jwtTokenDto);
-
-        // 테스트용
-//        if (userAgent == null) {
-//
-//            return;
-//        }
-//        if (userAgent.contains("Android") || userAgent.contains("iPhone")) {
-//            response.sendRedirect("poppin://login?email=" + userDetails.getUsername());
-//        } else {
-//            response.sendRedirect("http://localhost:3000/login?email=" + userDetails.getUsername());
-//        }
     }
 
     private void setSuccessAppResponse(HttpServletResponse response, JwtTokenDto jwtTokenDto) throws IOException {

@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_APPLE_IDENTITY_TOKEN_ERROR("40011", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Identity Token입니다."),
     EXPIRED_APPLE_IDENTITY_TOKEN_ERROR("40012", HttpStatus.BAD_REQUEST, "만료된 Apple Identity Token입니다."),
     INVALID_APPLE_PUBLIC_KEY_ERROR("40013", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Public Key입니다."),
+    PASSWORD_SAME("40014", HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일합니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
