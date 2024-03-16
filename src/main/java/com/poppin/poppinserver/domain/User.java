@@ -124,6 +124,10 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     public void logoutUser() {
         this.isLogin = false;
         this.refreshToken = null;
