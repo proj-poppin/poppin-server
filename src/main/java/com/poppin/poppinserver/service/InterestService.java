@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -46,5 +48,14 @@ public class InterestService {
         popup.addInterestCnt();
 
         return InterestDto.fromEntity(interest,user,popup);
+    }
+
+    public Boolean removeInterest(Long userId, Long popupId) {
+        Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+
+        interestRepository.delete(interest);
+
+        return true;
     }
 }

@@ -22,4 +22,8 @@ public class InterestController {
         return ResponseDto.ok(interestService.userAddInterest(addInterestDto, userId));
     }
 
+    @DeleteMapping("/remove-interest")
+    public ResponseDto<?> removeInterest(@RequestParam("popup_id") Long popupId, @UserId Long userId){
+        return ResponseDto.ok(interestService.removeInterest(userId, popupId));
+    }
 }
