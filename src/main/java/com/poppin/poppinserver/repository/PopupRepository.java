@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface PopupRepository extends JpaRepository<Popup, Long> {
-    @Query("SELECT p FROM Popup p JOIN Intereste i ON p.id = i.popup.id " +
+    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id " +
             "WHERE p.operationStatus = 'OPERATING' AND i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(i.popup.id) DESC, p.viewCnt DESC ")

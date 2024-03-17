@@ -65,7 +65,7 @@ public class User {
     private String refreshToken;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER )
-    private Set<Intereste> interestes = new HashSet<>();
+    private Set<Interest> interestes = new HashSet<>();
 
     @Builder
     public User(String email, String password, String nickname, String birthDate,
@@ -133,7 +133,7 @@ public class User {
         this.refreshToken = null;
     }
 
-    public void addIntereste(Intereste intereste){
+    public void addIntereste(Interest intereste){
         this.interestes.add(intereste);
     }
 }

@@ -2,10 +2,9 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.poppin.poppinserver.domain.Intereste;
+import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -31,10 +30,10 @@ public record PopupSearchingDto(
     public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user){
         List<PopupSearchingDto> dtoList = new ArrayList<>();
 
-        Set<Intereste> interestes = user.getInterestes();
+        Set<Interest> interestes = user.getInterestes();
 
         List<Popup> interestedPopups = new ArrayList<>();
-        for(Intereste intereste : interestes){
+        for(Interest intereste : interestes){
             interestedPopups.add(intereste.getPopup());
         }
 

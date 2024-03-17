@@ -2,7 +2,7 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.poppin.poppinserver.domain.Intereste;
+import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
 import lombok.Builder;
 
@@ -20,10 +20,10 @@ public record InterestedPopupDto(
         String open_date,
         String close_date
 ) {
-    public static List<InterestedPopupDto> fromEntityList(Set<Intereste> interesteSet){
+    public static List<InterestedPopupDto> fromEntityList(Set<Interest> interesteSet){
         List<InterestedPopupDto> dtoList = new ArrayList<>();
 
-        for(Intereste intereste : interesteSet){
+        for(Interest intereste : interesteSet){
             Popup popup = intereste.getPopup();
             InterestedPopupDto interestedPopupDto =
                     InterestedPopupDto.builder()

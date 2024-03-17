@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.dto.intereste.requeste.AddInteresteDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;

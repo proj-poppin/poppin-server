@@ -138,7 +138,7 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Set<Intereste> interestes = user.getInterestes();
+        Set<Interest> interestes = user.getInterestes();
 
         return InterestedPopupDto.fromEntityList(interestes);
     }

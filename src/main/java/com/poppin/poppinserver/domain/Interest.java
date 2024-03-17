@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -17,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Table(name = "intereste")
-public class Intereste {
+public class Interest {
     @EmbeddedId
     private InteresteId id;
 
@@ -65,7 +63,7 @@ public class Intereste {
     }
 
     @Builder
-    public Intereste(User user, Popup popup) {
+    public Interest(User user, Popup popup) {
         this.id = new InteresteId(user.getId(), popup.getId());
         this.user = user;
         this.popup = popup;
