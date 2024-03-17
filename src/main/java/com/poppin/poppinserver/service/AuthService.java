@@ -3,6 +3,7 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
 import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -139,5 +140,19 @@ public class AuthService {
         }
         // 유저에게 refreshToken 발급, 로그인 상태 변경
         return jwtTokenDto;
+    }
+
+    @Transactional
+    public void resetPassword(Long userId, PasswordRequestDto passwordRequestDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!passwordRequestDto.password().equals(passwordRequestDto.passwordConfirm())) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        // 이전의 비밀번호와 동일하다면 에러
+        if (bCryptPasswordEncoder.matches(passwordRequestDto.password(), user.getPassword())) {
+            throw new CommonException(ErrorCode.PASSWORD_SAME);
+        }
+        user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 }

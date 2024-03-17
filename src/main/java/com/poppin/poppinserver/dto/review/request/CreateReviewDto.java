@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CreateReviewDto (
@@ -13,20 +12,17 @@ public record CreateReviewDto (
     Long popupId,
 
     @NotNull
+    String nickname,
+    @NotNull
     String text,
-
     @NotNull
-    String visitDate,
-
+    String visitDate, // 평일 오전, 오후 / 주말 오전, 오후
     @NotNull
-    String satisfaction,
-
+    String satisfaction, // 만족 / 보통 / 불만족
     @NotNull
-    String congestion,
-
+    String congestion, // 혼잡 / 보통 / 여유
     @NotNull
-    Boolean isCertificated,
-
+    boolean isCertificated,
     @NotNull
     int recommendCnt
     ){

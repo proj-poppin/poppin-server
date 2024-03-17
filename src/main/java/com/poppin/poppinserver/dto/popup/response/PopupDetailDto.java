@@ -3,7 +3,11 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
+import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import lombok.Builder;
+
+import java.util.List;
 
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -27,9 +31,12 @@ public record PopupDetailDto(
          String openTime,
          String closeTime,
          String category,
-         String operationStatus
+         String operationStatus,
+         List<ReviewInfoDto> review,
+         VisitorDataInfoDto visitorData
 ) {
-    public static PopupDetailDto fromEntity(Popup popup){
+    public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto){
+
         return PopupDetailDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -51,6 +58,8 @@ public record PopupDetailDto(
                 .closeTime(popup.getCloseTime().toString())
                 .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
+                .review(reviewInfoList)
+                .visitorData(visitorDataDto)
                 .build();
     }
 }

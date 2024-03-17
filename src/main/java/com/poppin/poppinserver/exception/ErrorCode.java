@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_APPLE_IDENTITY_TOKEN_ERROR("40011", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Identity Token입니다."),
     EXPIRED_APPLE_IDENTITY_TOKEN_ERROR("40012", HttpStatus.BAD_REQUEST, "만료된 Apple Identity Token입니다."),
     INVALID_APPLE_PUBLIC_KEY_ERROR("40013", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Public Key입니다."),
+    PASSWORD_SAME("40014", HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일합니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
@@ -41,7 +42,7 @@ public enum ErrorCode {
     NOT_FOUND_RESOURCE("40402", HttpStatus.NOT_FOUND, "요청한 데이터를 찾을 수 없습니다."),
     NOT_FOUND_POPUP("40403", HttpStatus.NOT_FOUND, "해당 팝업이 존재하지 않습니다."),
     NOT_FOUND_REVIEW("40404" , HttpStatus.NOT_FOUND, "해당 리뷰가 존재하지 않습니다."),
-
+    NOT_FOUND_VISITOR_DATA("40405", HttpStatus.NOT_FOUND, "해당 방문자 데이터가 존재하지 않습니다."),
     // Access Denied Error
     ACCESS_DENIED_ERROR("40300", HttpStatus.FORBIDDEN, "액세스 권한이 없습니다."),
 

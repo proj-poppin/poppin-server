@@ -1,37 +1,35 @@
 package com.poppin.poppinserver.service;
 
-import com.poppin.poppinserver.domain.Intereste;
-import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.domain.PosterImage;
-import com.poppin.poppinserver.domain.User;
+import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.response.*;
+import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
+import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
+import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
+import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.PosterImageRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static com.poppin.poppinserver.constant.Constant.DEFAULT_POSTER;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PopupService {
     private final PopupRepository popupRepository;
+
+    private final ReviewRepository reviewRepository;
+
+    private final VisitorDataRepository visitorDataRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
@@ -80,7 +78,18 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        return PopupDetailDto.fromEntity(popup);
+        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3));
+
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+
+        Map<String,Object> weekdayAm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("평일 오전").toString());
+        Map<String,Object> weekdayPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("평일 오후").toString());
+        Map<String,Object> weekendAm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오전").toString());
+        Map<String,Object> weekendPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오후").toString());
+        int satisfaction = visitorDataRepository.satisfactionRate(popupId, Satisfaction.fromValue("만족").toString());
+
+        VisitorDataInfoDto visitorDataDto = VisitorDataInfoDto.fromEntity(weekdayAm, weekdayPm, weekendAm, weekendPm, satisfaction);
+        return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto);
     }
 
     public List<PopupSummaryDto> readHotList(){
