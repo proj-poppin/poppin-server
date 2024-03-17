@@ -21,6 +21,7 @@ public class InteresteController {
 
     @PostMapping("/add-intereste")
     public ResponseDto<?> addIntereste(@RequestBody @Valid AddInteresteDto addInteresteDto, @UserId Long userId){
+        log.info("userId : " + userId.toString());
         return ResponseDto.ok(interesteService.userAddIntereste(addInteresteDto, userId));
     }
 }

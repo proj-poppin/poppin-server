@@ -21,7 +21,6 @@ public class Constant {
             "/api/v1/popup/detail",     // 팝업 상세 조회
             "/api/v1/popup/create-popup", // 팝업 생성 ---- 임시
             "/api/v1/popup/interested-list", // ---- 임시
-            "/api/v1/intereste/add-intereste", // ---- 임시
             "/api/v1/auth/login/kakao",
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",

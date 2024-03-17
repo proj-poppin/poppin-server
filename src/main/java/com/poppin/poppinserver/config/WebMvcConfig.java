@@ -20,7 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UserIdInterceptor())
-                .addPathPatterns("/api/v1/intereste/add-intereste")
+                .addPathPatterns("/api/**")
                 .excludePathPatterns(Constant.NO_NEED_AUTH_URLS);
     }
 
