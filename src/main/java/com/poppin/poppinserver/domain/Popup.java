@@ -51,7 +51,7 @@ public class Popup {
     private Integer reopenDemandCnt;
 
     @Column(name = "interest_cnt", nullable = false)
-    private Integer interesteCnt;
+    private Integer interestCnt;
 
     @Column(name = "view_cnt", nullable = false)
     private Integer viewCnt;
@@ -81,7 +81,7 @@ public class Popup {
     private String operationStatus;
 
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
-    private Set<Intereste> interestes = new HashSet<>();
+    private Set<Interest> interestes = new HashSet<>();
 
     @Builder
     public Popup(String posterUrl, String name, String introduce,
@@ -98,7 +98,7 @@ public class Popup {
         this.parkingAvailable = parkingAvailable;
         this.visiterCnt = 0; // 방문하기 버튼 api 동기화
         this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
-        this.interesteCnt = 0; // 관심등록 api 동기화
+        this.interestCnt = 0; // 관심등록 api 동기화
         this.viewCnt = 0; // 상세 조회시 자동 ++
         this.createdAt = LocalDateTime.now();
         this.editedAt = LocalDateTime.now();
@@ -110,12 +110,12 @@ public class Popup {
         this.operationStatus = operationStatus; // 내부 동기화
     }
 
-    public void addInteresteCnt(){
-        this.interesteCnt += 1;
+    public void addInterestCnt(){
+        this.interestCnt += 1;
     }
 
-    public void addIntereste(Intereste intereste){
-        this.interestes.add(intereste);
+    public void addInterest(Interest interest){
+        this.interestes.add(interest);
     }
 
     public void updatePosterUrl(String url) {this.posterUrl = url;}

@@ -48,7 +48,7 @@ public record PopupDetailDto(
                 .parkingAvailable(popup.getParkingAvailable())
                 .visiterCnt(popup.getVisiterCnt())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
-                .interesteCnt(popup.getInteresteCnt())
+                .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
                 .createdAt(popup.getCreatedAt().toString())
                 .editedAt(popup.getEditedAt().toString())

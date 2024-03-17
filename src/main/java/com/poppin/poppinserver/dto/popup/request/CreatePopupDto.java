@@ -32,9 +32,7 @@ public record CreatePopupDto(
         @NotNull
         LocalTime closeTime,
         @NotNull
-        String category,
-        @NotNull
-        String operationStatus
+        String category
 ) {
 
 }

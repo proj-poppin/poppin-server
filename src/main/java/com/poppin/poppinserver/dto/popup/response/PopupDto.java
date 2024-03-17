@@ -5,10 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Popup;
 import lombok.Builder;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record PopupDto(
@@ -45,7 +41,7 @@ public record PopupDto(
                 .parkingAvailable(popup.getParkingAvailable())
                 .visiterCnt(popup.getVisiterCnt())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
-                .interesteCnt(popup.getInteresteCnt())
+                .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
                 .createdAt(popup.getCreatedAt().toString())
                 .editedAt(popup.getEditedAt().toString())

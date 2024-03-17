@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
 
 @Slf4j
@@ -35,6 +36,22 @@ public class PopupService {
     private final S3Service s3Service;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
+
+        //현재 운영상태 정의
+        String operationStatus;
+        LocalDateTime openDateTime = createPopupDto.openDate().atTime(createPopupDto.openTime());
+        LocalDateTime closeDateTime = createPopupDto.closeDate().atTime(createPopupDto.closeTime());
+        if (openDateTime.isAfter(LocalDateTime.now())){
+            //만약에 운영시간 기준으로 운영전이지만 오늘이 오픈날이면 일단 D-0으로 표시
+            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
+            operationStatus = "D-" + period.getDays();
+        } else if (closeDateTime.isBefore(LocalDateTime.now())) {
+            operationStatus = "TERMINATED";
+        }
+        else{
+            operationStatus = "OPERATING";
+        }
+
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
@@ -47,7 +64,7 @@ public class PopupService {
                 .location(createPopupDto.location())
                 .openDate(createPopupDto.openDate())
                 .openTime(createPopupDto.openTime())
-                .operationStatus(createPopupDto.operationStatus())
+                .operationStatus(operationStatus)
                 .parkingAvailable(createPopupDto.parkingAvailable())
                 .build();
 
@@ -121,14 +138,19 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Set<Intereste> interestes = user.getInterestes();
+        Set<Interest> interestes = user.getInterestes();
 
         return InterestedPopupDto.fromEntityList(interestes);
     }
 
-    public List<PopupSearchingDto> readSearchingList(String text, int page, int size){
-        User user = userRepository.findById(1L)
+    public List<PopupSearchingDto> readSearchingList(String text, int page, int size, Long userId){
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        log.info(text);
+        log.info(String.valueOf(page));
+        log.info(String.valueOf(size));
+        log.info(userId.toString());
 
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
 

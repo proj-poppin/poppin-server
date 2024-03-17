@@ -36,6 +36,9 @@ public enum ErrorCode {
     TOKEN_UNKNOWN_ERROR("40108", HttpStatus.UNAUTHORIZED, "알 수 없는 토큰입니다."),
     EMPTY_AUTHENTICATION("40109", HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."),
 
+    // Access Denied Error
+    ACCESS_DENIED_ERROR("40300", HttpStatus.FORBIDDEN, "액세스 권한이 없습니다."),
+
     // Not Found Error
     NOT_FOUND_USER("40400", HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
     NOT_FOUND_END_POINT("40401", HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
@@ -43,8 +46,6 @@ public enum ErrorCode {
     NOT_FOUND_POPUP("40403", HttpStatus.NOT_FOUND, "해당 팝업이 존재하지 않습니다."),
     NOT_FOUND_REVIEW("40404" , HttpStatus.NOT_FOUND, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOUND_VISITOR_DATA("40405", HttpStatus.NOT_FOUND, "해당 방문자 데이터가 존재하지 않습니다."),
-    // Access Denied Error
-    ACCESS_DENIED_ERROR("40300", HttpStatus.FORBIDDEN, "액세스 권한이 없습니다."),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),

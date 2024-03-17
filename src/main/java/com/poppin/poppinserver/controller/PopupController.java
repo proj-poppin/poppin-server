@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.dto.intereste.requeste.AddInteresteDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -58,5 +57,17 @@ public class PopupController {
     public ResponseDto<?> readInterestedList(@UserId Long userId) {
         log.info("Controller userId: {}", userId);
         return ResponseDto.ok(popupService.readInterestedPopups(userId));
+    }
+
+    @GetMapping("/search") // 팝업 검색
+    public ResponseDto<?> readSearchList(@RequestParam("text") String text,
+                                         @RequestParam("page") int page,
+                                         @RequestParam("size") int size,
+                                         @UserId Long userId){
+        log.info(text);
+        log.info(String.valueOf(page));
+        log.info(String.valueOf(size));
+        log.info(userId.toString());
+        return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
     }
 }

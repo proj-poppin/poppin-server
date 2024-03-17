@@ -13,10 +13,10 @@ import java.util.List;
 
 @Repository
 public interface PopupRepository extends JpaRepository<Popup, Long> {
-    @Query("SELECT p FROM Popup p JOIN Intereste i ON p.id = i.popup.id " +
-            "WHERE p.operationStatus = 'OPERATING' AND i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
+    @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
+            "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
             "GROUP BY p.id " +
-            "ORDER BY COUNT(i.popup.id) DESC, p.viewCnt DESC ")
+            "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
     List<Popup> findTopOperatingPopupsByInterestAndViewCount(@Param("startOfDay") LocalDateTime startOfDay,
                                                              @Param("endOfDay") LocalDateTime endOfDay,
                                                              Pageable pageable);
