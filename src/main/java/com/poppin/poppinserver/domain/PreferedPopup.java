@@ -2,9 +2,14 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -28,4 +33,12 @@ public class PreferedPopup {
 
     @Column(name = "want_free", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean wantFree;
+
+    @Builder
+    public PreferedPopup(Boolean market, Boolean display, Boolean experience, Boolean wantFree) {
+        this.market = market;
+        this.display = display;
+        this.experience = experience;
+        this.wantFree = wantFree;
+    }
 }

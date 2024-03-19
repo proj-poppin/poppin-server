@@ -2,6 +2,7 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -55,4 +56,25 @@ public class TastePopup {
 
     @Column(name = "animal_plant", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean animalPlant;
+
+    @Builder
+    public TastePopup(Boolean fasionBeauty, Boolean character, Boolean foodBeverage,
+                      Boolean webtoonAni, Boolean interiorThings, Boolean movie,
+                      Boolean musical, Boolean sports, Boolean game,
+                      Boolean itTech, Boolean kpop, Boolean alchol,
+                      Boolean animalPlant) {
+        this.fasionBeauty = fasionBeauty;
+        this.character = character;
+        this.foodBeverage = foodBeverage;
+        this.webtoonAni = webtoonAni;
+        this.interiorThings = interiorThings;
+        this.movie = movie;
+        this.musical = musical;
+        this.sports = sports;
+        this.game = game;
+        this.itTech = itTech;
+        this.kpop = kpop;
+        this.alchol = alchol;
+        this.animalPlant = animalPlant;
+    }
 }

@@ -2,6 +2,7 @@ package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -28,4 +29,13 @@ public class WhoWithPopup {
 
     @Column(name = "with_bool", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean withBool;
+
+    @Builder
+    public WhoWithPopup(Boolean solo, Boolean withFriend, Boolean withFamily,
+                        Boolean withBool) {
+        this.solo = solo;
+        this.withFriend = withFriend;
+        this.withFamily = withFamily;
+        this.withBool = withBool;
+    }
 }
