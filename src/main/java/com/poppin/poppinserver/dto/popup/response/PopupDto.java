@@ -41,9 +41,11 @@ public record PopupDto(
 ) {
     public static PopupDto fromEntity(Popup popup, PreferedPopup preferedPopup,
                                       TastePopup tastePopup, WhoWithPopup whoWithPopup){
+
         PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
         TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
         WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
+
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -65,6 +67,9 @@ public record PopupDto(
                 .closeTime(popup.getCloseTime().toString())
                 .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
+                .prefered(preferedDto)
+                .taste(tasteDto)
+                .whoWith(whoWithDto)
                 .build();
     }
 }
