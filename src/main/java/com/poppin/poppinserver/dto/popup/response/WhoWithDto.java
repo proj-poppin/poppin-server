@@ -1,18 +1,17 @@
-package com.poppin.poppinserver.dto.popup.request;
+package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record PreferedDto(
+public record WhoWithDto(
         @NotNull
-        Boolean market,
+        Boolean solo,
         @NotNull
-        Boolean display,
+        Boolean withFriend,
         @NotNull
-        Boolean experience,
+        Boolean withFamily,
         @NotNull
-        Boolean wantFree
-) {
+        Boolean withBool) {
 }

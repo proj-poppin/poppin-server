@@ -4,39 +4,32 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record CreatePopupDto(
+public record CreateTasteDto(
         @NotNull
-        String name,
+        Boolean fasionBeauty,
         @NotNull
-        String introduce,
+        Boolean character,
         @NotNull
-        String location,
+        Boolean foodBeverage,
         @NotNull
-        Integer entranceFee,
+        Boolean webtoonAni,
         @NotNull
-        Integer availableAge,
+        Boolean interiorThings,
         @NotNull
-        Boolean parkingAvailable,
+        Boolean movie,
         @NotNull
-        LocalDate openDate,
+        Boolean musical,
         @NotNull
-        LocalDate closeDate,
+        Boolean sports,
         @NotNull
-        LocalTime openTime,
+        Boolean game,
         @NotNull
-        LocalTime closeTime,
+        Boolean itTech,
         @NotNull
-        String category,
+        Boolean kpop,
         @NotNull
-        CreatePreferedDto prefered,
+        Boolean alchol,
         @NotNull
-        CreateTasteDto taste,
-        @NotNull
-        CreateWhoWithDto whoWith
-) {
-
+        Boolean animalPlant) {
 }

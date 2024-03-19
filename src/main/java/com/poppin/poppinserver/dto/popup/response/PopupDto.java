@@ -3,6 +3,10 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
@@ -27,7 +31,10 @@ public record PopupDto(
         String openTime,
         String closeTime,
         String category,
-        String operationStatus
+        String operationStatus,
+        PreferedDto prefered,
+        TasteDto taste,
+        WhoWithDto whoWith
 ) {
     public static PopupDto fromEntity(Popup popup){
         return PopupDto.builder()
