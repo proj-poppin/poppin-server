@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.poppin.poppinserver.domain.WhoWithPopup;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -13,13 +14,13 @@ public record WhoWithDto(
         Boolean withFriend,
         Boolean withFamily,
         Boolean withBool) {
-        public static WhoWithDto fromEntity(WhoWithDto whoWithDto){
+        public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup){
                 return WhoWithDto.builder()
-                        .id(whoWithDto.id)
-                        .solo(whoWithDto.solo)
-                        .withFriend(whoWithDto.withFriend)
-                        .withFamily(whoWithDto.withFamily)
-                        .withBool(whoWithDto.withBool)
+                        .id(whoWithPopup.getId())
+                        .solo(whoWithPopup.getSolo())
+                        .withFriend(whoWithPopup.getWithFriend())
+                        .withFamily(whoWithPopup.getWithFamily())
+                        .withBool(whoWithPopup.getWithBool())
                         .build();
         }
 }

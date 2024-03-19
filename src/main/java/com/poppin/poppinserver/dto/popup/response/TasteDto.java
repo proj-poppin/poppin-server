@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.poppin.poppinserver.domain.TastePopup;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -22,22 +23,22 @@ public record TasteDto(
         Boolean kpop,
         Boolean alchol,
         Boolean animalPlant) {
-        public static TasteDto fromEntity(TasteDto tasteDto){
+        public static TasteDto fromEntity(TastePopup tastePopup){
                 return TasteDto.builder()
-                        .id(tasteDto.id)
-                        .fasionBeauty(tasteDto.fasionBeauty)
-                        .character(tasteDto.character)
-                        .foodBeverage(tasteDto.foodBeverage)
-                        .webtoonAni(tasteDto.webtoonAni)
-                        .interiorThings(tasteDto.interiorThings)
-                        .movie(tasteDto.movie)
-                        .musical(tasteDto.musical)
-                        .sports(tasteDto.sports)
-                        .game(tasteDto.game)
-                        .itTech(tasteDto.itTech)
-                        .kpop(tasteDto.kpop)
-                        .alchol(tasteDto.alchol)
-                        .animalPlant(tasteDto.animalPlant)
+                        .id(tastePopup.getId())
+                        .fasionBeauty(tastePopup.getFasionBeauty())
+                        .character(tastePopup.getCharacter())
+                        .foodBeverage(tastePopup.getFoodBeverage())
+                        .webtoonAni(tastePopup.getWebtoonAni())
+                        .interiorThings(tastePopup.getInteriorThings())
+                        .movie(tastePopup.getMovie())
+                        .musical(tastePopup.getMusical())
+                        .sports(tastePopup.getSports())
+                        .game(tastePopup.getGame())
+                        .itTech(tastePopup.getItTech())
+                        .kpop(tastePopup.getKpop())
+                        .alchol(tastePopup.getAlchol())
+                        .animalPlant(tastePopup.getAnimalPlant())
                         .build();
         }
 }

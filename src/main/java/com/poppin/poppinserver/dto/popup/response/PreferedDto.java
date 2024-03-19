@@ -3,6 +3,7 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.PreferedPopup;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -15,13 +16,13 @@ public record PreferedDto(
         Boolean experience,
         Boolean wantFree
 ) {
-        public static PreferedDto fromEntity(PreferedDto preferedDto){
+        public static PreferedDto fromEntity(PreferedPopup preferedPopup){
                 return PreferedDto.builder()
-                        .id(preferedDto.id)
-                        .market(preferedDto.market)
-                        .display(preferedDto.display)
-                        .experience(preferedDto.experience)
-                        .wantFree(preferedDto.wantFree)
+                        .id(preferedPopup.getId())
+                        .market(preferedPopup.getMarket())
+                        .display(preferedPopup.getDisplay())
+                        .experience(preferedPopup.getExperience())
+                        .wantFree(preferedPopup.getWantFree())
                         .build();
         }
 }
