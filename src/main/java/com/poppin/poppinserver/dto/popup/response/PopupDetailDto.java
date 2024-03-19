@@ -8,6 +8,7 @@ import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import lombok.Builder;
 
 import java.util.List;
+import java.util.Optional;
 
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -20,7 +21,6 @@ public record PopupDetailDto(
          Integer entranceFee,
          Integer availableAge,
          Boolean parkingAvailable,
-         Integer visiterCnt,
          Integer reopenDemandCnt,
          Integer interesteCnt,
          Integer viewCnt,
@@ -33,9 +33,10 @@ public record PopupDetailDto(
          String category,
          String operationStatus,
          List<ReviewInfoDto> review,
-         VisitorDataInfoDto visitorData
+         VisitorDataInfoDto visitorData,
+         Optional<Integer> realTimeVisit
 ) {
-    public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto){
+    public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
         return PopupDetailDto.builder()
                 .id(popup.getId())
@@ -46,7 +47,6 @@ public record PopupDetailDto(
                 .entranceFee(popup.getEntranceFee())
                 .availableAge(popup.getEntranceFee())
                 .parkingAvailable(popup.getParkingAvailable())
-                .visiterCnt(popup.getVisiterCnt())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
                 .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
@@ -60,6 +60,7 @@ public record PopupDetailDto(
                 .operationStatus(popup.getOperationStatus())
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)
+                .realTimeVisit(realTimeVisit)
                 .build();
     }
 }

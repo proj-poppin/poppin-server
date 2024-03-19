@@ -34,8 +34,8 @@ public class PopupController {
     }
 
     @GetMapping("/detail")
-    public ResponseDto<?> readDetail(@RequestParam("popup_id") Long popupId){
-        return ResponseDto.ok(popupService.readDetail(popupId));
+    public ResponseDto<?> readDetail(@RequestParam("user_id") Long userId, @RequestParam("popup_id") Long popupId){
+        return ResponseDto.ok(popupService.readDetail(userId,popupId));
     }
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
