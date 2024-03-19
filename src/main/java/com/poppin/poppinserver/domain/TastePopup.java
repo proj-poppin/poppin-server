@@ -17,42 +17,42 @@ public class TastePopup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "fasion_beauty")
+    @Column(name = "fasion_beauty", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean fasionBeauty;
 
-    @Column(name = "character")
+    @Column(name = "character", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean character;
 
-    @Column(name = "food_beverage")
+    @Column(name = "food_beverage", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean foodBeverage;
 
-    @Column(name = "webtoon_ani")
+    @Column(name = "webtoon_ani", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean webtoonAni;
 
-    @Column(name = "interior_things")
+    @Column(name = "interior_things", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean interiorThings;
 
-    @Column(name = "movie")
+    @Column(name = "movie", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean movie;
 
-    @Column(name = "musical")
+    @Column(name = "musical", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean musical;
 
-    @Column(name = "sports")
+    @Column(name = "sports", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean sports;
 
-    @Column(name = "game")
+    @Column(name = "game", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean game;
 
-    @Column(name = "it_tech")
+    @Column(name = "it_tech", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean itTech;
 
-    @Column(name = "kpop")
+    @Column(name = "kpop", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean kpop;
 
-    @Column(name = "alchol")
+    @Column(name = "alchol", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean alchol;
 
-    @Column(name = "animal_plant")
+    @Column(name = "animal_plant", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean animalPlant;
 }

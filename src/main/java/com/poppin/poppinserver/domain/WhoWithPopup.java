@@ -17,15 +17,15 @@ public class WhoWithPopup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "solo")
+    @Column(name = "solo", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean solo;
 
-    @Column(name = "with_friend")
+    @Column(name = "with_friend", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean withFriend;
 
-    @Column(name = "with_family")
+    @Column(name = "with_family", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean withFamily;
 
-    @Column(name = "with_bool")
+    @Column(name = "with_bool", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean withBool;
 }

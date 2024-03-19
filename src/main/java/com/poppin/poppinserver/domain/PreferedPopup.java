@@ -17,15 +17,15 @@ public class PreferedPopup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "market")
+    @Column(name = "market", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean market;
 
-    @Column(name = "display")
+    @Column(name = "display", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean display;
 
-    @Column(name = "experience")
+    @Column(name = "experience", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean experience;
 
-    @Column(name = "want_free")
+    @Column(name = "want_free", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean wantFree;
 }

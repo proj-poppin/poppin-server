@@ -80,6 +80,18 @@ public class Popup {
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
+    @OneToOne
+    @JoinColumn(name = "prefered_id")
+    private PreferedPopup preferedPopup;
+
+    @OneToOne
+    @JoinColumn(name = "taste_id")
+    private TastePopup tastePopup;
+
+    @OneToOne
+    @JoinColumn(name = "with_id")
+    private WhoWithPopup whoWithPopup;
+
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
