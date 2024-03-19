@@ -17,14 +17,6 @@ public class TastePopup {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup-id")
-    private Popup popupId;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user-id")
-    private Popup userId;
-
     @Column(name = "fasion_beauty")
     private Boolean fasionBeauty;
 

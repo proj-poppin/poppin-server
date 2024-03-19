@@ -9,8 +9,6 @@ import java.time.LocalTime;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CreatePopupDto(
-        // String posterUrl,
-
         @NotNull
         String name,
         @NotNull
