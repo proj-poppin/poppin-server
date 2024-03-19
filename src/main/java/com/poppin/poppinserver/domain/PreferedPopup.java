@@ -35,7 +35,8 @@ public class PreferedPopup {
     private Boolean wantFree;
 
     @Builder
-    public PreferedPopup(Boolean market, Boolean display, Boolean experience, Boolean wantFree) {
+    public PreferedPopup(Boolean market, Boolean display, Boolean experience,
+                         Boolean wantFree) {
         this.market = market;
         this.display = display;
         this.experience = experience;
