@@ -16,7 +16,6 @@ public record PopupDto(
         Integer entranceFee,
         Integer availableAge,
         Boolean parkingAvailable,
-        Integer visiterCnt,
         Integer reopenDemandCnt,
         Integer interesteCnt,
         Integer viewCnt,
@@ -39,7 +38,6 @@ public record PopupDto(
                 .entranceFee(popup.getEntranceFee())
                 .availableAge(popup.getEntranceFee())
                 .parkingAvailable(popup.getParkingAvailable())
-                .visiterCnt(popup.getVisiterCnt())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
                 .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
