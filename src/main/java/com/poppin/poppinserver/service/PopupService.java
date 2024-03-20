@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
@@ -27,13 +28,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PopupService {
     private final PopupRepository popupRepository;
-
     private final ReviewRepository reviewRepository;
-
-    private final VisitorDataRepository visitorDataRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
+
     private final S3Service s3Service;
+    private final VisitorDataService visitorDataService;
+    private final RealTimeVisitService realTimeVisitService;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
 
@@ -91,7 +92,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     }
 
-    public PopupDetailDto readDetail(Long popupId){
+    public PopupDetailDto readDetail(Long userId, Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -99,14 +100,12 @@ public class PopupService {
 
         List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
 
-        Map<String,Object> weekdayAm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("평일 오전").toString());
-        Map<String,Object> weekdayPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("평일 오후").toString());
-        Map<String,Object> weekendAm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오전").toString());
-        Map<String,Object> weekendPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오후").toString());
-        int satisfaction = visitorDataRepository.satisfactionRate(popupId, Satisfaction.fromValue("만족").toString());
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        VisitorDataInfoDto visitorDataDto = VisitorDataInfoDto.fromEntity(weekdayAm, weekdayPm, weekendAm, weekendPm, satisfaction);
-        return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto);
+        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId,popupId);
+        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(addVisitorsDto); // 실시간 방문자
+
+        return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
     }
 
     public List<PopupSummaryDto> readHotList(){
