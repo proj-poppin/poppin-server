@@ -38,12 +38,11 @@ public record PopupDto(
         TasteDto taste,
         WhoWithDto whoWith
 ) {
-    public static PopupDto fromEntity(Popup popup, PreferedPopup preferedPopup,
-                                      TastePopup tastePopup, WhoWithPopup whoWithPopup){
+    public static PopupDto fromEntity(Popup popup){
 
-        PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
-        TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
-        WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
+//        PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
+//        TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
+//        WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
 
         return PopupDto.builder()
                 .id(popup.getId())
@@ -65,9 +64,9 @@ public record PopupDto(
                 .closeTime(popup.getCloseTime().toString())
                 .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
-                .prefered(preferedDto)
-                .taste(tasteDto)
-                .whoWith(whoWithDto)
+//                .prefered(preferedDto)
+//                .taste(tasteDto)
+//                .whoWith(whoWithDto)
                 .build();
     }
 }
