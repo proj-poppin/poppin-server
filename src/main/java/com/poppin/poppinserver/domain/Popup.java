@@ -77,6 +77,18 @@ public class Popup {
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
+    @OneToOne
+    @JoinColumn(name = "prefered_id", nullable = false)
+    private PreferedPopup preferedPopup;
+
+    @OneToOne
+    @JoinColumn(name = "taste_id", nullable = false)
+    private TastePopup tastePopup;
+
+    @OneToOne
+    @JoinColumn(name = "with_id", nullable = false)
+    private WhoWithPopup whoWithPopup;
+
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
@@ -85,7 +97,8 @@ public class Popup {
                  String location, Integer entranceFee, Integer availableAge,
                  Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String category, String operationStatus) {
+                 LocalTime closeTime, String category, String operationStatus,
+                 PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
         this.posterUrl = posterUrl;
         this.name = name;
         this.introduce = introduce;
@@ -104,6 +117,9 @@ public class Popup {
         this.closeTime = closeTime;
         this.category = category;
         this.operationStatus = operationStatus; // 내부 동기화
+        this.tastePopup = tastePopup;
+        this.whoWithPopup = whoWithPopup;
+        this.preferedPopup = preferedPopup;
     }
 
     public void addInterestCnt(){
