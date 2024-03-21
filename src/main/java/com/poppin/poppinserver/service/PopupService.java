@@ -3,6 +3,9 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
+import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
@@ -31,6 +34,9 @@ public class PopupService {
     private final ReviewRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
+    private final PreferedPopupRepository preferedPopupRepository;
+    private final TastePopupRepository tastePopupRepository;
+    private final WhoWithPopupRepository whoWithPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -53,6 +59,45 @@ public class PopupService {
             operationStatus = "OPERATING";
         }
 
+        //카테고리별 엔티티 정의
+        CreatePreferedDto createPreferedDto = createPopupDto.prefered();
+        PreferedPopup preferedPopup = PreferedPopup.builder()
+                .market(createPreferedDto.market())
+                .display(createPreferedDto.display())
+                .experience(createPreferedDto.experience())
+                .wantFree(createPreferedDto.wantFree())
+                .build();
+
+        CreateTasteDto createTasteDto = createPopupDto.taste();
+        TastePopup tastePopup = TastePopup.builder()
+                .fasionBeauty(createTasteDto.fasionBeauty())
+                .character(createTasteDto.character())
+                .foodBeverage(createTasteDto.foodBeverage())
+                .webtoonAni(createTasteDto.webtoonAni())
+                .interiorThings(createTasteDto.interiorThings())
+                .movie(createTasteDto.movie())
+                .musical(createTasteDto.musical())
+                .sports(createTasteDto.sports())
+                .game(createTasteDto.game())
+                .itTech(createTasteDto.itTech())
+                .kpop(createTasteDto.kpop())
+                .alchol(createTasteDto.alchol())
+                .animalPlant(createTasteDto.animalPlant())
+                .build();
+
+        CreateWhoWithDto createWhoWithDto = createPopupDto.whoWith();
+        WhoWithPopup whoWithPopup = WhoWithPopup.builder()
+                .solo(createWhoWithDto.solo())
+                .withBool(createWhoWithDto.withBool())
+                .withFamily(createWhoWithDto.withFamily())
+                .withFriend(createWhoWithDto.withFriend())
+                .build();
+
+        //각 카테고리 저장
+        preferedPopup = preferedPopupRepository.save(preferedPopup);
+        tastePopup = tastePopupRepository.save(tastePopup);
+        whoWithPopup = whoWithPopupRepository.save(whoWithPopup);
+
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
@@ -67,10 +112,12 @@ public class PopupService {
                 .openTime(createPopupDto.openTime())
                 .operationStatus(operationStatus)
                 .parkingAvailable(createPopupDto.parkingAvailable())
+                .preferedPopup(preferedPopup)
+                .tastePopup(tastePopup)
+                .whoWithPopup(whoWithPopup)
                 .build();
 
         popup = popupRepository.save(popup);
-
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
