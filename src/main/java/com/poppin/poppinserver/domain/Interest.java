@@ -14,7 +14,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "intereste")
+@Table(name = "interest")
 public class Interest {
     @EmbeddedId
     private InteresteId id;
