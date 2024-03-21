@@ -21,8 +21,8 @@ public class TastePopup {
     @Column(name = "fasion_beauty", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean fasionBeauty;
 
-    @Column(name = "character", nullable = false, columnDefinition = "TINYINT(1)")
-    private Boolean character;
+    @Column(name = "characters", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean characters;
 
     @Column(name = "food_beverage", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean foodBeverage;
@@ -58,13 +58,13 @@ public class TastePopup {
     private Boolean animalPlant;
 
     @Builder
-    public TastePopup(Boolean fasionBeauty, Boolean character, Boolean foodBeverage,
+    public TastePopup(Boolean fasionBeauty, Boolean characters, Boolean foodBeverage,
                       Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                       Boolean musical, Boolean sports, Boolean game,
                       Boolean itTech, Boolean kpop, Boolean alchol,
                       Boolean animalPlant) {
         this.fasionBeauty = fasionBeauty;
-        this.character = character;
+        this.characters = characters;
         this.foodBeverage = foodBeverage;
         this.webtoonAni = webtoonAni;
         this.interiorThings = interiorThings;

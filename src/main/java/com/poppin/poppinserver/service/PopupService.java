@@ -71,7 +71,7 @@ public class PopupService {
         CreateTasteDto createTasteDto = createPopupDto.taste();
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(createTasteDto.fasionBeauty())
-                .character(createTasteDto.character())
+                .characters(createTasteDto.characters())
                 .foodBeverage(createTasteDto.foodBeverage())
                 .webtoonAni(createTasteDto.webtoonAni())
                 .interiorThings(createTasteDto.interiorThings())

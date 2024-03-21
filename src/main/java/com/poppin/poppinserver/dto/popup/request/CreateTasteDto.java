@@ -9,7 +9,7 @@ public record CreateTasteDto(
         @NotNull
         Boolean fasionBeauty,
         @NotNull
-        Boolean character,
+        Boolean characters,
         @NotNull
         Boolean foodBeverage,
         @NotNull

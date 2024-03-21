@@ -3,7 +3,6 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.TastePopup;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
@@ -11,7 +10,7 @@ import lombok.Builder;
 public record TasteDto(
         Long id,
         Boolean fasionBeauty,
-        Boolean character,
+        Boolean characters,
         Boolean foodBeverage,
         Boolean webtoonAni,
         Boolean interiorThings,
@@ -27,7 +26,7 @@ public record TasteDto(
                 return TasteDto.builder()
                         .id(tastePopup.getId())
                         .fasionBeauty(tastePopup.getFasionBeauty())
-                        .character(tastePopup.getCharacter())
+                        .characters(tastePopup.getCharacters())
                         .foodBeverage(tastePopup.getFoodBeverage())
                         .webtoonAni(tastePopup.getWebtoonAni())
                         .interiorThings(tastePopup.getInteriorThings())
