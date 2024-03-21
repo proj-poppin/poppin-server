@@ -34,6 +34,9 @@ public class PopupService {
     private final ReviewRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
+    private final PreferedPopupRepository preferedPopupRepository;
+    private final TastePopupRepository tastePopupRepository;
+    private final WhoWithPopupRepository whoWithPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -91,7 +94,9 @@ public class PopupService {
                 .build();
 
         //각 카테고리 저장
-
+        preferedPopup = preferedPopupRepository.save(preferedPopup);
+        tastePopup = tastePopupRepository.save(tastePopup);
+        whoWithPopup = whoWithPopupRepository.save(whoWithPopup);
 
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
@@ -107,10 +112,12 @@ public class PopupService {
                 .openTime(createPopupDto.openTime())
                 .operationStatus(operationStatus)
                 .parkingAvailable(createPopupDto.parkingAvailable())
+                .preferedPopup(preferedPopup)
+                .tastePopup(tastePopup)
+                .whoWithPopup(whoWithPopup)
                 .build();
 
         popup = popupRepository.save(popup);
-
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장

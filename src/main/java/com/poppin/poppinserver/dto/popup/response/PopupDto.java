@@ -38,12 +38,11 @@ public record PopupDto(
         TasteDto taste,
         WhoWithDto whoWith
 ) {
-    public static PopupDto fromEntity(Popup popup, PreferedPopup preferedPopup, TastePopup tastePopup
-            , WhoWithPopup whoWithPopup){
+    public static PopupDto fromEntity(Popup popup){
 
-        PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
-        TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
-        WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
+        PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+        TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
+        WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
 
         return PopupDto.builder()
                 .id(popup.getId())
