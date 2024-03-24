@@ -53,6 +53,9 @@ public class User {
     @Column(name = "agreed_to_gps", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean agreedToGPS;
 
+    @Column(name = "deleted_at")
+    private LocalDate deletedAt;
+
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private EUserRole role;
