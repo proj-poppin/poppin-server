@@ -17,7 +17,7 @@ import java.util.Objects;
 @Table(name = "interest")
 public class Interest {
     @EmbeddedId
-    private InteresteId id;
+    private InterestId id;
 
     @ManyToOne
     @MapsId("userId")
@@ -36,13 +36,13 @@ public class Interest {
     // 복합키 생성자
     @Embeddable
     @Getter
-    public static class InteresteId implements Serializable {
+    public static class InterestId implements Serializable {
         private Long userId;
         private Long popupId;
 
-        public InteresteId() {}
+        public InterestId() {}
 
-        public InteresteId(Long userId, Long popupId) {
+        public InterestId(Long userId, Long popupId) {
             this.userId = userId;
             this.popupId = popupId;
         }
@@ -51,7 +51,7 @@ public class Interest {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            InteresteId that = (InteresteId) o;
+            InterestId that = (InterestId) o;
             return Objects.equals(userId, that.userId) &&
                     Objects.equals(popupId, that.popupId);
         }
@@ -64,7 +64,7 @@ public class Interest {
 
     @Builder
     public Interest(User user, Popup popup) {
-        this.id = new InteresteId(user.getId(), popup.getId());
+        this.id = new InterestId(user.getId(), popup.getId());
         this.user = user;
         this.popup = popup;
         this.createdAt = LocalDateTime.now();

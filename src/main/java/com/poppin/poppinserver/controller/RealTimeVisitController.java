@@ -20,12 +20,11 @@ public class RealTimeVisitController {
     private final RealTimeVisitService realTimeVisitService;
 
     @GetMapping ("/show-visitors")
-    public ResponseDto<?> showRealTimeVisitorsCnt(@UserId Long userId, AddVisitorsDto addVisitorsDto){ return ResponseDto.ok(realTimeVisitService.showRealTimeVisitors(userId, addVisitorsDto)); }
+    public ResponseDto<?> showRealTimeVisitorsCnt(AddVisitorsDto addVisitorsDto){ return ResponseDto.ok(realTimeVisitService.showRealTimeVisitors(addVisitorsDto)); }
 
     @PostMapping("/add-visitors")
-    public  ResponseDto<?> addRealTimeVisitors(@UserId Long userId, AddVisitorsDto addVisitorsDto){
-        log.info(userId.toString());
-        return ResponseDto.ok(realTimeVisitService.addRealTimeVisitors(userId, addVisitorsDto));
+    public  ResponseDto<?> addRealTimeVisitors(AddVisitorsDto addVisitorsDto){
+        return ResponseDto.ok(realTimeVisitService.addRealTimeVisitors(addVisitorsDto));
     }
 
 }
