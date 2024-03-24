@@ -27,15 +27,15 @@ public class WhoWithPopup {
     @Column(name = "with_family", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean withFamily;
 
-    @Column(name = "with_bool", nullable = false, columnDefinition = "TINYINT(1)")
-    private Boolean withBool;
+    @Column(name = "with_lover", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean withLover;
 
     @Builder
     public WhoWithPopup(Boolean solo, Boolean withFriend, Boolean withFamily,
-                        Boolean withBool) {
+                        Boolean withLover) {
         this.solo = solo;
         this.withFriend = withFriend;
         this.withFamily = withFamily;
-        this.withBool = withBool;
+        this.withLover = withLover;
     }
 }

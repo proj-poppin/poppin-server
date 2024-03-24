@@ -13,14 +13,14 @@ public record WhoWithDto(
         Boolean solo,
         Boolean withFriend,
         Boolean withFamily,
-        Boolean withBool) {
+        Boolean withLover) {
         public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup){
                 return WhoWithDto.builder()
                         .id(whoWithPopup.getId())
                         .solo(whoWithPopup.getSolo())
                         .withFriend(whoWithPopup.getWithFriend())
                         .withFamily(whoWithPopup.getWithFamily())
-                        .withBool(whoWithPopup.getWithBool())
+                        .withLover(whoWithPopup.getWithLover())
                         .build();
         }
 }
