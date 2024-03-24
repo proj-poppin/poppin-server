@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.type.ELoginProvider;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +41,7 @@ public class User {
     private String birthDate;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "is_login", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean isLogin;
@@ -54,7 +56,7 @@ public class User {
     private Boolean agreedToGPS;
 
     @Column(name = "deleted_at")
-    private LocalDate deletedAt;
+    private LocalDateTime deletedAt;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean isDeleted;
@@ -99,7 +101,7 @@ public class User {
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
         this.agreedToServiceTerms = agreedToServiceTerms;
         this.agreedToGPS = agreedToGPS;
-        this.createdAt = LocalDate.now();
+        this.createdAt = LocalDateTime.now();
         this.isLogin = false;
         this.refreshToken = null;
     }
@@ -146,9 +148,13 @@ public class User {
         this.password = password;
     }
 
-    public void logoutUser() {
-        this.isLogin = false;
-        this.refreshToken = null;
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);
     }
 
+    public void recover() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+    }
 }

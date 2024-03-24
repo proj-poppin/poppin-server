@@ -12,6 +12,7 @@ public class Constant {
     public static final String USER_ID_CLAIM_NAME = "uid";
     public static final String USER_EMAIL_CLAIM_NAME = "email";
     public static final String CONTENT_TYPE = "Content-Type";
+    public static final Long MEMBER_INFO_RETENTION_PERIOD = 30L;
     public static final List<String> NO_NEED_AUTH_URLS = List.of(
             "/api/v1/auth/sign-up", // 회원가입
             "/api/v1/auth/sign-in", // 로그인
