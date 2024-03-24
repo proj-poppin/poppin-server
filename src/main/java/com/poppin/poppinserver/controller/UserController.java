@@ -2,10 +2,7 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.dto.popup.request.CreateUserTasteDto;
-import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import com.poppin.poppinserver.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/taste")
+    @PostMapping("/popup-taste")
     public ResponseDto<?> createUserTaste(
             @UserId Long userId,
             @RequestBody @Valid CreateUserTasteDto userTasteDto
@@ -27,8 +24,16 @@ public class UserController {
         return ResponseDto.created(userService.createUserTaste(userId, userTasteDto));
     }
 
-    @GetMapping("/taste")
+    @GetMapping("/popup-taste")
     public ResponseDto<?> readUserTaste(@UserId Long userId) {
         return ResponseDto.ok(userService.readUserTaste(userId));
+    }
+
+    @PutMapping("/popup-taste")
+    public ResponseDto<?> updateUserTaste(
+            @UserId Long userId,
+            @RequestBody @Valid CreateUserTasteDto userTasteDto
+    ) {
+        return ResponseDto.ok(userService.updateUserTaste(userId, userTasteDto));
     }
 }

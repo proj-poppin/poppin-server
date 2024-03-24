@@ -90,8 +90,7 @@ public class User {
     @Builder
     public User(String email, String password, String nickname, String birthDate,
                 ELoginProvider eLoginProvider, EUserRole role,
-                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS,
-                PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup)
+                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS)
     {
         this.email = email;
         this.password = password;
@@ -107,9 +106,6 @@ public class User {
         this.refreshToken = null;
         this.deletedAt = null;
         this.isDeleted = false;
-        this.preferedPopup = preferedPopup;
-        this.tastePopup = tastePopup;
-        this.whoWithPopup = whoWithPopup;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
@@ -152,6 +148,12 @@ public class User {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void updatePopupTaste(PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
+        this.preferedPopup = preferedPopup;
+        this.tastePopup = tastePopup;
+        this.whoWithPopup = whoWithPopup;
     }
 
     public void softDelete() {

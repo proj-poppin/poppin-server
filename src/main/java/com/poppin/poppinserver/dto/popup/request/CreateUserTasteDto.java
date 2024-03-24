@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CreateUserTasteDto(
-        @NotNull CreatePreferedDto preferedDto,
-        @NotNull CreateTasteDto tasteDto,
-        @NotNull CreateWhoWithDto whoWithDto
+        @NotNull CreatePreferedDto prefered,
+        @NotNull CreateTasteDto taste,
+        @NotNull CreateWhoWithDto whoWith
 ) {
 
 }

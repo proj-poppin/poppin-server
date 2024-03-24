@@ -38,4 +38,12 @@ public class WhoWithPopup {
         this.withFamily = withFamily;
         this.withLover = withLover;
     }
+
+    public void update(Boolean solo, Boolean withFriend, Boolean withFamily,
+                        Boolean withLover) {
+        this.solo = solo;
+        this.withFriend = withFriend;
+        this.withFamily = withFamily;
+        this.withLover = withLover;
+    }
 }

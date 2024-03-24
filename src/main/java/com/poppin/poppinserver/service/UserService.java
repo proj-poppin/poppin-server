@@ -41,10 +41,10 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createUserTasteDto.preferedDto().market())
-                .display(createUserTasteDto.preferedDto().display())
-                .experience(createUserTasteDto.preferedDto().experience())
-                .wantFree(createUserTasteDto.preferedDto().wantFree())
+                .market(createUserTasteDto.prefered().market())
+                .display(createUserTasteDto.prefered().display())
+                .experience(createUserTasteDto.prefered().experience())
+                .wantFree(createUserTasteDto.prefered().wantFree())
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
@@ -52,19 +52,19 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createUserTasteDto.tasteDto().fasionBeauty())
-                .characters(createUserTasteDto.tasteDto().characters())
-                .foodBeverage(createUserTasteDto.tasteDto().foodBeverage())
-                .webtoonAni(createUserTasteDto.tasteDto().webtoonAni())
-                .interiorThings(createUserTasteDto.tasteDto().interiorThings())
-                .movie(createUserTasteDto.tasteDto().movie())
-                .musical(createUserTasteDto.tasteDto().musical())
-                .sports(createUserTasteDto.tasteDto().sports())
-                .game(createUserTasteDto.tasteDto().game())
-                .itTech(createUserTasteDto.tasteDto().itTech())
-                .kpop(createUserTasteDto.tasteDto().kpop())
-                .alchol(createUserTasteDto.tasteDto().alchol())
-                .animalPlant(createUserTasteDto.tasteDto().animalPlant())
+                .fasionBeauty(createUserTasteDto.taste().fasionBeauty())
+                .characters(createUserTasteDto.taste().characters())
+                .foodBeverage(createUserTasteDto.taste().foodBeverage())
+                .webtoonAni(createUserTasteDto.taste().webtoonAni())
+                .interiorThings(createUserTasteDto.taste().interiorThings())
+                .movie(createUserTasteDto.taste().movie())
+                .musical(createUserTasteDto.taste().musical())
+                .sports(createUserTasteDto.taste().sports())
+                .game(createUserTasteDto.taste().game())
+                .itTech(createUserTasteDto.taste().itTech())
+                .kpop(createUserTasteDto.taste().kpop())
+                .alchol(createUserTasteDto.taste().alchol())
+                .animalPlant(createUserTasteDto.taste().animalPlant())
                 .build();
         tastePopupRepository.save(tastePopup);
 
@@ -72,12 +72,15 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         WhoWithPopup whoWithPopup = WhoWithPopup.builder()
-                .solo(createUserTasteDto.whoWithDto().solo())
-                .withFriend(createUserTasteDto.whoWithDto().withFriend())
-                .withFamily(createUserTasteDto.whoWithDto().withFamily())
-                .withLover(createUserTasteDto.whoWithDto().withLover())
+                .solo(createUserTasteDto.whoWith().solo())
+                .withFriend(createUserTasteDto.whoWith().withFriend())
+                .withFamily(createUserTasteDto.whoWith().withFamily())
+                .withLover(createUserTasteDto.whoWith().withLover())
                 .build();
         whoWithPopupRepository.save(whoWithPopup);
+
+        user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
+        userRepository.save(user);
 
         return UserTasteDto.builder()
                 .preferedDto(PreferedDto.fromEntity(preferedPopup))
@@ -86,6 +89,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public UserTasteDto readUserTaste(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -94,6 +98,51 @@ public class UserService {
                 .preferedDto(PreferedDto.fromEntity(user.getPreferedPopup()))
                 .tasteDto(TasteDto.fromEntity(user.getTastePopup()))
                 .whoWithDto(WhoWithDto.fromEntity(user.getWhoWithPopup()))
+                .build();
+    }
+
+    @Transactional
+    public UserTasteDto updateUserTaste(Long userId, CreateUserTasteDto createUserTasteDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        PreferedPopup preferedPopup = user.getPreferedPopup();
+        preferedPopup.update(createUserTasteDto.prefered().market(),
+                createUserTasteDto.prefered().display(),
+                createUserTasteDto.prefered().experience(),
+                createUserTasteDto.prefered().wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        TastePopup tastePopup = user.getTastePopup();
+        tastePopup.update(createUserTasteDto.taste().fasionBeauty(),
+                createUserTasteDto.taste().characters(),
+                createUserTasteDto.taste().foodBeverage(),
+                createUserTasteDto.taste().webtoonAni(),
+                createUserTasteDto.taste().interiorThings(),
+                createUserTasteDto.taste().movie(),
+                createUserTasteDto.taste().musical(),
+                createUserTasteDto.taste().sports(),
+                createUserTasteDto.taste().game(),
+                createUserTasteDto.taste().itTech(),
+                createUserTasteDto.taste().kpop(),
+                createUserTasteDto.taste().alchol(),
+                createUserTasteDto.taste().animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        WhoWithPopup whoWithPopup = user.getWhoWithPopup();
+        whoWithPopup.update(createUserTasteDto.whoWith().solo(),
+                createUserTasteDto.whoWith().withFriend(),
+                createUserTasteDto.whoWith().withFamily(),
+                createUserTasteDto.whoWith().withLover());
+        whoWithPopupRepository.save(whoWithPopup);
+
+        user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
+        userRepository.save(user);
+
+        return UserTasteDto.builder()
+                .preferedDto(PreferedDto.fromEntity(preferedPopup))
+                .tasteDto(TasteDto.fromEntity(tastePopup))
+                .whoWithDto(WhoWithDto.fromEntity(whoWithPopup))
                 .build();
     }
 }
