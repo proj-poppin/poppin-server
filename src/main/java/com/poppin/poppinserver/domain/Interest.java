@@ -32,7 +32,7 @@ public class Interest {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // InteresteId 정적 중첩 클래스 정의
+    // InterestId 정적 중첩 클래스 정의
     // 복합키 생성자
     @Embeddable
     @Getter
