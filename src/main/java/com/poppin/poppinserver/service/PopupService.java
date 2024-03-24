@@ -149,8 +149,9 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId,popupId);
-        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(addVisitorsDto); // 실시간 방문자
+        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(popupId);
+
+        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(userId, addVisitorsDto); // 실시간 방문자
 
         return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
     }

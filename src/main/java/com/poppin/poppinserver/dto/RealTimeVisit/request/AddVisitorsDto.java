@@ -9,8 +9,6 @@ import lombok.Builder;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AddVisitorsDto(
         @NotNull
-        Long usersId,
-        @NotNull
         Long popupId
 ) {
 }

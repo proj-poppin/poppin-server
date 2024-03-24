@@ -25,7 +25,10 @@ public record PopupSearchingDto(
         String closeDate,
         String category,
         String operationStatus,
-        Boolean isInterested
+        Boolean isInterested,
+        PreferedDto prefered,
+        TasteDto taste,
+        WhoWithDto whoWith
 ) {
     public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user){
         List<PopupSearchingDto> dtoList = new ArrayList<>();
@@ -39,6 +42,10 @@ public record PopupSearchingDto(
 
         for(Popup popup : popups){
             Boolean isInterested;
+
+            PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+            TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
+            WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
 
             if(interestedPopups.contains(popup)) isInterested = Boolean.TRUE;
             else isInterested = Boolean.FALSE;
@@ -57,6 +64,9 @@ public record PopupSearchingDto(
                             .category(popup.getCategory())
                             .operationStatus(popup.getOperationStatus())
                             .isInterested(isInterested)
+                            .taste(tasteDto)
+                            .prefered(preferedDto)
+                            .whoWith(whoWithDto)
                             .build();
 
             dtoList.add(popupSummaryDto);
