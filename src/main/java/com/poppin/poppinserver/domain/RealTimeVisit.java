@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "real-time-visit")
+@Table(name = "realtime_visit")
 public class RealTimeVisit {
 
     @Id

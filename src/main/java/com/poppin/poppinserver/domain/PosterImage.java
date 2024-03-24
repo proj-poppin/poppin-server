@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "poster-images")
+@Table(name = "poster_images")
 public class PosterImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

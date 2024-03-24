@@ -30,7 +30,7 @@ public class InterestService {
         //중복검사
         interestRepository.findByUserIdAndPopupId(userId, addInterestDto.popupId())
                 .ifPresent(interest -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_INTERESTE);
+                    throw new CommonException(ErrorCode.DUPLICATED_INTEREST);
                 });
 
         User user = userRepository.findById(userId)

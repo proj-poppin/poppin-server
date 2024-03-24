@@ -64,10 +64,13 @@ public class PopupController {
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long userId){
-        log.info(text);
-        log.info(String.valueOf(page));
-        log.info(String.valueOf(size));
-        log.info(userId.toString());
         return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
+    }
+
+    @GetMapping("/guest/search") // 팝업 검색
+    public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
+                                         @RequestParam("page") int page,
+                                         @RequestParam("size") int size){
+        return ResponseDto.ok(popupService.readGuestSearchingList(text, page, size));
     }
 }

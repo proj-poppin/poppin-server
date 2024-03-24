@@ -149,7 +149,8 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId,popupId);
+        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId, popupId);
+
         Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(addVisitorsDto); // 실시간 방문자
 
         return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
@@ -193,13 +194,14 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        log.info(text);
-        log.info(String.valueOf(page));
-        log.info(String.valueOf(size));
-        log.info(userId.toString());
-
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
 
         return PopupSearchingDto.fromEntityList(popups, user);
+    }
+
+    public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
+
+        return PopupGuestSearchingDto.fromEntityList(popups);
     }
 }

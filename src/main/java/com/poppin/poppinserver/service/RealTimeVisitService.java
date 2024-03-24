@@ -33,7 +33,7 @@ public class RealTimeVisitService {
 
     public Optional<Integer> showRealTimeVisitors(AddVisitorsDto addVisitorsDto){
 
-        User user = userRepository.findById(addVisitorsDto.usersId())
+        User user = userRepository.findById(addVisitorsDto.userId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(addVisitorsDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -49,7 +49,7 @@ public class RealTimeVisitService {
 
     public RealTimeVisitorsDto addRealTimeVisitors(AddVisitorsDto addVisitorsDto){
 
-        User user = userRepository.findById(addVisitorsDto.usersId())
+        User user = userRepository.findById(addVisitorsDto.userId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(addVisitorsDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
