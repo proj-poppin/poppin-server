@@ -15,6 +15,7 @@ import com.poppin.poppinserver.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.repository.TastePopupRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import com.poppin.poppinserver.repository.WhoWithPopupRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
 
+    @Transactional
     public UserTasteDto createUserTaste(
             Long userId,
             CreateUserTasteDto createUserTasteDto
@@ -36,6 +37,9 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        if (user.getPreferedPopup() != null) {
+            throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
+        }
         PreferedPopup preferedPopup = PreferedPopup.builder()
                 .market(createUserTasteDto.preferedDto().market())
                 .display(createUserTasteDto.preferedDto().display())
@@ -44,6 +48,9 @@ public class UserService {
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
+        if (user.getTastePopup() != null) {
+            throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
+        }
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(createUserTasteDto.tasteDto().fasionBeauty())
                 .characters(createUserTasteDto.tasteDto().characters())
@@ -61,6 +68,9 @@ public class UserService {
                 .build();
         tastePopupRepository.save(tastePopup);
 
+        if (user.getWhoWithPopup() != null) {
+            throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
+        }
         WhoWithPopup whoWithPopup = WhoWithPopup.builder()
                 .solo(createUserTasteDto.whoWithDto().solo())
                 .withFriend(createUserTasteDto.whoWithDto().withFriend())

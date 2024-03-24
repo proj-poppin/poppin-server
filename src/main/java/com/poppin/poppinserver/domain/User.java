@@ -90,7 +90,8 @@ public class User {
     @Builder
     public User(String email, String password, String nickname, String birthDate,
                 ELoginProvider eLoginProvider, EUserRole role,
-                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS)
+                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS,
+                PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup)
     {
         this.email = email;
         this.password = password;
@@ -104,6 +105,11 @@ public class User {
         this.createdAt = LocalDateTime.now();
         this.isLogin = false;
         this.refreshToken = null;
+        this.deletedAt = null;
+        this.isDeleted = false;
+        this.preferedPopup = preferedPopup;
+        this.tastePopup = tastePopup;
+        this.whoWithPopup = whoWithPopup;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
