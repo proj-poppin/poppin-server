@@ -56,6 +56,9 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDate deletedAt;
 
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1)", nullable = false)
+    private Boolean isDeleted;
+
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private EUserRole role;
@@ -67,8 +70,20 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER )
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prefered_popup_id")
+    private PreferedPopup preferedPopup;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taste_popup_id")
+    private TastePopup tastePopup;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "who_with_popup_id")
+    private WhoWithPopup whoWithPopup;
 
     @Builder
     public User(String email, String password, String nickname, String birthDate,
@@ -136,7 +151,4 @@ public class User {
         this.refreshToken = null;
     }
 
-    public void addIntereste(Interest intereste){
-        this.interestes.add(intereste);
-    }
 }
