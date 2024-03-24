@@ -85,4 +85,15 @@ public class UserService {
                 .whoWithDto(WhoWithDto.fromEntity(whoWithPopup))
                 .build();
     }
+
+    public UserTasteDto readUserTaste(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        return UserTasteDto.builder()
+                .preferedDto(PreferedDto.fromEntity(user.getPreferedPopup()))
+                .tasteDto(TasteDto.fromEntity(user.getTastePopup()))
+                .whoWithDto(WhoWithDto.fromEntity(user.getWhoWithPopup()))
+                .build();
+    }
 }
