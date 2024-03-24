@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.controller;
 
+import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.RealTimeVisitService;
@@ -22,6 +23,8 @@ public class RealTimeVisitController {
     public ResponseDto<?> showRealTimeVisitorsCnt(AddVisitorsDto addVisitorsDto){ return ResponseDto.ok(realTimeVisitService.showRealTimeVisitors(addVisitorsDto)); }
 
     @PostMapping("/add-visitors")
-    public  ResponseDto<?> addRealTimeVisitors(AddVisitorsDto addVisitorsDto){ return ResponseDto.ok(realTimeVisitService.addRealTimeVisitors(addVisitorsDto)); }
+    public  ResponseDto<?> addRealTimeVisitors(AddVisitorsDto addVisitorsDto){
+        return ResponseDto.ok(realTimeVisitService.addRealTimeVisitors(addVisitorsDto));
+    }
 
 }

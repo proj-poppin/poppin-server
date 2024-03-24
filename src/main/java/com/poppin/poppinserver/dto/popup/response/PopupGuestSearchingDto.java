@@ -2,18 +2,15 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.domain.User;
 import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record PopupSearchingDto(
+public record PopupGuestSearchingDto(
         Long id,
         String posterUrl,
         String name,
@@ -25,33 +22,21 @@ public record PopupSearchingDto(
         String closeDate,
         String category,
         String operationStatus,
-        Boolean isInterested,
         PreferedDto prefered,
         TasteDto taste,
         WhoWithDto whoWith
 ) {
-    public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user){
-        List<PopupSearchingDto> dtoList = new ArrayList<>();
-
-        Set<Interest> interestes = user.getInterestes();
-
-        List<Popup> interestedPopups = new ArrayList<>();
-        for(Interest intereste : interestes){
-            interestedPopups.add(intereste.getPopup());
-        }
+    public static List<PopupGuestSearchingDto> fromEntityList(List<Popup> popups){
+        List<PopupGuestSearchingDto> dtoList = new ArrayList<>();
 
         for(Popup popup : popups){
-            Boolean isInterested;
 
             PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
             WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
 
-            if(interestedPopups.contains(popup)) isInterested = Boolean.TRUE;
-            else isInterested = Boolean.FALSE;
-
-            PopupSearchingDto popupSummaryDto =
-                    PopupSearchingDto.builder()
+            PopupGuestSearchingDto popupGuestSearchingDto =
+                    PopupGuestSearchingDto.builder()
                             .id(popup.getId())
                             .posterUrl(popup.getPosterUrl())
                             .name(popup.getName())
@@ -63,13 +48,12 @@ public record PopupSearchingDto(
                             .closeDate(popup.getCloseDate().toString())
                             .category(popup.getCategory())
                             .operationStatus(popup.getOperationStatus())
-                            .isInterested(isInterested)
                             .taste(tasteDto)
                             .prefered(preferedDto)
                             .whoWith(whoWithDto)
                             .build();
 
-            dtoList.add(popupSummaryDto);
+            dtoList.add(popupGuestSearchingDto);
         }
 
         return dtoList;
