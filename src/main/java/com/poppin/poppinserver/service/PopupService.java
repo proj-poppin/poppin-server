@@ -199,9 +199,9 @@ public class PopupService {
         return PopupSearchingDto.fromEntityList(popups, user);
     }
 
-    public List<PopupSearchingDto> readGuestSearchingList(String text, int page, int size){
+    public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
 
-        return PopupSearchingDto.fromEntityList(popups, user);
+        return PopupGuestSearchingDto.fromEntityList(popups);
     }
 }
