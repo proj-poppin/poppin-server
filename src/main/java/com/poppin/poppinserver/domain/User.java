@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.type.ELoginProvider;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +41,7 @@ public class User {
     private String birthDate;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "is_login", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean isLogin;
@@ -53,6 +55,12 @@ public class User {
     @Column(name = "agreed_to_gps", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean agreedToGPS;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1)", nullable = false)
+    private Boolean isDeleted;
+
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private EUserRole role;
@@ -64,8 +72,20 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER )
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prefered_popup_id")
+    private PreferedPopup preferedPopup;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taste_popup_id")
+    private TastePopup tastePopup;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "who_with_popup_id")
+    private WhoWithPopup whoWithPopup;
 
     @Builder
     public User(String email, String password, String nickname, String birthDate,
@@ -81,9 +101,11 @@ public class User {
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
         this.agreedToServiceTerms = agreedToServiceTerms;
         this.agreedToGPS = agreedToGPS;
-        this.createdAt = LocalDate.now();
+        this.createdAt = LocalDateTime.now();
         this.isLogin = false;
         this.refreshToken = null;
+        this.deletedAt = null;
+        this.isDeleted = false;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
@@ -128,12 +150,19 @@ public class User {
         this.password = password;
     }
 
-    public void logoutUser() {
-        this.isLogin = false;
-        this.refreshToken = null;
+    public void updatePopupTaste(PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
+        this.preferedPopup = preferedPopup;
+        this.tastePopup = tastePopup;
+        this.whoWithPopup = whoWithPopup;
     }
 
-    public void addIntereste(Interest intereste){
-        this.interestes.add(intereste);
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);
+    }
+
+    public void recover() {
+        this.isDeleted = false;
+        this.deletedAt = null;
     }
 }

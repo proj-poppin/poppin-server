@@ -88,7 +88,7 @@ public class PopupService {
         CreateWhoWithDto createWhoWithDto = createPopupDto.whoWith();
         WhoWithPopup whoWithPopup = WhoWithPopup.builder()
                 .solo(createWhoWithDto.solo())
-                .withBool(createWhoWithDto.withBool())
+                .withLover(createWhoWithDto.withLover())
                 .withFamily(createWhoWithDto.withFamily())
                 .withFriend(createWhoWithDto.withFriend())
                 .build();

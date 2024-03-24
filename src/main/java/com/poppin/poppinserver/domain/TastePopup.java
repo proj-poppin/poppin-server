@@ -77,4 +77,24 @@ public class TastePopup {
         this.alchol = alchol;
         this.animalPlant = animalPlant;
     }
+
+    public void update(Boolean fasionBeauty, Boolean characters, Boolean foodBeverage,
+                       Boolean webtoonAni, Boolean interiorThings, Boolean movie,
+                       Boolean musical, Boolean sports, Boolean game,
+                       Boolean itTech, Boolean kpop, Boolean alchol,
+                       Boolean animalPlant) {
+        this.fasionBeauty = fasionBeauty;
+        this.characters = characters;
+        this.foodBeverage = foodBeverage;
+        this.webtoonAni = webtoonAni;
+        this.interiorThings = interiorThings;
+        this.movie = movie;
+        this.musical = musical;
+        this.sports = sports;
+        this.game = game;
+        this.itTech = itTech;
+        this.kpop = kpop;
+        this.alchol = alchol;
+        this.animalPlant = animalPlant;
+    }
 }

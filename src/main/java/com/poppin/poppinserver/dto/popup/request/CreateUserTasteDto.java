@@ -5,13 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record CreateWhoWithDto(
-        @NotNull
-        Boolean solo,
-        @NotNull
-        Boolean withFriend,
-        @NotNull
-        Boolean withFamily,
-        @NotNull
-        Boolean withLover) {
+public record CreateUserTasteDto(
+        @NotNull CreatePreferedDto prefered,
+        @NotNull CreateTasteDto taste,
+        @NotNull CreateWhoWithDto whoWith
+) {
+
 }
