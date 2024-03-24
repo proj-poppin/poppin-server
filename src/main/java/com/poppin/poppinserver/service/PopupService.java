@@ -198,7 +198,7 @@ public class PopupService {
         log.info(String.valueOf(size));
         log.info(userId.toString());
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size)).toList();
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
 
         return PopupSearchingDto.fromEntityList(popups, user);
     }

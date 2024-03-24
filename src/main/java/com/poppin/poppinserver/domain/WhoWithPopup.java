@@ -11,7 +11,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "who_with_popup")
+@Table(name = "whowith_popup")
 public class WhoWithPopup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
