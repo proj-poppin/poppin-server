@@ -14,6 +14,8 @@ import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.specification.PopupSpecification;
+import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,8 @@ public class PopupService {
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final RealTimeVisitService realTimeVisitService;
+
+    private final SelectRandomUtil selectRandomUtil;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
 
@@ -190,25 +194,38 @@ public class PopupService {
         return InterestedPopupDto.fromEntityList(interestes);
     }
 
-//    public List<PopupSummaryDto> readTasteList(Long userId){
-//        //유저가 선택한 카테고리 중 랜덤으로 하나 선택
-//        //선택된 카테고리로 리스트 생성
-//        //랜덤함수에서 선택 리스트 만큼 수 추출
-//        //고른 카테고리 기반이 true인 팝업 긁어오기
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//
-//        //취향설정이 되지 않은 유저의 경우
-//        if(user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null){
-//            return null;
-//        }
-//
-//        List<String> tasteList = new ArrayList<>();
-//        for(boolean taste : user.getTastePopup().)
-//        Random random = new Random();
-//
-//    }
+    public PopupTasteDto readTasteList(Long userId){
+        //유저가 선택한 카테고리 중 랜덤으로 하나 선택
+        //선택된 카테고리로 리스트 생성
+        //랜덤함수에서 선택 리스트 만큼 수 추출
+        //고른 카테고리 기반이 true인 팝업 긁어오기
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        //취향설정이 되지 않은 유저의 경우
+        if(user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null){
+            return null;
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(17);
+
+        if (randomIndex > 4){
+            // Taste
+            TastePopup tastePopup = user.getTastePopup();
+            String selectedTaste = selectRandomUtil.selectRandomTaste(tastePopup);
+
+            List<Popup> popupsWithSelectedTaste = popupRepository.findAll(PopupSpecification.hasTaste(selectedTaste, true));
+        }
+        else{
+            // Prefered
+            PreferedPopup preferedPopup = user.getPreferedPopup();
+            String selectedPreference = selectRandomUtil.selectRandomPreference(preferedPopup);
+
+            List<Popup> popupsWithSelectedPrefer = popupRepository.findAll(PopupSpecification.hasTaste(selectedPreference, true));
+        }
+    }
 
     public List<PopupSearchingDto> readSearchingList(String text, int page, int size, Long userId){
         User user = userRepository.findById(userId)
