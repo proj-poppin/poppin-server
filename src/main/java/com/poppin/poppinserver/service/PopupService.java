@@ -190,6 +190,26 @@ public class PopupService {
         return InterestedPopupDto.fromEntityList(interestes);
     }
 
+//    public List<PopupSummaryDto> readTasteList(Long userId){
+//        //유저가 선택한 카테고리 중 랜덤으로 하나 선택
+//        //선택된 카테고리로 리스트 생성
+//        //랜덤함수에서 선택 리스트 만큼 수 추출
+//        //고른 카테고리 기반이 true인 팝업 긁어오기
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+//
+//        //취향설정이 되지 않은 유저의 경우
+//        if(user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null){
+//            return null;
+//        }
+//
+//        List<String> tasteList = new ArrayList<>();
+//        for(boolean taste : user.getTastePopup().)
+//        Random random = new Random();
+//
+//    }
+
     public List<PopupSearchingDto> readSearchingList(String text, int page, int size, Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
