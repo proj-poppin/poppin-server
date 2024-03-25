@@ -13,4 +13,13 @@ public class PopupSpecification {
             return criteriaBuilder.equal(root.get("tastePopup").get(taste), value);
         };
     }
+
+    public static Specification<Popup> hasPrefered(String taste, Boolean value) {
+        return (root, query, criteriaBuilder) -> {
+            if (taste == null || value == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("preferedPopup").get(taste), value);
+        };
+    }
 }
