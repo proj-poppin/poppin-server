@@ -2,6 +2,8 @@ package com.poppin.poppinserver.util;
 
 import com.poppin.poppinserver.domain.PreferedPopup;
 import com.poppin.poppinserver.domain.TastePopup;
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +25,7 @@ public class SelectRandomUtil {
 
         // 랜덤하게 하나의 항목을 선택
         if (preferences.isEmpty()) {
-            return null; // 또는 기본값
+            throw new CommonException(ErrorCode.NOT_FOUND_USER_PREFER);
         }
         Random random = new Random();
         int randomIndex = random.nextInt(preferences.size());
@@ -51,7 +53,7 @@ public class SelectRandomUtil {
 
         // 랜덤하게 하나의 항목을 선택
         if (tastes.isEmpty()) {
-            return null; // 또는 기본값
+            throw new CommonException(ErrorCode.NOT_FOUND_USER_TASTE);
         }
         Random random = new Random();
         int randomIndex = random.nextInt(tastes.size());

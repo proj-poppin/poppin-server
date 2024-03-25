@@ -49,6 +49,10 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW("40404" , HttpStatus.NOT_FOUND, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOUND_VISITOR_DATA("40405", HttpStatus.NOT_FOUND, "해당 방문자 데이터가 존재하지 않습니다."),
     NOT_FOUND_REALTIMEVISIT("40406", HttpStatus.NOT_FOUND, "방문자 데이터가 존재하지 않습니다"),
+    NOT_FOUND_USER_TASTE("40407", HttpStatus.NOT_FOUND, "해당 사용자의 설정 취향이 존재하지 않습니다."),
+    NOT_FOUND_USER_PREFER("40408", HttpStatus.NOT_FOUND, "해당 사용자의 설정 선호도가 존재하지 않습니다."),
+    NOT_FOUND_USER_WHOWITH("40409", HttpStatus.NOT_FOUND, "해당 사용자의 설정 동반인이 존재하지 않습니다."),
+
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
