@@ -17,7 +17,7 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH("40006", HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     DUPLICATED_NICKNAME("40007", HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     MISSING_REQUEST_BODY("40008", HttpStatus.BAD_REQUEST, "요청 바디가 누락되었습니다."),
-    DUPLICATED_INTERESTE("40009", HttpStatus.BAD_REQUEST, "이미 관심 등록된 팝업입니다."),
+    DUPLICATED_INTEREST("40009", HttpStatus.BAD_REQUEST, "이미 관심 등록된 팝업입니다."),
     MISSING_REQUEST_IMAGES("40010", HttpStatus.BAD_REQUEST, "이미지가 누락되었습니다."),
     INVALID_APPLE_IDENTITY_TOKEN_ERROR("40011", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Identity Token입니다."),
     EXPIRED_APPLE_IDENTITY_TOKEN_ERROR("40012", HttpStatus.BAD_REQUEST, "만료된 Apple Identity Token입니다."),
@@ -49,6 +49,10 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW("40404" , HttpStatus.NOT_FOUND, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOUND_VISITOR_DATA("40405", HttpStatus.NOT_FOUND, "해당 방문자 데이터가 존재하지 않습니다."),
     NOT_FOUND_REALTIMEVISIT("40406", HttpStatus.NOT_FOUND, "방문자 데이터가 존재하지 않습니다"),
+    NOT_FOUND_USER_TASTE("40407", HttpStatus.NOT_FOUND, "해당 사용자의 설정 취향이 존재하지 않습니다."),
+    NOT_FOUND_USER_PREFER("40408", HttpStatus.NOT_FOUND, "해당 사용자의 설정 선호도가 존재하지 않습니다."),
+    NOT_FOUND_USER_WHOWITH("40409", HttpStatus.NOT_FOUND, "해당 사용자의 설정 동반인이 존재하지 않습니다."),
+
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),

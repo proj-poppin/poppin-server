@@ -73,4 +73,9 @@ public class PopupController {
                                          @RequestParam("size") int size){
         return ResponseDto.ok(popupService.readGuestSearchingList(text, page, size));
     }
+
+    @GetMapping("/taste-list") // 팝업 검색
+    public ResponseDto<?> readTasteList(@UserId Long userId){
+        return ResponseDto.ok(popupService.readTasteList(userId));
+    }
 }

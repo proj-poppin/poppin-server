@@ -126,9 +126,5 @@ public class Popup {
         this.interestCnt += 1;
     }
 
-    public void addInterest(Interest interest){
-        this.interestes.add(interest);
-    }
-
     public void updatePosterUrl(String url) {this.posterUrl = url;}
 }
