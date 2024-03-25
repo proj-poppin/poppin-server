@@ -216,14 +216,18 @@ public class PopupService {
             TastePopup tastePopup = user.getTastePopup();
             String selectedTaste = selectRandomUtil.selectRandomTaste(tastePopup);
 
-            List<Popup> popupsWithSelectedTaste = popupRepository.findAll(PopupSpecification.hasTaste(selectedTaste, true));
+            List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedTaste, true));
+
+            return new PopupTasteDto(selectedTaste, PopupSummaryDto.fromEntityList(popups));
         }
         else{
             // Prefered
             PreferedPopup preferedPopup = user.getPreferedPopup();
             String selectedPreference = selectRandomUtil.selectRandomPreference(preferedPopup);
 
-            List<Popup> popupsWithSelectedPrefer = popupRepository.findAll(PopupSpecification.hasTaste(selectedPreference, true));
+            List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedPreference, true));
+
+            return new PopupTasteDto(selectedPreference, PopupSummaryDto.fromEntityList(popups));
         }
     }
 
