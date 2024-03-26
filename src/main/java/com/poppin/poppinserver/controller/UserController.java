@@ -46,4 +46,10 @@ public class UserController {
     ) {
         return ResponseDto.ok(userService.updateUserNicknameAndBirthDate(userId, userInfoDto));
     }
+
+    @DeleteMapping("/withdrawal")
+    public ResponseDto<?> deleteUser(@UserId Long userId) {
+        userService.deleteUser(userId);
+        return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
+    }
 }

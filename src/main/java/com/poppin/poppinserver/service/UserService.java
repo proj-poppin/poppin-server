@@ -163,4 +163,11 @@ public class UserService {
                 .birthDate(user.getBirthDate())
                 .build();
     }
+
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        user.softDelete();
+        userRepository.save(user);
+    }
 }
