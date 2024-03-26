@@ -194,6 +194,7 @@ public class PopupService {
         return InterestedPopupDto.fromEntityList(interestes);
     }
 
+    @Transactional
     public PopupTasteDto readTasteList(Long userId){
         //유저가 선택한 카테고리 중 랜덤으로 하나 선택
         //선택된 카테고리로 리스트 생성
@@ -209,13 +210,15 @@ public class PopupService {
         }
 
         Random random = new Random();
-        int randomIndex = random.nextInt(17);
+        Integer randomIndex = random.nextInt(17);
+
+        log.info(randomIndex.toString());
 
         if (randomIndex > 4){
             // Taste
             TastePopup tastePopup = user.getTastePopup();
             String selectedTaste = selectRandomUtil.selectRandomTaste(tastePopup);
-
+            log.info(selectedTaste);
             List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedTaste, true));
 
             return new PopupTasteDto(selectedTaste, PopupSummaryDto.fromEntityList(popups));
@@ -224,6 +227,7 @@ public class PopupService {
             // Prefered
             PreferedPopup preferedPopup = user.getPreferedPopup();
             String selectedPreference = selectRandomUtil.selectRandomPreference(preferedPopup);
+            log.info(selectedPreference);
 
             List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedPreference, true));
 
