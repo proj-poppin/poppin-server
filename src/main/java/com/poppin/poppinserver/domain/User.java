@@ -156,6 +156,11 @@ public class User {
         this.whoWithPopup = whoWithPopup;
     }
 
+    public void updateUserNicknameAndBirthDate(String nickname, String birthDate) {
+        this.nickname = nickname;
+        this.birthDate = birthDate;
+    }
+
     public void softDelete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);

@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.service;
 
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.poppin.poppinserver.domain.PreferedPopup;
 import com.poppin.poppinserver.domain.TastePopup;
 import com.poppin.poppinserver.domain.User;
@@ -9,6 +10,8 @@ import com.poppin.poppinserver.dto.popup.response.PreferedDto;
 import com.poppin.poppinserver.dto.popup.response.TasteDto;
 import com.poppin.poppinserver.dto.popup.response.UserTasteDto;
 import com.poppin.poppinserver.dto.popup.response.WhoWithDto;
+import com.poppin.poppinserver.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.dto.user.response.UserDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PreferedPopupRepository;
@@ -143,6 +146,21 @@ public class UserService {
                 .preferedDto(PreferedDto.fromEntity(preferedPopup))
                 .tasteDto(TasteDto.fromEntity(tastePopup))
                 .whoWithDto(WhoWithDto.fromEntity(whoWithPopup))
+                .build();
+    }
+
+    public UserInfoDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (userId != user.getId())) {
+            throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
+        }
+        user.updateUserNicknameAndBirthDate(userInfoDto.nickname(), userInfoDto.birthDate());
+        userRepository.save(user);
+
+        return UserInfoDto.builder()
+                .nickname(user.getNickname())
+                .birthDate(user.getBirthDate())
                 .build();
     }
 }
