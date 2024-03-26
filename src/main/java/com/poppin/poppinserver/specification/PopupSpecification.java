@@ -22,4 +22,8 @@ public class PopupSpecification {
             return criteriaBuilder.equal(root.get("preferedPopup").get(taste), value);
         };
     }
+
+    public static Specification<Popup> isOperating() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("operationStatus"), "OPERATING");
+    }
 }

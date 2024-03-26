@@ -21,7 +21,7 @@ public class SelectRandomUtil {
         if (preferedPopup.getMarket()) preferences.add("market");
         if (preferedPopup.getDisplay()) preferences.add("display");
         if (preferedPopup.getExperience()) preferences.add("experience");
-        if (preferedPopup.getWantFree()) preferences.add("want_free");
+        if (preferedPopup.getWantFree()) preferences.add("wantFree");
 
         // 랜덤하게 하나의 항목을 선택
         if (preferences.isEmpty()) {
@@ -37,19 +37,19 @@ public class SelectRandomUtil {
         List<String> tastes = new ArrayList<>();
 
         // TastePopup의 모든 속성을 검사하고 true로 설정된 항목들을 리스트에 추가
-        if (tastePopup.getFasionBeauty()) tastes.add("fasion_beauty");
+        if (tastePopup.getFasionBeauty()) tastes.add("fasionBeauty");
         if (tastePopup.getCharacters()) tastes.add("characters");
-        if (tastePopup.getFoodBeverage()) tastes.add("food_beverage");
-        if (tastePopup.getWebtoonAni()) tastes.add("webtoon_ani");
-        if (tastePopup.getInteriorThings()) tastes.add("interior_things");
+        if (tastePopup.getFoodBeverage()) tastes.add("foodBeverage");
+        if (tastePopup.getWebtoonAni()) tastes.add("webtoonAni");
+        if (tastePopup.getInteriorThings()) tastes.add("interiorThings");
         if (tastePopup.getMovie()) tastes.add("movie");
         if (tastePopup.getMusical()) tastes.add("musical");
         if (tastePopup.getSports()) tastes.add("sports");
         if (tastePopup.getGame()) tastes.add("game");
-        if (tastePopup.getItTech()) tastes.add("it_tech");
+        if (tastePopup.getItTech()) tastes.add("itTech");
         if (tastePopup.getKpop()) tastes.add("kpop");
         if (tastePopup.getAlchol()) tastes.add("alchol");
-        if (tastePopup.getAnimalPlant()) tastes.add("animal_plant");
+        if (tastePopup.getAnimalPlant()) tastes.add("animalPlant");
 
         // 랜덤하게 하나의 항목을 선택
         if (tastes.isEmpty()) {

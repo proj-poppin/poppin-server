@@ -20,6 +20,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -218,8 +221,15 @@ public class PopupService {
             // Taste
             TastePopup tastePopup = user.getTastePopup();
             String selectedTaste = selectRandomUtil.selectRandomTaste(tastePopup);
-            log.info(selectedTaste);
-            List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedTaste, true));
+            log.info("taste"+selectedTaste);
+
+            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
+            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(selectedTaste, true))
+                    .and(PopupSpecification.isOperating());
+
+            log.info(combinedSpec.toString());
+
+            List<Popup> popups = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             return new PopupTasteDto(selectedTaste, PopupSummaryDto.fromEntityList(popups));
         }
@@ -229,7 +239,12 @@ public class PopupService {
             String selectedPreference = selectRandomUtil.selectRandomPreference(preferedPopup);
             log.info(selectedPreference);
 
-            List<Popup> popups = popupRepository.findAll(PopupSpecification.hasTaste(selectedPreference, true));
+            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
+            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(selectedPreference, true))
+                    .and(PopupSpecification.isOperating());
+
+
+            List<Popup> popups = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             return new PopupTasteDto(selectedPreference, PopupSummaryDto.fromEntityList(popups));
         }
