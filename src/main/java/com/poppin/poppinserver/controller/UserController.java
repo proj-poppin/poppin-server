@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.controller;
 
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.popup.request.CreateUserTasteDto;
@@ -37,6 +36,11 @@ public class UserController {
             @RequestBody @Valid CreateUserTasteDto userTasteDto
     ) {
         return ResponseDto.ok(userService.updateUserTaste(userId, userTasteDto));
+    }
+
+    @GetMapping("")
+    public ResponseDto<?> readUserProfile(@UserId Long userId) {
+        return ResponseDto.ok(userService.readUserProfile(userId));
     }
 
     @PatchMapping("")

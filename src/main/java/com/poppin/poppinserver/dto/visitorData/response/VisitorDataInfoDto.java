@@ -1,13 +1,10 @@
 package com.poppin.poppinserver.dto.visitorData.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 
 import java.util.Map;
 
 @Builder
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record VisitorDataInfoDto(
         Map<String,Object> weekdayAm,
         Map<String,Object> weekdayPm,

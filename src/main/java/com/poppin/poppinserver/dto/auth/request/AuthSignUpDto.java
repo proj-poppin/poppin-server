@@ -1,10 +1,7 @@
 package com.poppin.poppinserver.dto.auth.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.*;
 
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AuthSignUpDto (
         // 이메일 형식
         @NotBlank

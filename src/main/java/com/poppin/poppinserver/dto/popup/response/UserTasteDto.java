@@ -1,14 +1,11 @@
 package com.poppin.poppinserver.dto.popup.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.PreferedPopup;
 import com.poppin.poppinserver.domain.TastePopup;
 import com.poppin.poppinserver.domain.WhoWithPopup;
 import lombok.Builder;
 
 @Builder
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record UserTasteDto(
         PreferedDto preferedDto,
         TasteDto tasteDto,

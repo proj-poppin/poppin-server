@@ -1,7 +1,5 @@
 package com.poppin.poppinserver.dto.popup.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Builder
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record PopupDetailDto(
          Long id,
          String posterUrl,

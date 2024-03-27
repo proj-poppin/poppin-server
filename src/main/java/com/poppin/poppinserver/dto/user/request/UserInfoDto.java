@@ -1,7 +1,5 @@
 package com.poppin.poppinserver.dto.user.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -9,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record UserInfoDto(
         @NotEmpty
         @Size(min = 1, max = 10)
