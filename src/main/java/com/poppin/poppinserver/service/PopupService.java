@@ -50,6 +50,10 @@ public class PopupService {
     private final SelectRandomUtil selectRandomUtil;
 
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
+        //날짜 요청 유효성 검증
+        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
 
         //현재 운영상태 정의
         String operationStatus;
