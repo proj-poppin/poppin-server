@@ -2,6 +2,7 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.constant.Constant;
+import com.poppin.poppinserver.dto.auth.request.EmailRequestDto;
 import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
 import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
@@ -56,9 +57,20 @@ public class AuthController {
         return ResponseDto.ok(authService.authAppleLogin(idToken));
     }
 
+    @PostMapping("/reissue")
+    public ResponseDto<?> reissue(
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken){
+        return ResponseDto.ok(authService.reissue(refreshToken));
+    }
+
     @PutMapping("/reset-password")
     public ResponseDto<?> resetPassword(@UserId Long userId, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
         authService.resetPassword(userId, passwordRequestDto);
         return ResponseDto.ok("비밀번호 변경 성공");
+    }
+
+    @PostMapping("/email/verification")
+    public ResponseDto<?> sendEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
+        return ResponseDto.ok(authService.sendEmail(emailRequestDto));
     }
 }

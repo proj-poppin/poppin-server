@@ -3,8 +3,10 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.dto.auth.request.EmailRequestDto;
 import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
 import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
+import com.poppin.poppinserver.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -16,6 +18,7 @@ import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.util.JwtUtil;
 import com.poppin.poppinserver.util.OAuth2Util;
 import com.poppin.poppinserver.util.PasswordUtil;
+import com.poppin.poppinserver.util.RandomCodeUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OAuth2Util oAuth2Util;
     private final AppleOAuthService appleOAuthService;
+    private final MailService mailService;
 
     public void authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
@@ -72,6 +76,7 @@ public class AuthService {
     }
 
     public JwtTokenDto authAppleLogin(String idToken) {
+        String token = refineToken(idToken);
         OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(idToken);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
     }
@@ -154,5 +159,30 @@ public class AuthService {
             throw new CommonException(ErrorCode.PASSWORD_SAME);
         }
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
+    }
+
+    public EmailResponseDto sendEmail(EmailRequestDto emailRequestDto) {
+        if (!userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_USER);
+        }
+        String authCode = RandomCodeUtil.generateVerificationCode();
+        mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
+        return EmailResponseDto.builder()
+                .authCode(authCode)
+                .build();
+    }
+
+    @Transactional
+    public JwtTokenDto reissue(String refreshToken) {
+        String token = refineToken(refreshToken);
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!user.getRefreshToken().equals(token)) {
+            throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
+        }
+        JwtTokenDto jwtToken = jwtUtil.generateToken(userId, user.getRole());
+        user.updateRefreshToken(jwtToken.refreshToken());
+        return jwtToken;
     }
 }
