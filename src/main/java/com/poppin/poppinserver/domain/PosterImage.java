@@ -23,16 +23,16 @@ public class PosterImage {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup-id")
+    @JoinColumn(name = "popup_id")
     private Popup popupId;
 
     @Column(name = "poster_url")
     private String posterUrl;
 
-    @Column(name = "created-at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "edited-at")
+    @Column(name = "edited_at")
     private LocalDateTime editedAt;
 
     @Builder
