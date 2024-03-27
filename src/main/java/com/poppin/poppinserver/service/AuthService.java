@@ -170,4 +170,18 @@ public class AuthService {
                 .authCode(authCode)
                 .build();
     }
+
+    @Transactional
+    public JwtTokenDto reissue(String refreshToken) {
+        String token = refineToken(refreshToken);
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!user.getRefreshToken().equals(token)) {
+            throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
+        }
+        JwtTokenDto jwtToken = jwtUtil.generateToken(userId, user.getRole());
+        user.updateRefreshToken(jwtToken.refreshToken());
+        return jwtToken;
+    }
 }
