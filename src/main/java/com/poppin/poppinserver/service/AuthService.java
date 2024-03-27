@@ -76,6 +76,7 @@ public class AuthService {
     }
 
     public JwtTokenDto authAppleLogin(String idToken) {
+        String token = refineToken(idToken);
         OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(idToken);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
     }
