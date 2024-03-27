@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 public record JwtTokenDto(
-        @JsonProperty("access_token")
         @NotBlank String accessToken,
-        @JsonProperty("refresh_token")
         @NotBlank String refreshToken
 )
 {

@@ -1,14 +1,11 @@
 package com.poppin.poppinserver.dto.auth.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.type.ELoginProvider;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record SocialRegisterRequestDto(
         @NotNull ELoginProvider provider,
         @Size(min = 1, max = 10)

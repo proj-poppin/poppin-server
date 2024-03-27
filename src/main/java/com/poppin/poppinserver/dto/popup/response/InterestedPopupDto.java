@@ -1,7 +1,5 @@
 package com.poppin.poppinserver.dto.popup.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
 import lombok.Builder;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 @Builder
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record InterestedPopupDto(
         Long id,
         String image_url,
