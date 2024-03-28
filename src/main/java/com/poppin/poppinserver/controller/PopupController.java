@@ -59,7 +59,7 @@ public class PopupController {
         return ResponseDto.ok(popupService.readInterestedPopups(userId));
     }
 
-    @GetMapping("/search") // 팝업 검색
+    @GetMapping("/search") // 로그인 팝업 검색
     public ResponseDto<?> readSearchList(@RequestParam("text") String text,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
@@ -67,14 +67,14 @@ public class PopupController {
         return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
     }
 
-    @GetMapping("/guest/search") // 팝업 검색
+    @GetMapping("/guest/search") // 비로그인 팝업 검색
     public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size){
         return ResponseDto.ok(popupService.readGuestSearchingList(text, page, size));
     }
 
-    @GetMapping("/taste-list") // 팝업 검색
+    @GetMapping("/taste-list") // 취향 저격 팝업 목록
     public ResponseDto<?> readTasteList(@UserId Long userId){
         return ResponseDto.ok(popupService.readTasteList(userId));
     }

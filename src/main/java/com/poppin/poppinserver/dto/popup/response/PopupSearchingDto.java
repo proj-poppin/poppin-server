@@ -20,7 +20,6 @@ public record PopupSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        String category,
         String operationStatus,
         Boolean isInterested,
         PreferedDto prefered,
@@ -58,7 +57,6 @@ public record PopupSearchingDto(
                             .editedAt(popup.getEditedAt().toString())
                             .openDate(popup.getOpenDate().toString())
                             .closeDate(popup.getCloseDate().toString())
-                            .category(popup.getCategory())
                             .operationStatus(popup.getOperationStatus())
                             .isInterested(isInterested)
                             .taste(tasteDto)

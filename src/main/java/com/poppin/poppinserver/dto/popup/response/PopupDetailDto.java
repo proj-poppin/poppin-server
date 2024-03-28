@@ -27,7 +27,6 @@ public record PopupDetailDto(
          String closeDate,
          String openTime,
          String closeTime,
-         String category,
          String operationStatus,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,
@@ -53,7 +52,6 @@ public record PopupDetailDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
-                .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)
