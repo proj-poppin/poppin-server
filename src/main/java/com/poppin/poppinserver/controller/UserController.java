@@ -2,7 +2,7 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.popup.request.CreateUserTasteDto;
+import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.service.UserService;
 import jakarta.validation.Valid;

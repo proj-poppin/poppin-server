@@ -40,6 +40,9 @@ public class User {
     @Column(name = "birth_date", nullable = false)
     private String birthDate;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -90,8 +93,9 @@ public class User {
     @Builder
     public User(String email, String password, String nickname, String birthDate,
                 ELoginProvider eLoginProvider, EUserRole role,
-                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS)
-    {
+                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS,
+                String profileImageUrl
+    ) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -106,6 +110,7 @@ public class User {
         this.refreshToken = null;
         this.deletedAt = null;
         this.isDeleted = false;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
@@ -159,6 +164,10 @@ public class User {
     public void updateUserNicknameAndBirthDate(String nickname, String birthDate) {
         this.nickname = nickname;
         this.birthDate = birthDate;
+    }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void softDelete() {
