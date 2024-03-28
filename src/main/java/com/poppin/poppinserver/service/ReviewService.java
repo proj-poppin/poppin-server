@@ -50,7 +50,7 @@ public class ReviewService {
         review = reviewRepository.save(review);
 
         // 리뷰 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.upload(images, review.getId());
+        List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
 
         List<ReviewImage> posterImages = new ArrayList<>();
         for (String url : fileUrls) {
