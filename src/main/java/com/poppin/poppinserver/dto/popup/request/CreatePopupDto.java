@@ -27,8 +27,6 @@ public record CreatePopupDto(
         @NotNull
         LocalTime closeTime,
         @NotNull
-        String category,
-        @NotNull
         CreatePreferedDto prefered,
         @NotNull
         CreateTasteDto taste,

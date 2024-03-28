@@ -22,7 +22,6 @@ public record PopupDto(
         String closeDate,
         String openTime,
         String closeTime,
-        String category,
         String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
@@ -52,7 +51,6 @@ public record PopupDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
-                .category(popup.getCategory())
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)

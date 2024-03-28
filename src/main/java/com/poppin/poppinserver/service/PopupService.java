@@ -113,7 +113,6 @@ public class PopupService {
         Popup popup = Popup.builder()
                 .name(createPopupDto.name())
                 .availableAge(createPopupDto.availableAge())
-                .category(createPopupDto.category())
                 .closeDate(createPopupDto.closeDate())
                 .closeTime(createPopupDto.closeTime())
                 .entranceFee(createPopupDto.entranceFee())
@@ -132,7 +131,7 @@ public class PopupService {
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.upload(images, popup.getId());
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
         for(String url : fileUrls){

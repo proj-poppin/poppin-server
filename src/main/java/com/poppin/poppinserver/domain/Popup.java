@@ -71,9 +71,6 @@ public class Popup {
     @Column(name = "close_time", nullable = false)
     private LocalTime closeTime;
 
-    @Column(name = "category", nullable = false)
-    private String category;
-
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
@@ -97,7 +94,7 @@ public class Popup {
                  String location, Integer entranceFee, Integer availableAge,
                  Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String category, String operationStatus,
+                 LocalTime closeTime, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
         this.posterUrl = posterUrl;
         this.name = name;
@@ -115,7 +112,6 @@ public class Popup {
         this.closeDate = closeDate;
         this.openTime = openTime;
         this.closeTime = closeTime;
-        this.category = category;
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
         this.whoWithPopup = whoWithPopup;
