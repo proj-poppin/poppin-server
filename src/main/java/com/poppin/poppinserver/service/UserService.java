@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -30,6 +31,7 @@ public class UserService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -148,7 +150,7 @@ public class UserService {
                 .build();
     }
 
-    public UserProfileDto readUserProfile(Long userId) {   // 이미지 추가 로직 필요
+    public UserProfileDto readUserProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -159,6 +161,22 @@ public class UserService {
                 .birthDate(user.getBirthDate())
                 .provider(user.getProvider())
                 .build();
+    }
+
+    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
+        user.updateProfileImage(profileImageUrl);
+        userRepository.save(user);
+        return user.getProfileImageUrl();
+    }
+
+    public void deleteProfileImage(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        user.deleteProfileImage();
+        userRepository.save(user);
     }
 
     public UserProfileDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {

@@ -170,6 +170,10 @@ public class User {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void deleteProfileImage() {
+        this.profileImageUrl = null;
+    }
+
     public void softDelete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);

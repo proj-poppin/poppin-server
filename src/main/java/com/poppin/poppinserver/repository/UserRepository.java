@@ -14,6 +14,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+
+    // 회원 탈퇴한 유저인지 확인하는 쿼리 추가
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false AND u.deletedAt IS NULL")
     Optional<User> findById(Long id);
     Optional<User> findByNickname(String nickname);
 
