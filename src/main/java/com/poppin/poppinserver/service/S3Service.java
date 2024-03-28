@@ -23,10 +23,17 @@ import java.util.List;
 public class S3Service {
     private final AmazonS3Client s3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    @Value("${cloud.aws.s3.popup-poster}")
+    private String bucketPopupPoster;
 
-    public List<String> upload(List<MultipartFile> multipartFile, Long popupId) {
+    @Value("${cloud.aws.s3.review-image}")
+    private String bucketReviewImage;
+
+    @Value("${cloud.aws.s3.user-profile}")
+    private String bucketUserProfile;
+
+    // 팝업 포스터 업로드
+    public List<String> uploadPopupPoster(List<MultipartFile> multipartFile, Long popupId) {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
@@ -38,9 +45,55 @@ public class S3Service {
             objectMetadata.setContentType(file.getContentType());
 
             try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(s3Client.getUrl(bucket, fileName).toString());
+                imgUrlList.add(s3Client.getUrl(bucketPopupPoster, fileName).toString());
+            } catch(IOException e) {
+                throw new CommonException(ErrorCode.SERVER_ERROR);
+            }
+        }
+        return imgUrlList;
+    }
+
+    // 리뷰 이미지 업로드
+    public List<String> uploadReviewImage(List<MultipartFile> multipartFile, Long popupId) {
+        List<String> imgUrlList = new ArrayList<>();
+        log.info("upload images");
+
+        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+        for (MultipartFile file : multipartFile) {
+            String fileName = createFileName(file.getOriginalFilename(), popupId);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            try(InputStream inputStream = file.getInputStream()) {
+                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(s3Client.getUrl(bucketReviewImage, fileName).toString());
+            } catch(IOException e) {
+                throw new CommonException(ErrorCode.SERVER_ERROR);
+            }
+        }
+        return imgUrlList;
+    }
+
+    // 유저 프로필 이미지 업로드
+    public List<String> uploadUserProfile(List<MultipartFile> multipartFile, Long popupId) {
+        List<String> imgUrlList = new ArrayList<>();
+        log.info("upload images");
+
+        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+        for (MultipartFile file : multipartFile) {
+            String fileName = createFileName(file.getOriginalFilename(), popupId);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            try(InputStream inputStream = file.getInputStream()) {
+                s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(s3Client.getUrl(bucketUserProfile, fileName).toString());
             } catch(IOException e) {
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
