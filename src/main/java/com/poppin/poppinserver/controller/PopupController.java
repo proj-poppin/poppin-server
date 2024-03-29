@@ -80,9 +80,4 @@ public class PopupController {
     public ResponseDto<?> readTasteList(@UserId Long userId) {
         return ResponseDto.ok(popupService.readTasteList(userId));
     }
-
-    @GetMapping("/test")
-    public void test(){
-        popupService.changePopupOperatingStatus();
-    }
 }

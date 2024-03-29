@@ -262,7 +262,7 @@ public class PopupService {
     }
 
     // 자정마다 팝업 상태 변경
-    @Scheduled(cron = "0 20 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void changePopupOperatingStatus(){
         List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
 
