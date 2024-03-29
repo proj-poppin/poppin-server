@@ -173,7 +173,7 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtTokenDto reissue(String refreshToken) {
+    public JwtTokenDto refresh(String refreshToken) {
         String token = refineToken(refreshToken);
         Long userId = jwtUtil.getUserIdFromToken(token);
         User user = userRepository.findById(userId)
