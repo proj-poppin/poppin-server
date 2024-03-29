@@ -265,7 +265,7 @@ public class PopupService {
 
     // 팝업 상태 변경
     public List<PopupSummaryDto> changePopupOperatingStatus(){
-        List<Popup> popups = popupRepository.findAllByOperationStatusNotTERMINATED();
+        List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
 
         return PopupSummaryDto.fromEntityList(popups);
     }

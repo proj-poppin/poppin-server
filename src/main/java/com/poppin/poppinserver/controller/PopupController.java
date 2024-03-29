@@ -22,11 +22,12 @@ import java.util.List;
 public class PopupController {
     private final PopupService popupService;
 
-    @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}) // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
+    @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
-                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto){
+                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto) {
 
-        if(images.isEmpty()){
+        if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
@@ -34,23 +35,23 @@ public class PopupController {
     }
 
     @GetMapping("/detail")
-    public ResponseDto<?> readDetail( @RequestParam("popupId") Long popupId){
+    public ResponseDto<?> readDetail(@RequestParam("popupId") Long popupId) {
 
         return ResponseDto.ok(popupService.readDetail(popupId));
     }
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
-    public ResponseDto<?> readHotList(){
+    public ResponseDto<?> readHotList() {
         return ResponseDto.ok(popupService.readHotList());
     }
 
     @GetMapping("/new-list") // 새로 오픈 팝업 목록 조회
-    public ResponseDto<?> readNewList(){
+    public ResponseDto<?> readNewList() {
         return ResponseDto.ok(popupService.readNewList());
     }
 
     @GetMapping("/closing-list") // 종료 임박 팝업 목록 조회
-    public ResponseDto<?> readclosingList(){
+    public ResponseDto<?> readclosingList() {
         return ResponseDto.ok(popupService.readClosingList());
     }
 
@@ -64,19 +65,24 @@ public class PopupController {
     public ResponseDto<?> readSearchList(@RequestParam("text") String text,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
-                                         @UserId Long userId){
+                                         @UserId Long userId) {
         return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
     }
 
     @GetMapping("/guest/search") // 비로그인 팝업 검색
     public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
-                                         @RequestParam("page") int page,
-                                         @RequestParam("size") int size){
+                                              @RequestParam("page") int page,
+                                              @RequestParam("size") int size) {
         return ResponseDto.ok(popupService.readGuestSearchingList(text, page, size));
     }
 
     @GetMapping("/taste-list") // 취향 저격 팝업 목록
-    public ResponseDto<?> readTasteList(@UserId Long userId){
+    public ResponseDto<?> readTasteList(@UserId Long userId) {
         return ResponseDto.ok(popupService.readTasteList(userId));
+    }
+
+    @GetMapping("/test")
+    public ResponseDto<?> test(){
+        return ResponseDto.ok(popupService.changePopupOperatingStatus());
     }
 }
