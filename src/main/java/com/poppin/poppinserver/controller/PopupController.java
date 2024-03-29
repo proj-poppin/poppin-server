@@ -34,7 +34,7 @@ public class PopupController {
     }
 
     @GetMapping("/detail")
-    public ResponseDto<?> readDetail(@RequestParam("user_id") Long userId, @RequestParam("popup_id") Long popupId){
+    public ResponseDto<?> readDetail(@RequestParam("userId") Long userId, @RequestParam("popupId") Long popupId){
         return ResponseDto.ok(popupService.readDetail(userId,popupId));
     }
 
