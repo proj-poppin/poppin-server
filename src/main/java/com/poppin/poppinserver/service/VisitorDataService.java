@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,7 +26,7 @@ public class VisitorDataService {
         Map<String,Object> weekdayPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("평일 오후").toString());
         Map<String,Object> weekendAm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오전").toString());
         Map<String,Object> weekendPm = visitorDataRepository.findCongestionRatioByPopupId(popupId, VisitDate.fromValue("주말 오후").toString());
-        int satisfaction = visitorDataRepository.satisfactionRate(popupId, Satisfaction.fromValue("만족").toString());
+        Optional<Integer> satisfaction = visitorDataRepository.satisfactionRate(popupId, Satisfaction.fromValue("만족").toString());
 
         VisitorDataInfoDto visitorDataDto = VisitorDataInfoDto.fromEntity(weekdayAm, weekdayPm, weekendAm, weekendPm, satisfaction);
 

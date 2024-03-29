@@ -4,12 +4,13 @@ import com.poppin.poppinserver.domain.PreferedPopup;
 import com.poppin.poppinserver.domain.TastePopup;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.domain.WhoWithPopup;
-import com.poppin.poppinserver.dto.popup.request.CreateUserTasteDto;
+import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.popup.response.PreferedDto;
 import com.poppin.poppinserver.dto.popup.response.TasteDto;
 import com.poppin.poppinserver.dto.popup.response.UserTasteDto;
 import com.poppin.poppinserver.dto.popup.response.WhoWithDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PreferedPopupRepository;
@@ -20,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -29,6 +31,7 @@ public class UserService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -147,17 +150,36 @@ public class UserService {
                 .build();
     }
 
-    public UserInfoDto readUserProfile(Long userId) {   // 이미지 추가 로직 필요
+    public UserProfileDto readUserProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        return UserInfoDto.builder()
+        return UserProfileDto.builder()
+                .email(user.getEmail())
+                .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate())
+                .provider(user.getProvider())
                 .build();
     }
 
-    public UserInfoDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {
+    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
+        user.updateProfileImage(profileImageUrl);
+        userRepository.save(user);
+        return user.getProfileImageUrl();
+    }
+
+    public void deleteProfileImage(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        user.deleteProfileImage();
+        userRepository.save(user);
+    }
+
+    public UserProfileDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (userId != user.getId())) {
@@ -166,7 +188,7 @@ public class UserService {
         user.updateUserNicknameAndBirthDate(userInfoDto.nickname(), userInfoDto.birthDate());
         userRepository.save(user);
 
-        return UserInfoDto.builder()
+        return UserProfileDto.builder()
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate())
                 .build();

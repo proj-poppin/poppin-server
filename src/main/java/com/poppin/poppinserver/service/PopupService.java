@@ -1,15 +1,12 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
-import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
-import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -149,7 +146,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     }
 
-    public PopupDetailDto readDetail(Long userId, Long popupId){
+    public PopupDetailDto readDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -159,9 +156,7 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId, popupId);
-
-        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(addVisitorsDto); // 실시간 방문자
+        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(popupId); // 실시간 방문자
 
         return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
     }

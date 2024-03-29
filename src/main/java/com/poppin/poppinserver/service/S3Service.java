@@ -79,26 +79,44 @@ public class S3Service {
     }
 
     // 유저 프로필 이미지 업로드
-    public List<String> uploadUserProfile(List<MultipartFile> multipartFile, Long userId) {
-        List<String> imgUrlList = new ArrayList<>();
-        log.info("upload images");
+//    public List<String> uploadUserProfile(List<MultipartFile> multipartFile, Long popupId) {
+//        List<String> imgUrlList = new ArrayList<>();
+//        log.info("upload images");
+//
+//        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+//        for (MultipartFile file : multipartFile) {
+//            String fileName = createFileName(file.getOriginalFilename(), popupId);
+//            ObjectMetadata objectMetadata = new ObjectMetadata();
+//            objectMetadata.setContentLength(file.getSize());
+//            objectMetadata.setContentType(file.getContentType());
+//
+//            try(InputStream inputStream = file.getInputStream()) {
+//                s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
+//                        .withCannedAcl(CannedAccessControlList.PublicRead));
+//                imgUrlList.add(s3Client.getUrl(bucketUserProfile, fileName).toString());
+//            } catch(IOException e) {
+//                throw new CommonException(ErrorCode.SERVER_ERROR);
+//            }
+//        }
+//        return imgUrlList;
+//    }
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-        for (MultipartFile file : multipartFile) {
-            String fileName = createFileName(file.getOriginalFilename(), userId);
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
+    public String uploadUserProfile(MultipartFile multipartFile, Long userId) {
+        String imageUrl;
+        String fileName = createFileName(multipartFile.getOriginalFilename(), userId);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(s3Client.getUrl(bucketUserProfile, fileName).toString());
-            } catch(IOException e) {
-                throw new CommonException(ErrorCode.SERVER_ERROR);
-            }
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            imageUrl = s3Client.getUrl(bucketUserProfile, fileName).toString();
+        } catch (IOException e) {
+            throw new CommonException(ErrorCode.SERVER_ERROR);
         }
-        return imgUrlList;
+
+        return imageUrl;
     }
 
     // 이미지파일명 중복 방지
