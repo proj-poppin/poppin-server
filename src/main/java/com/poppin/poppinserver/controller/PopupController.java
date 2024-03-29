@@ -81,8 +81,8 @@ public class PopupController {
         return ResponseDto.ok(popupService.readTasteList(userId));
     }
 
-//    @GetMapping("/test")
-//    public ResponseDto<?> test(){
-//        return ResponseDto.ok(popupService.changePopupOperatingStatus());
-//    }
+    @GetMapping("/test")
+    public void test(){
+        popupService.changePopupOperatingStatus();
+    }
 }

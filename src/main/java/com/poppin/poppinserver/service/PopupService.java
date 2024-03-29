@@ -265,20 +265,15 @@ public class PopupService {
         List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
 
         for(Popup popup : popups){
-            //현재 운영상태 정의
-            String operationStatus;
-            LocalDateTime openDateTime = popup.getOpenDate()
-            LocalDateTime closeDateTime = createPopupDto.closeDate().atTime(createPopupDto.closeTime());
-            if (openDateTime.isAfter(LocalDateTime.now())){
-                //만약에 운영시간 기준으로 운영전이지만 오늘이 오픈날이면 일단 D-0으로 표시
-                Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
-                operationStatus = "D-" + period.getDays();
-            } else if (closeDateTime.isBefore(LocalDateTime.now())) {
-                operationStatus = "TERMINATED";
-            }
-            else{
-                operationStatus = "OPERATING";
+            //현재 운영상태 수정
+            if (popup.getOpenDate().isAfter(LocalDate.now())){
+                Period period = Period.between(LocalDate.now(), popup.getOpenDate());
+                popup.updateOpStatus("D-" + period.getDays());
+            } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
+                popup.updateOpStatus("TERMINATED");
             }
         }
+
+        popupRepository.saveAll(popups);
     }
 }
