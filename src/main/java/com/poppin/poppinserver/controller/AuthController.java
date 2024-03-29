@@ -57,10 +57,10 @@ public class AuthController {
         return ResponseDto.ok(authService.authAppleLogin(idToken));
     }
 
-    @PostMapping("/reissue")
-    public ResponseDto<?> reissue(
+    @PostMapping("/refresh")
+    public ResponseDto<?> refresh(
             @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken){
-        return ResponseDto.ok(authService.reissue(refreshToken));
+        return ResponseDto.ok(authService.refresh(refreshToken));
     }
 
     @PutMapping("/reset-password")
