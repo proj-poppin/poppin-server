@@ -16,6 +16,7 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.util.SelectRandomUtil;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -149,7 +150,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     }
 
-    public PopupDetailDto readDetail(Long userId, Long popupId){
+    public PopupDetailDto readDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -159,9 +160,7 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        AddVisitorsDto addVisitorsDto = new AddVisitorsDto(userId, popupId);
-
-        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(addVisitorsDto); // 실시간 방문자
+        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(popupId); // 실시간 방문자
 
         return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
     }

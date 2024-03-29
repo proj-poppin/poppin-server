@@ -3,6 +3,7 @@ package com.poppin.poppinserver.dto.visitorData.response;
 import lombok.Builder;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Builder
 public record VisitorDataInfoDto(
@@ -10,14 +11,14 @@ public record VisitorDataInfoDto(
         Map<String,Object> weekdayPm,
         Map<String,Object> weekendAm,
         Map<String,Object> weekendPm,
-        Integer satisfaction
+        Optional<Integer> satisfaction
 ) {
     public static VisitorDataInfoDto fromEntity(
             Map<String,Object> weekdayAm,
             Map<String,Object> weekdayPm,
             Map<String,Object> weekendAm,
             Map<String,Object> weekendPm,
-            Integer satisfaction
+            Optional<Integer> satisfaction
     ){
         return VisitorDataInfoDto.builder()
                 .weekdayAm(weekdayAm)

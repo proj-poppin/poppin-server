@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> {
@@ -42,6 +43,6 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
     Map<String, Object> findCongestionRatioByPopupId(@Param("popupId") Long popupId, String visitDateEnum);
 
     @Query("SELECT (SUM(CASE WHEN v.satisfaction = :satisfaction THEN 1 ELSE 0 END) * 100) / COUNT(r) FROM VisitorData v JOIN Review r ON v.review.id = r.id JOIN r.popup p WHERE p.id = :popupId")
-    int satisfactionRate(@Param("popupId") Long popupId, String satisfaction);
+    Optional<Integer> satisfactionRate(@Param("popupId") Long popupId, String satisfaction);
 
 }

@@ -31,11 +31,9 @@ public class RealTimeVisitService {
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
 
-    public Optional<Integer> showRealTimeVisitors(AddVisitorsDto addVisitorsDto){
+    public Optional<Integer> showRealTimeVisitors(Long popupId){
 
-        User user = userRepository.findById(addVisitorsDto.userId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(addVisitorsDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         LocalDateTime now = LocalDateTime.now();
@@ -47,9 +45,9 @@ public class RealTimeVisitService {
         return realTimeVisitorsCount;
     }
 
-    public RealTimeVisitorsDto addRealTimeVisitors(AddVisitorsDto addVisitorsDto){
+    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, AddVisitorsDto addVisitorsDto){
 
-        User user = userRepository.findById(addVisitorsDto.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(addVisitorsDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));

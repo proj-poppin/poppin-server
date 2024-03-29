@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.PopupService;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,9 @@ public class PopupController {
     }
 
     @GetMapping("/detail")
-    public ResponseDto<?> readDetail(@RequestParam("userId") Long userId, @RequestParam("popupId") Long popupId){
-        return ResponseDto.ok(popupService.readDetail(userId,popupId));
+    public ResponseDto<?> readDetail( @RequestParam("popupId") Long popupId){
+
+        return ResponseDto.ok(popupService.readDetail(popupId));
     }
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
