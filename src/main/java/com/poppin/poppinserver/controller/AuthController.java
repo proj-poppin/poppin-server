@@ -36,6 +36,11 @@ public class AuthController {
         return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
     }
 
+    @PostMapping("/sign-in")
+    public ResponseDto<?> authSignIn(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader) {
+        return ResponseDto.ok(authService.authSignIn(authorizationHeader));
+    }
+
     @PostMapping("/login/kakao")
     public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
         log.info("accessToken : " + accessToken);   // 'bearer ' 제거 필요

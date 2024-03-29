@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.util;
 
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,12 +12,10 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class HeaderUtil {
-    public static Optional<String> refineHeader(HttpServletRequest request, String header, String prefix) {
-        String rawToken = request.getHeader(header);
-        log.info(rawToken + " " + prefix);
-        if (!StringUtils.hasText(rawToken) || !rawToken.startsWith(prefix)) {
-            return Optional.empty();
+    public static String refineHeader(String header, String prefix) {
+        if (!StringUtils.hasText(header) || !header.startsWith(prefix)) {
+            throw new CommonException(ErrorCode.INVALID_HEADER);
         }
-        return Optional.of(rawToken.substring(prefix.length()));
+        return header.substring(prefix.length());
     }
 }

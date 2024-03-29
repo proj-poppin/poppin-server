@@ -15,16 +15,15 @@ import com.poppin.poppinserver.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.repository.UserRepository;
 import com.poppin.poppinserver.type.ELoginProvider;
 import com.poppin.poppinserver.type.EUserRole;
-import com.poppin.poppinserver.util.JwtUtil;
-import com.poppin.poppinserver.util.OAuth2Util;
-import com.poppin.poppinserver.util.PasswordUtil;
-import com.poppin.poppinserver.util.RandomCodeUtil;
+import com.poppin.poppinserver.util.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
 
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -184,5 +183,20 @@ public class AuthService {
         JwtTokenDto jwtToken = jwtUtil.generateToken(userId, user.getRole());
         user.updateRefreshToken(jwtToken.refreshToken());
         return jwtToken;
+    }
+
+    public JwtTokenDto authSignIn(String authorizationHeader) {
+        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
+        String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
+        String email = decoded[0];
+        String password = decoded[1];
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (email != user.getEmail() && !bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw new CommonException(ErrorCode.INVALID_LOGIN);
+        }
+        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
+        userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        return jwtTokenDto;
     }
 }

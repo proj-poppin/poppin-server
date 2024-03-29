@@ -14,6 +14,7 @@ import com.poppin.poppinserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -39,21 +40,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+                //.httpBasic(AbstractHttpConfigurer::disable)
+                //.httpBasic(Customizer.withDefaults())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers(Constant.NO_NEED_AUTH_URLS.toArray(new String[0])).permitAll()
                                 .anyRequest().authenticated())
-                .formLogin(configurer ->
-                        configurer
-                                .loginPage("/")
-                                .loginProcessingUrl("/api/v1/auth/sign-in")
-                                .usernameParameter("email")
-                                .passwordParameter("password")
-                                .successHandler(defaultSignInSuccessHandler)
-                                .failureHandler(defaultSignInFailureHandler))
+//                .formLogin(configurer ->
+//                        configurer
+//                                .loginPage("/")
+//                                .loginProcessingUrl("/api/v1/auth/sign-in")
+//                                .usernameParameter("email")
+//                                .passwordParameter("password")
+//                                .successHandler(defaultSignInSuccessHandler)
+//                                .failureHandler(defaultSignInFailureHandler))
+                .formLogin(AbstractHttpConfigurer::disable)
                 .logout(configurer ->
                         configurer
                                 .logoutUrl("/api/v1/auth/sign-out")
