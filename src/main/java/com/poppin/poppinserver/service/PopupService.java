@@ -1,22 +1,18 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
-import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
-import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.util.SelectRandomUtil;
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
