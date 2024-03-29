@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -260,7 +261,8 @@ public class PopupService {
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
 
-    // 팝업 상태 변경
+    // 자정마다 팝업 상태 변경
+    @Scheduled(cron = "0 20 0 * * *")
     public void changePopupOperatingStatus(){
         List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
 
