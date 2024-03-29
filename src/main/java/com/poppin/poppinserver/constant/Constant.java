@@ -25,9 +25,9 @@ public class Constant {
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
-            "/api/v1/auth/email/verification",
+            "/api/v1/auth/email/verification"
 
-            "/api/v1/popup/test" // 테스트 api
+//            "/api/v1/popup/test" // 테스트 api
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

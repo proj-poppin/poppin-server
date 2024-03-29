@@ -123,4 +123,6 @@ public class Popup {
     }
 
     public void updatePosterUrl(String url) {this.posterUrl = url;}
+
+    public void updateOpStatus(String op) {this.operationStatus = op;}
 }

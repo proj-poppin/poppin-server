@@ -54,13 +54,10 @@ public class PopupService {
 
         //현재 운영상태 정의
         String operationStatus;
-        LocalDateTime openDateTime = createPopupDto.openDate().atTime(createPopupDto.openTime());
-        LocalDateTime closeDateTime = createPopupDto.closeDate().atTime(createPopupDto.closeTime());
-        if (openDateTime.isAfter(LocalDateTime.now())){
-            //만약에 운영시간 기준으로 운영전이지만 오늘이 오픈날이면 일단 D-0으로 표시
+        if (createPopupDto.openDate().isAfter(LocalDate.now())){
             Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
             operationStatus = "D-" + period.getDays();
-        } else if (closeDateTime.isBefore(LocalDateTime.now())) {
+        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = "TERMINATED";
         }
         else{
@@ -264,9 +261,24 @@ public class PopupService {
     }
 
     // 팝업 상태 변경
-    public List<PopupSummaryDto> changePopupOperatingStatus(){
+    public void changePopupOperatingStatus(){
         List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
 
-        return PopupSummaryDto.fromEntityList(popups);
+        for(Popup popup : popups){
+            //현재 운영상태 정의
+            String operationStatus;
+            LocalDateTime openDateTime = popup.getOpenDate()
+            LocalDateTime closeDateTime = createPopupDto.closeDate().atTime(createPopupDto.closeTime());
+            if (openDateTime.isAfter(LocalDateTime.now())){
+                //만약에 운영시간 기준으로 운영전이지만 오늘이 오픈날이면 일단 D-0으로 표시
+                Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
+                operationStatus = "D-" + period.getDays();
+            } else if (closeDateTime.isBefore(LocalDateTime.now())) {
+                operationStatus = "TERMINATED";
+            }
+            else{
+                operationStatus = "OPERATING";
+            }
+        }
     }
 }
