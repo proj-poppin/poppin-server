@@ -262,4 +262,11 @@ public class PopupService {
 
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
+
+    // 팝업 상태 변경
+    public List<PopupSummaryDto> changePopupOperatingStatus(){
+        List<Popup> popups = popupRepository.findAllByOperationStatusNotTERMINATED();
+
+        return PopupSummaryDto.fromEntityList(popups);
+    }
 }

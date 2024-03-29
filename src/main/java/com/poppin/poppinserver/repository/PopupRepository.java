@@ -39,5 +39,5 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p WHERE p.name LIKE %:text% OR p.introduce LIKE %:text%")
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
 
-
+    List<Popup> findAllByOperationStatusNotTERMINATED();
 }
