@@ -56,13 +56,13 @@ public class S3Service {
     }
 
     // 리뷰 이미지 업로드
-    public List<String> uploadReviewImage(List<MultipartFile> multipartFile, Long popupId) {
+    public List<String> uploadReviewImage(List<MultipartFile> multipartFile, Long reviewId) {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
         // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         for (MultipartFile file : multipartFile) {
-            String fileName = createFileName(file.getOriginalFilename(), popupId);
+            String fileName = createFileName(file.getOriginalFilename(), reviewId);
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());

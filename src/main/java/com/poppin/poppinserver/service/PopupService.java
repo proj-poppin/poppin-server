@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,13 +55,10 @@ public class PopupService {
 
         //현재 운영상태 정의
         String operationStatus;
-        LocalDateTime openDateTime = createPopupDto.openDate().atTime(createPopupDto.openTime());
-        LocalDateTime closeDateTime = createPopupDto.closeDate().atTime(createPopupDto.closeTime());
-        if (openDateTime.isAfter(LocalDateTime.now())){
-            //만약에 운영시간 기준으로 운영전이지만 오늘이 오픈날이면 일단 D-0으로 표시
+        if (createPopupDto.openDate().isAfter(LocalDate.now())){
             Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
             operationStatus = "D-" + period.getDays();
-        } else if (closeDateTime.isBefore(LocalDateTime.now())) {
+        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = "TERMINATED";
         }
         else{
@@ -261,5 +259,23 @@ public class PopupService {
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
 
         return PopupGuestSearchingDto.fromEntityList(popups);
+    }
+
+    // 자정마다 팝업 상태 변경
+    @Scheduled(cron = "0 0 0 * * *")
+    public void changePopupOperatingStatus(){
+        List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
+
+        for(Popup popup : popups){
+            //현재 운영상태 수정
+            if (popup.getOpenDate().isAfter(LocalDate.now())){
+                Period period = Period.between(LocalDate.now(), popup.getOpenDate());
+                popup.updateOpStatus("D-" + period.getDays());
+            } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
+                popup.updateOpStatus("TERMINATED");
+            }
+        }
+
+        popupRepository.saveAll(popups);
     }
 }

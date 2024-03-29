@@ -20,8 +20,13 @@ import com.poppin.poppinserver.repository.WhoWithPopupRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -199,5 +204,17 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         user.softDelete();
         userRepository.save(user);
+    }
+
+    // 자정마다 soft delete 한 지 30일이 지난 유저 삭제
+    @Scheduled(cron = "0 46 0 * * *")
+    public void hardDeleteUser(){
+        List<User> users = userRepository.findAllByDeletedAtIsNotNull();
+
+        List<User> usersToDelete = users.stream()
+                .filter(user -> user.getDeletedAt().toLocalDate().isBefore(LocalDate.now().plusDays(1)))
+                .collect(Collectors.toList());
+
+        userRepository.deleteAllInBatch(usersToDelete);
     }
 }
