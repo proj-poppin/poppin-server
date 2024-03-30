@@ -118,9 +118,12 @@ public class Popup {
         this.preferedPopup = preferedPopup;
     }
 
-    public void addInterestCnt(){
-        this.interestCnt += 1;
-    }
+    public void addInterestCnt() {this.interestCnt += 1;}
+
+    public void addreopenDemandCnt() {this.reopenDemandCnt += 1;}
+
+    public void addViewCnt() {this.viewCnt += 1;}
+
 
     public void updatePosterUrl(String url) {this.posterUrl = url;}
 

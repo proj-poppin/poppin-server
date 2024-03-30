@@ -80,4 +80,9 @@ public class PopupController {
     public ResponseDto<?> readTasteList(@UserId Long userId) {
         return ResponseDto.ok(popupService.readTasteList(userId));
     }
+
+    @GetMapping("/reopen") // 재오픈 수요
+    public ResponseDto<?> reopenDemand(@RequestParam("popupId") Long popupId){
+        return ResponseDto.ok(popupService.reopenDemand(popupId));
+    }
 }

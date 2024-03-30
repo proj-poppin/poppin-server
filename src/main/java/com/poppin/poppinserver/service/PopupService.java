@@ -148,13 +148,17 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3));
+        popup.addViewCnt(); // 조회수 + 1
+
+        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
 
         List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
         Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(popupId); // 실시간 방문자
+
+        popupRepository.save(popup);
 
         return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
     }
@@ -277,5 +281,15 @@ public class PopupService {
         }
 
         popupRepository.saveAll(popups);
+    }
+
+    public String reopenDemand(Long popupId){
+
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        popup.addreopenDemandCnt(); // 재오픈 수요 + 1
+        popupRepository.save(popup);
+        return "재오픈 수요 체크 되었습니다.";
     }
 }
