@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.PopupService;
+import com.poppin.poppinserver.service.S3Service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
+    private final S3Service s3Service;
 
     @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요

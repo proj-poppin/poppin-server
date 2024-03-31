@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.constant;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.List;
 
 public class Constant {
@@ -15,6 +17,7 @@ public class Constant {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final Long MEMBER_INFO_RETENTION_PERIOD = 30L;
     public static final List<String> NO_NEED_AUTH_URLS = List.of(
+
             "/api/v1/auth/sign-up", // 회원가입
             "/api/v1/auth/sign-in", // 로그인
             "/api/v1/popup/hot-list",   // 인기 팝업 목록 조회
@@ -27,6 +30,8 @@ public class Constant {
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
             "/api/v1/auth/email/verification"
+
+//            "/api/v1/popup/test"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";
