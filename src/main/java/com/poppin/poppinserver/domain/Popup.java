@@ -24,7 +24,7 @@ public class Popup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "poster_url", nullable = false)
+    @Column(name = "poster_url")
     private String posterUrl;
 
     @Column(name = "homepage_link", nullable = false)

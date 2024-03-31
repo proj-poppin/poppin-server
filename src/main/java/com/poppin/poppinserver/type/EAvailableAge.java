@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum EAvailableAge {
-    G_RATED("G_RATE"),
+    G_RATED("G_RATED"),
     PG_7("PG_7"),
     PG_12("PG_12"),
     PG_15("PG_15"),
