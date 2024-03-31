@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.type.EInformProgress;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,7 +39,7 @@ public class ManagerInform {
     private Popup popupId; // 팝업 정보
 
     @Column(name = "progress")
-    private String progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
+    private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
@@ -48,7 +49,8 @@ public class ManagerInform {
     private LocalDateTime executedAt; // 처리 일자
 
     @Builder
-    public ManagerInform(User informerId, LocalDateTime informedAt, String affiliation, String informer_email, Popup popupId, String progress) {
+    public ManagerInform(User informerId, LocalDateTime informedAt, String affiliation,
+                         String informer_email, Popup popupId, EInformProgress progress) {
         this.informerId = informerId;
         this.informedAt = informedAt;
         this.affiliation = affiliation;
@@ -57,7 +59,7 @@ public class ManagerInform {
         this.progress = progress;
     }
 
-    public void execute(String progress, User adminId, LocalDateTime executedAt) {
+    public void execute(EInformProgress progress, User adminId, LocalDateTime executedAt) {
         this.progress = progress;
         this.adminId = adminId;
         this.executedAt = executedAt;
