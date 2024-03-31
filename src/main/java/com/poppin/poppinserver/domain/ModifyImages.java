@@ -11,23 +11,23 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "alarm_keyword")
-public class AlarmKeyword {
+@Table(name = "modify_images")
+public class ModifyImages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup_id")
-    private Popup popupId;
+    @JoinColumn(name = "modify_id", nullable = false)
+    private ModifyInfo modifyId;
 
-    @Column(name = "keyword")
-    private String keyword; // 재오픈 알람 키워드
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Builder
-    public AlarmKeyword(Popup popupId, String keyword) {
-        this.popupId = popupId;
-        this.keyword = keyword;
+    public ModifyImages(ModifyInfo modifyId, String imageUrl) {
+        this.modifyId = modifyId;
+        this.imageUrl = imageUrl;
     }
 }
