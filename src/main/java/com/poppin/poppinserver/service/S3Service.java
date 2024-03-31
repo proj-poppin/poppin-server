@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.service;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -101,6 +102,7 @@ public class S3Service {
 //        return imgUrlList;
 //    }
 
+    //
     public String uploadUserProfile(MultipartFile multipartFile, Long userId) {
         String imageUrl;
         String fileName = createFileName(multipartFile.getOriginalFilename(), userId);
@@ -117,6 +119,47 @@ public class S3Service {
         }
 
         return imageUrl;
+    }
+
+    // s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
+    public void deleteImage(String url) {
+        try {
+            String bucketName = url.split("://")[1].split("\\.")[0];
+            log.info(bucketName);
+            String filename = url.split("://")[1].split("/", 2)[1];
+            log.info(filename);
+            s3Client.deleteObject(bucketName, filename);
+            log.info("Deleted image {} from bucket {}", filename, bucketName);
+        } catch (AmazonServiceException e) {
+            log.error("S3 Error deleting : {}", e.getMessage());
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+    }
+
+    // 이미지 수정    (기존 사진 url, 사진, 해당객체 id)
+    public String replaceImage(String url, MultipartFile multipartFile, Long id) {
+        //기존 이미지 삭제
+        deleteImage(url);
+
+        String bucketName = url.split("://")[1].split("\\.")[0];
+        log.info(bucketName);
+
+        // 기존 이미지와 동일한 이름 사용
+        String fileName = createFileName(multipartFile.getOriginalFilename(), id);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            // 기존 파일 덮어쓰기
+            s3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            log.info("Replaced image in bucket {}: {}", bucketName, fileName);
+            return s3Client.getUrl(bucketName, fileName).toString();
+        } catch (IOException e) {
+            log.error("Error replacing image in bucket {}: {}", bucketName, fileName);
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
     }
 
     // 이미지파일명 중복 방지
@@ -147,4 +190,6 @@ public class S3Service {
         }
         return fileName.substring(fileName.lastIndexOf("."));
     }
+
+
 }
