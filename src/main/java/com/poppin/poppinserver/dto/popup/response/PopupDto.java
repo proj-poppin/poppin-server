@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EAvailableAge;
 import lombok.Builder;
 
 @Builder
@@ -13,7 +14,7 @@ public record PopupDto(
         String address,
         String addressDetail,
         String entranceFee,
-        Integer availableAge,
+        EAvailableAge availableAge,
         Boolean parkingAvailable,
         Boolean resvRequired,
         Integer reopenDemandCnt,

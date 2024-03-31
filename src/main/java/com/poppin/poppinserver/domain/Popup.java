@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.type.EAvailableAge;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,7 +49,7 @@ public class Popup {
     private Boolean resvRequired;
 
     @Column(name = "available_age", nullable = false)
-    private Integer availableAge;
+    private EAvailableAge availableAge;
 
     @Column(name = "parking_available", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean parkingAvailable;
@@ -104,7 +105,7 @@ public class Popup {
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,
                  String address, String addressDetail, String entranceFee,
-                 Boolean resvRequired, Integer availableAge, Boolean parkingAvailable,
+                 Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, String operationExcept, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {

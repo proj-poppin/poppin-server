@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.dto.popup.request;
 
+import com.poppin.poppinserver.type.EAvailableAge;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public record CreatePopupDto(
         @NotNull
         String entranceFee,
         @NotNull
-        Integer availableAge,
+        EAvailableAge availableAge,
         @NotNull
         Boolean parkingAvailable,
         @NotNull
