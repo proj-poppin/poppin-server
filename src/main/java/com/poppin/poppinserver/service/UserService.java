@@ -205,16 +205,4 @@ public class UserService {
         user.softDelete();
         userRepository.save(user);
     }
-
-    // 자정마다 soft delete 한 지 30일이 지난 유저 삭제
-    @Scheduled(cron = "0 0 0 * * *")
-    public void hardDeleteUser(){
-        List<User> users = userRepository.findAllByDeletedAtIsNotNull();
-
-        List<User> usersToDelete = users.stream()
-                .filter(user -> user.getDeletedAt().toLocalDate().isBefore(LocalDate.now().plusDays(1)))
-                .collect(Collectors.toList());
-
-        userRepository.deleteAllInBatch(usersToDelete);
-    }
 }
