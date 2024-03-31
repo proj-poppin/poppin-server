@@ -20,10 +20,10 @@ public class ModifyImages {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modify_id", nullable = false)
-    private ModifyInfo modifyId;
+    private ModifyInfo modifyId; // 정보수정요청 id
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl; // 이미지 링크
 
     @Builder
     public ModifyImages(ModifyInfo modifyId, String imageUrl) {

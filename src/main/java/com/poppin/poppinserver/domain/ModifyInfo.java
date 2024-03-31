@@ -34,7 +34,7 @@ public class ModifyInfo {
     @Column(name = "content", nullable = false)
     private String content; // 수정 요청 텍스트
 
-    @Column(name = "is_executed", columnDefinition = "TINYINT(1)")
+    @Column(name = "is_executed", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isExecuted; // 처리 여부
 
     @Builder
