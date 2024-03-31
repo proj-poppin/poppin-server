@@ -106,6 +106,7 @@ public class PopupService {
 
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
+                .homepageLink(createPopupDto.homepageLink())
                 .name(createPopupDto.name())
                 .availableAge(createPopupDto.availableAge())
                 .closeDate(createPopupDto.closeDate())

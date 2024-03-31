@@ -23,8 +23,11 @@ public class Popup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "poster_url")
+    @Column(name = "poster_url", nullable = false)
     private String posterUrl;
+
+    @Column(name = "homepage_link", nullable = false)
+    private String homepageLink;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -99,13 +102,14 @@ public class Popup {
     private Set<Interest> interestes = new HashSet<>();
 
     @Builder
-    public Popup(String posterUrl, String name, String introduce,
+    public Popup(String posterUrl, String homepageLink, String name, String introduce,
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, Integer availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, String operationExcept, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
         this.posterUrl = posterUrl;
+        this.homepageLink = homepageLink;
         this.name = name;
         this.introduce = introduce;
         this.address = address;

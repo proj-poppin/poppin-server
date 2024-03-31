@@ -7,6 +7,8 @@ import java.time.LocalTime;
 
 public record CreatePopupDto(
         @NotNull
+        String homepageLink,
+        @NotNull
         String name,
         @NotNull
         String introduce,

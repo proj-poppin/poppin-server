@@ -7,6 +7,7 @@ import lombok.Builder;
 public record PopupDto(
         Long id,
         String posterUrl,
+        String homepageLink,
         String name,
         String introduce,
         String address,
@@ -39,6 +40,7 @@ public record PopupDto(
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())

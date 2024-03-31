@@ -12,6 +12,7 @@ import java.util.Optional;
 public record PopupDetailDto(
          Long id,
          String posterUrl,
+         String homepageLink,
          String name,
          String introduce,
          String address,
@@ -40,6 +41,7 @@ public record PopupDetailDto(
         return PopupDetailDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
