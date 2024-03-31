@@ -34,10 +34,10 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "nickname", nullable = false, unique = true)
+    @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "birth_date", nullable = false)
+    @Column(name = "birth_date")
     private String birthDate;
 
     @Column(name = "profile_image_url")
@@ -131,8 +131,6 @@ public class User {
         return User.builder()
                 .email(oAuth2UserInfo.email())
                 .password(encodedPassword)
-                .birthDate("")
-                .nickname("")
                 .eLoginProvider(eLoginProvider)
                 .role(EUserRole.GUEST)
                 .agreedToPrivacyPolicy(true)
