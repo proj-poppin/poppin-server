@@ -19,10 +19,10 @@ public class AlarmKeyword {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup_id")
+    @JoinColumn(name = "popup_id", nullable = false)
     private Popup popupId;
 
-    @Column(name = "keyword")
+    @Column(name = "keyword", nullable = false)
     private String keyword; // 재오픈 알람 키워드
 
     @Builder
