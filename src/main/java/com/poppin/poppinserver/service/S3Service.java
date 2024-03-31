@@ -136,7 +136,7 @@ public class S3Service {
         }
     }
 
-    // 이미지 수정
+    // 이미지 수정    (기존 사진 url, 사진, 해당객체 id)
     public String replaceImage(String url, MultipartFile multipartFile, Long id) {
         //기존 이미지 삭제
         deleteImage(url);
