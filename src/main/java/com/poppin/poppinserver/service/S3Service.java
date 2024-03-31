@@ -136,7 +136,31 @@ public class S3Service {
         }
     }
 
+    // 이미지 수정
+    public String replaceImage(String url, MultipartFile multipartFile, Long id) {
+        //기존 이미지 삭제
+        deleteImage(url);
 
+        String bucketName = url.split("://")[1].split("\\.")[0];
+        log.info(bucketName);
+
+        // 기존 이미지와 동일한 이름 사용
+        String fileName = createFileName(multipartFile.getOriginalFilename(), id);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            // 기존 파일 덮어쓰기
+            s3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            log.info("Replaced image in bucket {}: {}", bucketName, fileName);
+            return s3Client.getUrl(bucketName, fileName).toString();
+        } catch (IOException e) {
+            log.error("Error replacing image in bucket {}: {}", bucketName, fileName);
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+    }
 
     // 이미지파일명 중복 방지
     private String createFileName(String fileName, Long popupId) {
