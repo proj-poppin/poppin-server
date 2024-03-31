@@ -1,18 +1,22 @@
 package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EAvailableAge;
 import lombok.Builder;
 
 @Builder
 public record PopupDto(
         Long id,
         String posterUrl,
+        String homepageLink,
         String name,
         String introduce,
-        String location,
-        Integer entranceFee,
-        Integer availableAge,
+        String address,
+        String addressDetail,
+        String entranceFee,
+        EAvailableAge availableAge,
         Boolean parkingAvailable,
+        Boolean resvRequired,
         Integer reopenDemandCnt,
         Integer interesteCnt,
         Integer viewCnt,
@@ -22,6 +26,7 @@ public record PopupDto(
         String closeDate,
         String openTime,
         String closeTime,
+        String operationExcept,
         String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
@@ -36,12 +41,14 @@ public record PopupDto(
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
-                .location(popup.getLocation())
+                .address(popup.getAddress())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getEntranceFee())
+                .availableAge(popup.getAvailableAge())
                 .parkingAvailable(popup.getParkingAvailable())
+                .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
                 .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
@@ -51,6 +58,7 @@ public record PopupDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
+                .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)

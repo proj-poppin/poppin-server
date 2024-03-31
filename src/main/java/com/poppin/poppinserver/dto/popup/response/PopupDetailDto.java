@@ -3,6 +3,7 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
+import com.poppin.poppinserver.type.EAvailableAge;
 import lombok.Builder;
 
 import java.util.List;
@@ -12,12 +13,15 @@ import java.util.Optional;
 public record PopupDetailDto(
          Long id,
          String posterUrl,
+         String homepageLink,
          String name,
          String introduce,
-         String location,
-         Integer entranceFee,
-         Integer availableAge,
+         String address,
+         String addressDetail,
+         String entranceFee,
+         EAvailableAge availableAge,
          Boolean parkingAvailable,
+         Boolean resvRequired,
          Integer reopenDemandCnt,
          Integer interesteCnt,
          Integer viewCnt,
@@ -27,6 +31,7 @@ public record PopupDetailDto(
          String closeDate,
          String openTime,
          String closeTime,
+         String operationExcept,
          String operationStatus,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,
@@ -37,12 +42,15 @@ public record PopupDetailDto(
         return PopupDetailDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
-                .location(popup.getLocation())
+                .address(popup.getAddress())
+                .addressDetail(popup.getAddressDetail())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getEntranceFee())
+                .availableAge(popup.getAvailableAge())
                 .parkingAvailable(popup.getParkingAvailable())
+                .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
                 .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
@@ -52,6 +60,7 @@ public record PopupDetailDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
+                .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)

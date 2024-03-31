@@ -14,7 +14,7 @@ public record PopupSearchingDto(
         Long id,
         String posterUrl,
         String name,
-        String location,
+        String address,
         Integer viewCnt,
         String createdAt,
         String editedAt,
@@ -51,7 +51,7 @@ public record PopupSearchingDto(
                             .id(popup.getId())
                             .posterUrl(popup.getPosterUrl())
                             .name(popup.getName())
-                            .location(popup.getLocation())
+                            .address(popup.getAddress())
                             .viewCnt(popup.getViewCnt())
                             .createdAt(popup.getCreatedAt().toString())
                             .editedAt(popup.getEditedAt().toString())
