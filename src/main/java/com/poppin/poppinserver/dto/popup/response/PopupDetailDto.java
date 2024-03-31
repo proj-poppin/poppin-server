@@ -14,10 +14,12 @@ public record PopupDetailDto(
          String posterUrl,
          String name,
          String introduce,
-         String location,
-         Integer entranceFee,
+         String address,
+         String addressDetail,
+         String entranceFee,
          Integer availableAge,
          Boolean parkingAvailable,
+         Boolean resvRequired,
          Integer reopenDemandCnt,
          Integer interesteCnt,
          Integer viewCnt,
@@ -27,6 +29,7 @@ public record PopupDetailDto(
          String closeDate,
          String openTime,
          String closeTime,
+         String operationExcept,
          String operationStatus,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,
@@ -39,10 +42,12 @@ public record PopupDetailDto(
                 .posterUrl(popup.getPosterUrl())
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
-                .location(popup.getLocation())
+                .address(popup.getAddress())
+                .addressDetail(popup.getAddressDetail())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getEntranceFee())
+                .availableAge(popup.getAvailableAge())
                 .parkingAvailable(popup.getParkingAvailable())
+                .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
                 .interesteCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
@@ -52,6 +57,7 @@ public record PopupDetailDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
+                .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)

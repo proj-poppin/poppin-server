@@ -11,13 +11,16 @@ public record CreatePopupDto(
         @NotNull
         String introduce,
         @NotNull
-        String location,
+        String address,
+        String addressDetail,
         @NotNull
-        Integer entranceFee,
+        String entranceFee,
         @NotNull
         Integer availableAge,
         @NotNull
         Boolean parkingAvailable,
+        @NotNull
+        Boolean resvRequired,
         @NotNull
         LocalDate openDate,
         @NotNull
@@ -26,6 +29,7 @@ public record CreatePopupDto(
         LocalTime openTime,
         @NotNull
         LocalTime closeTime,
+        String operationExcept,
         @NotNull
         CreatePreferedDto prefered,
         @NotNull

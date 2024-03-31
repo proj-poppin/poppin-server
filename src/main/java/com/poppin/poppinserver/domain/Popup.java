@@ -32,11 +32,17 @@ public class Popup {
     @Column(name = "introduce", nullable = false)
     private String introduce;
 
-    @Column(name = "location", nullable = false)
-    private String location;
+    @Column(name = "address", nullable = false)
+    private String address;
+
+    @Column(name = "address_detail")
+    private String addressDetail;
 
     @Column(name = "entrance_fee", nullable = false)
-    private Integer entranceFee;
+    private String entranceFee;
+
+    @Column(name = "resv_required", nullable = false)
+    private Boolean resvRequired;
 
     @Column(name = "available_age", nullable = false)
     private Integer availableAge;
@@ -71,6 +77,9 @@ public class Popup {
     @Column(name = "close_time", nullable = false)
     private LocalTime closeTime;
 
+    @Column(name = "operation_except")
+    private String operationExcept;
+
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
@@ -91,16 +100,18 @@ public class Popup {
 
     @Builder
     public Popup(String posterUrl, String name, String introduce,
-                 String location, Integer entranceFee, Integer availableAge,
-                 Boolean parkingAvailable,
+                 String address, String addressDetail, String entranceFee,
+                 Boolean resvRequired, Integer availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationStatus,
+                 LocalTime closeTime, String operationExcept, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
         this.posterUrl = posterUrl;
         this.name = name;
         this.introduce = introduce;
-        this.location = location;
+        this.address = address;
+        this.addressDetail = addressDetail;
         this.entranceFee = entranceFee;
+        this.resvRequired = resvRequired;
         this.availableAge = availableAge;
         this.parkingAvailable = parkingAvailable;
         this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
@@ -112,6 +123,7 @@ public class Popup {
         this.closeDate = closeDate;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
         this.whoWithPopup = whoWithPopup;
