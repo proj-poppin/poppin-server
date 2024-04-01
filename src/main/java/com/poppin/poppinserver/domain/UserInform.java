@@ -32,6 +32,9 @@ public class UserInform {
     @JoinColumn(name = "popup_id")
     private Popup popupId; // 팝업 정보
 
+    @Column(name = "contact_link")
+    private String contactLink; // 정보를 접한 사이트 주소
+
     @Column(name = "progress")
     private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
@@ -44,10 +47,11 @@ public class UserInform {
 
     @Builder
     public UserInform(User informerId, LocalDateTime informedAt, Popup popupId,
-                      EInformProgress progress) {
+                      String contactLink, EInformProgress progress) {
         this.informerId = informerId;
         this.informedAt = informedAt;
         this.popupId = popupId;
+        this.contactLink = contactLink;
         this.progress = progress;
     }
 

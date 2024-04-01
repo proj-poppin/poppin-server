@@ -27,31 +27,31 @@ public class Popup {
     @Column(name = "poster_url")
     private String posterUrl;
 
-    @Column(name = "homepage_link", nullable = false)
+    @Column(name = "homepage_link")
     private String homepageLink;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "introduce", nullable = false)
+    @Column(name = "introduce")
     private String introduce;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
     @Column(name = "address_detail")
     private String addressDetail;
 
-    @Column(name = "entrance_fee", nullable = false)
+    @Column(name = "entrance_fee")
     private String entranceFee;
 
-    @Column(name = "resv_required", nullable = false)
+    @Column(name = "resv_required")
     private Boolean resvRequired;
 
-    @Column(name = "available_age", nullable = false)
+    @Column(name = "available_age")
     private EAvailableAge availableAge;
 
-    @Column(name = "parking_available", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "parking_available", columnDefinition = "TINYINT(1)")
     private Boolean parkingAvailable;
 
     @Column(name = "reopen_demand_cnt", nullable = false)
@@ -69,22 +69,22 @@ public class Popup {
     @Column(name = "edited_at", nullable = false)
     private LocalDateTime editedAt;
 
-    @Column(name = "open_date", nullable = false)
+    @Column(name = "open_date")
     private LocalDate openDate;
 
-    @Column(name = "close_date", nullable = false)
+    @Column(name = "close_date")
     private LocalDate closeDate;
 
-    @Column(name = "open_time", nullable = false)
+    @Column(name = "open_time")
     private LocalTime openTime;
 
-    @Column(name = "close_time", nullable = false)
+    @Column(name = "close_time")
     private LocalTime closeTime;
 
     @Column(name = "operation_except")
     private String operationExcept;
 
-    @Column(name = "operation_status", nullable = false)
+    @Column(name = "operation_status")
     private String operationStatus;
 
     @OneToOne
