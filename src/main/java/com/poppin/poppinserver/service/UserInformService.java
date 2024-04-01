@@ -6,10 +6,7 @@ import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.PosterImageRepository;
-import com.poppin.poppinserver.repository.UserRepository;
-import com.poppin.poppinserver.repository.UserinformRepository;
+import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EInformProgress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +21,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class UserInformService {
-    private final UserinformRepository userinformRepository;
+    private final UserInformRepository userInformRepository;
     private final PopupRepository popupRepository;
+    private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
 
@@ -54,6 +52,7 @@ public class UserInformService {
                 .alchol(createTasteDto.alchol())
                 .animalPlant(createTasteDto.animalPlant())
                 .build();
+        tastePopupRepository.save(tastePopup);
 
         Popup popup = Popup.builder()
                 .name(createUserInformDto.name())
@@ -74,14 +73,18 @@ public class UserInformService {
             posterImages.add(posterImage);
         }
         posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        popup = popupRepository.save(popup);
 
         UserInform userInform = UserInform.builder()
                 .informerId(user)
                 .informedAt(LocalDateTime.now())
                 .popupId(popup)
-                .contactLink(createUserInformDto.contactlink())
+                .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
+        userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
 

@@ -18,7 +18,7 @@ public record PopupDto(
         Boolean parkingAvailable,
         Boolean resvRequired,
         Integer reopenDemandCnt,
-        Integer interesteCnt,
+        Integer interestCnt,
         Integer viewCnt,
         String createdAt,
         String editedAt,
@@ -33,7 +33,33 @@ public record PopupDto(
 ) {
     public static PopupDto fromEntity(Popup popup){
 
-        PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+        // 각 nullable 부분들에 대해 예외처리
+
+        PreferedDto preferedDto = null;
+        if (popup.getPreferedPopup() != null){
+            preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+        }
+
+        String openDate = null;
+        if(popup.getOpenDate() != null){
+            openDate = popup.getOpenDate().toString();
+        }
+
+        String closeDate = null;
+        if(popup.getOpenDate() != null){
+            closeDate = popup.getCloseDate().toString();
+        }
+
+        String openTime = null;
+        if(popup.getOpenDate() != null){
+            openTime = popup.getOpenTime().toString();
+        }
+
+        String closeTime = null;
+        if(popup.getOpenDate() != null){
+            closeTime = popup.getCloseTime().toString();
+        }
+
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
         return PopupDto.builder()
@@ -48,14 +74,14 @@ public record PopupDto(
                 .parkingAvailable(popup.getParkingAvailable())
                 .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
-                .interesteCnt(popup.getInterestCnt())
+                .interestCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
                 .createdAt(popup.getCreatedAt().toString())
                 .editedAt(popup.getEditedAt().toString())
-                .openDate(popup.getOpenDate().toString())
-                .closeDate(popup.getCloseDate().toString())
-                .openTime(popup.getOpenTime().toString())
-                .closeTime(popup.getCloseTime().toString())
+                .openDate(openDate)
+                .closeDate(closeDate)
+                .openTime(openTime)
+                .closeTime(closeTime)
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
