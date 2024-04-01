@@ -98,6 +98,9 @@ public class Popup {
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
+    @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
+    private Set<PosterImage> posterImages = new HashSet<>();
+
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,
                  String address, String addressDetail, String entranceFee,
