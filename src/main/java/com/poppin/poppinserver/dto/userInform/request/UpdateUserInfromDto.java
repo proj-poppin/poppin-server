@@ -10,6 +10,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 public record UpdateUserInfromDto(
+        Long adminId,
+        Long userInformId,
         String homepageLink,
         String name,
         String introduce,

@@ -3,6 +3,7 @@ package com.poppin.poppinserver.controller;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
+import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.UserInformService;
@@ -35,8 +36,20 @@ public class UserInformController {
         return ResponseDto.ok(userInformService.createUserInform(createUserInformDto, images, userId));
     }
 
-    @GetMapping
+    @GetMapping("")
     public ResponseDto<?> readUserInform(@RequestParam("userInformId") Long userInformId) {
         return ResponseDto.ok(userInformService.readUserInform(userInformId));
+    }
+
+    @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> saveUserInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                           @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
+                                           @UserId Long userId) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images));
     }
 }

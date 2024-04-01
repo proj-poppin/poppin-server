@@ -113,12 +113,12 @@ public class UserInformService {
 
     @Transactional
     public UserInformDto updateUserInform(UpdateUserInfromDto updateUserInfromDto,
-                                          List<MultipartFile> images,
-                                          Long adminId, Long userInformId){
-        UserInform userInform = userInformRepository.findById(userInformId)
+                                          List<MultipartFile> images
+                                          ){
+        UserInform userInform = userInformRepository.findById(updateUserInfromDto.userInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = userRepository.findById(adminId)
+        User admin = userRepository.findById(updateUserInfromDto.adminId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         CreateTasteDto createTasteDto = updateUserInfromDto.taste();
