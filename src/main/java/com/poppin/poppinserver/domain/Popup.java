@@ -88,7 +88,7 @@ public class Popup {
     private String operationStatus;
 
     @OneToOne
-    @JoinColumn(name = "prefered_id", nullable = false)
+    @JoinColumn(name = "prefered_id")
     private PreferedPopup preferedPopup;
 
     @OneToOne

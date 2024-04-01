@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 public record CreateUserInform(
         @NotNull
         String name,
+        String contactlink,
         @NotNull
-        CreateTasteDto taste,
-        String contactlink
+        CreateTasteDto taste
 ) {
 }
