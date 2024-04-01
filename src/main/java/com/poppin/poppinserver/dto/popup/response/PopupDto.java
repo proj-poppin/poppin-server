@@ -1,8 +1,12 @@
 package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.type.EAvailableAge;
 import lombok.Builder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 public record PopupDto(
@@ -29,7 +33,8 @@ public record PopupDto(
         String operationExcept,
         String operationStatus,
         PreferedDto prefered,
-        TasteDto taste
+        TasteDto taste,
+        List<String> posterList
 ) {
     public static PopupDto fromEntity(Popup popup){
 
@@ -62,6 +67,11 @@ public record PopupDto(
 
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
+        List<String> posterList = new ArrayList<>();
+        for(PosterImage posterImage : popup.getPosterImages()){
+            posterList.add(posterImage.getPosterUrl());
+        }
+
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -86,6 +96,7 @@ public record PopupDto(
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)
+                .posterList(posterList)
                 .build();
     }
 }

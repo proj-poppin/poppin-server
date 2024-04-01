@@ -6,6 +6,8 @@ import com.poppin.poppinserver.dto.popup.response.PopupDto;
 import com.poppin.poppinserver.type.EInformProgress;
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
 public record UserInformDto(
         Long id,

@@ -8,6 +8,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EInformProgress;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ public class UserInformService {
 
     private final S3Service s3Service;
 
-    //사용자 제보 생성
-    public UserInformDto createUserInform(CreateUserInformDto createUserInformDto,
+    @Transactional
+    public UserInformDto createUserInform(CreateUserInformDto createUserInformDto, //사용자 제보 생성
                                           List<MultipartFile> images,
                                           Long userId){
         User user = userRepository.findById(userId)
@@ -87,7 +88,13 @@ public class UserInformService {
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
-
     }
 
+    @Transactional
+    public UserInformDto readUserInform(Long userInformId){ // 사용자 제보 조회
+        UserInform userInform = userInformRepository.findById(userInformId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
+
+        return UserInformDto.fromEntity(userInform);
+    }
 }

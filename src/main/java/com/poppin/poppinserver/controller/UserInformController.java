@@ -2,7 +2,6 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -34,5 +33,10 @@ public class UserInformController {
         }
 
         return ResponseDto.ok(userInformService.createUserInform(createUserInformDto, images, userId));
+    }
+
+    @GetMapping
+    public ResponseDto<?> readUserInform(@RequestParam("userInformId") Long userInformId) {
+        return ResponseDto.ok(userInformService.readUserInform(userInformId));
     }
 }
