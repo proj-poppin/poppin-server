@@ -97,4 +97,14 @@ public class UserInformService {
 
         return UserInformDto.fromEntity(userInform);
     }
+
+//    public UserInformDto updateUserInform(Long adminId, Long userInformId){
+//        UserInform userInform = userInformRepository.findById(userInformId)
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
+//
+//        User admin = userRepository.findById(adminId)
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+//
+//        userInform.execute(EInformProgress.EXECUTING, admin);
+//    }
 }
