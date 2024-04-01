@@ -29,14 +29,12 @@ public record PopupDto(
         String operationExcept,
         String operationStatus,
         PreferedDto prefered,
-        TasteDto taste,
-        WhoWithDto whoWith
+        TasteDto taste
 ) {
     public static PopupDto fromEntity(Popup popup){
 
         PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
-        WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
 
         return PopupDto.builder()
                 .id(popup.getId())
@@ -62,7 +60,6 @@ public record PopupDto(
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)
-                .whoWith(whoWithDto)
                 .build();
     }
 }

@@ -36,9 +36,7 @@ public record CreatePopupDto(
         @NotNull
         CreatePreferedDto prefered,
         @NotNull
-        CreateTasteDto taste,
-        @NotNull
-        CreateWhoWithDto whoWith
+        CreateTasteDto taste
 ) {
 
 }

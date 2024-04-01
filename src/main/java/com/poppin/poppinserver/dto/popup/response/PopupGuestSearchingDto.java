@@ -19,8 +19,7 @@ public record PopupGuestSearchingDto(
         String closeDate,
         String operationStatus,
         PreferedDto prefered,
-        TasteDto taste,
-        WhoWithDto whoWith
+        TasteDto taste
 ) {
     public static List<PopupGuestSearchingDto> fromEntityList(List<Popup> popups){
         List<PopupGuestSearchingDto> dtoList = new ArrayList<>();
@@ -29,7 +28,6 @@ public record PopupGuestSearchingDto(
 
             PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
-            WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
 
             PopupGuestSearchingDto popupGuestSearchingDto =
                     PopupGuestSearchingDto.builder()
@@ -45,7 +43,6 @@ public record PopupGuestSearchingDto(
                             .operationStatus(popup.getOperationStatus())
                             .taste(tasteDto)
                             .prefered(preferedDto)
-                            .whoWith(whoWithDto)
                             .build();
 
             dtoList.add(popupGuestSearchingDto);

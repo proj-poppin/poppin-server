@@ -95,10 +95,6 @@ public class Popup {
     @JoinColumn(name = "taste_id", nullable = false)
     private TastePopup tastePopup;
 
-    @OneToOne
-    @JoinColumn(name = "with_id", nullable = false)
-    private WhoWithPopup whoWithPopup;
-
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
@@ -108,7 +104,7 @@ public class Popup {
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, String operationExcept, String operationStatus,
-                 PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
+                 PreferedPopup preferedPopup, TastePopup tastePopup) {
         this.posterUrl = posterUrl;
         this.homepageLink = homepageLink;
         this.name = name;
@@ -131,7 +127,6 @@ public class Popup {
         this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
-        this.whoWithPopup = whoWithPopup;
         this.preferedPopup = preferedPopup;
     }
 
