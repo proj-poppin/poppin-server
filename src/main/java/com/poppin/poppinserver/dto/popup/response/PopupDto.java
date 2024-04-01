@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.dto.popup.response;
 
+import com.poppin.poppinserver.domain.AlarmKeyword;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.type.EAvailableAge;
@@ -34,7 +35,8 @@ public record PopupDto(
         String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
-        List<String> posterList
+        List<String> posterList,
+        List<String> keywordList
 ) {
     public static PopupDto fromEntity(Popup popup){
 
@@ -72,6 +74,11 @@ public record PopupDto(
             posterList.add(posterImage.getPosterUrl());
         }
 
+        List<String> keywordList = new ArrayList<>();
+        for(AlarmKeyword alarmKeyword : popup.getAlarmKeywords()){
+            keywordList.add(alarmKeyword.getKeyword());
+        }
+
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -97,6 +104,7 @@ public record PopupDto(
                 .prefered(preferedDto)
                 .taste(tasteDto)
                 .posterList(posterList)
+                .keywordList(keywordList)
                 .build();
     }
 }

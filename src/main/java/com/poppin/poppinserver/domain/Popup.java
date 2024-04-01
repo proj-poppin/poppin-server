@@ -88,7 +88,7 @@ public class Popup {
     private String operationStatus;
 
     @OneToOne
-    @JoinColumn(name = "prefered_id")
+    @JoinColumn(name = "prefered_id", nullable = false)
     private PreferedPopup preferedPopup;
 
     @OneToOne
@@ -134,6 +134,33 @@ public class Popup {
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
         this.preferedPopup = preferedPopup;
+    }
+
+    public void update(String homepageLink, String name, String introduce,
+                 String address, String addressDetail, String entranceFee,
+                 Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
+                 LocalDate openDate, LocalDate closeDate, LocalTime openTime,
+                 LocalTime closeTime, String operationExcept, String operationStatus) {
+        this.homepageLink = homepageLink;
+        this.name = name;
+        this.introduce = introduce;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.entranceFee = entranceFee;
+        this.resvRequired = resvRequired;
+        this.availableAge = availableAge;
+        this.parkingAvailable = parkingAvailable;
+        this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
+        this.interestCnt = 0; // 관심등록 api 동기화
+        this.viewCnt = 0; // 상세 조회시 자동 ++
+        this.createdAt = LocalDateTime.now();
+        this.editedAt = LocalDateTime.now();
+        this.openDate = openDate;
+        this.closeDate = closeDate;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.operationExcept = operationExcept;
+        this.operationStatus = operationStatus; // 내부 동기화
     }
 
     public void addInterestCnt() {this.interestCnt += 1;}

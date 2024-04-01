@@ -55,7 +55,7 @@ public class UserInform {
         this.progress = progress;
     }
 
-    public void execute(EInformProgress progress, User adminId) {
+    public void update(EInformProgress progress, User adminId) {
         this.progress = progress;
         this.adminId = adminId;
         this.executedAt = LocalDateTime.now();
