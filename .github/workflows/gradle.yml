@@ -46,7 +46,7 @@ jobs:
         run: |
           mkdir ./src/main/resources
           touch ./src/main/resources/application.yml
-          echo "${{ secrets.AWS_PROPERTIES }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.AWS_PROPERTIES }}" > ./application.yml
           cat ./src/main/resources/application.yml
         shell: bash
 
