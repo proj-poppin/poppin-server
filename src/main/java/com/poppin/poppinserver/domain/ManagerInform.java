@@ -32,7 +32,7 @@ public class ManagerInform {
     private String affiliation; // 소속
 
     @Column(name = "informer_email")
-    private String informer_email; // 담당자 이메일
+    private String informerEmail; // 담당자 이메일
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id")
@@ -50,11 +50,11 @@ public class ManagerInform {
 
     @Builder
     public ManagerInform(User informerId, LocalDateTime informedAt, String affiliation,
-                         String informer_email, Popup popupId, EInformProgress progress) {
+                         String informerEmail, Popup popupId, EInformProgress progress) {
         this.informerId = informerId;
         this.informedAt = informedAt;
         this.affiliation = affiliation;
-        this.informer_email = informer_email;
+        this.informerEmail = informerEmail;
         this.popupId = popupId;
         this.progress = progress;
     }
