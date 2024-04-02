@@ -38,7 +38,7 @@ public class ManagerInformController {
     }
 
     @GetMapping("") // 운영자 제보 조회
-    public ResponseDto<?> readUserInform(@RequestParam("manageInformId") Long manageInformId) {
-        return ResponseDto.ok(managerInformService.readManageInform(manageInformId));
+    public ResponseDto<?> readUserInform(@RequestParam("managerInformId") Long managerInformId) {
+        return ResponseDto.ok(managerInformService.readManageInform(managerInformId));
     }
 }

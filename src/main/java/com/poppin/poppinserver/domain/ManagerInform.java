@@ -59,9 +59,9 @@ public class ManagerInform {
         this.progress = progress;
     }
 
-    public void execute(EInformProgress progress, User adminId, LocalDateTime executedAt) {
+    public void update(EInformProgress progress, User adminId) {
         this.progress = progress;
         this.adminId = adminId;
-        this.executedAt = executedAt;
+        this.executedAt = LocalDateTime.now();
     }
 }
