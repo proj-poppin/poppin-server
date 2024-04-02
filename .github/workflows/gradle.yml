@@ -43,14 +43,11 @@ jobs:
 
         # create application.yml
       - name: make application.yml
-        if: contains(github.ref, 'release')
         run: |
-          # spring의 resources 경로로 이동
-          mkdir ./src/main/resources
-          cd ./src/main/resources
           mkdir ./src/main/resources
           touch ./src/main/resources/application.yml
           echo "${{ secrets.AWS_PROPERTIES }}" > ./src/main/resources/application.yml
+          cat ./src/main/resources/application.yml
         shell: bash
 
       # gradlew 파일 실행권한 설정
