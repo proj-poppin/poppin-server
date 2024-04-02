@@ -44,12 +44,24 @@ public class UserInformController {
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
-                                           @UserId Long userId) {
+                                           @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images));
+        return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images, adminId));
+    }
+
+    @PutMapping(value = "/upload", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> uploadUserInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                         @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
+                                         @UserId Long adminId) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(userInformService.uploadPopup(updateUserInfromDto, images, adminId));
     }
 }

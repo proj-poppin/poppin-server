@@ -16,7 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +73,7 @@ public class UserInformService {
                 .name(createUserInformDto.name())
                 .tastePopup(tastePopup)
                 .preferedPopup(preferedPopup)
+                .operationStatus("EXECUTING")
                 .build();
         popup = popupRepository.save(popup);
         log.info(popup.toString());
@@ -113,12 +116,12 @@ public class UserInformService {
 
     @Transactional
     public UserInformDto updateUserInform(UpdateUserInfromDto updateUserInfromDto,
-                                          List<MultipartFile> images
-                                          ){
+                                          List<MultipartFile> images,
+                                          Long adminId){
         UserInform userInform = userInformRepository.findById(updateUserInfromDto.userInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = userRepository.findById(updateUserInfromDto.adminId())
+        User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         CreateTasteDto createTasteDto = updateUserInfromDto.taste();
@@ -189,12 +192,118 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                updateUserInfromDto.operationExcept()
+                "EXECUTING"
         );
 
         popup = popupRepository.save(popup);
 
         userInform.update(EInformProgress.EXECUTING, admin);
+        userInform = userInformRepository.save(userInform);
+
+        return UserInformDto.fromEntity(userInform);
+    }
+
+    @Transactional
+    public UserInformDto uploadPopup(UpdateUserInfromDto updateUserInfromDto,
+                                          List<MultipartFile> images,
+                                          Long adminId){
+        UserInform userInform = userInformRepository.findById(updateUserInfromDto.userInformId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
+
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        CreateTasteDto createTasteDto = updateUserInfromDto.taste();
+        TastePopup tastePopup = userInform.getPopupId().getTastePopup();
+        tastePopup.update(createTasteDto.fasionBeauty(),
+                createTasteDto.characters(),
+                createTasteDto.foodBeverage(),
+                createTasteDto.webtoonAni(),
+                createTasteDto.interiorThings(),
+                createTasteDto.movie(),
+                createTasteDto.musical(),
+                createTasteDto.sports(),
+                createTasteDto.game(),
+                createTasteDto.itTech(),
+                createTasteDto.kpop(),
+                createTasteDto.alchol(),
+                createTasteDto.animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = updateUserInfromDto.prefered();
+        PreferedPopup preferedPopup = userInform.getPopupId().getPreferedPopup();
+        preferedPopup.update(createPreferedDto.market(),
+                createPreferedDto.display(),
+                createPreferedDto.experience(),
+                createPreferedDto.wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        Popup popup = userInform.getPopupId();
+
+        // 팝업 이미지 처리 및 저장
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        // 기존 키워드 삭제 및 다시 저장
+        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+
+        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        for(String keyword : updateUserInfromDto.keywords()){
+            alarmKeywords.add(AlarmKeyword.builder()
+                    .popupId(popup)
+                    .keyword(keyword)
+                    .build());
+        }
+        alarmKeywordRepository.saveAll(alarmKeywords);
+
+        //날짜 요청 유효성 검증
+        if (updateUserInfromDto.openDate().isAfter(updateUserInfromDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
+
+        //현재 운영상태 정의
+        String operationStatus;
+        if (updateUserInfromDto.openDate().isAfter(LocalDate.now())){
+            Period period = Period.between(LocalDate.now(), updateUserInfromDto.openDate());
+            operationStatus = "D-" + period.getDays();
+        } else if (updateUserInfromDto.closeDate().isBefore(LocalDate.now())) {
+            operationStatus = "TERMINATED";
+        }
+        else{
+            operationStatus = "OPERATING";
+        }
+
+        popup.update(
+                updateUserInfromDto.homepageLink(),
+                updateUserInfromDto.name(),
+                updateUserInfromDto.introduce(),
+                updateUserInfromDto.address(),
+                updateUserInfromDto.addressDetail(),
+                updateUserInfromDto.entranceFee(),
+                updateUserInfromDto.resvRequired(),
+                updateUserInfromDto.availableAge(),
+                updateUserInfromDto.parkingAvailable(),
+                updateUserInfromDto.openDate(),
+                updateUserInfromDto.closeDate(),
+                updateUserInfromDto.openTime(),
+                updateUserInfromDto.closeTime(),
+                updateUserInfromDto.operationExcept(),
+                operationStatus
+        );
+
+        popup = popupRepository.save(popup);
+
+        userInform.update(EInformProgress.EXECUTED, admin);
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
