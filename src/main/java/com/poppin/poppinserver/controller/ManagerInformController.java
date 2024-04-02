@@ -56,4 +56,17 @@ public class ManagerInformController {
 
         return ResponseDto.ok(managerInformService.updateManageInform(updateManagerInfromDto, images, adminId));
     }
+
+    //운영자 제보 업로드
+    @PutMapping(value = "/upload", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                           @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                           @UserId Long adminId) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInfromDto, images, adminId));
+    }
 }
