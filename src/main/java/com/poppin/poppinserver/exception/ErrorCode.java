@@ -56,6 +56,7 @@ public enum ErrorCode {
     NOT_FOUND_USER_PREFER("40408", HttpStatus.NOT_FOUND, "해당 사용자의 설정 선호도가 존재하지 않습니다."),
     NOT_FOUND_USER_WHOWITH("40409", HttpStatus.NOT_FOUND, "해당 사용자의 설정 동반인이 존재하지 않습니다."),
     NOT_FOUND_USER_INFORM("40410" , HttpStatus.NOT_FOUND, "해당 사용자 제보는 존재하지 않습니다."),
+    NOT_FOUND_MANAGE_INFORM("40411" , HttpStatus.NOT_FOUND, "해당 사용자 제보는 존재하지 않습니다."),
 
 
     // UnsupportedMediaType Error

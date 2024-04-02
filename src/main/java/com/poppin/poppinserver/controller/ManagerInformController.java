@@ -12,10 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -27,7 +24,7 @@ import java.util.List;
 public class ManagerInformController {
     private final ManagerInformService managerInformService;
 
-    //사용자 제보 생성
+    //운영자 제보 생성
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid CreateManagerInformDto createManagerInformDto,
@@ -38,5 +35,10 @@ public class ManagerInformController {
         }
 
         return ResponseDto.ok(managerInformService.createManagerInform(createManagerInformDto, images, userId));
+    }
+
+    @GetMapping("") // 운영자 제보 조회
+    public ResponseDto<?> readUserInform(@RequestParam("manageInformId") Long manageInformId) {
+        return ResponseDto.ok(managerInformService.readManageInform(manageInformId));
     }
 }

@@ -118,4 +118,12 @@ public class ManagerInformService {
 
         return ManagerInformDto.fromEntity(managerInform);
     }
+
+    @Transactional
+    public ManagerInformDto readManageInform(Long manageInformId){ // 운영자 제보 조회
+        ManagerInform managerInform = managerInformRepository.findById(manageInformId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
+
+        return ManagerInformDto.fromEntity(managerInform);
+    }
 }
