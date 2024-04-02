@@ -42,14 +42,14 @@ jobs:
           distribution: 'temurin'
 
       # create application.yml
-      - name: make application-aws.yml
-        if: contains(github.ref, 'release')
+      - name: make application.yml
+        if: contains(github.ref, 'dev')
         run: |
           # spring의 resources 경로로 이동
           cd ./src/main/resources
           
           ls -al
-          touch ./application-aws.yml
+          touch ./application.yml
           
           # GitHub-Actions에서 설정한 값을 application-aws.yml 파일에 쓰기
           echo "copy properties"
