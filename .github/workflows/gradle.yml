@@ -41,21 +41,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # create application.yml
-      - name: make application.yml
-        if: contains(github.ref, 'dev')
-        run: |
-          # spring의 resources 경로로 이동
-          cd ./src/main/resources
-          
-          ls -al
-          touch ./application.yml
-          
-          # GitHub-Actions에서 설정한 값을 application-aws.yml 파일에 쓰기
-          echo "copy properties"
-          echo "${{ secrets.AWS_PROPERTIES }}" > ./application.yml
-        shell: bash
-
+      #application.yml  만들기
+      - uses: actions/checkout@v2
+      - run: touch ./src/main/resources/application.yml
+      - run: echo "${{secrets.AWS_PROPERTIES}}" > ./src/main/resources/application.yml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: application.yml
+          path: ./src/main/resources/application.yml
 
       # gradlew 파일 실행권한 설정
       - name: Grant execute permission for gradlew
