@@ -3,7 +3,9 @@ package com.poppin.poppinserver.controller;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
+import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
+import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.ManagerInformService;
@@ -40,5 +42,18 @@ public class ManagerInformController {
     @GetMapping("") // 운영자 제보 조회
     public ResponseDto<?> readUserInform(@RequestParam("managerInformId") Long managerInformId) {
         return ResponseDto.ok(managerInformService.readManageInform(managerInformId));
+    }
+
+    // 운영자 제보 임시저장
+    @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> saveManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                         @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                         @UserId Long adminId) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(managerInformService.updateManageInform(updateManagerInfromDto, images, adminId));
     }
 }
