@@ -45,6 +45,9 @@ public class Review {
     @Column(name = "is_certificated",nullable = false)
     private Boolean isCertificated;
 
+    @Column(name = "is_visible" ,nullable = false)
+    private Boolean isVisible;
+
     @Column(name = "recommend_cnt",nullable = false)
     private int recommendCnt;
 
@@ -57,9 +60,11 @@ public class Review {
         this.text = text;
         this.createdAt = LocalDateTime.now();
         this.isCertificated = isCertificated;
+        this.isVisible = true; // 후기 첫 생성 시엔 true, 이 후 신고 받아 숨김처리 시 false
         this.recommendCnt = 0;
     }
 
     public void addRecommendCnt(){this.recommendCnt += 1;} // 추천 버튼 클릭시
     public void updateReviewUrl(String imageUrl){this.imageUrl = imageUrl;}
+    public void updateReviewVisible(){if (this.getIsVisible()) this.isVisible = false;}
 }
