@@ -21,7 +21,7 @@ public class ManagerInform {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "informer_id")
     private User informerId; // 제보자 id
 

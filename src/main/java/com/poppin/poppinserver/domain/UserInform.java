@@ -28,7 +28,7 @@ public class UserInform {
     @Column(name = "informed_at")
     private LocalDateTime informedAt;  // 제보 일자
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id")
     private Popup popupId; // 팝업 정보
 
