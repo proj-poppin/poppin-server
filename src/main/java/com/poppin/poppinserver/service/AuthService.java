@@ -165,9 +165,20 @@ public class AuthService {
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 
-    public EmailResponseDto sendEmail(EmailRequestDto emailRequestDto) {
+    public EmailResponseDto sendPasswordResetVerificationEmail(EmailRequestDto emailRequestDto) {
         if (!userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
             throw new CommonException(ErrorCode.NOT_FOUND_USER);
+        }
+        String authCode = RandomCodeUtil.generateVerificationCode();
+        mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
+        return EmailResponseDto.builder()
+                .authCode(authCode)
+                .build();
+    }
+
+    public EmailResponseDto sendSignUpEmail(EmailRequestDto emailRequestDto) {
+        if (userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
+            throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
         }
         String authCode = RandomCodeUtil.generateVerificationCode();
         mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
