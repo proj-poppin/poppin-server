@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.dto.auth.request.EmailRequestDto;
 import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
 import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
+import com.poppin.poppinserver.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -21,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class AuthService {
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
 
-    public void authSignUp(AuthSignUpDto authSignUpDto) {
+    public JwtTokenDto authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
         userRepository.findByEmail(authSignUpDto.email())
                 .ifPresent(user -> {
@@ -53,30 +53,35 @@ public class AuthService {
                     throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
                 });
         // 유저 생성, 패스워드 암호화
-        userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()), ELoginProvider.DEFAULT));
+        User newUser = userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()), ELoginProvider.DEFAULT));
+
+        // 회원 가입 후 바로 로그인 상태로 변경
+        JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
+        userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
+        return jwtToken;
     }
 
-    public JwtTokenDto authKakaoLogin(String accessToken) {
+    public Object authKakaoLogin(String accessToken) {
         String token = refineToken(accessToken);
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
     }
 
-    public JwtTokenDto authNaverLogin(String accessToken) {
+    public Object authNaverLogin(String accessToken) {
         String token = refineToken(accessToken);
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getNaverUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.NAVER);
     }
 
-    public JwtTokenDto authGoogleLogin(String accessToken) {
+    public Object authGoogleLogin(String accessToken) {
         String token = refineToken(accessToken);
         OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getGoogleUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
     }
 
-    public JwtTokenDto authAppleLogin(String idToken) {
+    public Object authAppleLogin(String idToken) {
         String token = refineToken(idToken);
-        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(idToken);
+        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(token);
         return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
     }
 
@@ -123,13 +128,13 @@ public class AuthService {
         }
     }
 
-    private JwtTokenDto processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
-        JwtTokenDto jwtTokenDto;
+    private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
         Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (user.isPresent()) {
-            jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
+            JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
+            return jwtTokenDto;
         } else {
             // 비밀번호 랜덤 생성 후 암호화해서 DB에 저장
             User newUser = userRepository.findByEmail(oAuth2UserInfo.email())
@@ -139,11 +144,11 @@ public class AuthService {
                                     provider))
                     );
             // 유저에게 GUEST 권한 주기
-            jwtTokenDto = jwtUtil.generateToken(newUser.getId(), EUserRole.GUEST);
+            JwtTokenDto jwtTokenDto = jwtUtil.generateToken(newUser.getId(), EUserRole.GUEST);
+            String accessToken = jwtTokenDto.accessToken();
             userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtTokenDto.refreshToken(), true);
+            return new AccessTokenDto(accessToken);
         }
-        // 유저에게 refreshToken 발급, 로그인 상태 변경
-        return jwtTokenDto;
     }
 
     @Transactional

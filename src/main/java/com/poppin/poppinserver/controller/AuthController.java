@@ -24,9 +24,8 @@ public class AuthController {
     // 자체 회원가입 API
     @PostMapping("/sign-up")
     public ResponseDto<?> authSignUp(@RequestBody @Valid AuthSignUpDto authSignUpDto) {
-        authService.authSignUp(authSignUpDto);
         log.info("authSignUpDto : " + authSignUpDto);
-        return ResponseDto.created("회원 가입 성공");
+        return ResponseDto.created(authService.authSignUp(authSignUpDto));
     }
 
     @PostMapping("/register")
