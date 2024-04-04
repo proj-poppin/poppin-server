@@ -58,7 +58,7 @@ public class ManagerInformController {
     }
 
     //운영자 제보 업로드
-    @PutMapping(value = "/upload", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
                                            @UserId Long adminId) {

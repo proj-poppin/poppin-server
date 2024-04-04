@@ -53,7 +53,7 @@ public class UserInformController {
         return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images, adminId));
     }
 
-    @PutMapping(value = "/upload", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                          @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
                                          @UserId Long adminId) {
