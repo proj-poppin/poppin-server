@@ -29,7 +29,8 @@ public class Constant {
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
-            "/api/v1/auth/email/verification"
+            "/api/v1/auth/email/verification",
+            "/api/v1/auth/email/verification/password"
 
 //            "/api/v1/popup/test"
     );
