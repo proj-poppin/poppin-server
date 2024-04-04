@@ -4,8 +4,10 @@ import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.managerInform.response.ManagerInformDto;
+import com.poppin.poppinserver.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -322,5 +324,11 @@ public class ManagerInformService {
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
+    }
+
+    public List<ManagerInformSummaryDto> reatManagerInformList(){
+        List<ManagerInform> managerInforms = managerInformRepository.findAll();
+
+        return ManagerInformSummaryDto.fromEntityList(managerInforms);
     }
 }

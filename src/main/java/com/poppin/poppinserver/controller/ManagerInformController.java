@@ -69,4 +69,9 @@ public class ManagerInformController {
 
         return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInfromDto, images, adminId));
     }
+
+    @GetMapping("/list")
+    public ResponseDto<?> readManagerInformList(){
+        return ResponseDto.ok(managerInformService.reatManagerInformList());
+    }
 }
