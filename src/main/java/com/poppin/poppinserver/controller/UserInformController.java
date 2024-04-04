@@ -64,4 +64,9 @@ public class UserInformController {
 
         return ResponseDto.ok(userInformService.uploadPopup(updateUserInfromDto, images, adminId));
     }
+
+    @GetMapping("/list")
+    public ResponseDto<?> readUserInformList(){
+        return ResponseDto.ok(userInformService.reatUserInformList());
+    }
 }

@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformDto;
+import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -307,5 +308,11 @@ public class UserInformService {
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
+    }
+
+    public List<UserInformSummaryDto> reatUserInformList(){
+        List<UserInform> userInforms = userInformRepository.findAll();
+
+        return UserInformSummaryDto.fromEntityList(userInforms);
     }
 }
