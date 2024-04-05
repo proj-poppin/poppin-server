@@ -47,10 +47,10 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createUserTasteDto.prefered().market())
-                .display(createUserTasteDto.prefered().display())
-                .experience(createUserTasteDto.prefered().experience())
-                .wantFree(createUserTasteDto.prefered().wantFree())
+                .market(createUserTasteDto.preference().market())
+                .display(createUserTasteDto.preference().display())
+                .experience(createUserTasteDto.preference().experience())
+                .wantFree(createUserTasteDto.preference().wantFree())
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
@@ -113,10 +113,10 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
-        preferedPopup.update(createUserTasteDto.prefered().market(),
-                createUserTasteDto.prefered().display(),
-                createUserTasteDto.prefered().experience(),
-                createUserTasteDto.prefered().wantFree());
+        preferedPopup.update(createUserTasteDto.preference().market(),
+                createUserTasteDto.preference().display(),
+                createUserTasteDto.preference().experience(),
+                createUserTasteDto.preference().wantFree());
         preferedPopupRepository.save(preferedPopup);
 
         TastePopup tastePopup = user.getTastePopup();
