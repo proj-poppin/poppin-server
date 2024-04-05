@@ -9,7 +9,6 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.RealTimeVisitRepository;
-import com.poppin.poppinserver.repository.ReviewRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,6 @@ public class RealTimeVisitService {
     private final RealTimeVisitRepository realTimeVisitRepository;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
 
     public Optional<Integer> showRealTimeVisitors(Long popupId){
 

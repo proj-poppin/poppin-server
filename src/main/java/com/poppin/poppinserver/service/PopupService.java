@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,7 +75,7 @@ public class PopupService {
 
         CreateTasteDto createTasteDto = createPopupDto.taste();
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fasionBeauty())
+                .fasionBeauty(createTasteDto.fashionBeauty())
                 .characters(createTasteDto.characters())
                 .foodBeverage(createTasteDto.foodBeverage())
                 .webtoonAni(createTasteDto.webtoonAni())
@@ -87,7 +86,7 @@ public class PopupService {
                 .game(createTasteDto.game())
                 .itTech(createTasteDto.itTech())
                 .kpop(createTasteDto.kpop())
-                .alchol(createTasteDto.alchol())
+                .alchol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
                 .build();
 
