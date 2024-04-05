@@ -6,7 +6,7 @@ import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateUserTasteDto(
-        @NotNull CreatePreferedDto prefered,
+        @NotNull CreatePreferedDto preference,
         @NotNull CreateTasteDto taste,
         @NotNull CreateWhoWithDto whoWith
 ) {
