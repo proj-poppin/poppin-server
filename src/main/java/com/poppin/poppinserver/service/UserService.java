@@ -20,13 +20,10 @@ import com.poppin.poppinserver.repository.WhoWithPopupRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -61,7 +58,7 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createUserTasteDto.taste().fasionBeauty())
+                .fasionBeauty(createUserTasteDto.taste().fashionBeauty())
                 .characters(createUserTasteDto.taste().characters())
                 .foodBeverage(createUserTasteDto.taste().foodBeverage())
                 .webtoonAni(createUserTasteDto.taste().webtoonAni())
@@ -72,7 +69,7 @@ public class UserService {
                 .game(createUserTasteDto.taste().game())
                 .itTech(createUserTasteDto.taste().itTech())
                 .kpop(createUserTasteDto.taste().kpop())
-                .alchol(createUserTasteDto.taste().alchol())
+                .alchol(createUserTasteDto.taste().alcohol())
                 .animalPlant(createUserTasteDto.taste().animalPlant())
                 .build();
         tastePopupRepository.save(tastePopup);
@@ -123,7 +120,7 @@ public class UserService {
         preferedPopupRepository.save(preferedPopup);
 
         TastePopup tastePopup = user.getTastePopup();
-        tastePopup.update(createUserTasteDto.taste().fasionBeauty(),
+        tastePopup.update(createUserTasteDto.taste().fashionBeauty(),
                 createUserTasteDto.taste().characters(),
                 createUserTasteDto.taste().foodBeverage(),
                 createUserTasteDto.taste().webtoonAni(),
@@ -134,7 +131,7 @@ public class UserService {
                 createUserTasteDto.taste().game(),
                 createUserTasteDto.taste().itTech(),
                 createUserTasteDto.taste().kpop(),
-                createUserTasteDto.taste().alchol(),
+                createUserTasteDto.taste().alcohol(),
                 createUserTasteDto.taste().animalPlant());
         tastePopupRepository.save(tastePopup);
 
