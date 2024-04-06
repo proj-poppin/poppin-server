@@ -33,6 +33,9 @@ public class S3Service {
     @Value("${cloud.aws.s3.user-profile}")
     private String bucketUserProfile;
 
+    @Value("${cloud.aws.s3.modify-info}")
+    private String bucketModifyInfo;
+
     // 팝업 포스터 업로드
     public List<String> uploadPopupPoster(List<MultipartFile> multipartFile, Long popupId) {
         List<String> imgUrlList = new ArrayList<>();
@@ -119,6 +122,29 @@ public class S3Service {
         }
 
         return imageUrl;
+    }
+
+    // 정보수정요청 이미지 업로드
+    public List<String> uploadModifyInfo(List<MultipartFile> multipartFile, Long modifyInfoId) {
+        List<String> imgUrlList = new ArrayList<>();
+        log.info("upload images");
+
+        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+        for (MultipartFile file : multipartFile) {
+            String fileName = createFileName(file.getOriginalFilename(), modifyInfoId);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            try(InputStream inputStream = file.getInputStream()) {
+                s3Client.putObject(new PutObjectRequest(bucketModifyInfo, fileName, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(s3Client.getUrl(bucketModifyInfo, fileName).toString());
+            } catch(IOException e) {
+                throw new CommonException(ErrorCode.SERVER_ERROR);
+            }
+        }
+        return imgUrlList;
     }
 
     // s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
