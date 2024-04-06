@@ -37,15 +37,11 @@ public class ModifyInfo {
     @Column(name = "is_executed", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isExecuted; // 처리 여부
 
-    @Column(name = "executed_at")
-    private LocalDateTime executedAt; // 처리 일자
-
     @Builder
     public ModifyInfo(User userId, Popup popupId, String content) {
         this.userId = userId;
         this.popupId = popupId;
         this.createdAt = LocalDateTime.now();
         this.content = content;
-        this.isExecuted = false;
     }
 }

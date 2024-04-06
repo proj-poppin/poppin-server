@@ -4,10 +4,12 @@ import com.poppin.poppinserver.domain.ManagerInform;
 import com.poppin.poppinserver.domain.ModifyInfo;
 import com.poppin.poppinserver.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.type.EInformProgress;
+import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 public record ModifyInfoSummaryDto(
         Long id,
         EInformProgress progress,
@@ -15,24 +17,23 @@ public record ModifyInfoSummaryDto(
         String informerName,
         String informedAt,
         String adminName,
-        String executedAt
+        Boolean isExecuted
 ) {
     public static List<ModifyInfoSummaryDto> fromEntityList(List<ModifyInfo> modifyInfos){
         List<ModifyInfoSummaryDto> dtoList = new ArrayList<>();
 
         for(ModifyInfo modifyInfo : modifyInfos){
 
-            ManagerInformSummaryDto modifyInfoSummaryDto =
-                    ManagerInformSummaryDto.builder()
+            ModifyInfoSummaryDto modifyInfoSummaryDto =
+                    ModifyInfoSummaryDto.builder()
                             .id(modifyInfo.getId())
                             .popupName(modifyInfo.getPopupId().getName())
-                            .informerName(modifyInfo.)
-                            .informedAt(modifyInfo.getInformedAt().toString())
-                            .adminName(modifyInfo.getAdminId().getNickname())
-                            .executedAt(executedAt)
+                            .informerName(modifyInfo.getUserId().getNickname())
+                            .informedAt(modifyInfo.getCreatedAt().toString())
+                            .isExecuted(modifyInfo.getIsExecuted())
                             .build();
 
-            dtoList.add(managerInformSummaryDto);
+            dtoList.add(modifyInfoSummaryDto);
         }
 
         return dtoList;

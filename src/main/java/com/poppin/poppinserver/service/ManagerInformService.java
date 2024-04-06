@@ -47,7 +47,7 @@ public class ManagerInformService {
 
         CreateTasteDto createTasteDto = createManagerInformDto.taste();
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fasionBeauty())
+                .fasionBeauty(createTasteDto.fashionBeauty())
                 .characters(createTasteDto.characters())
                 .foodBeverage(createTasteDto.foodBeverage())
                 .webtoonAni(createTasteDto.webtoonAni())
@@ -58,7 +58,7 @@ public class ManagerInformService {
                 .game(createTasteDto.game())
                 .itTech(createTasteDto.itTech())
                 .kpop(createTasteDto.kpop())
-                .alchol(createTasteDto.alchol())
+                .alchol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
                 .build();
         tastePopupRepository.save(tastePopup);
@@ -143,7 +143,7 @@ public class ManagerInformService {
 
         CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
         TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fasionBeauty(),
+        tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
                 createTasteDto.webtoonAni(),
@@ -154,7 +154,7 @@ public class ManagerInformService {
                 createTasteDto.game(),
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
-                createTasteDto.alchol(),
+                createTasteDto.alcohol(),
                 createTasteDto.animalPlant());
         tastePopupRepository.save(tastePopup);
 
@@ -232,7 +232,7 @@ public class ManagerInformService {
 
         CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
         TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fasionBeauty(),
+        tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
                 createTasteDto.webtoonAni(),
@@ -243,7 +243,7 @@ public class ManagerInformService {
                 createTasteDto.game(),
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
-                createTasteDto.alchol(),
+                createTasteDto.alcohol(),
                 createTasteDto.animalPlant());
         tastePopupRepository.save(tastePopup);
 
