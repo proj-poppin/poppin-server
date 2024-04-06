@@ -43,5 +43,6 @@ public class ModifyInfo {
         this.popupId = popupId;
         this.createdAt = LocalDateTime.now();
         this.content = content;
+        this.isExecuted = false;
     }
 }
