@@ -12,11 +12,9 @@ import java.util.List;
 @Builder
 public record ModifyInfoSummaryDto(
         Long id,
-        EInformProgress progress,
         String popupName,
         String informerName,
         String informedAt,
-        String adminName,
         Boolean isExecuted
 ) {
     public static List<ModifyInfoSummaryDto> fromEntityList(List<ModifyInfo> modifyInfos){

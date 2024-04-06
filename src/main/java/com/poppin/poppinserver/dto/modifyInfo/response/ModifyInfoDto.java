@@ -22,6 +22,7 @@ public record ModifyInfoDto(
                 .popupId(modifyInfo.getPopupId().getId())
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
+                .isExecuted(modifyInfo.getIsExecuted())
                 .images(images)
                 .build();
     }

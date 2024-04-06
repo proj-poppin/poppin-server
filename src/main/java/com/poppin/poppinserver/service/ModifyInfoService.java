@@ -11,6 +11,7 @@ import com.poppin.poppinserver.repository.ModifyImageReposiroty;
 import com.poppin.poppinserver.repository.ModifyInformRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.util.ImageUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,7 @@ public class ModifyInfoService {
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     }
 
+    @Transactional
     public List<ModifyInfoSummaryDto> readModifyInfoList(){
         List<ModifyInfo> modifyInfoList = modifyInformRepository.findAll();
 
