@@ -20,13 +20,10 @@ import com.poppin.poppinserver.repository.WhoWithPopupRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -50,10 +47,10 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createUserTasteDto.prefered().market())
-                .display(createUserTasteDto.prefered().display())
-                .experience(createUserTasteDto.prefered().experience())
-                .wantFree(createUserTasteDto.prefered().wantFree())
+                .market(createUserTasteDto.preference().market())
+                .display(createUserTasteDto.preference().display())
+                .experience(createUserTasteDto.preference().experience())
+                .wantFree(createUserTasteDto.preference().wantFree())
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
@@ -61,7 +58,7 @@ public class UserService {
             throw new CommonException(ErrorCode.ALREADY_EXISTS_PREFERENCE);
         }
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createUserTasteDto.taste().fasionBeauty())
+                .fasionBeauty(createUserTasteDto.taste().fashionBeauty())
                 .characters(createUserTasteDto.taste().characters())
                 .foodBeverage(createUserTasteDto.taste().foodBeverage())
                 .webtoonAni(createUserTasteDto.taste().webtoonAni())
@@ -72,7 +69,7 @@ public class UserService {
                 .game(createUserTasteDto.taste().game())
                 .itTech(createUserTasteDto.taste().itTech())
                 .kpop(createUserTasteDto.taste().kpop())
-                .alchol(createUserTasteDto.taste().alchol())
+                .alchol(createUserTasteDto.taste().alcohol())
                 .animalPlant(createUserTasteDto.taste().animalPlant())
                 .build();
         tastePopupRepository.save(tastePopup);
@@ -116,14 +113,14 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
-        preferedPopup.update(createUserTasteDto.prefered().market(),
-                createUserTasteDto.prefered().display(),
-                createUserTasteDto.prefered().experience(),
-                createUserTasteDto.prefered().wantFree());
+        preferedPopup.update(createUserTasteDto.preference().market(),
+                createUserTasteDto.preference().display(),
+                createUserTasteDto.preference().experience(),
+                createUserTasteDto.preference().wantFree());
         preferedPopupRepository.save(preferedPopup);
 
         TastePopup tastePopup = user.getTastePopup();
-        tastePopup.update(createUserTasteDto.taste().fasionBeauty(),
+        tastePopup.update(createUserTasteDto.taste().fashionBeauty(),
                 createUserTasteDto.taste().characters(),
                 createUserTasteDto.taste().foodBeverage(),
                 createUserTasteDto.taste().webtoonAni(),
@@ -134,7 +131,7 @@ public class UserService {
                 createUserTasteDto.taste().game(),
                 createUserTasteDto.taste().itTech(),
                 createUserTasteDto.taste().kpop(),
-                createUserTasteDto.taste().alchol(),
+                createUserTasteDto.taste().alcohol(),
                 createUserTasteDto.taste().animalPlant());
         tastePopupRepository.save(tastePopup);
 

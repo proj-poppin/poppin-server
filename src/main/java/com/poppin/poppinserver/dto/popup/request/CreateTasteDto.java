@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateTasteDto(
         @NotNull
-        Boolean fasionBeauty,
+        Boolean fashionBeauty,
         @NotNull
         Boolean characters,
         @NotNull
@@ -26,7 +26,7 @@ public record CreateTasteDto(
         @NotNull
         Boolean kpop,
         @NotNull
-        Boolean alchol,
+        Boolean alcohol,
         @NotNull
         Boolean animalPlant) {
 }

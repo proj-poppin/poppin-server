@@ -2,14 +2,20 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/app/deploy
+    destination: /home/ubuntu/apps/deploy
+
+permissions:
+  - object: /
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
 
 hooks:
   AfterInstall:
     - location: scripts/stop.sh
       timeout: 60
-      runas: ec2-user
+      runas: ubuntu
   ApplicationStart:
     - location: scripts/start.sh
       timeout: 60
-      runas: ec2-user
+      runas: ubuntu

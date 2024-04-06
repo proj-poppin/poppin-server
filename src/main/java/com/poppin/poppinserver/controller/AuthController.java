@@ -24,9 +24,8 @@ public class AuthController {
     // 자체 회원가입 API
     @PostMapping("/sign-up")
     public ResponseDto<?> authSignUp(@RequestBody @Valid AuthSignUpDto authSignUpDto) {
-        authService.authSignUp(authSignUpDto);
         log.info("authSignUpDto : " + authSignUpDto);
-        return ResponseDto.created("회원 가입 성공");
+        return ResponseDto.created(authService.authSignUp(authSignUpDto));
     }
 
     @PostMapping("/register")
@@ -74,8 +73,13 @@ public class AuthController {
         return ResponseDto.ok("비밀번호 변경 성공");
     }
 
+    @PostMapping("/email/verification/password")
+    public ResponseDto<?> sendPasswordResetVerificationEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
+        return ResponseDto.ok(authService.sendPasswordResetVerificationEmail(emailRequestDto));
+    }
+
     @PostMapping("/email/verification")
-    public ResponseDto<?> sendEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
-        return ResponseDto.ok(authService.sendEmail(emailRequestDto));
+    public ResponseDto<?> sendSignUpEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
+        return ResponseDto.ok(authService.sendSignUpEmail(emailRequestDto));
     }
 }

@@ -13,7 +13,7 @@ public record UserInfoDto(
         @Pattern(regexp = "^(?=.*[가-힣A-Za-z])[가-힣A-Za-z\\s]*$", message = "올바른 닉네임 형식이 아닙니다.")
         String nickname,
         @NotBlank
-        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "올바른 생년월일 형식이 아닙니다.")
+        @Pattern(regexp = "^\\d{4}\\.(0[1-9]|1[0-2])\\.(0[1-9]|[12][0-9]|3[01])$", message = "올바른 생년월일 형식이 아닙니다.")
         String birthDate
 ) {
 

@@ -3,13 +3,12 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.RealTimeVisit;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.RealTimeVisit.request.AddVisitorsDto;
-import com.poppin.poppinserver.dto.RealTimeVisit.response.RealTimeVisitorsDto;
+import com.poppin.poppinserver.dto.popup.request.PopupInfoDto;
+import com.poppin.poppinserver.dto.realtimeVisit.response.RealTimeVisitorsDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.RealTimeVisitRepository;
-import com.poppin.poppinserver.repository.ReviewRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -29,7 +26,6 @@ public class RealTimeVisitService {
     private final RealTimeVisitRepository realTimeVisitRepository;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
 
     public Optional<Integer> showRealTimeVisitors(Long popupId){
 
@@ -45,11 +41,11 @@ public class RealTimeVisitService {
         return realTimeVisitorsCount;
     }
 
-    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, AddVisitorsDto addVisitorsDto){
+    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, PopupInfoDto popupInfoDto){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(addVisitorsDto.popupId())
+        Popup popup = popupRepository.findById(popupInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         LocalDateTime now = LocalDateTime.now();

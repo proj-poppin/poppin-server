@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.dto.RealTimeVisit.response;
+package com.poppin.poppinserver.dto.realtimeVisit.response;
 
 import com.poppin.poppinserver.domain.RealTimeVisit;
 import jakarta.validation.constraints.NotNull;
