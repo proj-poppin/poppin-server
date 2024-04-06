@@ -19,7 +19,7 @@ public record PopupDto(
         String address,
         String addressDetail,
         String entranceFee,
-        EAvailableAge availableAge,
+        String availableAge,
         Boolean parkingAvailable,
         Boolean resvRequired,
         Integer reopenDemandCnt,
@@ -87,7 +87,7 @@ public record PopupDto(
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getAvailableAge())
+                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
                 .parkingAvailable(popup.getParkingAvailable())
                 .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())

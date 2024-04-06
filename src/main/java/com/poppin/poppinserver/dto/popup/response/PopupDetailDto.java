@@ -14,6 +14,7 @@ public record PopupDetailDto(
          Long id,
          String posterUrl,
          String homepageLink,
+         Boolean isInstagram,
          String name,
          String introduce,
          String address,
@@ -39,10 +40,13 @@ public record PopupDetailDto(
 ) {
     public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
+        Boolean isInstagram = popup.getHomepageLink().contains("instagram");
+
         return PopupDetailDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
+                .isInstagram(isInstagram)
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
