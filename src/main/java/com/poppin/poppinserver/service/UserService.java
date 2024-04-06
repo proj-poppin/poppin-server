@@ -165,18 +165,30 @@ public class UserService {
                 .build();
     }
 
-    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+    public String createProfileImage(Long userId, MultipartFile profileImage) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
         user.updateProfileImage(profileImageUrl);
         userRepository.save(user);
+
+        return user.getProfileImageUrl();
+    }
+
+    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        String profileImageUrl = s3Service.replaceImage(user.getProfileImageUrl(), profileImage, userId);
+        user.updateProfileImage(profileImageUrl);
+        userRepository.save(user);
+
         return user.getProfileImageUrl();
     }
 
     public void deleteProfileImage(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        s3Service.deleteImage(user.getProfileImageUrl());
         user.deleteProfileImage();
         userRepository.save(user);
     }
