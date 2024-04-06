@@ -46,7 +46,7 @@ public class UserController {
 
     @PostMapping("/image")
     public ResponseDto<?> createUserProfileImage(@UserId Long userId, @RequestPart(value = "profileImage") MultipartFile profileImage) {
-        return ResponseDto.ok(userService.updateProfileImage(userId, profileImage));
+        return ResponseDto.ok(userService.createProfileImage(userId, profileImage));
     }
 
     @PutMapping("/image")
