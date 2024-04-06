@@ -33,7 +33,7 @@ public class ModifyInfoService {
     private final S3Service s3Service;
 
     @Transactional
-    public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto, //운영자 제보 생성
+    public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
                                           List<MultipartFile> images,
                                           Long userId){
         User user = userRepository.findById(userId)
@@ -63,6 +63,21 @@ public class ModifyInfoService {
         modifyImageReposiroty.saveAll(modifyImagesList);
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
+    } // 요청 생성
+
+    @Transactional
+    public ModifyInfoDto readModifyInfo(Long modifyInfoId){
+        ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
+
+        List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
+
+        List<String> imageList = new ArrayList<>();
+        for(ModifyImages modifyImages : modifyImageList){
+            imageList.add(modifyImages.getImageUrl());
+        }
+
+        return ModifyInfoDto.fromEntity(modifyInfo, imageList);
     }
 
     @Transactional

@@ -33,10 +33,15 @@ public class ModifyInfoController {
         }
 
         return ResponseDto.ok(modifyInfoService.createModifyInfo(createModifyInfoDto, images, userId));
-    }
+    } // 요청 생성
 
-    @GetMapping ("/list") // 목록 조회
+    @GetMapping("")
+    public ResponseDto<?> readModifyInfo(@RequestParam("modifyInfoId") Long modifyInfoId){
+        return ResponseDto.ok(modifyInfoService.readModifyInfo(modifyInfoId));
+    } // 요청 조회
+
+    @GetMapping ("/list")
     public ResponseDto<?> readModifyInfoList(){
         return ResponseDto.ok(modifyInfoService.readModifyInfoList());
-    }
+    } // 목록 조회
 }
