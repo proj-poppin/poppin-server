@@ -89,9 +89,9 @@ public class UserService {
         userRepository.save(user);
 
         return UserTasteDto.builder()
-                .preferedDto(PreferedDto.fromEntity(preferedPopup))
-                .tasteDto(TasteDto.fromEntity(tastePopup))
-                .whoWithDto(WhoWithDto.fromEntity(whoWithPopup))
+                .preference(PreferedDto.fromEntity(preferedPopup))
+                .taste(TasteDto.fromEntity(tastePopup))
+                .whoWith(WhoWithDto.fromEntity(whoWithPopup))
                 .build();
     }
 
@@ -101,9 +101,9 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         return UserTasteDto.builder()
-                .preferedDto(PreferedDto.fromEntity(user.getPreferedPopup()))
-                .tasteDto(TasteDto.fromEntity(user.getTastePopup()))
-                .whoWithDto(WhoWithDto.fromEntity(user.getWhoWithPopup()))
+                .preference(PreferedDto.fromEntity(user.getPreferedPopup()))
+                .taste(TasteDto.fromEntity(user.getTastePopup()))
+                .whoWith(WhoWithDto.fromEntity(user.getWhoWithPopup()))
                 .build();
     }
 
@@ -146,9 +146,9 @@ public class UserService {
         userRepository.save(user);
 
         return UserTasteDto.builder()
-                .preferedDto(PreferedDto.fromEntity(preferedPopup))
-                .tasteDto(TasteDto.fromEntity(tastePopup))
-                .whoWithDto(WhoWithDto.fromEntity(whoWithPopup))
+                .preference(PreferedDto.fromEntity(preferedPopup))
+                .taste(TasteDto.fromEntity(tastePopup))
+                .whoWith(WhoWithDto.fromEntity(whoWithPopup))
                 .build();
     }
 

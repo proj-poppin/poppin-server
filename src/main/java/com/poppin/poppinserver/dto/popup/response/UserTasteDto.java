@@ -7,9 +7,9 @@ import lombok.Builder;
 
 @Builder
 public record UserTasteDto(
-        PreferedDto preferedDto,
-        TasteDto tasteDto,
-        WhoWithDto whoWithDto
+        PreferedDto preference,
+        TasteDto taste,
+        WhoWithDto whoWith
 ) {
         public static UserTasteDto fromEntity(
                 PreferedPopup preferedPopup,
@@ -21,9 +21,9 @@ public record UserTasteDto(
                 WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
 
                 return UserTasteDto.builder()
-                        .preferedDto(preferedDto)
-                        .tasteDto(tasteDto)
-                        .whoWithDto(whoWithDto)
+                        .preference(preferedDto)
+                        .taste(tasteDto)
+                        .whoWith(whoWithDto)
                         .build();
         }
 }
