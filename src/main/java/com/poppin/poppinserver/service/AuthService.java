@@ -158,10 +158,7 @@ public class AuthService {
         if (!passwordRequestDto.password().equals(passwordRequestDto.passwordConfirm())) {
             throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
         }
-        // 이전의 비밀번호와 동일하다면 에러
-        if (bCryptPasswordEncoder.matches(passwordRequestDto.password(), user.getPassword())) {
-            throw new CommonException(ErrorCode.PASSWORD_SAME);
-        }
+        // 기존 쓰던 비밀번호로 설정해도 무방
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 
