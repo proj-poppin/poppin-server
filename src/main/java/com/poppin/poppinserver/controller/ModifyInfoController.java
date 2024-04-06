@@ -36,7 +36,7 @@ public class ModifyInfoController {
     } // 요청 생성
 
     @GetMapping("")
-    public ResponseDto<?> readModifyInfo(@RequestParam("modifyInfoId") Long modifyInfoId){
+    public ResponseDto<?> readModifyInfo(@RequestParam("infoId") Long modifyInfoId){
         return ResponseDto.ok(modifyInfoService.readModifyInfo(modifyInfoId));
     } // 요청 조회
 
