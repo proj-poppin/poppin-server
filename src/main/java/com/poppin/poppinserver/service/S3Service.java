@@ -7,12 +7,14 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class S3Service {
     private final AmazonS3Client s3Client;
+    private final ImageUtil imageUtil;
 
     @Value("${cloud.aws.s3.popup-poster}")
     private String bucketPopupPoster;
@@ -33,23 +36,34 @@ public class S3Service {
     @Value("${cloud.aws.s3.user-profile}")
     private String bucketUserProfile;
 
+    @Value("${cloud.aws.s3.modify-info}")
+    private String bucketModifyInfo;
+
     // 팝업 포스터 업로드
     public List<String> uploadPopupPoster(List<MultipartFile> multipartFile, Long popupId) {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         for (MultipartFile file : multipartFile) {
             String fileName = createFileName(file.getOriginalFilename(), popupId);
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, inputStream, objectMetadata)
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
                 imgUrlList.add(s3Client.getUrl(bucketPopupPoster, fileName).toString());
             } catch(IOException e) {
+                log.error("Error processing image for modifyInfoId: " + popupId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
         }
@@ -61,18 +75,26 @@ public class S3Service {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         for (MultipartFile file : multipartFile) {
             String fileName = createFileName(file.getOriginalFilename(), reviewId);
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, inputStream, objectMetadata)
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
                 imgUrlList.add(s3Client.getUrl(bucketReviewImage, fileName).toString());
             } catch(IOException e) {
+                log.error("Error processing image for modifyInfoId: " + reviewId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
         }
@@ -104,22 +126,62 @@ public class S3Service {
 
     //
     public String uploadUserProfile(MultipartFile multipartFile, Long userId) {
-        String imageUrl;
+        String imageUrl = "";
         String fileName = createFileName(multipartFile.getOriginalFilename(), userId);
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getSize());
-        objectMetadata.setContentType(multipartFile.getContentType());
 
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
+        try (InputStream originalInputStream = multipartFile.getInputStream()) {
+            // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+            InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+
+            // 조정된 이미지의 크기를 계산
+            byte[] imageBytes = processedInputStream.readAllBytes();
+            objectMetadata.setContentLength(imageBytes.length);
+            objectMetadata.setContentType(multipartFile.getContentType());
+
+            // 조정된 이미지를 S3에 업로드
+            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             imageUrl = s3Client.getUrl(bucketUserProfile, fileName).toString();
         } catch (IOException e) {
-            throw new CommonException(ErrorCode.SERVER_ERROR);
+            log.error("Error processing image for modifyInfoId: " + userId + ", fileName: " + fileName, e);
         }
 
         return imageUrl;
     }
+
+    // 정보수정요청 이미지 업로드
+    public List<String> uploadModifyInfo(List<MultipartFile> multipartFile, Long modifyInfoId) {
+        List<String> imgUrlList = new ArrayList<>();
+        log.info("upload images");
+
+        for (MultipartFile file : multipartFile) {
+            String fileName = createFileName(file.getOriginalFilename(), modifyInfoId);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketModifyInfo, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(s3Client.getUrl(bucketModifyInfo, fileName).toString());
+            } catch(IOException e) {
+                log.error("Error processing image for modifyInfoId: " + modifyInfoId + ", fileName: " + fileName, e);
+                throw new CommonException(ErrorCode.SERVER_ERROR);
+            }
+        }
+
+        return imgUrlList;
+    }
+
 
     // s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
     public void deleteImage(String url) {

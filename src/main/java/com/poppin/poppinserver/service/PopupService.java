@@ -38,7 +38,6 @@ public class PopupService {
     private final UserRepository userRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
-    private final WhoWithPopupRepository whoWithPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -90,18 +89,9 @@ public class PopupService {
                 .animalPlant(createTasteDto.animalPlant())
                 .build();
 
-        CreateWhoWithDto createWhoWithDto = createPopupDto.whoWith();
-        WhoWithPopup whoWithPopup = WhoWithPopup.builder()
-                .solo(createWhoWithDto.solo())
-                .withLover(createWhoWithDto.withLover())
-                .withFamily(createWhoWithDto.withFamily())
-                .withFriend(createWhoWithDto.withFriend())
-                .build();
-
         //각 카테고리 저장
         preferedPopup = preferedPopupRepository.save(preferedPopup);
         tastePopup = tastePopupRepository.save(tastePopup);
-        whoWithPopup = whoWithPopupRepository.save(whoWithPopup);
 
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
@@ -122,7 +112,6 @@ public class PopupService {
                 .parkingAvailable(createPopupDto.parkingAvailable())
                 .preferedPopup(preferedPopup)
                 .tastePopup(tastePopup)
-                .whoWithPopup(whoWithPopup)
                 .build();
 
         popup = popupRepository.save(popup);
@@ -267,8 +256,6 @@ public class PopupService {
 
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
-
-
 
     public String reopenDemand(Long popupId){
 

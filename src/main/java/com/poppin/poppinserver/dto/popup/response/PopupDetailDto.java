@@ -14,12 +14,13 @@ public record PopupDetailDto(
          Long id,
          String posterUrl,
          String homepageLink,
+         Boolean isInstagram,
          String name,
          String introduce,
          String address,
          String addressDetail,
          String entranceFee,
-         EAvailableAge availableAge,
+         String availableAge,
          Boolean parkingAvailable,
          Boolean resvRequired,
          Integer reopenDemandCnt,
@@ -39,16 +40,19 @@ public record PopupDetailDto(
 ) {
     public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
+        Boolean isInstagram = popup.getHomepageLink().contains("instagram");
+
         return PopupDetailDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
+                .isInstagram(isInstagram)
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
                 .addressDetail(popup.getAddressDetail())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getAvailableAge())
+                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
                 .parkingAvailable(popup.getParkingAvailable())
                 .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())

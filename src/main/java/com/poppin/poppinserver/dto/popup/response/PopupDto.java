@@ -1,8 +1,13 @@
 package com.poppin.poppinserver.dto.popup.response;
 
+import com.poppin.poppinserver.domain.AlarmKeyword;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.type.EAvailableAge;
 import lombok.Builder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 public record PopupDto(
@@ -14,11 +19,11 @@ public record PopupDto(
         String address,
         String addressDetail,
         String entranceFee,
-        EAvailableAge availableAge,
+        String availableAge,
         Boolean parkingAvailable,
         Boolean resvRequired,
         Integer reopenDemandCnt,
-        Integer interesteCnt,
+        Integer interestCnt,
         Integer viewCnt,
         String createdAt,
         String editedAt,
@@ -30,13 +35,49 @@ public record PopupDto(
         String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
-        WhoWithDto whoWith
+        List<String> posterList,
+        List<String> keywordList
 ) {
     public static PopupDto fromEntity(Popup popup){
 
-        PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+        // 각 nullable 부분들에 대해 예외처리
+
+        PreferedDto preferedDto = null;
+        if (popup.getPreferedPopup() != null){
+            preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+        }
+
+        String openDate = null;
+        if(popup.getOpenDate() != null){
+            openDate = popup.getOpenDate().toString();
+        }
+
+        String closeDate = null;
+        if(popup.getOpenDate() != null){
+            closeDate = popup.getCloseDate().toString();
+        }
+
+        String openTime = null;
+        if(popup.getOpenDate() != null){
+            openTime = popup.getOpenTime().toString();
+        }
+
+        String closeTime = null;
+        if(popup.getOpenDate() != null){
+            closeTime = popup.getCloseTime().toString();
+        }
+
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
-        WhoWithDto whoWithDto = WhoWithDto.fromEntity(popup.getWhoWithPopup());
+
+        List<String> posterList = new ArrayList<>();
+        for(PosterImage posterImage : popup.getPosterImages()){
+            posterList.add(posterImage.getPosterUrl());
+        }
+
+        List<String> keywordList = new ArrayList<>();
+        for(AlarmKeyword alarmKeyword : popup.getAlarmKeywords()){
+            keywordList.add(alarmKeyword.getKeyword());
+        }
 
         return PopupDto.builder()
                 .id(popup.getId())
@@ -46,23 +87,24 @@ public record PopupDto(
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getAvailableAge())
+                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
                 .parkingAvailable(popup.getParkingAvailable())
                 .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
-                .interesteCnt(popup.getInterestCnt())
+                .interestCnt(popup.getInterestCnt())
                 .viewCnt(popup.getViewCnt())
                 .createdAt(popup.getCreatedAt().toString())
                 .editedAt(popup.getEditedAt().toString())
-                .openDate(popup.getOpenDate().toString())
-                .closeDate(popup.getCloseDate().toString())
-                .openTime(popup.getOpenTime().toString())
-                .closeTime(popup.getCloseTime().toString())
+                .openDate(openDate)
+                .closeDate(closeDate)
+                .openTime(openTime)
+                .closeTime(closeTime)
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)
-                .whoWith(whoWithDto)
+                .posterList(posterList)
+                .keywordList(keywordList)
                 .build();
     }
 }

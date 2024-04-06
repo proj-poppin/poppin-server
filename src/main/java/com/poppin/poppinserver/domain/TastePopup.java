@@ -18,8 +18,8 @@ public class TastePopup {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "fasion_beauty", nullable = false, columnDefinition = "TINYINT(1)")
-    private Boolean fasionBeauty;
+    @Column(name = "fashion_beauty", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean fashionBeauty;
 
     @Column(name = "characters", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean characters;
@@ -51,8 +51,8 @@ public class TastePopup {
     @Column(name = "kpop", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean kpop;
 
-    @Column(name = "alchol", nullable = false, columnDefinition = "TINYINT(1)")
-    private Boolean alchol;
+    @Column(name = "alcohol", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean alcohol;
 
     @Column(name = "animal_plant", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean animalPlant;
@@ -63,7 +63,7 @@ public class TastePopup {
                       Boolean musical, Boolean sports, Boolean game,
                       Boolean itTech, Boolean kpop, Boolean alchol,
                       Boolean animalPlant) {
-        this.fasionBeauty = fasionBeauty;
+        this.fashionBeauty = fasionBeauty;
         this.characters = characters;
         this.foodBeverage = foodBeverage;
         this.webtoonAni = webtoonAni;
@@ -74,7 +74,7 @@ public class TastePopup {
         this.game = game;
         this.itTech = itTech;
         this.kpop = kpop;
-        this.alchol = alchol;
+        this.alcohol = alchol;
         this.animalPlant = animalPlant;
     }
 
@@ -83,7 +83,7 @@ public class TastePopup {
                        Boolean musical, Boolean sports, Boolean game,
                        Boolean itTech, Boolean kpop, Boolean alchol,
                        Boolean animalPlant) {
-        this.fasionBeauty = fasionBeauty;
+        this.fashionBeauty = fasionBeauty;
         this.characters = characters;
         this.foodBeverage = foodBeverage;
         this.webtoonAni = webtoonAni;
@@ -94,7 +94,7 @@ public class TastePopup {
         this.game = game;
         this.itTech = itTech;
         this.kpop = kpop;
-        this.alchol = alchol;
+        this.alcohol = alchol;
         this.animalPlant = animalPlant;
     }
 }

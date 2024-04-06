@@ -38,11 +38,11 @@ public class ModifyInfo {
     private Boolean isExecuted; // 처리 여부
 
     @Builder
-    public ModifyInfo(User userId, Popup popupId, LocalDateTime createdAt, String content, Boolean isExecuted) {
+    public ModifyInfo(User userId, Popup popupId, String content) {
         this.userId = userId;
         this.popupId = popupId;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
         this.content = content;
-        this.isExecuted = isExecuted;
+        this.isExecuted = false;
     }
 }

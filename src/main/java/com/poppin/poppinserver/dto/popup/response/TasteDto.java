@@ -22,7 +22,7 @@ public record TasteDto(
         public static TasteDto fromEntity(TastePopup tastePopup){
                 return TasteDto.builder()
                         .id(tastePopup.getId())
-                        .fasionBeauty(tastePopup.getFasionBeauty())
+                        .fasionBeauty(tastePopup.getFashionBeauty())
                         .characters(tastePopup.getCharacters())
                         .foodBeverage(tastePopup.getFoodBeverage())
                         .webtoonAni(tastePopup.getWebtoonAni())
@@ -33,7 +33,7 @@ public record TasteDto(
                         .game(tastePopup.getGame())
                         .itTech(tastePopup.getItTech())
                         .kpop(tastePopup.getKpop())
-                        .alchol(tastePopup.getAlchol())
+                        .alchol(tastePopup.getAlcohol())
                         .animalPlant(tastePopup.getAnimalPlant())
                         .build();
         }

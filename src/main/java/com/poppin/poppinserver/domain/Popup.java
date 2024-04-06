@@ -27,31 +27,31 @@ public class Popup {
     @Column(name = "poster_url")
     private String posterUrl;
 
-    @Column(name = "homepage_link", nullable = false)
+    @Column(name = "homepage_link")
     private String homepageLink;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "introduce", nullable = false)
+    @Column(name = "introduce")
     private String introduce;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
     @Column(name = "address_detail")
     private String addressDetail;
 
-    @Column(name = "entrance_fee", nullable = false)
+    @Column(name = "entrance_fee")
     private String entranceFee;
 
-    @Column(name = "resv_required", nullable = false)
+    @Column(name = "resv_required")
     private Boolean resvRequired;
 
-    @Column(name = "available_age", nullable = false)
+    @Column(name = "available_age")
     private EAvailableAge availableAge;
 
-    @Column(name = "parking_available", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "parking_available", columnDefinition = "TINYINT(1)")
     private Boolean parkingAvailable;
 
     @Column(name = "reopen_demand_cnt", nullable = false)
@@ -69,22 +69,22 @@ public class Popup {
     @Column(name = "edited_at", nullable = false)
     private LocalDateTime editedAt;
 
-    @Column(name = "open_date", nullable = false)
+    @Column(name = "open_date")
     private LocalDate openDate;
 
-    @Column(name = "close_date", nullable = false)
+    @Column(name = "close_date")
     private LocalDate closeDate;
 
-    @Column(name = "open_time", nullable = false)
+    @Column(name = "open_time")
     private LocalTime openTime;
 
-    @Column(name = "close_time", nullable = false)
+    @Column(name = "close_time")
     private LocalTime closeTime;
 
     @Column(name = "operation_except")
     private String operationExcept;
 
-    @Column(name = "operation_status", nullable = false)
+    @Column(name = "operation_status")
     private String operationStatus;
 
     @OneToOne
@@ -95,12 +95,14 @@ public class Popup {
     @JoinColumn(name = "taste_id", nullable = false)
     private TastePopup tastePopup;
 
-    @OneToOne
-    @JoinColumn(name = "with_id", nullable = false)
-    private WhoWithPopup whoWithPopup;
-
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
+
+    @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
+    private Set<PosterImage> posterImages = new HashSet<>();
+
+    @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
+    private Set<AlarmKeyword> alarmKeywords = new HashSet<>();
 
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,
@@ -108,7 +110,7 @@ public class Popup {
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, String operationExcept, String operationStatus,
-                 PreferedPopup preferedPopup, TastePopup tastePopup, WhoWithPopup whoWithPopup) {
+                 PreferedPopup preferedPopup, TastePopup tastePopup) {
         this.posterUrl = posterUrl;
         this.homepageLink = homepageLink;
         this.name = name;
@@ -131,8 +133,34 @@ public class Popup {
         this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
-        this.whoWithPopup = whoWithPopup;
         this.preferedPopup = preferedPopup;
+    }
+
+    public void update(String homepageLink, String name, String introduce,
+                 String address, String addressDetail, String entranceFee,
+                 Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
+                 LocalDate openDate, LocalDate closeDate, LocalTime openTime,
+                 LocalTime closeTime, String operationExcept, String operationStatus) {
+        this.homepageLink = homepageLink;
+        this.name = name;
+        this.introduce = introduce;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.entranceFee = entranceFee;
+        this.resvRequired = resvRequired;
+        this.availableAge = availableAge;
+        this.parkingAvailable = parkingAvailable;
+        this.reopenDemandCnt = 0; // 재오픈 수요 버튼 api 동기화
+        this.interestCnt = 0; // 관심등록 api 동기화
+        this.viewCnt = 0; // 상세 조회시 자동 ++
+        this.createdAt = LocalDateTime.now();
+        this.editedAt = LocalDateTime.now();
+        this.openDate = openDate;
+        this.closeDate = closeDate;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.operationExcept = operationExcept;
+        this.operationStatus = operationStatus; // 내부 동기화
     }
 
     public void addInterestCnt() {this.interestCnt += 1;}

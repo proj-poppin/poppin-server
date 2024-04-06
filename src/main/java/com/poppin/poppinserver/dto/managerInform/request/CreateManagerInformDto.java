@@ -1,42 +1,34 @@
-package com.poppin.poppinserver.dto.popup.request;
+package com.poppin.poppinserver.dto.managerInform.request;
 
+import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.type.EAvailableAge;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record CreatePopupDto(
+public record CreateManagerInformDto(
         @NotNull
+        String affiliation,
+        @NotNull
+        String informerEmail,
         String homepageLink,
-        @NotNull
         String name,
-        @NotNull
         String introduce,
-        @NotNull
         String address,
         String addressDetail,
-        @NotNull
         String entranceFee,
-        @NotNull
         EAvailableAge availableAge,
-        @NotNull
         Boolean parkingAvailable,
-        @NotNull
         Boolean resvRequired,
-        @NotNull
         LocalDate openDate,
-        @NotNull
         LocalDate closeDate,
-        @NotNull
         LocalTime openTime,
-        @NotNull
         LocalTime closeTime,
         String operationExcept,
-        @NotNull
         CreatePreferedDto prefered,
-        @NotNull
         CreateTasteDto taste
 ) {
-
 }
