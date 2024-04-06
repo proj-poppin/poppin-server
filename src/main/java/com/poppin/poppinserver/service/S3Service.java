@@ -44,18 +44,26 @@ public class S3Service {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         for (MultipartFile file : multipartFile) {
             String fileName = createFileName(file.getOriginalFilename(), popupId);
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, inputStream, objectMetadata)
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
                 imgUrlList.add(s3Client.getUrl(bucketPopupPoster, fileName).toString());
             } catch(IOException e) {
+                log.error("Error processing image for modifyInfoId: " + popupId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
         }
@@ -67,18 +75,26 @@ public class S3Service {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         for (MultipartFile file : multipartFile) {
             String fileName = createFileName(file.getOriginalFilename(), reviewId);
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, inputStream, objectMetadata)
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
                 imgUrlList.add(s3Client.getUrl(bucketReviewImage, fileName).toString());
             } catch(IOException e) {
+                log.error("Error processing image for modifyInfoId: " + reviewId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
         }
@@ -110,18 +126,25 @@ public class S3Service {
 
     //
     public String uploadUserProfile(MultipartFile multipartFile, Long userId) {
-        String imageUrl;
+        String imageUrl = "";
         String fileName = createFileName(multipartFile.getOriginalFilename(), userId);
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getSize());
-        objectMetadata.setContentType(multipartFile.getContentType());
 
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, inputStream, objectMetadata)
+        try (InputStream originalInputStream = multipartFile.getInputStream()) {
+            // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+            InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+
+            // 조정된 이미지의 크기를 계산
+            byte[] imageBytes = processedInputStream.readAllBytes();
+            objectMetadata.setContentLength(imageBytes.length);
+            objectMetadata.setContentType(multipartFile.getContentType());
+
+            // 조정된 이미지를 S3에 업로드
+            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             imageUrl = s3Client.getUrl(bucketUserProfile, fileName).toString();
         } catch (IOException e) {
-            throw new CommonException(ErrorCode.SERVER_ERROR);
+            log.error("Error processing image for modifyInfoId: " + userId + ", fileName: " + fileName, e);
         }
 
         return imageUrl;
@@ -155,6 +178,7 @@ public class S3Service {
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
         }
+
         return imgUrlList;
     }
 
