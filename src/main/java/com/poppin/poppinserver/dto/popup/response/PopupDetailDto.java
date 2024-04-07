@@ -12,7 +12,6 @@ import java.util.Optional;
 @Builder
 public record PopupDetailDto(
          Long id,
-         String posterUrl,
          String homepageLink,
          Boolean isInstagram,
          String name,
@@ -34,17 +33,17 @@ public record PopupDetailDto(
          String closeTime,
          String operationExcept,
          String operationStatus,
+         List<String> images,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,
          Optional<Integer> realTimeVisit
 ) {
-    public static PopupDetailDto fromEntity(Popup popup, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
+    public static PopupDetailDto fromEntity(Popup popup,List<String> images, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
         Boolean isInstagram = popup.getHomepageLink().contains("instagram");
 
         return PopupDetailDto.builder()
                 .id(popup.getId())
-                .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
                 .isInstagram(isInstagram)
                 .name(popup.getName())
@@ -66,6 +65,7 @@ public record PopupDetailDto(
                 .closeTime(popup.getCloseTime().toString())
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
+                .images(images)
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)
                 .realTimeVisit(realTimeVisit)
