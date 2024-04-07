@@ -152,7 +152,15 @@ public class PopupService {
 
         popupRepository.save(popup);
 
-        return PopupDetailDto.fromEntity(popup, reviewInfoList, visitorDataDto, visitors);
+        // 이미지 목록 가져오기
+        List<PosterImage> posterImages  = posterImageRepository.findByPopupId(popup);
+
+        List<String> imageList = new ArrayList<>();
+        for(PosterImage posterImage : posterImages){
+            imageList.add(posterImage.getPosterUrl());
+        }
+
+        return PopupDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
     }
 
     public List<PopupSummaryDto> readHotList(){

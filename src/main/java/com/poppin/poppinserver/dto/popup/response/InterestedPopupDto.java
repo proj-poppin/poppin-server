@@ -25,7 +25,7 @@ public record InterestedPopupDto(
             InterestedPopupDto interestedPopupDto =
                     InterestedPopupDto.builder()
                             .id(popup.getId())
-                            .image_url(popup.getPosterUrl()) // 임시 url
+                            .image_url(popup.getPosterUrl())
                             .status(popup.getOperationStatus())
                             .name(popup.getName())
                             .open_date(popup.getOpenDate().toString())

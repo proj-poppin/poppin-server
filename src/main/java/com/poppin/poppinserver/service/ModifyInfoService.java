@@ -78,7 +78,7 @@ public class ModifyInfoService {
         }
 
         return ModifyInfoDto.fromEntity(modifyInfo, imageList);
-    }
+    } // 조회
 
     @Transactional
     public List<ModifyInfoSummaryDto> readModifyInfoList(){
