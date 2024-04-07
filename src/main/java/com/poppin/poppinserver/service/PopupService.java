@@ -4,7 +4,6 @@ import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.dto.popup.request.CreateWhoWithDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
@@ -38,6 +37,7 @@ public class PopupService {
     private final UserRepository userRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
+    private final InterestRepository interestRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -136,7 +136,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     }
 
-    public PopupDetailDto readDetail(Long popupId){
+    public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -160,7 +160,37 @@ public class PopupService {
             imageList.add(posterImage.getPosterUrl());
         }
 
-        return PopupDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
+        return PopupGuestDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
+    }
+
+    public PopupDetailDto readDetail(Long popupId, Long userId){
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        popup.addViewCnt(); // 조회수 + 1
+
+        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
+
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
+
+        Optional<Integer> visitors = realTimeVisitService.showRealTimeVisitors(popupId); // 실시간 방문자
+
+        popupRepository.save(popup);
+
+        // 이미지 목록 가져오기
+        List<PosterImage> posterImages  = posterImageRepository.findByPopupId(popup);
+
+        List<String> imageList = new ArrayList<>();
+        for(PosterImage posterImage : posterImages){
+            imageList.add(posterImage.getPosterUrl());
+        }
+
+        // 관심 여부 확인
+        Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
+
+        return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors);
     }
 
     public List<PopupSummaryDto> readHotList(){

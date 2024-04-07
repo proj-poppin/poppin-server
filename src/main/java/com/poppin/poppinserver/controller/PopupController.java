@@ -36,10 +36,16 @@ public class PopupController {
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images));
     }
 
-    @GetMapping("/detail")
-    public ResponseDto<?> readDetail(@RequestParam("popupId") Long popupId) {
+    @GetMapping("/guest/detail")
+    public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {
 
-        return ResponseDto.ok(popupService.readDetail(popupId));
+        return ResponseDto.ok(popupService.readGuestDetail(popupId));
+    }
+
+    @GetMapping("/detail")
+    public ResponseDto<?> readDetail(@RequestParam("popupId") Long popupId, @UserId Long userId) {
+
+        return ResponseDto.ok(popupService.readDetail(popupId, userId));
     }
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
