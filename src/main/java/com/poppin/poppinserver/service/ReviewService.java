@@ -15,8 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -27,11 +30,13 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewRecommendUserRepository reviewRecommendUserRepository;
     private final ReviewImageRepository reviewImageRepository;
 
     private final VisitorDataRepository visitorDataRepository;
     private final S3Service s3Service;
 
+    /*후기 생성*/
     @Transactional
     public ReviewDto createReview(CreateReviewDto createReviewDto, List<MultipartFile> images) {
 
@@ -78,11 +83,38 @@ public class ReviewService {
         return ReviewDto.fromEntity(reviewRepository.save(review), visitorData);
     }
 
-    public String addRecommendReview(Long reviewId, Long popupId) {
+    /*후기 추천 증가*/
+    public String addRecommendReview(Long userId ,Long reviewId, Long popupId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
         Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
 
-        review.addRecommendCnt();
+        Optional<ReviewRecommendUser> recommendCnt = reviewRecommendUserRepository.findByUserAndReview(user, review);
+        if (recommendCnt.isPresent())throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지
+        else review.addRecommendCnt();
+
         reviewRepository.save(review);
+
+        ReviewRecommendUser reviewRecommendUser = ReviewRecommendUser.builder()
+                .user(user)
+                .review(review)
+                .build();
+        reviewRecommendUserRepository.save(reviewRecommendUser);
+
         return "정상적으로 반환되었습니다";
+    }
+
+    /*작성완료 후기 조회*/
+    public List<Review> readFinishReview(Long userId){
+        List<Review> reviewList = reviewRepository.findByUserId(userId);
+
+        /*개발 중*/
+//        for (Review review : reviewList){
+//            Popup popup = popupRepository.f
+//            VisitorData visitorData = visitorDataRepository.findBy(review);
+//        }
+
+        return reviewList;
     }
 }

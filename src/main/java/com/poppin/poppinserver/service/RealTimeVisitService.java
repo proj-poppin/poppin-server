@@ -48,9 +48,8 @@ public class RealTimeVisitService {
         Popup popup = popupRepository.findById(popupInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        LocalDateTime now = LocalDateTime.now();
-
-        LocalDateTime thirtyMinutesAgo = now.minus(30, ChronoUnit.MINUTES);
+        /*30분 전 시간*/
+        LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);
 
         RealTimeVisit realTimeVisit = RealTimeVisit.builder()
                 .user(user)
@@ -58,7 +57,7 @@ public class RealTimeVisitService {
                 .build();
 
         int visitors = realTimeVisitRepository.findDuplicateVisitors(user,popup, thirtyMinutesAgo);
-        if (visitors > 0)throw new CommonException(ErrorCode.DUPLICATED_REALTIMEVISIT); // 30분 이내 재 방문 방지
+        if (visitors > 0)throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
 
         realTimeVisitRepository.save(realTimeVisit);
 

@@ -5,6 +5,8 @@ import com.poppin.poppinserver.domain.VisitorData;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Builder
@@ -31,4 +33,5 @@ public record ReviewDto(
                 .recommendCnt(review.getRecommendCnt())
                 .build();
     }
+
 }

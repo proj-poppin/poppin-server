@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.controller;
 
+import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.service.ReviewService;
@@ -20,14 +21,21 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(value = "/create-review", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
+    @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
     public ResponseDto<?> createReview(@RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto , @RequestPart(value = "images") List<MultipartFile> images){
         return ResponseDto.ok(reviewService.createReview(createReviewDto, images));
     }
 
     @PostMapping("/add-recommend") // 후기 추천
-    public ResponseDto<?> addRecommendReview(@RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId")Long popupId){
-        return ResponseDto.ok(reviewService.addRecommendReview(reviewId, popupId));
+    public ResponseDto<?> addRecommendReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId")Long popupId){
+        return ResponseDto.ok(reviewService.addRecommendReview(userId, reviewId, popupId));
     }
+
+    /*개발중. 테스트 x - sakang*/
+    @PostMapping("/read/finish")
+    public ResponseDto<?> readFinishReview(@UserId Long userId ){
+        return ResponseDto.ok(reviewService.readFinishReview(userId));
+    }
+
 
 }
