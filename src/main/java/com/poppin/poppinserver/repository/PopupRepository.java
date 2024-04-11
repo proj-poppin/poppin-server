@@ -41,4 +41,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
+
+    @Query("SELECT p FROM Popup p JOIN Review  r ON  p.id = r.popup.id where p.id = :reviewId order by p.createdAt asc ")
+    Popup findByReviewId(Long reviewId);
 }

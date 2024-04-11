@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.visitorData.common.Congestion;
 import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
 import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
@@ -106,15 +107,17 @@ public class ReviewService {
     }
 
     /*작성완료 후기 조회*/
-    public List<Review> readFinishReview(Long userId){
+    public List<ReviewFinishDto> readFinishReview(Long userId){
+
+        List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
         List<Review> reviewList = reviewRepository.findByUserId(userId);
 
-        /*개발 중*/
-//        for (Review review : reviewList){
-//            Popup popup = popupRepository.f
-//            VisitorData visitorData = visitorDataRepository.findBy(review);
-//        }
 
-        return reviewList;
+        for (Review review : reviewList){
+              Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
+              ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
+              reviewFinishDtoList.add(reviewFinishDto);
+        }
+            return reviewFinishDtoList;
     }
 }
