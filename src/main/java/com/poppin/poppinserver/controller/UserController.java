@@ -73,4 +73,9 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
     }
+
+    @GetMapping("/review/read")
+    public ResponseDto<?> readFinishReview(@UserId Long userId ){
+        return ResponseDto.ok(userService.readFinishReview(userId));
+    }
 }

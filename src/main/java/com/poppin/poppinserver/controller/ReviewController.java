@@ -31,11 +31,4 @@ public class ReviewController {
         return ResponseDto.ok(reviewService.addRecommendReview(userId, reviewId, popupId));
     }
 
-    /*개발중. 테스트 x - sakang*/
-    @PostMapping("/read/finish")
-    public ResponseDto<?> readFinishReview(@UserId Long userId ){
-        return ResponseDto.ok(reviewService.readFinishReview(userId));
-    }
-
-
 }

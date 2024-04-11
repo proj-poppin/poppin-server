@@ -106,18 +106,4 @@ public class ReviewService {
         return "정상적으로 반환되었습니다";
     }
 
-    /*작성완료 후기 조회*/
-    public List<ReviewFinishDto> readFinishReview(Long userId){
-
-        List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
-        List<Review> reviewList = reviewRepository.findByUserId(userId);
-
-
-        for (Review review : reviewList){
-              Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
-              ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
-              reviewFinishDtoList.add(reviewFinishDto);
-        }
-            return reviewFinishDtoList;
-    }
 }

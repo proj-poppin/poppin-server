@@ -1,9 +1,7 @@
 package com.poppin.poppinserver.service;
 
-import com.poppin.poppinserver.domain.PreferedPopup;
-import com.poppin.poppinserver.domain.TastePopup;
-import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.domain.WhoWithPopup;
+import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.popup.response.PreferedDto;
 import com.poppin.poppinserver.dto.popup.response.TasteDto;
@@ -13,16 +11,15 @@ import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.repository.TastePopupRepository;
-import com.poppin.poppinserver.repository.UserRepository;
-import com.poppin.poppinserver.repository.WhoWithPopupRepository;
+import com.poppin.poppinserver.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -33,6 +30,8 @@ public class UserService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
+    private final ReviewRepository reviewRepository;
+    private final PopupRepository popupRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -213,5 +212,20 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         user.softDelete();
         userRepository.save(user);
+    }
+
+    /*작성완료 후기 조회*/
+    public List<ReviewFinishDto> readFinishReview(Long userId){
+
+        List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
+        List<Review> reviewList = reviewRepository.findByUserId(userId);
+
+
+        for (Review review : reviewList){
+            Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
+            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
+            reviewFinishDtoList.add(reviewFinishDto);
+        }
+        return reviewFinishDtoList;
     }
 }
