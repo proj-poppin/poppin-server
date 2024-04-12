@@ -1,14 +1,13 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.popup.response.*;
+import com.poppin.poppinserver.dto.review.response.ReviewFinishListDto;
 import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.dto.popup.response.PreferedDto;
-import com.poppin.poppinserver.dto.popup.response.TasteDto;
-import com.poppin.poppinserver.dto.popup.response.UserTasteDto;
-import com.poppin.poppinserver.dto.popup.response.WhoWithDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
+import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -32,7 +31,14 @@ public class UserService {
     private final WhoWithPopupRepository whoWithPopupRepository;
     private final ReviewRepository reviewRepository;
     private final PopupRepository popupRepository;
+    private final PosterImageRepository posterImageRepository;
+    private final InterestRepository interestRepository;
+    private final VisitorRepository visitorRepository;
+    private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
+    private final VisitorService visitorService;
+    private final VisitorDataService visitorDataService;
+
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -215,17 +221,51 @@ public class UserService {
     }
 
     /*작성완료 후기 조회*/
-    public List<ReviewFinishDto> readFinishReview(Long userId){
+    public List<ReviewFinishListDto> readFinishReview(Long userId){
 
-        List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
+        List<ReviewFinishListDto> reviewFinishListDtoList = new ArrayList<>();
         List<Review> reviewList = reviewRepository.findByUserId(userId);
-
 
         for (Review review : reviewList){
             Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
-            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
-            reviewFinishDtoList.add(reviewFinishDto);
+            ReviewFinishListDto reviewFinishListDto = ReviewFinishListDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
+            reviewFinishListDtoList.add(reviewFinishListDto);
         }
-        return reviewFinishDtoList;
+        return reviewFinishListDtoList;
+    }
+
+    /*마이페이지 작성완료한 후기*/
+    public ReviewFinishDto getVerifiedPopups(Long userId, Long reviewId, Long popupId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP)); /*여기서 인증된 후기의 popupId로 조회한다*/
+
+        Review review = reviewRepository.findByIdAndPopupId(reviewId, popupId); /* 후기 */
+
+        Visitor visitor = visitorRepository.findByUserIdAndPopupId(userId, popupId);
+
+        List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
+
+        return ReviewFinishDto.fromEntity(
+                popup.getIntroduce(),
+                popup.getPosterUrl(),
+                user.getNickname(),
+                visitor.getCreatedAt(),
+                review.getCreatedAt(),
+                review.getText(),
+                reviewImageListUrl
+        );
+
+
+        /*
+        *  5. 근데 결론적으로 인증, 미인증 후기가 같은 api 써도 되니 공통화 먼저 진행.
+        * 1. 리뷰 이미지 리스트를 review image 에서 review id 로 긁어온다
+        * 2. reviewVerifiedDto에 imageUrl을 List로 받는다.
+        * 3. visitor 데이터 추가한다.
+        * 4. reviewVerifiedDto + visitor 데이터 추가하여 dto로 최종 리턴.
+
+        * */
+
     }
 }

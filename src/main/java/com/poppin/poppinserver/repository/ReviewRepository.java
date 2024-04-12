@@ -20,4 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r where r.user.id = :userId order by r.createdAt asc ")
     List<Review> findByUserId(Long userId);
+
+    @Query("SELECT r FROM Review r WHERE r.id = :reviewId AND r.popup.id = :popupId ")
+    Review findByIdAndPopupId(Long reviewId, Long popupId);
 }

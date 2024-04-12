@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.visitorData.common.Congestion;
 import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
 import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
@@ -16,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -18,7 +18,7 @@ public record CreateReviewDto (
     @NotNull
     String congestion, // 혼잡 / 보통 / 여유
     @NotNull
-    boolean isCertificated,
+    boolean isCertificated, /*인증, 일반 후기 (중요)*/
     @NotNull
     int recommendCnt
     ){

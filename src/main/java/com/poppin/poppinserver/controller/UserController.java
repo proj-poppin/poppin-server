@@ -78,4 +78,9 @@ public class UserController {
     public ResponseDto<?> readFinishReview(@UserId Long userId ){
         return ResponseDto.ok(userService.readFinishReview(userId));
     }
+
+    @PostMapping("/popups/verified")
+    public ResponseDto<?> getVerifiedPopups(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
+        return ResponseDto.ok(userService.getVerifiedPopups(userId, reviewId, popupId));
+    }
 }

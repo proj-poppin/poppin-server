@@ -21,6 +21,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    /*후기 작성하기*/
     @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
     public ResponseDto<?> createReview(@RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto , @RequestPart(value = "images") List<MultipartFile> images){
         return ResponseDto.ok(reviewService.createReview(createReviewDto, images));

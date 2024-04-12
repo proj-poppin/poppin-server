@@ -4,33 +4,52 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-/*마이페이지 - 작성 완료 후기 생성 dto*/
 @Builder
 public record ReviewFinishDto(
-        @NotNull
-        Long reviewId,    /*리뷰 id*/
 
         @NotNull
-        Long popupId,     /*팝업 id*/
+        String introduce,
 
         @NotNull
-        String introduce, /*팝업 메인 글*/
+        String posterUrl,
 
         @NotNull
-        Boolean isCertificated, /*인증 후기 여부*/
+        String nickname, /*user nickname*/
 
         @NotNull
-        LocalDateTime createdAt /*후기 생성 일자*/
+        LocalDateTime visitDate, /*visitor class createdAt*/
+
+        @NotNull
+        LocalDateTime createDate, /*review class createdAt*/
+
+        @NotNull
+        String text, /*글*/
+
+        @NotNull
+        List<String> imageUrl /*사진 리스트*/ /*후기 테이블도 리스트화 해야 합니다.*/
 
 ) {
-        public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String introduce, Boolean isCertificated, LocalDateTime createdAt){
-               return  ReviewFinishDto.builder()
-                        .reviewId(reviewId)
-                        .popupId(popupId)
-                        .introduce(introduce)
-                        .isCertificated(isCertificated)
-                        .createdAt(createdAt)
-                        .build();
-        }
+
+    public static ReviewFinishDto fromEntity(
+            String introduce,
+            String posterUrl,
+            String nickname,
+            LocalDateTime visitDate,
+            LocalDateTime createDate,
+            String text,
+            List<String> imageUrl
+    ){
+        return ReviewFinishDto.builder()
+                .introduce(introduce)
+                .posterUrl(posterUrl)
+                .nickname(nickname)
+                .visitDate(visitDate)
+                .createDate(createDate)
+                .text(text)
+                .imageUrl(imageUrl)
+                .build();
+    }
+
 }

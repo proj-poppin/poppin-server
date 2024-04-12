@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.repository;
 
+import com.poppin.poppinserver.domain.Visitor;
 import com.poppin.poppinserver.domain.VisitorData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,6 +45,5 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
 
     @Query("SELECT (SUM(CASE WHEN v.satisfaction = :satisfaction THEN 1 ELSE 0 END) * 100) / COUNT(r) FROM VisitorData v JOIN Review r ON v.review.id = r.id JOIN r.popup p WHERE p.id = :popupId")
     Optional<Integer> satisfactionRate(@Param("popupId") Long popupId, String satisfaction);
-
 
 }
