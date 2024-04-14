@@ -198,7 +198,7 @@ public class UserService {
     public UserProfileDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (!userId.equals(user.getId()))) {
+        if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (userId != user.getId())) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
         user.updateUserNicknameAndBirthDate(userInfoDto.nickname(), userInfoDto.birthDate());
