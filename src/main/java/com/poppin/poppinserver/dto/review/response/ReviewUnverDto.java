@@ -25,7 +25,7 @@ public record ReviewUnverDto(
         LocalDateTime createDate, /*review class createdAt*/
 
         @NotNull
-        VisitorDataRvDto visitorDataRvDto,
+        VisitorDataRvDto visitorData,
 
         @NotNull
         String text, /*글*/
@@ -51,7 +51,7 @@ public record ReviewUnverDto(
                 .isCertificated(isCertificated)
                 .nickname(nickname)
                 .createDate(createDate)
-                .visitorDataRvDto(visitorDataRvDto)
+                .visitorData(visitorDataRvDto)
                 .text(text)
                 .imageUrl(imageUrl)
                 .build();
