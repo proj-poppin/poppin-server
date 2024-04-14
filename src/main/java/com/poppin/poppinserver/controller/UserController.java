@@ -74,13 +74,21 @@ public class UserController {
         return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
     }
 
+    /*작성완료 후기 조회*/
     @GetMapping("/review/read")
     public ResponseDto<?> readFinishReview(@UserId Long userId ){
         return ResponseDto.ok(userService.readFinishReview(userId));
     }
 
-    @PostMapping("/popups/verified")
+    /*작성완료 인증후기 보기*/
+    @PostMapping("/review/read/ver")
+    public ResponseDto<?> getVerifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
+        return ResponseDto.ok(userService.getVerifiedReview(userId, reviewId, popupId));
+    }
+
+    /*작성완료 미인증후기 보기*/
+    @PostMapping("/review/read/unver")
     public ResponseDto<?> getVerifiedPopups(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
-        return ResponseDto.ok(userService.getVerifiedPopups(userId, reviewId, popupId));
+        return ResponseDto.ok(userService.getUnverifiedReview(userId, reviewId, popupId));
     }
 }
