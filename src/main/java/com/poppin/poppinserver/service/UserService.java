@@ -7,7 +7,6 @@ import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
-import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -33,10 +32,10 @@ public class UserService {
     private final PopupRepository popupRepository;
     private final PosterImageRepository posterImageRepository;
     private final InterestRepository interestRepository;
-    private final VisitorRepository visitorRepository;
+    private final VisitRepository visitRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
-    private final VisitorService visitorService;
+    private final VisitService visitService;
     private final VisitorDataService visitorDataService;
 
 
@@ -243,7 +242,7 @@ public class UserService {
 
         Review review = reviewRepository.findByIdAndPopupId(reviewId, popupId); /* 후기 */
 
-        Visitor visitor = visitorRepository.findByUserIdAndPopupId(userId, popupId);
+        Visit visit = visitRepository.findByUserIdAndPopupId(userId, popupId);
 
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
@@ -251,7 +250,7 @@ public class UserService {
                 popup.getIntroduce(),
                 popup.getPosterUrl(),
                 user.getNickname(),
-                visitor.getCreatedAt(),
+                visit.getCreatedAt(),
                 review.getCreatedAt(),
                 review.getText(),
                 reviewImageListUrl

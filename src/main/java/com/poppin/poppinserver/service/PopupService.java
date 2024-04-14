@@ -41,7 +41,7 @@ public class PopupService {
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
-    private final VisitorService visitorService;
+    private final VisitService visitService;
 
     private final SelectRandomUtil selectRandomUtil;
 
@@ -148,7 +148,7 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        Optional<Integer> visitors = visitorService.showRealTimeVisitors(popupId); // 실시간 방문자
+        Optional<Integer> visitors = visitService.showRealTimeVisitors(popupId); // 실시간 방문자
 
         popupRepository.save(popup);
 
@@ -175,7 +175,7 @@ public class PopupService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
-        Optional<Integer> visitors = visitorService.showRealTimeVisitors(popupId); // 실시간 방문자
+        Optional<Integer> visitors = visitService.showRealTimeVisitors(popupId); // 실시간 방문자
 
         popupRepository.save(popup);
 

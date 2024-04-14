@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "visitors")
-public class Visitor {
+@Table(name = "visit")
+public class Visit {
 
     /*방문하기 누른 사람들 데이터*/
     @Id
@@ -33,7 +33,7 @@ public class Visitor {
     private LocalDateTime createdAt; /*방문한 날짜*/
 
     @Builder
-    public Visitor(User user, Popup popup) {
+    public Visit(User user, Popup popup) {
         this.user = user;
         this.popup = popup;
         this.createdAt = LocalDateTime.now();

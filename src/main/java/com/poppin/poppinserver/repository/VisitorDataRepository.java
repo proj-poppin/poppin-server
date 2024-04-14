@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.repository;
 
-import com.poppin.poppinserver.domain.Visitor;
 import com.poppin.poppinserver.domain.VisitorData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,6 @@
-package com.poppin.poppinserver.dto.realtimeVisit.response;
+package com.poppin.poppinserver.dto.visit.response;
 
-import com.poppin.poppinserver.domain.Visitor;
+import com.poppin.poppinserver.domain.Visit;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -16,10 +16,10 @@ public record RealTimeVisitorsDto(
 
     Optional<Integer> visitorsCnt
 ) {
-    public static RealTimeVisitorsDto fromEntity(Visitor visitor, Optional<Integer> realTimeVisitors){
+    public static RealTimeVisitorsDto fromEntity(Visit visit, Optional<Integer> realTimeVisitors){
         return RealTimeVisitorsDto.builder()
-                .userId(visitor.getUser().getId())
-                .popupId(visitor.getPopup().getId())
+                .userId(visit.getUser().getId())
+                .popupId(visit.getPopup().getId())
                 .visitorsCnt(realTimeVisitors)
                 .build();
     }
