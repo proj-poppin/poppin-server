@@ -94,25 +94,33 @@ public class ModifyInfoService {
 
         // 프록시 이미지와 생성
         List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
-        List<String> fileUrls = posterImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
 
         List<PosterImage> proxyImages = new ArrayList<>();
-        for(String url : fileUrls){
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
+        for(PosterImage posterImage : posterImages){
+            PosterImage proxyImage = PosterImage.builder()
+                    .posterUrl(posterImage.getPosterUrl())
                     .popup(proxyPopup)
                     .build();
             proxyImages.add(posterImage);
         }
         posterImageRepository.saveAll(proxyImages);
-        proxyPopup.updatePosterUrl(fileUrls.get(0));
+        proxyPopup.updatePosterUrl(proxyImages.get(0).getPosterUrl());
 
-        proxyPopup = popupRepository.save(proxyPopup);
 
         // 프록시 알람키워드 생성
-        List<AlarmKeyword> alarmKeywords = alarmKeywordRepository.
+        List<AlarmKeyword> alarmKeywords = alarmKeywordRepository.findByPopupId(popup);
+
+        List<AlarmKeyword> proxyKeywords = new ArrayList<>();
+        for (AlarmKeyword alarmKeyword : alarmKeywords) {
+            AlarmKeyword proxyKeyword = AlarmKeyword.builder()
+                    .popupId(proxyPopup)
+                    .keyword(alarmKeyword.getKeyword())
+                    .build();
+        }
+        alarmKeywordRepository.saveAll(proxyKeywords);
+
+        popupRepository.save(proxyPopup);
+
 
         // 그 다음에 해당 팝업을 정보수정요청 팝업과 연결해야댐
 
