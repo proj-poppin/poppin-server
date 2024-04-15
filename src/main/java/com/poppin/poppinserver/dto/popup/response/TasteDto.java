@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record TasteDto(
         Long id,
-        Boolean fasionBeauty,
+        Boolean fashionBeauty,
         Boolean characters,
         Boolean foodBeverage,
         Boolean webtoonAni,
@@ -17,12 +17,12 @@ public record TasteDto(
         Boolean game,
         Boolean itTech,
         Boolean kpop,
-        Boolean alchol,
+        Boolean alcohol,
         Boolean animalPlant) {
         public static TasteDto fromEntity(TastePopup tastePopup){
                 return TasteDto.builder()
                         .id(tastePopup.getId())
-                        .fasionBeauty(tastePopup.getFashionBeauty())
+                        .fashionBeauty(tastePopup.getFashionBeauty())
                         .characters(tastePopup.getCharacters())
                         .foodBeverage(tastePopup.getFoodBeverage())
                         .webtoonAni(tastePopup.getWebtoonAni())
@@ -33,7 +33,7 @@ public record TasteDto(
                         .game(tastePopup.getGame())
                         .itTech(tastePopup.getItTech())
                         .kpop(tastePopup.getKpop())
-                        .alchol(tastePopup.getAlcohol())
+                        .alcohol(tastePopup.getAlcohol())
                         .animalPlant(tastePopup.getAnimalPlant())
                         .build();
         }
