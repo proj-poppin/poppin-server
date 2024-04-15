@@ -37,7 +37,7 @@ public class UserInformController {
     } // 제보 생성
 
     @GetMapping("")
-    public ResponseDto<?> readUserInform(@RequestParam("userInformId") Long userInformId) {
+    public ResponseDto<?> readUserInform(@RequestParam("informId") Long userInformId) {
         return ResponseDto.ok(userInformService.readUserInform(userInformId));
     } // 제보 조회
 
