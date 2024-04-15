@@ -2,9 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.util.ImageUtil;
@@ -194,6 +192,29 @@ public class S3Service {
             log.info("Deleted image {} from bucket {}", filename, bucketName);
         } catch (AmazonServiceException e) {
             log.error("S3 Error deleting : {}", e.getMessage());
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+    }
+
+    // (여러장)s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
+    public void deleteMultipleImages(List<String> urls) {
+        try {
+            // 버킷 이름 추출 (모든 URL이 동일한 버킷에 있다고 가정)
+            String bucketName = urls.get(0).split("://")[1].split("\\.")[0];
+
+            // 삭제할 객체 목록 생성
+            DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(bucketName)
+                    .withKeys(urls.stream()
+                            .map(url -> url.split("://")[1].split("/", 2)[1])
+                            .toArray(String[]::new))
+                    .withQuiet(false);
+
+            // 객체 삭제 실행
+            DeleteObjectsResult delObjRes = s3Client.deleteObjects(multiObjectDeleteRequest);
+            log.info("Deleted images: {}", delObjRes.getDeletedObjects());
+
+        } catch (AmazonServiceException e) {
+            log.error("S3 Error during multi deletion: {}", e.getMessage());
             throw new CommonException(ErrorCode.SERVER_ERROR);
         }
     }

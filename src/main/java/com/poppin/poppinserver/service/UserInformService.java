@@ -153,6 +153,8 @@ public class UserInformService {
         Popup popup = userInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
+        // 지금까지 있던 것 들은 다 지워야 한다
+        // 아님 차집합을 계산해야 한다
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
