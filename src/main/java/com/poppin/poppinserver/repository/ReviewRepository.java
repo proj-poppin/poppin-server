@@ -16,11 +16,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByPopupIdOrderByRecommendCntDesc(@Param("popupId") Long popupId, PageRequest pageable);
 
     @Query("SELECT r FROM Review r join Popup p on p.id = r.popup.id WHERE p.id = :popupId AND r.id = :reviewId")
-    Review findByReviewIdAndPopupId(Long reviewId, Long popupId);
+    Review findByReviewIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);
 
     @Query("SELECT r FROM Review r where r.user.id = :userId order by r.createdAt asc ")
-    List<Review> findByUserId(Long userId);
+    List<Review> findByUserId(@Param("userId")Long userId);
 
     @Query("SELECT r FROM Review r WHERE r.id = :reviewId AND r.popup.id = :popupId ")
-    Review findByIdAndPopupId(Long reviewId, Long popupId);
+    Review findByIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);
+
+    @Query("SELECT r FROM Review r WHERE r.user.id = :userId")
+    List<Review> findAllByUserId(@Param("userId")Long userId);
 }

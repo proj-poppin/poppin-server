@@ -9,7 +9,7 @@ import java.util.List;
 
 /*마이페이지 인증후기 조회*/
 @Builder
-public record ReviewVerDto(
+public record ReviewCertiDto(
 
         @NotNull
         String introduce,
@@ -40,7 +40,7 @@ public record ReviewVerDto(
 
 ) {
 
-    public static ReviewVerDto fromEntity(
+    public static ReviewCertiDto fromEntity(
             String introduce,
             String posterUrl,
             Boolean isCertificated,
@@ -51,7 +51,7 @@ public record ReviewVerDto(
             String text,
             List<String> imageUrl
     ){
-        return ReviewVerDto.builder()
+        return ReviewCertiDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)

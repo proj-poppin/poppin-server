@@ -15,7 +15,7 @@ public record ReviewFinishDto(
         Long popupId,     /*팝업 id*/
 
         @NotNull
-        String introduce, /*팝업 메인 글*/
+        String name, /*팝업 메인 글*/
 
         @NotNull
         Boolean isCertificated, /*인증 후기 여부*/
@@ -24,11 +24,11 @@ public record ReviewFinishDto(
         LocalDateTime createdAt /*후기 생성 일자*/
 
 ) {
-        public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String introduce, Boolean isCertificated, LocalDateTime createdAt){
+        public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated, LocalDateTime createdAt){
                return  ReviewFinishDto.builder()
                         .reviewId(reviewId)
                         .popupId(popupId)
-                        .introduce(introduce)
+                        .name(name)
                         .isCertificated(isCertificated)
                         .createdAt(createdAt)
                         .build();

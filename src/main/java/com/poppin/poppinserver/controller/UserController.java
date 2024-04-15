@@ -76,19 +76,26 @@ public class UserController {
 
     /*작성완료 후기 조회*/
     @GetMapping("/review/read")
-    public ResponseDto<?> readFinishReview(@UserId Long userId ){
-        return ResponseDto.ok(userService.readFinishReview(userId));
+    public ResponseDto<?> getFinishReviewList(@UserId Long userId ){
+        return ResponseDto.ok(userService.getFinishReviewList(userId));
     }
 
     /*작성완료 인증후기 보기*/
-    @PostMapping("/review/read/ver")
-    public ResponseDto<?> getVerifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
-        return ResponseDto.ok(userService.getVerifiedReview(userId, reviewId, popupId));
+    @PostMapping("/review/certi")
+    public ResponseDto<?> getCertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
+        return ResponseDto.ok(userService.getCertifiedReview(userId, reviewId, popupId));
     }
 
     /*작성완료 미인증후기 보기*/
-    @PostMapping("/review/read/unver")
-    public ResponseDto<?> getVerifiedPopups(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
-        return ResponseDto.ok(userService.getUnverifiedReview(userId, reviewId, popupId));
+    @PostMapping("/review/uncerti")
+    public ResponseDto<?> getUncertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
+        return ResponseDto.ok(userService.getUncertifiedReview(userId, reviewId, popupId));
     }
+
+    /*마이페이지 - 방문한 팝업 조회*/
+    @GetMapping("popup/certi")
+    public ResponseDto<?> getCertifiedPopupList(@UserId Long userId){
+        return ResponseDto.ok(userService.getCertifiedPopupList(userId));
+    }
+
 }

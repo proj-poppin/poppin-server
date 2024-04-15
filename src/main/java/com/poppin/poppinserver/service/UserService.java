@@ -3,8 +3,8 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
-import com.poppin.poppinserver.dto.review.response.ReviewUnverDto;
-import com.poppin.poppinserver.dto.review.response.ReviewVerDto;
+import com.poppin.poppinserver.dto.review.response.ReviewUncertiDto;
+import com.poppin.poppinserver.dto.review.response.ReviewCertiDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -218,21 +219,21 @@ public class UserService {
     }
 
     /*작성완료 후기 조회*/
-    public List<ReviewFinishDto> readFinishReview(Long userId){
+    public List<ReviewFinishDto> getFinishReviewList(Long userId){
 
-        List<ReviewFinishDto> reviewFinish = new ArrayList<>();
+        List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
         List<Review> reviewList = reviewRepository.findByUserId(userId);
 
         for (Review review : reviewList){
             Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
-            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getIntroduce(), review.getIsCertificated(),review.getCreatedAt());
-            reviewFinish.add(reviewFinishDto);
+            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt());
+            reviewFinishDtoList.add(reviewFinishDto);
         }
-        return reviewFinish;
+        return reviewFinishDtoList;
     }
 
     /*마이페이지 인증 후기 보기*/
-    public ReviewVerDto getVerifiedReview(Long userId, Long reviewId, Long popupId){
+    public ReviewCertiDto getCertifiedReview(Long userId, Long reviewId, Long popupId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)
@@ -249,7 +250,7 @@ public class UserService {
 
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
-        return ReviewVerDto.fromEntity(
+        return ReviewCertiDto.fromEntity(
                 popup.getIntroduce(),
                 popup.getPosterUrl(),
                 review.getIsCertificated(),
@@ -263,7 +264,7 @@ public class UserService {
     }
 
     /*마이페이지 인증 후기 보기*/
-    public ReviewUnverDto getUnverifiedReview(Long userId, Long reviewId, Long popupId){
+    public ReviewUncertiDto getUncertifiedReview(Long userId, Long reviewId, Long popupId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)
@@ -277,7 +278,7 @@ public class UserService {
 
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
-        return ReviewUnverDto.fromEntity(
+        return ReviewUncertiDto.fromEntity(
                 popup.getIntroduce(),
                 popup.getPosterUrl(),
                 review.getIsCertificated(),
@@ -287,5 +288,23 @@ public class UserService {
                 review.getText(),
                 reviewImageListUrl
         );
+    }
+
+    public List<PopupCertiDto> getCertifiedPopupList(Long userId){
+        /* 1. userId로 visit 리스트 뽑기
+         *  2. visit 리스트의 popupid 와 popup의 id 일치하는 popup 뽑기
+         */
+        List<Visit> visitList = visitRepository.findByUserId(userId);
+        if (visitList.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+
+        List<PopupCertiDto> popupCertiDtoList = new ArrayList<>();
+
+        for (Visit visit : visitList){
+            Long vdPopupId = visit.getPopup().getId();
+            Popup popup = popupRepository.findTopByPopupId(vdPopupId);
+            PopupCertiDto popupCertiDto = PopupCertiDto.fromEntity(popup.getName(),popup.getPosterUrl(),visit.getCreatedAt());
+            popupCertiDtoList.add(popupCertiDto);
+        }
+        return popupCertiDtoList;
     }
 }
