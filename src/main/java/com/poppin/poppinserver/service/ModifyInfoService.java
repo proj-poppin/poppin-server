@@ -119,18 +119,13 @@ public class ModifyInfoService {
         }
         alarmKeywordRepository.saveAll(proxyKeywords);
 
-        popupRepository.save(proxyPopup);
-
-
-        // 그 다음에 해당 팝업을 정보수정요청 팝업과 연결해야댐
-
-        // 그리고 업로드 시점에 프록시 팝업 정보를 기존 팝업에 덮어 씌워야함
+        proxyPopup = popupRepository.save(proxyPopup);
 
         // 정보수정요청 객체 저장
         ModifyInfo modifyInfo = ModifyInfo.builder()
                 .content(createModifyInfoDto.content())
                 .userId(user)
-                .popupId(popup)
+                .popupId(proxyPopup)
                 .build();
         modifyInformRepository.save(modifyInfo);
 
