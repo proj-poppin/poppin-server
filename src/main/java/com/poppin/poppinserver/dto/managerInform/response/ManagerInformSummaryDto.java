@@ -40,7 +40,7 @@ public record ManagerInformSummaryDto(
                             .popupName(managerInform.getPopupId().getName())
                             .informerName(managerInform.getInformerId().getNickname())
                             .informedAt(managerInform.getInformedAt().toString())
-                            .adminName(managerInform.getAdminId().getNickname())
+                            .adminName(adminName)
                             .executedAt(executedAt)
                             .build();
 

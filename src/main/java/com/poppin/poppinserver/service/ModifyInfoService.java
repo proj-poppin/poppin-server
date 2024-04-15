@@ -7,10 +7,7 @@ import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.ModifyImageReposiroty;
-import com.poppin.poppinserver.repository.ModifyInformRepository;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.util.ImageUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,6 +27,10 @@ public class ModifyInfoService {
     private final ModifyImageReposiroty modifyImageReposiroty;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
+    private final PreferedPopupRepository preferedPopupRepository;
+    private final TastePopupRepository tastePopupRepository;
+    private final PosterImageRepository posterImageRepository;
+    private final AlarmKeywordRepository alarmKeywordRepository;
 
     private final S3Service s3Service;
 
@@ -40,6 +42,81 @@ public class ModifyInfoService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        // 프록시 팝업 생성
+        PreferedPopup preferedPopup = popup.getPreferedPopup();
+        PreferedPopup proxyPrefered = PreferedPopup.builder()
+                .wantFree(preferedPopup.getWantFree())
+                .market(preferedPopup.getMarket())
+                .experience(preferedPopup.getExperience())
+                .display(preferedPopup.getDisplay())
+                .build();
+        proxyPrefered = preferedPopupRepository.save(proxyPrefered);
+
+        TastePopup tastePopup = popup.getTastePopup();
+        TastePopup proxyTaste = TastePopup.builder()
+                .fasionBeauty(tastePopup.getFashionBeauty())
+                .characters(tastePopup.getCharacters())
+                .foodBeverage(tastePopup.getFoodBeverage())
+                .webtoonAni(tastePopup.getWebtoonAni())
+                .interiorThings(tastePopup.getInteriorThings())
+                .movie(tastePopup.getMovie())
+                .musical(tastePopup.getMusical())
+                .sports(tastePopup.getSports())
+                .game(tastePopup.getGame())
+                .itTech(tastePopup.getItTech())
+                .kpop(tastePopup.getKpop())
+                .alchol(tastePopup.getAlcohol())
+                .animalPlant(tastePopup.getAnimalPlant())
+                .build();
+        proxyTaste = tastePopupRepository.save(proxyTaste);
+
+        Popup proxyPopup = Popup.builder()
+                .homepageLink(popup.getHomepageLink())
+                .name(popup.getName())
+                .availableAge(popup.getAvailableAge())
+                .closeDate(popup.getCloseDate())
+                .closeTime(popup.getCloseTime())
+                .entranceFee(popup.getEntranceFee())
+                .resvRequired(popup.getResvRequired())
+                .introduce(popup.getIntroduce())
+                .address(popup.getAddress())
+                .addressDetail(popup.getAddressDetail())
+                .openDate(popup.getOpenDate())
+                .openTime(popup.getOpenTime())
+                .operationExcept(popup.getOperationExcept())
+                .operationStatus("EXECUTING")
+                .parkingAvailable(popup.getParkingAvailable())
+                .preferedPopup(proxyPrefered)
+                .tastePopup(proxyTaste)
+                .build();
+        proxyPopup = popupRepository.save(proxyPopup);
+
+        // 프록시 이미지와 생성
+        List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
+        List<String> fileUrls = posterImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+
+        List<PosterImage> proxyImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(proxyPopup)
+                    .build();
+            proxyImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(proxyImages);
+        proxyPopup.updatePosterUrl(fileUrls.get(0));
+
+        proxyPopup = popupRepository.save(proxyPopup);
+
+        // 프록시 알람키워드 생성
+        List<AlarmKeyword> alarmKeywords = alarmKeywordRepository.
+
+        // 그 다음에 해당 팝업을 정보수정요청 팝업과 연결해야댐
+
+        // 그리고 업로드 시점에 프록시 팝업 정보를 기존 팝업에 덮어 씌워야함
 
         // 정보수정요청 객체 저장
         ModifyInfo modifyInfo = ModifyInfo.builder()
@@ -86,4 +163,6 @@ public class ModifyInfoService {
 
         return ModifyInfoSummaryDto.fromEntityList(modifyInfoList);
     }// 목록 조회
+
+
 }
