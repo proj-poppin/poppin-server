@@ -28,6 +28,11 @@ public record ManagerInformSummaryDto(
                 executedAt = managerInform.getExecutedAt().toString();
             }
 
+            String adminName = null;
+            if(managerInform.getAdminId() != null){
+                adminName = managerInform.getAdminId().getNickname();
+            }
+
             ManagerInformSummaryDto managerInformSummaryDto =
                     ManagerInformSummaryDto.builder()
                             .id(managerInform.getId())

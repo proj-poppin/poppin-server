@@ -344,6 +344,7 @@ public class ManagerInformService {
         return ManagerInformDto.fromEntity(managerInform);
     }
 
+    @Transactional
     public List<ManagerInformSummaryDto> reatManagerInformList(){
         List<ManagerInform> managerInforms = managerInformRepository.findAll();
 

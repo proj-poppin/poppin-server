@@ -329,6 +329,7 @@ public class UserInformService {
         return UserInformDto.fromEntity(userInform);
     }
 
+    @Transactional
     public List<UserInformSummaryDto> reatUserInformList(){
         List<UserInform> userInforms = userInformRepository.findAll();
 

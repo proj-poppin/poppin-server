@@ -27,6 +27,11 @@ public record UserInformSummaryDto(
                 executedAt = userInform.getExecutedAt().toString();
             }
 
+            String adminName = null;
+            if(userInform.getAdminId() != null){
+                adminName = userInform.getAdminId().getNickname();
+            }
+
             UserInformSummaryDto userInformSummaryDto =
                     UserInformSummaryDto.builder()
                             .id(userInform.getId())
@@ -34,7 +39,7 @@ public record UserInformSummaryDto(
                             .popupName(userInform.getPopupId().getName())
                             .informerName(userInform.getInformerId().getNickname())
                             .informedAt(userInform.getInformedAt().toString())
-                            .adminName(userInform.getAdminId().getNickname())
+                            .adminName(adminName)
                             .executedAt(executedAt)
                             .build();
 
