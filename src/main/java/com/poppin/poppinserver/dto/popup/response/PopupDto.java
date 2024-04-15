@@ -79,6 +79,11 @@ public record PopupDto(
             keywordList.add(alarmKeyword.getKeyword());
         }
 
+        String availableAge = null;
+        if(popup.getAvailableAge() != null){
+            availableAge = popup.getAvailableAge().getAvailableAgeProvider();
+        }
+
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -87,7 +92,7 @@ public record PopupDto(
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
                 .entranceFee(popup.getEntranceFee())
-                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
+                .availableAge(availableAge)
                 .parkingAvailable(popup.getParkingAvailable())
                 .resvRequired(popup.getResvRequired())
                 .reopenDemandCnt(popup.getReopenDemandCnt())
