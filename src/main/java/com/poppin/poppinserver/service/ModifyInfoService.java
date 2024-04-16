@@ -1,9 +1,6 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
-import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
-import com.poppin.poppinserver.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
@@ -153,7 +150,7 @@ public class ModifyInfoService {
         }
         modifyImageReposiroty.saveAll(modifyImagesList);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
+        return ModifyInfoDto.fromEntity(modifyInfo);
     } // 요청 생성
 
     @Transactional
@@ -168,7 +165,7 @@ public class ModifyInfoService {
             imageList.add(modifyImages.getImageUrl());
         }
 
-        return ModifyInfoDto.fromEntity(modifyInfo, imageList);
+        return ModifyInfoDto.fromEntity(modifyInfo);
     } // 조회
 
     @Transactional
@@ -179,17 +176,17 @@ public class ModifyInfoService {
     }// 목록 조회
 
     @Transactional
-    public ManagerInformDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
+    public ModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
                                                List<MultipartFile> images,
                                                Long adminId){
-        ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
+        ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
-        TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
+        CreateTasteDto createTasteDto = updateModifyInfoDto.taste();
+        TastePopup tastePopup = modifyInfo.getPopupId().getTastePopup();
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
@@ -205,15 +202,15 @@ public class ModifyInfoService {
                 createTasteDto.animalPlant());
         tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
-        PreferedPopup preferedPopup = managerInform.getPopupId().getPreferedPopup();
+        CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
+        PreferedPopup preferedPopup = modifyInfo.getPopupId().getPreferedPopup();
         preferedPopup.update(createPreferedDto.market(),
                 createPreferedDto.display(),
                 createPreferedDto.experience(),
                 createPreferedDto.wantFree());
         preferedPopupRepository.save(preferedPopup);
 
-        Popup popup = managerInform.getPopupId();
+        Popup popup = modifyInfo.getPopupId();
 
         // 팝업 이미지 처리 및 저장
 
@@ -242,7 +239,7 @@ public class ModifyInfoService {
         alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
 
         List<AlarmKeyword> alarmKeywords = new ArrayList<>();
-        for(String keyword : updateManagerInfromDto.keywords()){
+        for(String keyword : updateModifyInfoDto.keywords()){
             alarmKeywords.add(AlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -251,28 +248,27 @@ public class ModifyInfoService {
         alarmKeywordRepository.saveAll(alarmKeywords);
 
         popup.update(
-                updateManagerInfromDto.homepageLink(),
-                updateManagerInfromDto.name(),
-                updateManagerInfromDto.introduce(),
-                updateManagerInfromDto.address(),
-                updateManagerInfromDto.addressDetail(),
-                updateManagerInfromDto.entranceFee(),
-                updateManagerInfromDto.resvRequired(),
-                updateManagerInfromDto.availableAge(),
-                updateManagerInfromDto.parkingAvailable(),
-                updateManagerInfromDto.openDate(),
-                updateManagerInfromDto.closeDate(),
-                updateManagerInfromDto.openTime(),
-                updateManagerInfromDto.closeTime(),
-                updateManagerInfromDto.operationExcept(),
+                updateModifyInfoDto.homepageLink(),
+                updateModifyInfoDto.name(),
+                updateModifyInfoDto.introduce(),
+                updateModifyInfoDto.address(),
+                updateModifyInfoDto.addressDetail(),
+                updateModifyInfoDto.entranceFee(),
+                updateModifyInfoDto.resvRequired(),
+                updateModifyInfoDto.availableAge(),
+                updateModifyInfoDto.parkingAvailable(),
+                updateModifyInfoDto.openDate(),
+                updateModifyInfoDto.closeDate(),
+                updateModifyInfoDto.openTime(),
+                updateModifyInfoDto.closeTime(),
+                updateModifyInfoDto.operationExcept(),
                 "EXECUTING"
         );
 
         popup = popupRepository.save(popup);
 
-        managerInform.update(EInformProgress.EXECUTING, admin);
-        managerInform = managerInformRepository.save(managerInform);
+        modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ManagerInformDto.fromEntity(managerInform);
-    }
+        return ModifyInfoDto.fromEntity(modifyInfo);
+    } // 임시 저장
 }

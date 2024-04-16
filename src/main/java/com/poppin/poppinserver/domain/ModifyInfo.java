@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.type.EInformProgress;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -44,5 +45,9 @@ public class ModifyInfo {
         this.createdAt = LocalDateTime.now();
         this.content = content;
         this.isExecuted = false;
+    }
+
+    public void update(Boolean isExecuted) {
+        this.isExecuted = isExecuted;
     }
 }
