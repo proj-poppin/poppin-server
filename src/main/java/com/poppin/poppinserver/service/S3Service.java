@@ -209,6 +209,41 @@ public class S3Service {
         }
     }
 
+    // s3 이미지를 리스트 단위로 다른 폴더로 복사 (기존 이미지 url과 popupId)
+    public List<String> copyImageListToAnotherFolder(List<String> urls, Long popupId) {
+        List<String> newUrls = new ArrayList<>();
+
+        for (String url : urls) {
+            // URL에서 버킷 이름과 키 추출
+            String sourceBucket = url.split("://")[1].split("\\.")[0];
+            String sourceKey = url.split("://")[1].split("/", 2)[1];
+
+            // 대상 버킷과 대상 키 설정 (동일 버킷 내 다른 폴더로 복사)
+            String destinationBucket = sourceBucket; // 같은 버킷 내에서 복사
+            String destinationKey = popupId + "/" + sourceKey.substring(sourceKey.lastIndexOf("/") + 1); // 새로운 폴더에 저장
+
+            try {
+                // 복사 요청 생성 및 실행
+                CopyObjectRequest copyObjectRequest = new CopyObjectRequest()
+                        .withSourceBucketName(sourceBucket)
+                        .withSourceKey(sourceKey)
+                        .withDestinationBucketName(destinationBucket)
+                        .withDestinationKey(destinationKey);
+
+                CopyObjectResult copyObjectResponse = s3Client.copyObject(copyObjectRequest);
+                log.info("Copied image to new folder: {}", destinationKey);
+
+                // 복사된 이미지의 URL 반환
+                String newUrl = s3Client.getResourceUrl(destinationBucket, destinationKey);
+                newUrls.add(newUrl);
+            } catch (Exception e) {
+                log.error("Failed to copy image: {}", e.getMessage());
+                throw new RuntimeException("Failed to copy image", e);
+            }
+        }
+
+        return newUrls;
+    }
 
     // s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
     public void deleteImage(String url) {
