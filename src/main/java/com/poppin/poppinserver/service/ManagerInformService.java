@@ -176,6 +176,7 @@ public class ManagerInformService {
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
         s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
 
         //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
@@ -274,6 +275,7 @@ public class ManagerInformService {
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
         s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
 
         //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());

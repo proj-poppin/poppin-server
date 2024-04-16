@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.modifyInfo.request.updateModifyInfoDto;
+import com.poppin.poppinserver.dto.modifyInfo.response.modifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
@@ -18,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,7 +137,7 @@ public class ModifyInfoService {
         ModifyInfo modifyInfo = ModifyInfo.builder()
                 .content(createModifyInfoDto.content())
                 .userId(user)
-                .popupId(proxyPopup)
+                .proxyPopup(proxyPopup)
                 .build();
         modifyInformRepository.save(modifyInfo);
 
@@ -177,16 +181,12 @@ public class ModifyInfoService {
 
     @Transactional
     public ModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                               List<MultipartFile> images,
-                                               Long adminId){
+                                               List<MultipartFile> images){
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
         CreateTasteDto createTasteDto = updateModifyInfoDto.taste();
-        TastePopup tastePopup = modifyInfo.getPopupId().getTastePopup();
+        TastePopup tastePopup = modifyInfo.getProxyPopup().getTastePopup();
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
@@ -203,14 +203,14 @@ public class ModifyInfoService {
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
-        PreferedPopup preferedPopup = modifyInfo.getPopupId().getPreferedPopup();
+        PreferedPopup preferedPopup = modifyInfo.getProxyPopup().getPreferedPopup();
         preferedPopup.update(createPreferedDto.market(),
                 createPreferedDto.display(),
                 createPreferedDto.experience(),
                 createPreferedDto.wantFree());
         preferedPopupRepository.save(preferedPopup);
 
-        Popup popup = modifyInfo.getPopupId();
+        Popup popup = modifyInfo.getProxyPopup();
 
         // 팝업 이미지 처리 및 저장
 
@@ -271,4 +271,116 @@ public class ModifyInfoService {
 
         return ModifyInfoDto.fromEntity(modifyInfo);
     } // 임시 저장
+
+    @Transactional
+    public ModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
+                                        List<MultipartFile> images){
+        ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
+
+        // 기존 팝업에 수정 사항 덮어 씌우기
+        CreateTasteDto createTasteDto = updateModifyInfoDto.taste();
+        TastePopup tastePopup = modifyInfo.getOriginPopup().getTastePopup();
+        tastePopup.update(createTasteDto.fashionBeauty(),
+                createTasteDto.characters(),
+                createTasteDto.foodBeverage(),
+                createTasteDto.webtoonAni(),
+                createTasteDto.interiorThings(),
+                createTasteDto.movie(),
+                createTasteDto.musical(),
+                createTasteDto.sports(),
+                createTasteDto.game(),
+                createTasteDto.itTech(),
+                createTasteDto.kpop(),
+                createTasteDto.alcohol(),
+                createTasteDto.animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
+        PreferedPopup preferedPopup = modifyInfo.getOriginPopup().getPreferedPopup();
+        preferedPopup.update(createPreferedDto.market(),
+                createPreferedDto.display(),
+                createPreferedDto.experience(),
+                createPreferedDto.wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        Popup originPopup = modifyInfo.getOriginPopup();
+
+        // 팝업 이미지 처리 및 저장
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(originPopup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+
+        //새로운 이미지 추가
+        List<String> fileUrls = s3Service.copyImageListToAnotherFolder(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        // 기존 키워드 삭제 및 다시 저장
+        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+
+        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        for(String keyword : updateModifyInfoDto.keywords()){
+            alarmKeywords.add(AlarmKeyword.builder()
+                    .popupId(popup)
+                    .keyword(keyword)
+                    .build());
+        }
+        alarmKeywordRepository.saveAll(alarmKeywords);
+
+        //날짜 요청 유효성 검증
+        if (updateModifyInfoDto.openDate().isAfter(updateModifyInfoDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
+
+        //현재 운영상태 정의
+        String operationStatus;
+        if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())){
+            Period period = Period.between(LocalDate.now(), updateModifyInfoDto.openDate());
+            operationStatus = "D-" + period.getDays();
+        } else if (updateModifyInfoDto.closeDate().isBefore(LocalDate.now())) {
+            operationStatus = "TERMINATED";
+        }
+        else{
+            operationStatus = "OPERATING";
+        }
+
+        popup.update(
+                updateModifyInfoDto.homepageLink(),
+                updateModifyInfoDto.name(),
+                updateModifyInfoDto.introduce(),
+                updateModifyInfoDto.address(),
+                updateModifyInfoDto.addressDetail(),
+                updateModifyInfoDto.entranceFee(),
+                updateModifyInfoDto.resvRequired(),
+                updateModifyInfoDto.availableAge(),
+                updateModifyInfoDto.parkingAvailable(),
+                updateModifyInfoDto.openDate(),
+                updateModifyInfoDto.closeDate(),
+                updateModifyInfoDto.openTime(),
+                updateModifyInfoDto.closeTime(),
+                updateModifyInfoDto.operationExcept(),
+                operationStatus
+        );
+
+        popup = popupRepository.save(popup);
+
+        modifyInfo.update(true);
+        modifyInfo = modifyInformRepository.save(modifyInfo);
+
+        return ModifyInfoDto.fromEntity(modifyInfo);
+    } // 업로드
 }
