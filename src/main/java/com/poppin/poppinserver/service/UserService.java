@@ -294,7 +294,7 @@ public class UserService {
         /* 1. userId로 visit 리스트 뽑기
          *  2. visit 리스트의 popupid 와 popup의 id 일치하는 popup 뽑기
          */
-        List<Visit> visitList = visitRepository.findByUserId(userId);
+        List<Visit> visitList = visitRepository.findAllByUserId(userId);
         if (visitList.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
 
         List<PopupCertiDto> popupCertiDtoList = new ArrayList<>();

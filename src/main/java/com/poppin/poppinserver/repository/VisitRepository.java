@@ -26,5 +26,8 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     Visit findByUserIdAndPopupId(@Param("userId") Long userId , @Param("popupId") Long popupId);
 
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId")
-    List<Visit> findByUserId(@Param("userId") Long userId);
+    List<Visit> findAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT v FROM Visit v WHERE v.user.id = :userId AND v.popup.id = :popupId")
+    Visit findByUserId(@Param("userId")Long userId, @Param("popupId") Long popupId);
 }
