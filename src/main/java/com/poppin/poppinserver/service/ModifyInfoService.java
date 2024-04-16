@@ -2,12 +2,18 @@ package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
+import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
+import com.poppin.poppinserver.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
+import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoSummaryDto;
+import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.type.EInformProgress;
 import com.poppin.poppinserver.util.ImageUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -94,14 +100,19 @@ public class ModifyInfoService {
 
         // 프록시 이미지와 생성
         List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
+        List<String> posterUrls = posterImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+
+        List<String> proxyUrls = s3Service.copyImageListToAnotherFolder(posterUrls, proxyPopup.getId());
 
         List<PosterImage> proxyImages = new ArrayList<>();
-        for(PosterImage posterImage : posterImages){
+        for(String proxyUrl : proxyUrls){
             PosterImage proxyImage = PosterImage.builder()
-                    .posterUrl(posterImage.getPosterUrl())
+                    .posterUrl(proxyUrl)
                     .popup(proxyPopup)
                     .build();
-            proxyImages.add(posterImage);
+            proxyImages.add(proxyImage);
         }
         posterImageRepository.saveAll(proxyImages);
         proxyPopup.updatePosterUrl(proxyImages.get(0).getPosterUrl());
@@ -167,5 +178,101 @@ public class ModifyInfoService {
         return ModifyInfoSummaryDto.fromEntityList(modifyInfoList);
     }// 목록 조회
 
+    @Transactional
+    public ManagerInformDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
+                                               List<MultipartFile> images,
+                                               Long adminId){
+        ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
+        TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
+        tastePopup.update(createTasteDto.fashionBeauty(),
+                createTasteDto.characters(),
+                createTasteDto.foodBeverage(),
+                createTasteDto.webtoonAni(),
+                createTasteDto.interiorThings(),
+                createTasteDto.movie(),
+                createTasteDto.musical(),
+                createTasteDto.sports(),
+                createTasteDto.game(),
+                createTasteDto.itTech(),
+                createTasteDto.kpop(),
+                createTasteDto.alcohol(),
+                createTasteDto.animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
+        PreferedPopup preferedPopup = managerInform.getPopupId().getPreferedPopup();
+        preferedPopup.update(createPreferedDto.market(),
+                createPreferedDto.display(),
+                createPreferedDto.experience(),
+                createPreferedDto.wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        Popup popup = managerInform.getPopupId();
+
+        // 팝업 이미지 처리 및 저장
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+
+        //새로운 이미지 추가
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        // 기존 키워드 삭제 및 다시 저장
+        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+
+        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        for(String keyword : updateManagerInfromDto.keywords()){
+            alarmKeywords.add(AlarmKeyword.builder()
+                    .popupId(popup)
+                    .keyword(keyword)
+                    .build());
+        }
+        alarmKeywordRepository.saveAll(alarmKeywords);
+
+        popup.update(
+                updateManagerInfromDto.homepageLink(),
+                updateManagerInfromDto.name(),
+                updateManagerInfromDto.introduce(),
+                updateManagerInfromDto.address(),
+                updateManagerInfromDto.addressDetail(),
+                updateManagerInfromDto.entranceFee(),
+                updateManagerInfromDto.resvRequired(),
+                updateManagerInfromDto.availableAge(),
+                updateManagerInfromDto.parkingAvailable(),
+                updateManagerInfromDto.openDate(),
+                updateManagerInfromDto.closeDate(),
+                updateManagerInfromDto.openTime(),
+                updateManagerInfromDto.closeTime(),
+                updateManagerInfromDto.operationExcept(),
+                "EXECUTING"
+        );
+
+        popup = popupRepository.save(popup);
+
+        managerInform.update(EInformProgress.EXECUTING, admin);
+        managerInform = managerInformRepository.save(managerInform);
+
+        return ManagerInformDto.fromEntity(managerInform);
+    }
 }

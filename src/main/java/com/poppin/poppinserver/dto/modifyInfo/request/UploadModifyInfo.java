@@ -9,25 +9,42 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-public record UpdateModifyInfoDto(
+public record UploadModifyInfo(
         @NotNull
         Long modifyInfoId,
+        @NotNull
         String homepageLink,
+        @NotNull
         String name,
+        @NotNull
         String introduce,
+        @NotNull
         String address,
+        @NotNull
         String addressDetail,
+        @NotNull
         String entranceFee,
+        @NotNull
         EAvailableAge availableAge,
+        @NotNull
         Boolean parkingAvailable,
+        @NotNull
         Boolean resvRequired,
+        @NotNull
         LocalDate openDate,
+        @NotNull
         LocalDate closeDate,
+        @NotNull
         LocalTime openTime,
+        @NotNull
         LocalTime closeTime,
+        @NotNull
         String operationExcept,
+        @NotNull
         CreatePreferedDto prefered,
+        @NotNull
         CreateTasteDto taste,
+        @NotNull
         List<String> keywords
 ) {
 }
