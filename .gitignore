@@ -1,5 +1,5 @@
 #application.xx
-src/main/resources/*.yml
+src/main/resources/*
 
 HELP.md
 .gradle
