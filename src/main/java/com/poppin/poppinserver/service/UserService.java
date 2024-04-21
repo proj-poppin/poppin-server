@@ -251,7 +251,7 @@ public class UserService {
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
         return ReviewCertiDto.fromEntity(
-                popup.getIntroduce(),
+                popup.getName(),
                 popup.getPosterUrl(),
                 review.getIsCertificated(),
                 user.getNickname(),
@@ -279,7 +279,7 @@ public class UserService {
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
         return ReviewUncertiDto.fromEntity(
-                popup.getIntroduce(),
+                popup.getName(),
                 popup.getPosterUrl(),
                 review.getIsCertificated(),
                 user.getNickname(),

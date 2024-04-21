@@ -133,7 +133,6 @@ public class UserController {
                                           @RequestParam("size") int size,
                                           @UserId Long userId) {
         return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
-
     }
 
 }
