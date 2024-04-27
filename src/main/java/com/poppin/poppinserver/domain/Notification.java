@@ -32,13 +32,13 @@ public class Notification {
     private User user;
 
     @Column(name = "title" , nullable = false)
-    private String title;
+    private String title; // 제목
 
     @Column(name = "content" , nullable = false)
-    private String content;
+    private String content; // 내용
 
     @Column(name = "created_at",nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // 생성일자
 
     @Column(name = "type" , nullable = false)
     private String type; // 팝업, 공지사항

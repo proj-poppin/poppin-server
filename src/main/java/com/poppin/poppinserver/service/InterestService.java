@@ -1,21 +1,19 @@
 package com.poppin.poppinserver.service;
 
-import com.poppin.poppinserver.domain.Interest;
-import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.domain.User;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.interest.requeste.AddInterestDto;
 import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.InterestRepository;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.util.NotificationUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -24,6 +22,10 @@ public class InterestService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
+    private final NotificationTokenRepository notificationTokenRepository;
+    private final NotificationTopicRepository notificationTopicRepository;
+
+    private final NotificationUtil notificationUtil;
 
     @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InterestDto userAddInterest(AddInterestDto addInterestDto, Long userId){
@@ -46,6 +48,23 @@ public class InterestService {
         interestRepository.save(interest);
 
         popup.addInterestCnt();
+
+        /*
+          Method : 관심 팝업 등록 시 주제 테이블에 데이터 삽입 , 구독 시키기
+          Author : sakang
+          Date   : 2024-04-27
+        */
+        try {
+            log.info("==== subscribe topic START ====");
+            List<NotificationToken> tokenList = notificationTokenRepository.findTokenListByUserId(user.getId());
+            if (tokenList.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+
+            notificationUtil.androidSubscribeTopic(tokenList,popup); // 구독 및 저장
+
+        }catch (CommonException | FirebaseMessagingException e){
+            log.error("==== subscribe topic FAILED ====");
+            e.printStackTrace();
+        }
 
         return InterestDto.fromEntity(interest,user,popup);
     }
