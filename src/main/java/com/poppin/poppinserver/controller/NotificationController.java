@@ -1,7 +1,9 @@
 package com.poppin.poppinserver.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
+import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
 import com.poppin.poppinserver.service.NotificationService;
 import com.poppin.poppinserver.util.NotificationUtil;
 import jakarta.validation.Valid;
@@ -29,5 +31,11 @@ public class NotificationController {
     @PostMapping("/android/topic/test")
     public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto) throws FirebaseMessagingException {
         notificationUtil.sendAndroidNotificationByTopicTest(pushDto);
+    }
+
+    /*알림 허용 시 데이터 저장*/
+    @PostMapping("/add/token")
+    public ResponseDto<?> addTokenUsers(@RequestBody TokenRequestDto tokenRequestDto){
+        return ResponseDto.ok(notificationService.addToken(tokenRequestDto));
     }
 }
