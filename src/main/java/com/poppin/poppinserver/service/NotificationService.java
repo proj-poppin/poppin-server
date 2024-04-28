@@ -10,6 +10,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.NotificationRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.repository.NotificationTopicRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import com.poppin.poppinserver.util.NotificationUtil;
 import jakarta.transaction.Transactional;
@@ -29,19 +30,17 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NotificationTokenRepository notificationTokenRepository;
+    private final NotificationTopicRepository notificationTopicRepository;
     private final NotificationUtil notificationUtil;
 
-
-    public TokenResponseDto addToken(TokenRequestDto tokenRequestDto){
-        User user = userRepository.findById(tokenRequestDto.userId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+    /* 알림 동의 */
+    public TokenResponseDto applyFCMToken(TokenRequestDto tokenRequestDto){
 
         NotificationToken notificationToken = new NotificationToken(
-                user,
                 tokenRequestDto.token(),
-                LocalDateTime.now(),
-                tokenRequestDto.device()
-                );
+                LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
+                tokenRequestDto.device() // android or ios
+        );
 
         notificationTokenRepository.save(notificationToken);
 
@@ -57,6 +56,7 @@ public class NotificationService {
 
         try {
             log.info("==== subscribe topic START ====");
+
             List<NotificationToken> tokenList = notificationTokenRepository.findTokenListByUserId(user.getId());
             if (tokenList.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
 

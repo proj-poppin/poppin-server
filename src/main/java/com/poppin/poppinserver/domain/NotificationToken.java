@@ -21,10 +21,6 @@ public class NotificationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User userId; // 작성자 id
-
     @Column(name = "token" , nullable = false , columnDefinition = "TINYTEXT")
     private String token; // 토큰, 최대 255자
 
@@ -35,13 +31,10 @@ public class NotificationToken {
     private LocalDateTime exp_dtm; // 토큰 만료일
 
     @Column(name = "device" , nullable = false)
-    private String device; // android or ios
-
+    private String device;         // android or ios
 
     @Builder
-    public NotificationToken(User user, String token, LocalDateTime mod_dtm , String device){
-
-        this.userId     = user;
+    public NotificationToken( String token, LocalDateTime mod_dtm ,String device ){
         this.token      = token;
         this.mod_dtm    = mod_dtm;
         this.exp_dtm    = mod_dtm.plusMonths(2); // 2달 뒤
