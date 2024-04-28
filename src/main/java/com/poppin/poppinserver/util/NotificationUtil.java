@@ -83,34 +83,36 @@ public class NotificationUtil {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
-        // (관심 팝업 관련) 모든 주제에 대해서 구독
+        // 관심 팝업 관련 주제에 대해서 구독
         for (ETopic topic : ETopic.values()){
+            if (topic.equals(ETopic.OPEN_POPUP) || topic.equals(ETopic.CHANGE_INFO_POPUP) || topic.equals(ETopic.MAGAM_POPUP)){ // 관심팝업 관련
+                NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now(), topic);
+                notificationTopicRepository.save(notificationTopic); // 저장
 
-            NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now(), topic);
-            notificationTopicRepository.save(notificationTopic); // 저장
-
-            String topicName = topic.getTopicName();
-            response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
+                String topicName = topic.getTopicName();
+                response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
+            }
         }
 
-        log.info(response.getSuccessCount() + " tokens were subscribed successfully");
+        log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
     }
 
     public void androidUnsubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
-        // (관심 팝업 관련) 모든 주제에 대해서 구독 해제
+        // 관심 팝업 관련 주제에 대해서 구독 해제
         for (ETopic topic : ETopic.values()){
+            if (topic.equals(ETopic.OPEN_POPUP) || topic.equals(ETopic.CHANGE_INFO_POPUP) || topic.equals(ETopic.MAGAM_POPUP)) { // 관심팝업 관련
+                NotificationTopic notificationTopic = notificationTopicRepository.findByTokenAndTopic(token.getToken(), topic);
+                notificationTopicRepository.delete(notificationTopic); // 삭제
 
-            NotificationTopic notificationTopic = notificationTopicRepository.findByTokenAndTopic(token.getToken(),topic);
-            notificationTopicRepository.delete(notificationTopic); // 삭제
-
-            String topicName = topic.getTopicName();
-            response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topicName); // 구독 해제
+                String topicName = topic.getTopicName();
+                response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topicName); // 구독 해제
+            }
         }
 
-        log.info(response.getSuccessCount() + " tokens were unsubscribed successfully");
+        log.info(response.getSuccessCount() + " token(s) were unsubscribed successfully");
     }
 
     /* 안드로이드 토픽 메시지 발송 */
