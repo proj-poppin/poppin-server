@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
@@ -297,9 +298,11 @@ public class PopupService {
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
 
-    public String reopenDemand(Long popupId, String fcmToken ){
+    public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupRepository.findById(pushRequestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
@@ -308,7 +311,7 @@ public class PopupService {
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
         log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
 
-        notificationService.fcmAddTopic(fcmToken, popup , ETopicType.RO);
+        notificationService.fcmAddTopic(pushRequestDto.token(), popup , ETopicType.RO);
 
 
         return "재오픈 수요 체크 되었습니다.";
