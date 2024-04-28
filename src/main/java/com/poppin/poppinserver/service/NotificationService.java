@@ -55,7 +55,7 @@ public class NotificationService {
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             if (tk.getDevice().equals("android")){
                 // 안드로이드
-                notificationUtil.androidSubscribeTopic(tk,popup); // 구독 및 저장
+                notificationUtil.androidSubscribeInterestedPopupTopic(tk,popup); // 구독 및 저장
             }else{
                 // 아이폰
             }
@@ -75,7 +75,7 @@ public class NotificationService {
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             if (tk.getDevice().equals("android")){
                 // 안드로이드
-                notificationUtil.androidUnsubscribeTopic(tk,popup); // 구독 및 저장
+                notificationUtil.androidUnsubscribeInterestedPopupTopic(tk,popup); // 구독 및 저장
             }else {
                 // 아이폰
             }

@@ -79,7 +79,7 @@ public class NotificationUtil {
     }
 
     /* 안드로이드 토픽 구독 */
-    public void androidSubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
+    public void androidSubscribeInterestedPopupTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
@@ -97,7 +97,7 @@ public class NotificationUtil {
         log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
     }
 
-    public void androidUnsubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
+    public void androidUnsubscribeInterestedPopupTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
