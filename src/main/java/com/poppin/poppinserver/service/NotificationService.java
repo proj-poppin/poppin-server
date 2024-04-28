@@ -9,7 +9,9 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 
+import com.poppin.poppinserver.type.ETopicType;
 import com.poppin.poppinserver.util.NotificationUtil;
+import com.poppin.poppinserver.util.SubscribeUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +28,7 @@ public class NotificationService {
     private final NotificationTokenRepository notificationTokenRepository;
 
     private final NotificationUtil notificationUtil;
-
+    private final SubscribeUtil subscribeUtil;
     /* 알림 동의 */
     public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
 
@@ -46,7 +48,7 @@ public class NotificationService {
       Author : sakang
       Date   : 2024-04-27
     */
-    public void fcmAddTopic(String token, Popup popup){
+    public void fcmAddTopic(String token, Popup popup , ETopicType type){
 
         try {
             log.info("==== subscribe topic START ====");
@@ -55,7 +57,9 @@ public class NotificationService {
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             if (tk.getDevice().equals("android")){
                 // 안드로이드
-                notificationUtil.androidSubscribeInterestedPopupTopic(tk,popup); // 구독 및 저장
+                if (type.equals(ETopicType.IP))subscribeUtil.androidSubscribeInterestedPopupTopic(tk,popup); // 구독 및 저장
+                if (type.equals(ETopicType.RO))subscribeUtil.androidSubscribeReopenPopupTopic(tk,popup); // 구독 및 저장
+
             }else{
                 // 아이폰
             }
@@ -66,7 +70,7 @@ public class NotificationService {
 
     }
 
-    public void fcmRemoveTokenFromTopic(String token, Popup popup){
+    public void fcmRemoveTokenFromTopic(String token, ETopicType type){
 
         try {
             log.info("==== unsubscribe topic START ====");
@@ -75,7 +79,7 @@ public class NotificationService {
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             if (tk.getDevice().equals("android")){
                 // 안드로이드
-                notificationUtil.androidUnsubscribeInterestedPopupTopic(tk,popup); // 구독 및 저장
+                if (type.equals(ETopicType.IP))subscribeUtil.androidUnsubscribeInterestedPopupTopic(tk); // 구독 및 저장
             }else {
                 // 아이폰
             }
@@ -86,5 +90,7 @@ public class NotificationService {
         }
 
     }
+
+
     
 }

@@ -89,8 +89,8 @@ public class PopupController {
         return ResponseDto.ok(popupService.readTasteList(userId));
     }
 
-    @GetMapping("/reopen") // 재오픈 수요
-    public ResponseDto<?> reopenDemand(@RequestParam("popupId") Long popupId){
-        return ResponseDto.ok(popupService.reopenDemand(popupId));
+    @PostMapping("/reopen") // 재오픈 수요
+    public ResponseDto<?> reopenDemand(@RequestBody Long popupId, @RequestBody String fcmToken){
+        return ResponseDto.ok(popupService.reopenDemand(popupId, fcmToken));
     }
 }

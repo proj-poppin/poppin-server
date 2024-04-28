@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.type.ETopicType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class InterestService {
 
         /*알림 구독*/
         String token = addInterestDto.fcmToken();
-        notificationService.fcmAddTopic(token, popup);
+        notificationService.fcmAddTopic(token, popup , ETopicType.IP);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
@@ -55,13 +56,10 @@ public class InterestService {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        notificationService.fcmRemoveTokenFromTopic(fcmToken,popup);
+        notificationService.fcmRemoveTokenFromTopic(fcmToken, ETopicType.IP);
 
         return true;
     }
