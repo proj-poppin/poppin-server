@@ -9,6 +9,7 @@ public record PushDto(
         @NotNull
         String title,
 
+        @NotNull
         String body,
 
         String image

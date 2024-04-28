@@ -6,11 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
 @Repository
 public interface NotificationTokenRepository extends JpaRepository<NotificationToken, Long> {
 
-    @Query("SELECT nt FROM NotificationToken nt WHERE nt.userId = :userId")
-    List<NotificationToken> findTokenListByUserId(@Param("userId") Long userId);
+    @Query("SELECT nt FROM NotificationToken nt WHERE nt.token = :token")
+    NotificationToken findByToken(@Param("token") String token);
 }

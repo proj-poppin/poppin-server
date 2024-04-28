@@ -8,9 +8,6 @@ import lombok.Builder;
 public record TokenResponseDto(
 
         @NotNull
-        Long userId,
-
-        @NotNull
         String token,
 
         @NotNull
@@ -19,7 +16,6 @@ public record TokenResponseDto(
 ) {
     public static TokenResponseDto fromEntity(TokenRequestDto tokenRequestDto){
         return TokenResponseDto.builder()
-                .userId(tokenRequestDto.userId())
                 .token(tokenRequestDto.token())
                 .device(tokenRequestDto.device())
                 .build();

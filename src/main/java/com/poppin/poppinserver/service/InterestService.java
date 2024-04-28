@@ -44,16 +44,24 @@ public class InterestService {
 
         popup.addInterestCnt();
 
-        notificationService.addTopic(user, popup); // TOPIC 등록, 구독
+        /*알림 구독*/
+        String token = addInterestDto.fcmToken();
+        notificationService.addTopic(token, popup);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
 
-    public Boolean removeInterest(Long userId, Long popupId) {
+    public Boolean removeInterest(Long userId, Long popupId, String fcmToken) {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
         interestRepository.delete(interest);
+
+        /*FCM 구독취소*/
+        notificationService.removeTokenFromTopic(fcmToken,popup);
 
         return true;
     }

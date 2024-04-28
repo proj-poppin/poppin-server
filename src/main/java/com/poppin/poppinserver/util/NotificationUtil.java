@@ -7,10 +7,8 @@ import com.poppin.poppinserver.domain.NotificationTopic;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
-import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.repository.NotificationTopicRepository;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -32,11 +30,7 @@ public class NotificationUtil {
     private static final String ANDROID_TOKEN = "[FCM Android Token]";
     private static final String ANDROID_TOPIC = "[FCM Android Topic]";
 
-    private final UserRepository userRepository;
-    private final PopupRepository popupRepository;
-    private final NotificationTokenRepository notificationTokenRepository;
     private final NotificationTopicRepository notificationTopicRepository;
-
 
     private final FirebaseMessaging firebaseMessaging;
 
@@ -84,20 +78,28 @@ public class NotificationUtil {
     }
 
     /* 안드로이드 토픽 구독 */
-    public void androidSubscribeTopic(List<NotificationToken> tokenList, Popup popup) throws FirebaseMessagingException {
-        List<String> registrationTokens = null;
+    public void androidSubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
+        List<String> registrationTokens = Collections.singletonList(token.getToken());
 
-        // 데이터베이스 저장
-        for (NotificationToken token : tokenList){
-            NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now());
-            notificationTopicRepository.save(notificationTopic);
-            registrationTokens = Collections.singletonList(token.getToken());
-        }
+        NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now());
+        notificationTopicRepository.save(notificationTopic);
 
         String topic = popup.getName();
         TopicManagementResponse response = firebaseMessaging.subscribeToTopic(registrationTokens, topic);
 
         log.info(response.getSuccessCount() + " tokens were subscribed successfully");
+    }
+
+    public void androidUnsubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
+        List<String> registrationTokens = Collections.singletonList(token.getToken());
+
+        NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now());
+        notificationTopicRepository.save(notificationTopic);
+
+        String topic = popup.getName();
+        TopicManagementResponse response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic);
+
+        log.info(response.getSuccessCount() + " tokens were unsubscribed successfully");
     }
 
     /* 안드로이드 토픽 메시지 발송 */
