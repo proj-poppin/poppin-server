@@ -1,11 +1,11 @@
-package com.poppin.poppinserver.alarm;
+package com.poppin.poppinserver.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Inform {
+public enum EInform {
 
     UPDATE("업데이트 알림", "공지사항"),
     EVENT("이벤트 공지사항", "공지사항"),

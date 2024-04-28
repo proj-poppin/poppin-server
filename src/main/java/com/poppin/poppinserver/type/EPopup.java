@@ -1,11 +1,11 @@
-package com.poppin.poppinserver.alarm;
+package com.poppin.poppinserver.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Popup {
+public enum EPopup {
 
     JAEBO("나만 알기 아까운 팝업","POPPIN에 제보해주세요"),
     MAGAM("벌써 마감이라니", "마감 D-1"),

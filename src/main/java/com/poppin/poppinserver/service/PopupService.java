@@ -302,6 +302,12 @@ public class PopupService {
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
         popupRepository.save(popup);
+
+        /* 재오픈 체크 시 재오픈 토픽에 등록 */
+        log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
+
+
+
         return "재오픈 수요 체크 되었습니다.";
     }
 }

@@ -9,6 +9,7 @@ import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
 import com.poppin.poppinserver.repository.NotificationTopicRepository;
 
+import com.poppin.poppinserver.type.ETopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -80,24 +81,34 @@ public class NotificationUtil {
     /* 안드로이드 토픽 구독 */
     public void androidSubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
+        TopicManagementResponse response = null;
 
-        NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now());
-        notificationTopicRepository.save(notificationTopic);
+        // (관심 팝업 관련) 모든 주제에 대해서 구독
+        for (ETopic topic : ETopic.values()){
 
-        String topic = popup.getName();
-        TopicManagementResponse response = firebaseMessaging.subscribeToTopic(registrationTokens, topic);
+            NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now(), topic);
+            notificationTopicRepository.save(notificationTopic); // 저장
+
+            String topicName = topic.getTopicName();
+            response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
+        }
 
         log.info(response.getSuccessCount() + " tokens were subscribed successfully");
     }
 
     public void androidUnsubscribeTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
+        TopicManagementResponse response = null;
 
-        NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now());
-        notificationTopicRepository.save(notificationTopic);
+        // (관심 팝업 관련) 모든 주제에 대해서 구독 해제
+        for (ETopic topic : ETopic.values()){
 
-        String topic = popup.getName();
-        TopicManagementResponse response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic);
+            NotificationTopic notificationTopic = notificationTopicRepository.findByTokenAndTopic(token.getToken(),topic);
+            notificationTopicRepository.delete(notificationTopic); // 삭제
+
+            String topicName = topic.getTopicName();
+            response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topicName); // 구독 해제
+        }
 
         log.info(response.getSuccessCount() + " tokens were unsubscribed successfully");
     }

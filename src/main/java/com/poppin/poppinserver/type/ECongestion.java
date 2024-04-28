@@ -1,8 +1,8 @@
-package com.poppin.poppinserver.dto.visitorData.common;
+package com.poppin.poppinserver.type;
 
 import com.poppin.poppinserver.exception.ErrorCode;
 
-public enum Congestion {
+public enum ECongestion {
 
     CROWDED("혼잡"),
     NORMAL("보통"),
@@ -10,7 +10,7 @@ public enum Congestion {
     ;
 
     private final String value;
-    Congestion(String value) {
+    ECongestion(String value) {
         this.value = value;
     }
 
@@ -18,10 +18,10 @@ public enum Congestion {
         return value;
     }
 
-    public static Congestion fromValue(String value) {
-        for (Congestion congestion : Congestion.values()) {
-            if (congestion.getValue().equalsIgnoreCase(value)) {
-                return congestion;
+    public static ECongestion fromValue(String value) {
+        for (ECongestion ECongestion : ECongestion.values()) {
+            if (ECongestion.getValue().equalsIgnoreCase(value)) {
+                return ECongestion;
             }
         }
         throw new IllegalArgumentException(String.valueOf(ErrorCode.SERVER_ERROR));

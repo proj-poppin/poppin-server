@@ -36,6 +36,6 @@ public class NotificationController {
     /*알림 허용 시 데이터 저장*/
     @PostMapping("/apply/FCMtoken")
     public ResponseDto<?> addFCMTokenUsers(@RequestBody TokenRequestDto tokenRequestDto){
-        return ResponseDto.ok(notificationService.applyFCMToken(tokenRequestDto));
+        return ResponseDto.ok(notificationService.fcmApplyToken(tokenRequestDto));
     }
 }

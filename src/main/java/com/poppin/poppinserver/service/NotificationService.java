@@ -28,7 +28,7 @@ public class NotificationService {
     private final NotificationUtil notificationUtil;
 
     /* 알림 동의 */
-    public TokenResponseDto applyFCMToken(TokenRequestDto tokenRequestDto){
+    public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
 
         NotificationToken notificationToken = new NotificationToken(
                 tokenRequestDto.token(),
@@ -46,16 +46,19 @@ public class NotificationService {
       Author : sakang
       Date   : 2024-04-27
     */
-    public void addTopic(String token, Popup popup){
+    public void fcmAddTopic(String token, Popup popup){
 
         try {
             log.info("==== subscribe topic START ====");
 
             NotificationToken tk = notificationTokenRepository.findByToken(token);
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-
-            notificationUtil.androidSubscribeTopic(tk,popup); // 구독 및 저장
-
+            if (tk.getDevice().equals("android")){
+                // 안드로이드
+                notificationUtil.androidSubscribeTopic(tk,popup); // 구독 및 저장
+            }else{
+                // 아이폰
+            }
         }catch (CommonException | FirebaseMessagingException e){
             log.error("==== subscribe topic FAILED ====");
             e.printStackTrace();
@@ -63,15 +66,19 @@ public class NotificationService {
 
     }
 
-    public  void removeTokenFromTopic(String token, Popup popup){
+    public void fcmRemoveTokenFromTopic(String token, Popup popup){
 
         try {
             log.info("==== unsubscribe topic START ====");
 
             NotificationToken tk = notificationTokenRepository.findByToken(token);
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-
-            notificationUtil.androidUnsubscribeTopic(tk,popup); // 구독 취소 및 저장
+            if (tk.getDevice().equals("android")){
+                // 안드로이드
+                notificationUtil.androidUnsubscribeTopic(tk,popup); // 구독 및 저장
+            }else {
+                // 아이폰
+            }
 
         }catch (CommonException | FirebaseMessagingException e){
             log.error("==== unsubscribe topic FAILED ====");
@@ -79,4 +86,5 @@ public class NotificationService {
         }
 
     }
+    
 }

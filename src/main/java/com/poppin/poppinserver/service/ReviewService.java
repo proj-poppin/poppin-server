@@ -1,9 +1,9 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.visitorData.common.Congestion;
-import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
-import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
+import com.poppin.poppinserver.type.ECongestion;
+import com.poppin.poppinserver.type.ESatisfaction;
+import com.poppin.poppinserver.type.EVisitDate;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -72,11 +72,11 @@ public class ReviewService {
 
 
         VisitorData visitorData = new VisitorData(
-                VisitDate.fromValue(createReviewDto.visitDate())
+                EVisitDate.fromValue(createReviewDto.visitDate())
                 , popup
                 , review
-                , Congestion.fromValue(createReviewDto.congestion())
-                , Satisfaction.fromValue(createReviewDto.satisfaction())
+                , ECongestion.fromValue(createReviewDto.congestion())
+                , ESatisfaction.fromValue(createReviewDto.satisfaction())
         );
 
         visitorDataRepository.save(visitorData);
@@ -117,11 +117,11 @@ public class ReviewService {
         review.updateReviewUrl(fileUrls.get(0));
 
         VisitorData visitorData = new VisitorData(
-                VisitDate.fromValue(createReviewDto.visitDate())
+                EVisitDate.fromValue(createReviewDto.visitDate())
                 , popup
                 , review
-                , Congestion.fromValue(createReviewDto.congestion())
-                , Satisfaction.fromValue(createReviewDto.satisfaction())
+                , ECongestion.fromValue(createReviewDto.congestion())
+                , ESatisfaction.fromValue(createReviewDto.satisfaction())
         );
 
         visitorDataRepository.save(visitorData);
