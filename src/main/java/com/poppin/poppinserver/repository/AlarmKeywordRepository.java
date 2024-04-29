@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface AlarmKeywordRepository extends JpaRepository<AlarmKeyword, Long> {
     List<AlarmKeyword> findByPopupId(Popup popupId);
+
+    void deleteAllByPopupId(Popup popupId);
 }

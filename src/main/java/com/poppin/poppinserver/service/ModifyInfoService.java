@@ -1,8 +1,6 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.modifyInfo.request.updateModifyInfoDto;
-import com.poppin.poppinserver.dto.modifyInfo.response.modifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
@@ -130,8 +128,6 @@ public class ModifyInfoService {
                     .build();
         }
         alarmKeywordRepository.saveAll(proxyKeywords);
-
-        proxyPopup = popupRepository.save(proxyPopup);
 
         // 정보수정요청 객체 저장
         ModifyInfo modifyInfo = ModifyInfo.builder()
@@ -304,42 +300,56 @@ public class ModifyInfoService {
                 createPreferedDto.wantFree());
         preferedPopupRepository.save(preferedPopup);
 
-        Popup originPopup = modifyInfo.getOriginPopup();
-
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
+        Popup originPopup = modifyInfo.getOriginPopup();
         List<PosterImage> originImages = posterImageRepository.findByPopupId(originPopup);
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
         s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(originPopup);
 
-        //새로운 이미지 추가
-        List<String> fileUrls = s3Service.copyImageListToAnotherFolder(images, popup.getId());
+        // 프록시 이미지들 복사해서 기존 이미지 폴더에 복사하고
+        Popup proxyPopup = modifyInfo.getProxyPopup();
+        List<PosterImage> proxyImages = posterImageRepository.findByPopupId(proxyPopup);
+        List<String> proxyUrls = proxyImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+        List<String> fileUrls = s3Service.copyImageListToAnotherFolder(proxyUrls, originPopup.getId());
 
+        // 프록시 이미지 싹 지우기
+        s3Service.deleteMultipleImages(proxyUrls);
+        posterImageRepository.deleteAllByPopupId(proxyPopup);
+
+
+        // 기존 이미지 db 동기화
         List<PosterImage> posterImages = new ArrayList<>();
         for(String url : fileUrls){
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
-                    .popup(popup)
+                    .popup(originPopup)
                     .build();
             posterImages.add(posterImage);
         }
         posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        originPopup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+        alarmKeywordRepository.deleteAll(originPopup.getAlarmKeywords());
 
         List<AlarmKeyword> alarmKeywords = new ArrayList<>();
         for(String keyword : updateModifyInfoDto.keywords()){
             alarmKeywords.add(AlarmKeyword.builder()
-                    .popupId(popup)
+                    .popupId(originPopup)
                     .keyword(keyword)
                     .build());
         }
         alarmKeywordRepository.saveAll(alarmKeywords);
+
+        // 프록시 키워드 삭제
+        alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
         //날짜 요청 유효성 검증
         if (updateModifyInfoDto.openDate().isAfter(updateModifyInfoDto.closeDate())) {
@@ -358,7 +368,11 @@ public class ModifyInfoService {
             operationStatus = "OPERATING";
         }
 
-        popup.update(
+        // 프록시 팝업 삭제 이거 근데 자동으로 지워지나
+        popupRepository.delete(proxyPopup);
+
+        // 기존 팝업 업데이트
+        originPopup.update(
                 updateModifyInfoDto.homepageLink(),
                 updateModifyInfoDto.name(),
                 updateModifyInfoDto.introduce(),
@@ -376,7 +390,7 @@ public class ModifyInfoService {
                 operationStatus
         );
 
-        popup = popupRepository.save(popup);
+        originPopup = popupRepository.save(originPopup);
 
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);

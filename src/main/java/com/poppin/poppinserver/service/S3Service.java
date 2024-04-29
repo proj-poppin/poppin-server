@@ -209,7 +209,7 @@ public class S3Service {
         }
     }
 
-    // s3 이미지를 리스트 단위로 다른 폴더로 복사 (기존 이미지 url과 popupId)
+    // s3 이미지를 리스트 단위로 다른 폴더로 복사 (복사할 이미지 url List, popupId)
     public List<String> copyImageListToAnotherFolder(List<String> urls, Long popupId) {
         List<String> newUrls = new ArrayList<>();
 
