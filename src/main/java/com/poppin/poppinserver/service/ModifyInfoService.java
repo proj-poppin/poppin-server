@@ -266,7 +266,7 @@ public class ModifyInfoService {
 
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
+        return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 임시 저장
 
     @Transactional
@@ -323,7 +323,6 @@ public class ModifyInfoService {
         // 프록시 이미지 싹 지우기
         s3Service.deleteMultipleImages(proxyUrls);
         posterImageRepository.deleteAllByPopupId(proxyPopup);
-
 
         // 기존 이미지 db 동기화
         List<PosterImage> posterImages = new ArrayList<>();
@@ -396,6 +395,6 @@ public class ModifyInfoService {
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ModifyInfoDto.fromEntity(modifyInfo);
+        return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
 }
