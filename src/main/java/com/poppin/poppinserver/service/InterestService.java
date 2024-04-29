@@ -1,21 +1,18 @@
 package com.poppin.poppinserver.service;
 
-import com.poppin.poppinserver.domain.Interest;
-import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.domain.User;
+import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.interest.requeste.AddInterestDto;
 import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.InterestRepository;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.type.ETopicType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -25,6 +22,7 @@ public class InterestService {
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
 
+    private final NotificationService notificationService;
     @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InterestDto userAddInterest(AddInterestDto addInterestDto, Long userId){
         //중복검사
@@ -47,14 +45,21 @@ public class InterestService {
 
         popup.addInterestCnt();
 
+        /*알림 구독*/
+        String token = addInterestDto.fcmToken();
+        notificationService.fcmAddTopic(token, popup , ETopicType.IP);
+
         return InterestDto.fromEntity(interest,user,popup);
     }
 
-    public Boolean removeInterest(Long userId, Long popupId) {
+    public Boolean removeInterest(Long userId, Long popupId, String fcmToken) {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
         interestRepository.delete(interest);
+
+        /*FCM 구독취소*/
+        notificationService.fcmRemoveTokenFromTopic(fcmToken, ETopicType.IP);
 
         return true;
     }

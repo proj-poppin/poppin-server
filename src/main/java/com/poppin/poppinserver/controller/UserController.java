@@ -2,14 +2,20 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.service.PopupService;
+import com.poppin.poppinserver.service.ReviewService;
 import com.poppin.poppinserver.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final ReviewService reviewService;
+    private final PopupService popupService;
 
     @PostMapping("/popup-taste")
     public ResponseDto<?> createUserTaste(
@@ -75,27 +83,56 @@ public class UserController {
     }
 
     /*작성완료 후기 조회*/
-    @GetMapping("/review/read")
+    @GetMapping("/review/r")
     public ResponseDto<?> getFinishReviewList(@UserId Long userId ){
         return ResponseDto.ok(userService.getFinishReviewList(userId));
     }
 
     /*작성완료 인증후기 보기*/
-    @PostMapping("/review/certi")
+    @PostMapping("/review/r/certi")
     public ResponseDto<?> getCertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getCertifiedReview(userId, reviewId, popupId));
     }
 
     /*작성완료 미인증후기 보기*/
-    @PostMapping("/review/uncerti")
+    @PostMapping("/review/r/uncerti")
     public ResponseDto<?> getUncertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getUncertifiedReview(userId, reviewId, popupId));
     }
 
     /*마이페이지 - 방문한 팝업 조회*/
-    @GetMapping("popup/certi")
+    @GetMapping("popup/v/certi")
     public ResponseDto<?> getCertifiedPopupList(@UserId Long userId){
         return ResponseDto.ok(userService.getCertifiedPopupList(userId));
+    }
+
+    /*마이페이지 - 방문한 팝업 후기 작성*/
+    @PostMapping(value = "review/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> createMPCertiReview(
+              @UserId Long userId,
+              @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
+              @RequestPart(value = "images") List<MultipartFile> images)
+    {
+        return ResponseDto.ok(reviewService.createCertifiedReview(userId, createReviewDto, images));
+    }
+
+    /*마이페이지 - 방문한 팝업 일반 후기 작성*/
+    @PostMapping(value = "review/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> createMPUncertiReview(
+            @UserId Long userId,
+            @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
+            @RequestPart(value = "images") List<MultipartFile> images)
+    {
+        return ResponseDto.ok(reviewService.createUncertifiedReview(userId, createReviewDto, images));
+    }
+
+    /*마이페이지 - 일반후기 팝업 검색*/
+    @GetMapping("/popup/search")
+    public ResponseDto<?> searchPopupName(@RequestParam("text") String text,
+                                          @RequestParam("page") int page,
+                                          @RequestParam("size") int size,
+                                          @UserId Long userId) {
+        return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
     }
 
 }

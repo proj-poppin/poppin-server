@@ -19,7 +19,7 @@ public class VisitController {
     @GetMapping ("/show-visitors")
     public ResponseDto<?> getRealTimeVisitorsCnt(@RequestParam("popupId") Long popupId){ return ResponseDto.ok(visitService.showRealTimeVisitors(popupId));}
 
-    @PostMapping("/add-visitors")
+    @PostMapping("/add-visitors") /*방문하기*/
     public  ResponseDto<?> addRealTimeVisitors(@UserId Long userId, PopupInfoDto popupInfoDto){return ResponseDto.ok(visitService.addRealTimeVisitors(userId,popupInfoDto));}
 
 }

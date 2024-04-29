@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.constant;
 
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -31,7 +30,11 @@ public class Constant {
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
             "/api/v1/auth/email/verification",
-            "/api/v1/auth/email/verification/password"
+            "/api/v1/auth/email/verification/password",
+            "/api/v1/noti/android/token/test",
+            "/api/v1/noti/android/topic/test",
+            "/api/v1/noti/android/topic/test",
+            "/api/v1/noti/apply/FCMtoken"
 
 //            "/api/v1/popup/test"
     );

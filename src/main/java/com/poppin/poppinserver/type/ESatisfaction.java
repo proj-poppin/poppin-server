@@ -1,8 +1,8 @@
-package com.poppin.poppinserver.dto.visitorData.common;
+package com.poppin.poppinserver.type;
 
 import com.poppin.poppinserver.exception.ErrorCode;
 
-public enum Satisfaction {
+public enum ESatisfaction {
 
     SATISFIED("만족"),
     NORMAL("보통"),
@@ -10,7 +10,7 @@ public enum Satisfaction {
     ;
 
     private final String value;
-    Satisfaction(String value) {
+    ESatisfaction(String value) {
         this.value = value;
     }
 
@@ -18,10 +18,10 @@ public enum Satisfaction {
         return value;
     }
 
-    public static Satisfaction fromValue(String value) {
-        for (Satisfaction satisfaction : Satisfaction.values()) {
-            if (satisfaction.getValue().equalsIgnoreCase(value)) {
-                return satisfaction;
+    public static ESatisfaction fromValue(String value) {
+        for (ESatisfaction ESatisfaction : ESatisfaction.values()) {
+            if (ESatisfaction.getValue().equalsIgnoreCase(value)) {
+                return ESatisfaction;
             }
         }
         throw new IllegalArgumentException(String.valueOf(ErrorCode.SERVER_ERROR));

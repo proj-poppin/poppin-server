@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
@@ -11,6 +12,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
+import com.poppin.poppinserver.type.ETopicType;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class PopupService {
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
+    private final NotificationService notificationService;
 
     private final SelectRandomUtil selectRandomUtil;
 
@@ -295,13 +298,22 @@ public class PopupService {
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
 
-    public String reopenDemand(Long popupId){
+    public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupRepository.findById(pushRequestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
         popupRepository.save(popup);
+
+        /* 재오픈 체크 시 재오픈 토픽에 등록 */
+        log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
+
+        notificationService.fcmAddTopic(pushRequestDto.token(), popup , ETopicType.RO);
+
+
         return "재오픈 수요 체크 되었습니다.";
     }
 }

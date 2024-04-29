@@ -1,8 +1,8 @@
 package com.poppin.poppinserver.domain;
 
-import com.poppin.poppinserver.dto.visitorData.common.Congestion;
-import com.poppin.poppinserver.dto.visitorData.common.Satisfaction;
-import com.poppin.poppinserver.dto.visitorData.common.VisitDate;
+import com.poppin.poppinserver.type.ECongestion;
+import com.poppin.poppinserver.type.ESatisfaction;
+import com.poppin.poppinserver.type.EVisitDate;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -40,7 +40,7 @@ public class VisitorData {
     private String satisfaction; // 만족, 보통, 불만족
 
     @Builder
-    public VisitorData(Enum<VisitDate> visitDate, Popup popup, Review review, Enum<Congestion> congestion, Enum<Satisfaction> satisfaction) {
+    public VisitorData(Enum<EVisitDate> visitDate, Popup popup, Review review, Enum<ECongestion> congestion, Enum<ESatisfaction> satisfaction) {
         this.visitDate = visitDate.toString();
         this.popup = popup;
         this.review = review;

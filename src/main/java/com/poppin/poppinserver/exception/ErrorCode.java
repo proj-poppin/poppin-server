@@ -61,6 +61,8 @@ public enum ErrorCode {
     NOT_FOUND_MANAGE_INFORM("40411" , HttpStatus.NOT_FOUND, "해당 사용자 제보는 존재하지 않습니다."),
     NOT_FOUND_MODIFY_INFO("40412" , HttpStatus.NOT_FOUND, "해당 정보수정요청 정보는 존재하지 않습니다."),
     NOT_FOUND_VISIT("40413", HttpStatus.NOT_FOUND , "방문한 내역이 없습니다"),
+    NOT_FOUND_TOKEN("40414" , HttpStatus.NOT_FOUND , "알림 토큰이 저장된 내역이 없습니다"),
+    NOT_FOUND_TOPIC("40415" , HttpStatus.NOT_FOUND , "알림 토픽이 저장된 내역이 없습니다"),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),

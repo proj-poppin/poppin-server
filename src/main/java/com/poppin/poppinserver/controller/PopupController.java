@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -89,8 +90,8 @@ public class PopupController {
         return ResponseDto.ok(popupService.readTasteList(userId));
     }
 
-    @GetMapping("/reopen") // 재오픈 수요
-    public ResponseDto<?> reopenDemand(@RequestParam("popupId") Long popupId){
-        return ResponseDto.ok(popupService.reopenDemand(popupId));
+    @PostMapping("/reopen") // 재오픈 수요
+    public ResponseDto<?> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto){
+        return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
     }
 }
