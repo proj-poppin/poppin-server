@@ -4,6 +4,8 @@ import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
+import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
+import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.ModifyInfoService;
@@ -44,4 +46,15 @@ public class ModifyInfoController {
     public ResponseDto<?> readModifyInfoList(){
         return ResponseDto.ok(modifyInfoService.readModifyInfoList());
     } // 목록 조회
+
+    @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> saveModifyInfo(@RequestPart(value = "images") List<MultipartFile> images,
+                                         @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(modifyInfoService.updateModifyInfo(updateModifyInfoDto, images));
+    } // 제보 임시 저장
 }

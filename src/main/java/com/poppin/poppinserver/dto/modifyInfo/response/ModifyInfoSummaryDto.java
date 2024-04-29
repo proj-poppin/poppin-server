@@ -25,7 +25,7 @@ public record ModifyInfoSummaryDto(
             ModifyInfoSummaryDto modifyInfoSummaryDto =
                     ModifyInfoSummaryDto.builder()
                             .id(modifyInfo.getId())
-                            .popupName(modifyInfo.getPopupId().getName())
+                            .popupName(modifyInfo.getProxyPopup().getName())
                             .informerName(modifyInfo.getUserId().getNickname())
                             .informedAt(modifyInfo.getCreatedAt().toString())
                             .isExecuted(modifyInfo.getIsExecuted())

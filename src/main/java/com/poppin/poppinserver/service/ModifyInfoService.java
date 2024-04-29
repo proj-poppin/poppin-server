@@ -134,6 +134,7 @@ public class ModifyInfoService {
                 .content(createModifyInfoDto.content())
                 .userId(user)
                 .proxyPopup(proxyPopup)
+                .originPopup(popup)
                 .build();
         modifyInformRepository.save(modifyInfo);
 
@@ -150,7 +151,7 @@ public class ModifyInfoService {
         }
         modifyImageReposiroty.saveAll(modifyImagesList);
 
-        return ModifyInfoDto.fromEntity(modifyInfo);
+        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 요청 생성
 
     @Transactional
@@ -165,7 +166,7 @@ public class ModifyInfoService {
             imageList.add(modifyImages.getImageUrl());
         }
 
-        return ModifyInfoDto.fromEntity(modifyInfo);
+        return ModifyInfoDto.fromEntity(modifyInfo, imageList);
     } // 조회
 
     @Transactional
@@ -265,7 +266,7 @@ public class ModifyInfoService {
 
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ModifyInfoDto.fromEntity(modifyInfo);
+        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 임시 저장
 
     @Transactional

@@ -43,9 +43,10 @@ public class ModifyInfo {
     private Boolean isExecuted; // 처리 여부
 
     @Builder
-    public ModifyInfo(User userId, Popup proxyPopup, String content) {
+    public ModifyInfo(User userId, Popup proxyPopup, Popup originPopup, String content) {
         this.userId = userId;
         this.proxyPopup = proxyPopup;
+        this.originPopup = originPopup;
         this.createdAt = LocalDateTime.now();
         this.content = content;
         this.isExecuted = false;
