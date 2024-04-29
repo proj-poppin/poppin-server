@@ -34,12 +34,12 @@ public class UserInformController {
         }
 
         return ResponseDto.ok(userInformService.createUserInform(createUserInformDto, images, userId));
-    }
+    } // 제보 생성
 
     @GetMapping("")
-    public ResponseDto<?> readUserInform(@RequestParam("userInformId") Long userInformId) {
+    public ResponseDto<?> readUserInform(@RequestParam("informId") Long userInformId) {
         return ResponseDto.ok(userInformService.readUserInform(userInformId));
-    }
+    } // 제보 조회
 
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveUserInform(@RequestPart(value = "images") List<MultipartFile> images,
@@ -51,7 +51,7 @@ public class UserInformController {
         }
 
         return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images, adminId));
-    }
+    } // 제보 임시 저장
 
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadUserInform(@RequestPart(value = "images") List<MultipartFile> images,
@@ -63,10 +63,10 @@ public class UserInformController {
         }
 
         return ResponseDto.ok(userInformService.uploadPopup(updateUserInfromDto, images, adminId));
-    }
+    } // 제보 업로드 승인
 
     @GetMapping("/list")
     public ResponseDto<?> readUserInformList(){
         return ResponseDto.ok(userInformService.reatUserInformList());
-    }
+    } // 제보 목록 조회
 }

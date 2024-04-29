@@ -21,7 +21,7 @@ public class ManagerInform {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "informer_id")
     private User informerId; // 제보자 id
 
@@ -34,7 +34,7 @@ public class ManagerInform {
     @Column(name = "informer_email")
     private String informerEmail; // 담당자 이메일
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id")
     private Popup popupId; // 팝업 정보
 
