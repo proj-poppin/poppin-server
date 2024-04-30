@@ -47,7 +47,7 @@ public class InterestService {
 
         /*알림 구독*/
         String token = addInterestDto.fcmToken();
-        notificationService.fcmAddTopic(token, popup , ETopicType.IP);
+        notificationService.fcmAddTopic(token, ETopicType.IP);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
