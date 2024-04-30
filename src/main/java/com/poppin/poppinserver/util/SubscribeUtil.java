@@ -5,7 +5,6 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.TopicManagementResponse;
 import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.NotificationTopic;
-import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.repository.NotificationTopicRepository;
 import com.poppin.poppinserver.type.ETopic;
 import com.poppin.poppinserver.type.ETopicType;

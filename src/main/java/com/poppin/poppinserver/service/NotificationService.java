@@ -3,7 +3,6 @@ package com.poppin.poppinserver.service;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.NotificationTopic;
-import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
 import com.poppin.poppinserver.dto.notification.response.TokenResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -31,7 +30,6 @@ public class NotificationService {
     private final NotificationTokenRepository notificationTokenRepository;
     private final NotificationTopicRepository notificationTopicRepository;
 
-    private final NotificationUtil notificationUtil;
     private final SubscribeUtil subscribeUtil;
     /* 알림 동의 */
     public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
