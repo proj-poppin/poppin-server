@@ -38,7 +38,7 @@ public class NotificationService {
                 tokenRequestDto.device() // android or ios
         );
 
-        notificationTokenRepository.save(notificationToken);
+        notificationTokenRepository.save(notificationToken); // 토큰 저장
 
         return TokenResponseDto.fromEntity(tokenRequestDto);
     }

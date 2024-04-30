@@ -31,7 +31,7 @@ public class SubscribeUtil {
 
         // 관심 팝업 관련 주제에 대해서 구독
         for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.OPEN_POPUP) || topic.equals(ETopic.CHANGE_INFO_POPUP) || topic.equals(ETopic.MAGAM_POPUP)){ // 관심팝업 관련
+            if (topic.equals(ETopic.OPEN) || topic.equals(ETopic.CHANGE_INFO) || topic.equals(ETopic.MAGAM)){ // 관심팝업 관련
                 NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now(), topic);
                 notificationTopicRepository.save(notificationTopic); // 저장
 
@@ -49,7 +49,7 @@ public class SubscribeUtil {
 
         // 관심 팝업 관련 주제에 대해서 구독 해제
         for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.OPEN_POPUP) || topic.equals(ETopic.CHANGE_INFO_POPUP) || topic.equals(ETopic.MAGAM_POPUP)) { // 관심팝업 관련
+            if (topic.equals(ETopic.OPEN) || topic.equals(ETopic.CHANGE_INFO) || topic.equals(ETopic.MAGAM)) { // 관심팝업 관련
                 NotificationTopic notificationTopic = notificationTopicRepository.findByTokenAndTopic(token.getToken(), topic);
                 notificationTopicRepository.delete(notificationTopic); // 삭제
 
@@ -67,7 +67,7 @@ public class SubscribeUtil {
 
         // 재오픈 수요체크 주제에 대해서 구독
         for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.REOPEN_POPUP)){ // 재오프 수요체크
+            if (topic.equals(ETopic.REOPEN)){ // 재오픈 수요체크
                 NotificationTopic notificationTopic = new NotificationTopic(popup, token, LocalDateTime.now(), topic);
                 notificationTopicRepository.save(notificationTopic); // 저장
 
