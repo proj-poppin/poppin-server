@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.domain;
 
+import com.poppin.poppinserver.type.EInformProgress;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,9 +25,13 @@ public class ModifyInfo {
     @JoinColumn(name = "user_id", nullable = false)
     private User userId; // 작성자 id
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup_id", nullable = false)
-    private Popup popupId; // 팝업 id
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "origin_popup", nullable = false)
+    private Popup originPopup; // 기존 팝업 id
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proxy_popup", nullable = false)
+    private Popup proxyPopup; // 임시 팝업 id
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt; // 작성 일자
@@ -38,11 +43,16 @@ public class ModifyInfo {
     private Boolean isExecuted; // 처리 여부
 
     @Builder
-    public ModifyInfo(User userId, Popup popupId, String content) {
+    public ModifyInfo(User userId, Popup proxyPopup, Popup originPopup, String content) {
         this.userId = userId;
-        this.popupId = popupId;
+        this.proxyPopup = proxyPopup;
+        this.originPopup = originPopup;
         this.createdAt = LocalDateTime.now();
         this.content = content;
         this.isExecuted = false;
+    }
+
+    public void update(Boolean isExecuted) {
+        this.isExecuted = isExecuted;
     }
 }

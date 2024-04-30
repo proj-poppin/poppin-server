@@ -7,7 +7,6 @@ import com.poppin.poppinserver.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -169,6 +169,16 @@ public class ManagerInformService {
         Popup popup = managerInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
@@ -258,6 +268,16 @@ public class ManagerInformService {
         Popup popup = managerInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
@@ -326,6 +346,7 @@ public class ManagerInformService {
         return ManagerInformDto.fromEntity(managerInform);
     }
 
+    @Transactional
     public List<ManagerInformSummaryDto> reatManagerInformList(){
         List<ManagerInform> managerInforms = managerInformRepository.findAll();
 

@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -153,10 +154,20 @@ public class UserInformService {
         Popup popup = userInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
+        List<String> newUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for(String url : newUrls){
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -164,7 +175,7 @@ public class UserInformService {
             posterImages.add(posterImage);
         }
         posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        popup.updatePosterUrl(newUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
@@ -242,6 +253,16 @@ public class UserInformService {
         Popup popup = userInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
@@ -310,6 +331,7 @@ public class UserInformService {
         return UserInformDto.fromEntity(userInform);
     }
 
+    @Transactional
     public List<UserInformSummaryDto> reatUserInformList(){
         List<UserInform> userInforms = userInformRepository.findAll();
 

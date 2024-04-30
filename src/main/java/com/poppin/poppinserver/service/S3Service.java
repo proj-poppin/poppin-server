@@ -2,9 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.util.ImageUtil;
@@ -182,6 +180,70 @@ public class S3Service {
         return imgUrlList;
     }
 
+    // s3 이미지 다른 폴더로 복사 (기존 이미지 url과 popupId)
+    public String copyImageToAnotherFolder(String url, Long popupId) {
+        // URL에서 버킷 이름과 키 추출
+        String sourceBucket = url.split("://")[1].split("\\.")[0];
+        String sourceKey = url.split("://")[1].split("/", 2)[1];
+
+        // 대상 버킷과 대상 키 설정 (여기에서는 동일 버킷 내 다른 폴더로 복사)
+        String destinationBucket = sourceBucket; // 같은 버킷 내에서 복사
+        String destinationKey = popupId + "/" + sourceKey.substring(sourceKey.lastIndexOf("/") + 1); // 새로운 폴더에 저장
+
+        try {
+            // 복사 요청 생성 및 실행
+            CopyObjectRequest copyObjectRequest = new CopyObjectRequest()
+                    .withSourceBucketName(sourceBucket)
+                    .withSourceKey(sourceKey)
+                    .withDestinationBucketName(destinationBucket)
+                    .withDestinationKey(destinationKey);
+
+            CopyObjectResult copyObjectResponse = s3Client.copyObject(copyObjectRequest);
+            log.info("Copied image to new folder: {}", destinationKey);
+
+            // 복사된 이미지의 URL 반환
+            return s3Client.getResourceUrl(destinationBucket, destinationKey);
+        } catch (Exception e) {
+            log.error("Failed to copy image: {}", e.getMessage());
+            throw new RuntimeException("Failed to copy image", e);
+        }
+    }
+
+    // s3 이미지를 리스트 단위로 다른 폴더로 복사 (복사할 이미지 url List, popupId)
+    public List<String> copyImageListToAnotherFolder(List<String> urls, Long popupId) {
+        List<String> newUrls = new ArrayList<>();
+
+        for (String url : urls) {
+            // URL에서 버킷 이름과 키 추출
+            String sourceBucket = url.split("://")[1].split("\\.")[0];
+            String sourceKey = url.split("://")[1].split("/", 2)[1];
+
+            // 대상 버킷과 대상 키 설정 (동일 버킷 내 다른 폴더로 복사)
+            String destinationBucket = sourceBucket; // 같은 버킷 내에서 복사
+            String destinationKey = popupId + "/" + sourceKey.substring(sourceKey.lastIndexOf("/") + 1); // 새로운 폴더에 저장
+
+            try {
+                // 복사 요청 생성 및 실행
+                CopyObjectRequest copyObjectRequest = new CopyObjectRequest()
+                        .withSourceBucketName(sourceBucket)
+                        .withSourceKey(sourceKey)
+                        .withDestinationBucketName(destinationBucket)
+                        .withDestinationKey(destinationKey);
+
+                CopyObjectResult copyObjectResponse = s3Client.copyObject(copyObjectRequest);
+                log.info("Copied image to new folder: {}", destinationKey);
+
+                // 복사된 이미지의 URL 반환
+                String newUrl = s3Client.getResourceUrl(destinationBucket, destinationKey);
+                newUrls.add(newUrl);
+            } catch (Exception e) {
+                log.error("Failed to copy image: {}", e.getMessage());
+                throw new RuntimeException("Failed to copy image", e);
+            }
+        }
+
+        return newUrls;
+    }
 
     // s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
     public void deleteImage(String url) {
@@ -194,6 +256,29 @@ public class S3Service {
             log.info("Deleted image {} from bucket {}", filename, bucketName);
         } catch (AmazonServiceException e) {
             log.error("S3 Error deleting : {}", e.getMessage());
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+    }
+
+    // (여러장)s3 사진 삭제 url만 주면 버킷 인식해서 알아서 지울 수 있다
+    public void deleteMultipleImages(List<String> urls) {
+        try {
+            // 버킷 이름 추출 (모든 URL이 동일한 버킷에 있다고 가정)
+            String bucketName = urls.get(0).split("://")[1].split("\\.")[0];
+
+            // 삭제할 객체 목록 생성
+            DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(bucketName)
+                    .withKeys(urls.stream()
+                            .map(url -> url.split("://")[1].split("/", 2)[1])
+                            .toArray(String[]::new))
+                    .withQuiet(false);
+
+            // 객체 삭제 실행
+            DeleteObjectsResult delObjRes = s3Client.deleteObjects(multiObjectDeleteRequest);
+            log.info("Deleted images: {}", delObjRes.getDeletedObjects());
+
+        } catch (AmazonServiceException e) {
+            log.error("S3 Error during multi deletion: {}", e.getMessage());
             throw new CommonException(ErrorCode.SERVER_ERROR);
         }
     }
