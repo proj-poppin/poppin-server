@@ -25,8 +25,8 @@ public class ModifyInfo {
     @JoinColumn(name = "user_id", nullable = false)
     private User userId; // 작성자 id
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "origin_popup", nullable = false, unique = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "origin_popup", nullable = false)
     private Popup originPopup; // 기존 팝업 id
 
     @OneToOne(fetch = FetchType.LAZY)
