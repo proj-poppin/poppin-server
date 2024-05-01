@@ -57,4 +57,15 @@ public class ModifyInfoController {
 
         return ResponseDto.ok(modifyInfoService.updateModifyInfo(updateModifyInfoDto, images));
     } // 제보 임시 저장
+
+    @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> modifyConfirm(@RequestPart(value = "images") List<MultipartFile> images,
+                                           @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(modifyInfoService.uploadModifyInfo(updateModifyInfoDto, images));
+    } // 최종 수정 승인
 }
