@@ -213,6 +213,8 @@ public class S3Service {
     public List<String> copyImageListToAnotherFolder(List<String> urls, Long popupId) {
         List<String> newUrls = new ArrayList<>();
 
+        log.info(urls.toString());
+
         for (String url : urls) {
             // URL에서 버킷 이름과 키 추출
             String sourceBucket = url.split("://")[1].split("\\.")[0];
@@ -230,6 +232,8 @@ public class S3Service {
                         .withDestinationBucketName(destinationBucket)
                         .withDestinationKey(destinationKey);
 
+                log.info("sourceKey : {}", sourceKey);
+                log.info("destKdy : {}", destinationKey);
                 CopyObjectResult copyObjectResponse = s3Client.copyObject(copyObjectRequest);
                 log.info("Copied image to new folder: {}", destinationKey);
 
