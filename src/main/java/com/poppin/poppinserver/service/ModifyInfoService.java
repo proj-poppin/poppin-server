@@ -369,9 +369,6 @@ public class ModifyInfoService {
             operationStatus = "OPERATING";
         }
 
-        // 프록시 팝업 삭제 이거 근데 자동으로 지워지나
-        popupRepository.delete(proxyPopup);
-
         // 기존 팝업 업데이트
         originPopup.update(
                 updateModifyInfoDto.homepageLink(),
@@ -391,11 +388,11 @@ public class ModifyInfoService {
                 operationStatus
         );
 
-        originPopup = popupRepository.save(originPopup);
-
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, null);
+        popupRepository.delete(proxyPopup);
+
+        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 업로드
 }

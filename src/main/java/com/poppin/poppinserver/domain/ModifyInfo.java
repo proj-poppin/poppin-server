@@ -26,7 +26,7 @@ public class ModifyInfo {
     private User userId; // 작성자 id
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "origin_popup", nullable = false)
+    @JoinColumn(name = "origin_popup", nullable = false, unique = false)
     private Popup originPopup; // 기존 팝업 id
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -54,5 +54,6 @@ public class ModifyInfo {
 
     public void update(Boolean isExecuted) {
         this.isExecuted = isExecuted;
+        this.proxyPopup = this.originPopup;
     }
 }
