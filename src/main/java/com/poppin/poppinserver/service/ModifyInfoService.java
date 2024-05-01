@@ -217,6 +217,7 @@ public class ModifyInfoService {
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
         s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
 
         //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
@@ -312,19 +313,18 @@ public class ModifyInfoService {
         s3Service.deleteMultipleImages(originUrls);
         posterImageRepository.deleteAllByPopupId(originPopup);
 
-        // 프록시 이미지들 복사해서 기존 이미지 폴더에 복사하고
+        // 프록시 이미지 싹 지우기
         Popup proxyPopup = modifyInfo.getProxyPopup();
         List<PosterImage> proxyImages = posterImageRepository.findByPopupId(proxyPopup);
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        List<String> fileUrls = s3Service.copyImageListToAnotherFolder(proxyUrls, originPopup.getId());
-
-        // 프록시 이미지 싹 지우기
         s3Service.deleteMultipleImages(proxyUrls);
         posterImageRepository.deleteAllByPopupId(proxyPopup);
 
-        // 기존 이미지 db 동기화
+        //새로운 이미지 추가
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, originPopup.getId());
+
         List<PosterImage> posterImages = new ArrayList<>();
         for(String url : fileUrls){
             PosterImage posterImage = PosterImage.builder()
@@ -368,9 +368,6 @@ public class ModifyInfoService {
             operationStatus = "OPERATING";
         }
 
-        // 프록시 팝업 삭제 이거 근데 자동으로 지워지나
-        popupRepository.delete(proxyPopup);
-
         // 기존 팝업 업데이트
         originPopup.update(
                 updateModifyInfoDto.homepageLink(),
@@ -390,10 +387,10 @@ public class ModifyInfoService {
                 operationStatus
         );
 
-        originPopup = popupRepository.save(originPopup);
-
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
+
+        popupRepository.delete(proxyPopup);
 
         return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
