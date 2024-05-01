@@ -392,6 +392,6 @@ public class ModifyInfoService {
 
         popupRepository.delete(proxyPopup);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
+        return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
 }
