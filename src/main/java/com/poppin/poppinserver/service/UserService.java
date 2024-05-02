@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewFinishDto;
 import com.poppin.poppinserver.dto.review.response.ReviewUncertiDto;
@@ -20,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -37,6 +37,7 @@ public class UserService {
     private final VisitorDataRepository visitorDataRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
+    private final FreqQuestionRepository freqQuestionRepository;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -306,5 +307,19 @@ public class UserService {
             popupCertiDtoList.add(popupCertiDto);
         }
         return popupCertiDtoList;
+    }
+
+    public List<FaqResponseDto> readFAQs() {
+        List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
+        List<FaqResponseDto> faqDtoList = new ArrayList<>();
+        for (FreqQuestion freqQuestion : freqQuestionList) {
+            faqDtoList.add(FaqResponseDto.builder()
+                    .id(freqQuestion.getId())
+                    .question(freqQuestion.getQuestion())
+                    .answer(freqQuestion.getAnswer())
+                    .createdAt(freqQuestion.getCreatedAt().toString())
+                    .build());
+        }
+        return faqDtoList;
     }
 }
