@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public enum ETopic {
+public enum EPopupTopic {
 
     /* Popup */
     MAGAM("MAGAM_POPUP"),                 // 관심 팝업 마감 임박
@@ -26,12 +26,7 @@ public enum ETopic {
     KEYWORD("KEYWORD_POPUP"),             // 키워드알림 팝업 오픈
     OPEN("OPEN_POPUP"),                   // 관심 팝업 오픈
     JAEBO("JAEBO_POPUP"),                 // 제보하기
-    BANGMUN("BANGMUN_POPUP"),             // 방문하기
-
-
-    NOTI("NOTIFICATION"),                       // 공지사항
-    ERROR("ERROR"),                             // 에러사항
-    EVT("EVENT");                               // 이벤트
+    BANGMUN("BANGMUN_POPUP");             // 방문하기
 
     private final String topicName;
 }

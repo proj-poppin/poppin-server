@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.domain;
 
-import com.poppin.poppinserver.type.ETopic;
+import com.poppin.poppinserver.type.EInformationTopic;
 import com.poppin.poppinserver.type.ETopicType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "notification_topic")
-public class NotificationTopic {
+@Table(name = "information_topic")
+public class InformationTopic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,13 @@ public class NotificationTopic {
     @JoinColumn(name = "token_id", nullable = false)
     private NotificationToken tokenId; // 토큰 id
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "popup_id", nullable = false)
+    private Popup popup; // 토큰 id
+
     @Enumerated(EnumType.STRING)
     @Column(name = "topic" , nullable = false)
-    private ETopic topic; // 주제
+    private EInformationTopic topic; // 주제
 
     @Enumerated(EnumType.STRING)
     @Column(name = "topic_type" , nullable = false)
@@ -42,13 +46,12 @@ public class NotificationTopic {
 
 
     @Builder
-    public NotificationTopic( NotificationToken token, ETopicType type, LocalDateTime mod_dtm, ETopic topic){
-
-        this.tokenId        = token;
-        this.topic          = topic;
-        this.type           = type;
-        this.createdAt      = LocalDateTime.now();
-        this.mod_dtm        = mod_dtm;
-
+    public InformationTopic(NotificationToken token, ETopicType type, LocalDateTime mod_dtm, EInformationTopic topic) {
+        this.tokenId = token;
+        this.topic = topic;
+        this.type = type;
+        this.createdAt = LocalDateTime.now();
+        this.mod_dtm = mod_dtm;
     }
+
 }
