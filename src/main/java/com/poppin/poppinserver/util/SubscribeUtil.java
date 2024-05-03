@@ -3,10 +3,14 @@ package com.poppin.poppinserver.util;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.TopicManagementResponse;
+import com.poppin.poppinserver.domain.InformationTopic;
 import com.poppin.poppinserver.domain.NotificationToken;
-import com.poppin.poppinserver.domain.NotificationTopic;
-import com.poppin.poppinserver.repository.NotificationTopicRepository;
-import com.poppin.poppinserver.type.ETopic;
+import com.poppin.poppinserver.domain.PopupTopic;
+import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.repository.InformationTopicRepository;
+import com.poppin.poppinserver.repository.PopupTopicRepository;
+import com.poppin.poppinserver.type.EInformationTopic;
+import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.type.ETopicType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,20 +24,21 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class SubscribeUtil {
-    private final NotificationTopicRepository notificationTopicRepository;
+    private final PopupTopicRepository popupTopicRepository;
+    private final InformationTopicRepository informationTopicRepository;
 
     private final FirebaseMessaging firebaseMessaging;
 
     /* 안드로이드 토픽 구독 */
-    public void androidSubscribeInterestedPopupTopic(NotificationToken token) throws FirebaseMessagingException {
+    public void androidSubscribeInterestedPopupTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
         // 관심 팝업 관련 주제에 대해서 구독
-        for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.OPEN) || topic.equals(ETopic.CHANGE_INFO) || topic.equals(ETopic.MAGAM)){ // 관심팝업 관련
-                NotificationTopic notificationTopic = new NotificationTopic(token, ETopicType.IP, LocalDateTime.now(), topic);
-                notificationTopicRepository.save(notificationTopic); // 저장
+        for (EPopupTopic topic : EPopupTopic.values()){
+            if (topic.equals(EPopupTopic.OPEN) || topic.equals(EPopupTopic.CHANGE_INFO) || topic.equals(EPopupTopic.MAGAM)){ // 관심팝업 관련
+                PopupTopic popupTopic = new PopupTopic(token, popup, ETopicType.IP, LocalDateTime.now(), topic);
+                popupTopicRepository.save(popupTopic); // 저장
 
                 String topicName = topic.getTopicName();
                 response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
@@ -48,10 +53,10 @@ public class SubscribeUtil {
         TopicManagementResponse response = null;
 
         // 관심 팝업 관련 주제에 대해서 구독 해제
-        for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.OPEN) || topic.equals(ETopic.CHANGE_INFO) || topic.equals(ETopic.MAGAM)) { // 관심팝업 관련
-                NotificationTopic notificationTopic = notificationTopicRepository.findByTokenAndTopic(token.getToken(), topic);
-                notificationTopicRepository.delete(notificationTopic); // 삭제
+        for (EPopupTopic topic : EPopupTopic.values()){
+            if (topic.equals(EPopupTopic.OPEN) || topic.equals(EPopupTopic.CHANGE_INFO) || topic.equals(EPopupTopic.MAGAM)) { // 관심팝업 관련
+                PopupTopic popupTopic = popupTopicRepository.findByTokenAndTopic(token.getToken(), topic);
+                popupTopicRepository.delete(popupTopic); // 삭제
 
                 String topicName = topic.getTopicName();
                 response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topicName); // 구독 해제
@@ -61,15 +66,15 @@ public class SubscribeUtil {
         log.info(response.getSuccessCount() + " token(s) were unsubscribed successfully");
     }
 
-    public void androidSubscribeReopenPopupTopic(NotificationToken token) throws FirebaseMessagingException {
+    public void androidSubscribeReopenPopupTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
         // 재오픈 수요체크 주제에 대해서 구독
-        for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.REOPEN)){ // 재오픈 수요체크
-                NotificationTopic notificationTopic = new NotificationTopic(token, ETopicType.RO, LocalDateTime.now(), topic);
-                notificationTopicRepository.save(notificationTopic); // 저장
+        for (EPopupTopic topic : EPopupTopic.values()){
+            if (topic.equals(EPopupTopic.REOPEN)){ // 재오픈 수요체크
+                PopupTopic popupTopic = new PopupTopic(token, popup, ETopicType.RO, LocalDateTime.now(), topic);
+                popupTopicRepository.save(popupTopic); // 저장
 
                 String topicName = topic.getTopicName();
                 response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
@@ -79,21 +84,23 @@ public class SubscribeUtil {
         log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
     }
 
-    public void androidSubscribeNotificationTopic(NotificationToken token) throws FirebaseMessagingException {
+    public void androidSubscribeNotificationTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(token.getToken());
         TopicManagementResponse response = null;
 
-        // 재오픈 수요체크 주제에 대해서 구독
-        for (ETopic topic : ETopic.values()){
-            if (topic.equals(ETopic.NOTI)){ // 재오픈 수요체크
-                NotificationTopic notificationTopic = new NotificationTopic(token, ETopicType.NT, LocalDateTime.now(), topic);
-                notificationTopicRepository.save(notificationTopic); // 저장
+        if (popup != null){
+            // 재오픈 수요체크 주제에 대해서 구독
+            for (EInformationTopic topic : EInformationTopic.values()){
+                if (topic.equals(EInformationTopic.NOTI)){ // 재오픈 수요체크
+                    InformationTopic informationTopic = new InformationTopic(token, ETopicType.NT, LocalDateTime.now(), topic);
+                    informationTopicRepository.save(informationTopic); // 저장
 
-                String topicName = topic.getTopicName();
-                response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
+                    String topicName = topic.getTopicName();
+                    response = firebaseMessaging.subscribeToTopic(registrationTokens, topicName); // 구독
+                }
             }
+            log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
         }
 
-        log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
     }
 }

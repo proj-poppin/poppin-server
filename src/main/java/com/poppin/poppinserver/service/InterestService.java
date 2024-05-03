@@ -47,7 +47,7 @@ public class InterestService {
 
         /*알림 구독*/
         String token = addInterestDto.fcmToken();
-        notificationService.fcmAddTopic(token, ETopicType.IP);
+        notificationService.fcmAddTopic(token, popup, ETopicType.IP);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
@@ -59,7 +59,7 @@ public class InterestService {
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        notificationService.fcmRemoveTokenFromTopic(fcmToken, ETopicType.IP);
+        notificationService.fcmRemoveTopic(fcmToken, ETopicType.IP);
 
         return true;
     }

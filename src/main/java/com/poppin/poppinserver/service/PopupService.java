@@ -311,7 +311,7 @@ public class PopupService {
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
         log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
 
-        notificationService.fcmAddTopic(pushRequestDto.token(), ETopicType.RO);
+        notificationService.fcmAddTopic(pushRequestDto.token(), popup, ETopicType.RO);
 
 
         return "재오픈 수요 체크 되었습니다.";
