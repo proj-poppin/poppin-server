@@ -49,7 +49,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     Popup findTopByPopupId(Long vdPopupId);
 
 
-    @Query("SELECT  p.id FROM Popup p JOIN Interest i ON  p.id = i.popup.id WHERE p.openDate >= :nowDate ")
-    List<Popup> findByInterestPopupIdReopen(LocalDate nowDate); // 쿼리 수정 필요
+    @Query("SELECT p FROM Popup p JOIN ReopenDemandUser rod ON p.id = rod.popup.id WHERE p.openDate >= :nowDate ")
+    List<Popup> findReopenPopup(LocalDate nowDate); // 재오픈 수요 체크 -> 재오픈 알림
+
+    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.closeDate BETWEEN :now AND :tomorrow")
+    List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
 
 }

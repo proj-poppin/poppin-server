@@ -40,6 +40,8 @@ public class PopupService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final InterestRepository interestRepository;
+    private final NotificationTokenRepository notificationTokenRepository;
+    private final ReopenDemandUserRepository reopenDemandUserRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -299,11 +301,17 @@ public class PopupService {
     }
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         Popup popup = popupRepository.findById(pushRequestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        NotificationToken token = notificationTokenRepository.findByToken(pushRequestDto.token());
+        if (token==null) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+
+        ReopenDemandUser reopenDemandUser = new ReopenDemandUser(user, popup, pushRequestDto.token(), token.getMod_dtm(),token.getExp_dtm());
+        reopenDemandUserRepository.save(reopenDemandUser);
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
         popupRepository.save(popup);
