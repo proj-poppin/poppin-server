@@ -59,7 +59,7 @@ public class InterestService {
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        notificationService.fcmRemoveTokenFromTopic(fcmToken, ETopicType.IP);
+        notificationService.fcmRemoveTopic(fcmToken, ETopicType.IP);
 
         return true;
     }

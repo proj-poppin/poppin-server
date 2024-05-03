@@ -98,7 +98,7 @@ public class NotificationService {
         }
     }
 
-    public void fcmRemoveTokenFromTopic(String token, ETopicType type){
+    public void fcmRemoveTopic(String token, ETopicType type){
 
         try {
             log.info("==== unsubscribe topic START ====");
