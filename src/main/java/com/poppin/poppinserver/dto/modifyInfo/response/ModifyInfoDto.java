@@ -19,7 +19,7 @@ public record ModifyInfoDto(
     public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images){
 
         PopupDto popupDto = null;
-        if(popupDto != null){
+        if(modifyInfo != null){
             popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
         }
 
