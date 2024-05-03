@@ -76,7 +76,7 @@ public class NotificationUtil {
 
 
     /* 안드로이드 토픽 메시지 발송 */
-    public void sendFCMTopic(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
+    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
         List<String> tokenList = null;
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
             tokenList = IntStream.rangeClosed(1, 30)
@@ -87,7 +87,6 @@ public class NotificationUtil {
                 .setNotification(Notification.builder()
                         .setTitle(fcmRequestDtoList.get(0).title())
                         .setBody(fcmRequestDtoList.get(0).body())
-                        .setImage(fcmRequestDtoList.get(0).image())
                         .build()
                 )
                 .addAllTokens(tokenList)

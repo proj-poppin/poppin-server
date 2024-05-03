@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.domain.PopupTopic;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecificationExecutor<Popup> {
@@ -52,6 +50,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
 
     @Query("SELECT  p.id FROM Popup p JOIN Interest i ON  p.id = i.popup.id WHERE p.openDate >= :nowDate ")
-    Optional<List<Popup>> findByInterestPopupIdReopen(LocalDate nowDate); // 쿼리 수정 필요
+    List<Popup> findByInterestPopupIdReopen(LocalDate nowDate); // 쿼리 수정 필요
 
 }
