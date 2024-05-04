@@ -131,6 +131,8 @@ public class PopupService {
                 .tastePopup(tastePopup)
                 .build();
 
+        popup.updateAgent(admin);
+
         popup = popupRepository.save(popup);
         log.info(popup.toString());
 
@@ -149,15 +151,6 @@ public class PopupService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         popup = popupRepository.save(popup);
-
-        ManagerInform managerInform = ManagerInform.builder()
-                .informerId(admin)
-                .popupId(popup)
-                .affiliation("poppin")
-                .progress(EInformProgress.EXECUTED)
-                .informerEmail("c68254@gmail.com").build();
-
-        managerInformRepository.save(managerInform);
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
