@@ -178,7 +178,11 @@ public class ModifyInfoService {
 
     @Transactional
     public ModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                               List<MultipartFile> images){
+                                               List<MultipartFile> images,
+                                                Long adminId){
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
+
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -260,10 +264,10 @@ public class ModifyInfoService {
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
                 updateModifyInfoDto.operationExcept(),
-                "EXECUTING"
-        );
+                "EXECUTING",
+                admin
 
-        popup = popupRepository.save(popup);
+        );
 
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
@@ -272,7 +276,11 @@ public class ModifyInfoService {
 
     @Transactional
     public ModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                        List<MultipartFile> images){
+                                        List<MultipartFile> images,
+                                          Long adminId){
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
+
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -384,7 +392,8 @@ public class ModifyInfoService {
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
                 updateModifyInfoDto.operationExcept(),
-                operationStatus
+                operationStatus,
+                admin
         );
 
         modifyInfo.update(true);

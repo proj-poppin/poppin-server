@@ -49,23 +49,25 @@ public class ModifyInfoController {
 
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveModifyInfo(@RequestPart(value = "images") List<MultipartFile> images,
-                                         @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto) {
+                                         @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
+                                         @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(modifyInfoService.updateModifyInfo(updateModifyInfoDto, images));
+        return ResponseDto.ok(modifyInfoService.updateModifyInfo(updateModifyInfoDto, images, adminId));
     } // 제보 임시 저장
 
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> modifyConfirm(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto) {
+                                           @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
+                                            @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(modifyInfoService.uploadModifyInfo(updateModifyInfoDto, images));
+        return ResponseDto.ok(modifyInfoService.uploadModifyInfo(updateModifyInfoDto, images, adminId));
     } // 최종 수정 승인
 }

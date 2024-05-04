@@ -203,7 +203,8 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                "EXECUTING"
+                "EXECUTING",
+                admin
         );
 
         popup = popupRepository.save(popup);
@@ -319,10 +320,9 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                operationStatus
+                operationStatus,
+                admin
         );
-
-        popup = popupRepository.save(popup);
 
         userInform.update(EInformProgress.EXECUTED, admin);
         userInform = userInformRepository.save(userInform);
