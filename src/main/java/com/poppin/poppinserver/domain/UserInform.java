@@ -46,10 +46,10 @@ public class UserInform {
     private LocalDateTime executedAt; // 처리 일자
 
     @Builder
-    public UserInform(User informerId, LocalDateTime informedAt, Popup popupId,
+    public UserInform(User informerId, Popup popupId,
                       String contactLink, EInformProgress progress) {
         this.informerId = informerId;
-        this.informedAt = informedAt;
+        this.informedAt = LocalDateTime.now();
         this.popupId = popupId;
         this.contactLink = contactLink;
         this.progress = progress;

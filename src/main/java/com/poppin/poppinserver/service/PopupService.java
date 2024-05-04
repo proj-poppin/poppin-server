@@ -12,7 +12,9 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
+import com.poppin.poppinserver.type.EInformProgress;
 import com.poppin.poppinserver.type.ETopicType;
+import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +53,15 @@ public class PopupService {
     private final SelectRandomUtil selectRandomUtil;
 
     @Transactional
-    public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
+    public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 관리자인지 검증
+        if (admin.getRole() != EUserRole.ADMIN){
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
+
         //날짜 요청 유효성 검증
         if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
             throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
@@ -138,6 +148,13 @@ public class PopupService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         popup = popupRepository.save(popup);
+
+        ManagerInform managerInform = ManagerInform.builder()
+                .informerId(admin)
+                .popupId(popup)
+                .affiliation("poppin")
+                .progress(EInformProgress.EXECUTED)
+                .informerEmail("c68254@gmail.com").build();
 
         return PopupDto.fromEntity(popup);
     }

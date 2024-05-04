@@ -112,7 +112,6 @@ public class ManagerInformService {
 
         ManagerInform managerInform = ManagerInform.builder()
                 .informerId(user)
-                .informedAt(LocalDateTime.now())
                 .popupId(popup)
                 .informerEmail(createManagerInformDto.informerEmail())
                 .affiliation(createManagerInformDto.affiliation())

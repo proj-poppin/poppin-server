@@ -98,7 +98,6 @@ public class UserInformService {
 
         UserInform userInform = UserInform.builder()
                 .informerId(user)
-                .informedAt(LocalDateTime.now())
                 .popupId(popup)
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)

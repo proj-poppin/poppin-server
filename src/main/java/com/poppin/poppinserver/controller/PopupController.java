@@ -35,7 +35,7 @@ public class PopupController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(popupService.createPopup(createPopupDto, images));
+        return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
     }
 
     @GetMapping("/guest/detail")

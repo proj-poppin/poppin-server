@@ -49,10 +49,10 @@ public class ManagerInform {
     private LocalDateTime executedAt; // 처리 일자
 
     @Builder
-    public ManagerInform(User informerId, LocalDateTime informedAt, String affiliation,
+    public ManagerInform(User informerId, String affiliation,
                          String informerEmail, Popup popupId, EInformProgress progress) {
         this.informerId = informerId;
-        this.informedAt = informedAt;
+        this.informedAt = LocalDateTime.now();
         this.affiliation = affiliation;
         this.informerEmail = informerEmail;
         this.popupId = popupId;
