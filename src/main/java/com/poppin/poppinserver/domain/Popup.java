@@ -95,7 +95,7 @@ public class Popup {
     @JoinColumn(name = "taste_id", nullable = false)
     private TastePopup tastePopup;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "agent")
     private User agent;
 

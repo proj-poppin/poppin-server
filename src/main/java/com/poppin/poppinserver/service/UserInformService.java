@@ -207,9 +207,7 @@ public class UserInformService {
                 admin
         );
 
-        popup = popupRepository.save(popup);
-
-        userInform.update(EInformProgress.EXECUTING, admin);
+        userInform.update(EInformProgress.EXECUTING);
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
@@ -324,7 +322,7 @@ public class UserInformService {
                 admin
         );
 
-        userInform.update(EInformProgress.EXECUTED, admin);
+        userInform.update(EInformProgress.EXECUTED);
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);

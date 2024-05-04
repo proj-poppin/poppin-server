@@ -38,10 +38,6 @@ public class UserInform {
     @Column(name = "progress")
     private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private User adminId; // 담당자(관리자) id
-
     @Column(name = "executed_at")
     private LocalDateTime executedAt; // 처리 일자
 
@@ -55,9 +51,8 @@ public class UserInform {
         this.progress = progress;
     }
 
-    public void update(EInformProgress progress, User adminId) {
+    public void update(EInformProgress progress) {
         this.progress = progress;
-        this.adminId = adminId;
         this.executedAt = LocalDateTime.now();
     }
 }
