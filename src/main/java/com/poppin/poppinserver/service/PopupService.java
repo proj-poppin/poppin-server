@@ -44,6 +44,7 @@ public class PopupService {
     private final InterestRepository interestRepository;
     private final NotificationTokenRepository notificationTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
+    private final ManagerInformRepository managerInformRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -155,6 +156,8 @@ public class PopupService {
                 .affiliation("poppin")
                 .progress(EInformProgress.EXECUTED)
                 .informerEmail("c68254@gmail.com").build();
+
+        managerInformRepository.save(managerInform);
 
         return PopupDto.fromEntity(popup);
     }
