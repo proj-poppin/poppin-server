@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record FCMRequestDto(
 
-        @NotNull
-        Long userId,
 
         @NotNull
         Long popupId,
@@ -17,8 +15,7 @@ public record FCMRequestDto(
         String title,
 
         @NotNull
-        String body,
+        String body
 
-        String image
 ) {
 }

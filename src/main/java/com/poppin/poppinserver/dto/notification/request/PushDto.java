@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.notification.request;
 
 import jakarta.validation.constraints.NotNull;
 
+
 public record PushDto(
         @NotNull
         String token,
@@ -10,9 +11,7 @@ public record PushDto(
         String title,
 
         @NotNull
-        String body,
-
-        String image
+        String body
 
 ) {
 }
