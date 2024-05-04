@@ -178,17 +178,19 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
-//    public List<ManageSummaryDto> readManageList(Long adminId){
-//        User admin = userRepository.findById(adminId)
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//
-//        // 관리자인지 검증
-//        if (admin.getRole() != EUserRole.ADMIN){
-//            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-//        }
-//
-//        List<Popup> popups = popupRepository.
-//    } // 전체 팝업 관리 - 전체 팝업 조회
+    public List<ManageSummaryDto> readManageList(Long adminId, int page, int size){
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 관리자인지 검증
+        if (admin.getRole() != EUserRole.ADMIN){
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
+
+        List<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size));
+
+        return ManageSummaryDto.fromEntityList(popups);
+    } // 전체 팝업 관리 - 전체 팝업 조회
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)

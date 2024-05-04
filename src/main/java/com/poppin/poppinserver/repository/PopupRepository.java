@@ -37,7 +37,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     //팝업 검색 -> 추후 full text search 변경 필요
     @Query("SELECT p FROM Popup p WHERE (p.name LIKE %:text% OR p.introduce LIKE %:text%) " +
-            "AND (p.operationStatus != 'EXECUTING' or p.operationStatus != 'EXECUTED' or p.operationStatus != 'NOTEXECUTED')")
+            "AND (p.operationStatus != 'EXECUTING' and p.operationStatus != 'EXECUTED' and p.operationStatus != 'NOTEXECUTED')")
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
@@ -56,4 +56,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.closeDate BETWEEN :now AND :tomorrow")
     List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
 
+    @Query("SELECT p FROM Popup p " +
+            "WHERE p.operationStatus NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED') " +
+            "ORDER BY p.name ASC")
+    List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
 }
