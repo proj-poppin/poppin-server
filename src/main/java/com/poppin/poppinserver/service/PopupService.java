@@ -185,6 +185,23 @@ public class PopupService {
         return ManageSummaryDto.fromEntityList(popups);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
+    public Boolean removePopup(Long adminId, Long popupId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 관리자인지 검증
+        if (admin.getRole() != EUserRole.ADMIN){
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
+
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        popupRepository.delete(popup);
+
+        return true;
+    } // 전체 팝업 관리 - 팝업 삭제
+
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));

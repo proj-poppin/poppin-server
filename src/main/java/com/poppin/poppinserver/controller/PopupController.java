@@ -37,6 +37,25 @@ public class PopupController {
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 
+    @GetMapping("")
+    public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
+                                    @UserId Long adminId) {
+
+        return ResponseDto.ok(popupService.readPopup(adminId, popupId));
+    } // 전체팝업관리 - 팝업조회
+
+    @GetMapping("/list")
+    public ResponseDto<?> readManageList(@RequestParam("page") int page,
+                                         @RequestParam("size") int size,
+                                         @UserId Long adminId) {
+        return ResponseDto.ok(popupService.readManageList(adminId, page, size));
+    } // 전체팝업관리 - 전체 팝업 리스트 조회
+
+    @DeleteMapping("")
+    public ResponseDto<?> removePopup(@RequestParam("id") Long popupId, @UserId Long adminId){
+        return ResponseDto.ok(popupService.removePopup(adminId, popupId));
+    } // 전체팝업관리 - 팝업 삭제
+
     @GetMapping("/guest/detail")
     public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {
 
