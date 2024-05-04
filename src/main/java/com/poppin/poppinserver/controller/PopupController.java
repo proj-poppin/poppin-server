@@ -25,8 +25,7 @@ public class PopupController {
     private final PopupService popupService;
     private final S3Service s3Service;
 
-    @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
                                       @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
                                       @UserId Long adminId) {
@@ -36,7 +35,7 @@ public class PopupController {
         }
 
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
-    }
+    } // 전체팝업관리 - 팝업생성
 
     @GetMapping("/guest/detail")
     public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {

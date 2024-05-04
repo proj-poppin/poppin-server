@@ -63,23 +63,6 @@ public class PopupService {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
 
-        //날짜 요청 유효성 검증
-        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
-            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
-        }
-
-        //현재 운영상태 정의
-        String operationStatus;
-        if (createPopupDto.openDate().isAfter(LocalDate.now())){
-            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
-            operationStatus = "D-" + period.getDays();
-        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
-        }
-        else{
-            operationStatus = "OPERATING";
-        }
-
         //카테고리별 엔티티 정의
         CreatePreferedDto createPreferedDto = createPopupDto.prefered();
         PreferedPopup preferedPopup = PreferedPopup.builder()
@@ -109,6 +92,23 @@ public class PopupService {
         //각 카테고리 저장
         preferedPopup = preferedPopupRepository.save(preferedPopup);
         tastePopup = tastePopupRepository.save(tastePopup);
+
+        //날짜 요청 유효성 검증
+        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
+
+        //현재 운영상태 정의
+        String operationStatus;
+        if (createPopupDto.openDate().isAfter(LocalDate.now())){
+            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
+            operationStatus = "D-" + period.getDays();
+        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
+            operationStatus = "TERMINATED";
+        }
+        else{
+            operationStatus = "OPERATING";
+        }
 
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
@@ -162,7 +162,33 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
+    public PopupDto readPopup(Long adminId, Long popupId){
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        // 관리자인지 검증
+        if (admin.getRole() != EUserRole.ADMIN){
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
+
+        // 팝업 정보 불러오기
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        return PopupDto.fromEntity(popup);
+    } // 전체 팝업 관리 - 팝업 조회
+
+//    public List<ManageSummaryDto> readManageList(Long adminId){
+//        User admin = userRepository.findById(adminId)
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+//
+//        // 관리자인지 검증
+//        if (admin.getRole() != EUserRole.ADMIN){
+//            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+//        }
+//
+//        List<Popup> popups = popupRepository.
+//    } // 전체 팝업 관리 - 전체 팝업 조회
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
