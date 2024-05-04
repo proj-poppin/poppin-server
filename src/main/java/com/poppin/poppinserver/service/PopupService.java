@@ -50,6 +50,7 @@ public class PopupService {
 
     private final SelectRandomUtil selectRandomUtil;
 
+    @Transactional
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
         //날짜 요청 유효성 검증
         if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {

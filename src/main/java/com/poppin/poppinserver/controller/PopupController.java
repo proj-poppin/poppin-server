@@ -28,7 +28,8 @@ public class PopupController {
     @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
-                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto) {
+                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
+                                      @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);

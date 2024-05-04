@@ -37,7 +37,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     //팝업 검색 -> 추후 full text search 변경 필요
     @Query("SELECT p FROM Popup p WHERE (p.name LIKE %:text% OR p.introduce LIKE %:text%) " +
-            "AND (p.operationStatus != 'EXECUTING' or p.operationStatus != 'EXECUTED')")
+            "AND (p.operationStatus != 'EXECUTING' or p.operationStatus != 'EXECUTED' or p.operationStatus != 'NOTEXECUTED')")
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
