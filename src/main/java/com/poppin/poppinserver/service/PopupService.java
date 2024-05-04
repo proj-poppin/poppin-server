@@ -160,7 +160,9 @@ public class PopupService {
         managerInformRepository.save(managerInform);
 
         return PopupDto.fromEntity(popup);
-    }
+    } // 전체 팝업 관리 - 팝업 생성
+
+
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)

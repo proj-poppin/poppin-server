@@ -218,12 +218,13 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                "EXECUTING"
+                "EXECUTING",
+                admin
         );
 
         popup = popupRepository.save(popup);
 
-        managerInform.update(EInformProgress.EXECUTING, admin);
+        managerInform.update(EInformProgress.EXECUTING);
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
@@ -334,12 +335,11 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                operationStatus
+                operationStatus,
+                admin
         );
 
-        popup = popupRepository.save(popup);
-
-        managerInform.update(EInformProgress.EXECUTING, admin);
+        managerInform.update(EInformProgress.EXECUTING);
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
