@@ -1,10 +1,12 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
@@ -30,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +47,7 @@ public class PopupService {
     private final InterestRepository interestRepository;
     private final NotificationTokenRepository notificationTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
-    private final ManagerInformRepository managerInformRepository;
+    private final AlarmKeywordRepository alarmKeywordRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -201,6 +204,102 @@ public class PopupService {
 
         return true;
     } // 전체 팝업 관리 - 팝업 삭제
+
+    @Transactional
+    public PopupDto updatePopup(UpdatePopupDto updatePopupDto,
+                                List<MultipartFile> images,
+                                Long adminId){
+        Popup popup = popupRepository.findById(updatePopupDto.popupId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 관리자인지 검증
+        if (admin.getRole() != EUserRole.ADMIN){
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
+
+        CreateTasteDto createTasteDto = updatePopupDto.taste();
+        TastePopup tastePopup = popup.getTastePopup();
+        tastePopup.update(createTasteDto.fashionBeauty(),
+                createTasteDto.characters(),
+                createTasteDto.foodBeverage(),
+                createTasteDto.webtoonAni(),
+                createTasteDto.interiorThings(),
+                createTasteDto.movie(),
+                createTasteDto.musical(),
+                createTasteDto.sports(),
+                createTasteDto.game(),
+                createTasteDto.itTech(),
+                createTasteDto.kpop(),
+                createTasteDto.alcohol(),
+                createTasteDto.animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
+        PreferedPopup preferedPopup = popup.getPreferedPopup();
+        preferedPopup.update(createPreferedDto.market(),
+                createPreferedDto.display(),
+                createPreferedDto.experience(),
+                createPreferedDto.wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        // 기존 키워드 삭제 및 다시 저장
+        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+
+        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        for(String keyword : updatePopupDto.keywords()){
+            alarmKeywords.add(AlarmKeyword.builder()
+                    .popupId(popup)
+                    .keyword(keyword)
+                    .build());
+        }
+        alarmKeywordRepository.saveAll(alarmKeywords);
+
+        popup.update(
+                updatePopupDto.homepageLink(),
+                updatePopupDto.name(),
+                updatePopupDto.introduce(),
+                updatePopupDto.address(),
+                updatePopupDto.addressDetail(),
+                updatePopupDto.entranceFee(),
+                updatePopupDto.resvRequired(),
+                updatePopupDto.availableAge(),
+                updatePopupDto.parkingAvailable(),
+                updatePopupDto.openDate(),
+                updatePopupDto.closeDate(),
+                updatePopupDto.openTime(),
+                updatePopupDto.closeTime(),
+                updatePopupDto.operationExcept(),
+                popup.getOperationStatus(),
+                admin
+        );
+
+        return PopupDto.fromEntity(popup);
+    } // 전체 팝업 관리 - 팝업 수정
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
