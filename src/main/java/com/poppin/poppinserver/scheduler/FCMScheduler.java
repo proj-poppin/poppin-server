@@ -39,7 +39,7 @@ public class FCMScheduler {
          * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
          */
         LocalDate now = LocalDate.now();
-        List<Popup> reopenPopup = popupRepository.findReopenPopup(now); // null, 1, many
+        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
         if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
         else{
             schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPopupTopic.REOPEN.getTopicType(), EPushInfo.REOPEN);
