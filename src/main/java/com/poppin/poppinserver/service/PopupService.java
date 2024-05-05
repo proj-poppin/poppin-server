@@ -61,11 +61,6 @@ public class PopupService {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        // 관리자인지 검증
-        if (admin.getRole() != EUserRole.ADMIN){
-            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-        }
-
         //카테고리별 엔티티 정의
         CreatePreferedDto createPreferedDto = createPopupDto.prefered();
         PreferedPopup preferedPopup = PreferedPopup.builder()
@@ -159,14 +154,6 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 생성
 
     public PopupDto readPopup(Long adminId, Long popupId){
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        // 관리자인지 검증
-        if (admin.getRole() != EUserRole.ADMIN){
-            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-        }
-
         // 팝업 정보 불러오기
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -175,28 +162,12 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 조회
 
     public List<ManageSummaryDto> readManageList(Long adminId, int page, int size){
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        // 관리자인지 검증
-        if (admin.getRole() != EUserRole.ADMIN){
-            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-        }
-
         List<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size));
 
         return ManageSummaryDto.fromEntityList(popups);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
-    public Boolean removePopup(Long adminId, Long popupId) {
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        // 관리자인지 검증
-        if (admin.getRole() != EUserRole.ADMIN){
-            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-        }
-
+    public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -214,11 +185,6 @@ public class PopupService {
 
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        // 관리자인지 검증
-        if (admin.getRole() != EUserRole.ADMIN){
-            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
-        }
 
         CreateTasteDto createTasteDto = updatePopupDto.taste();
         TastePopup tastePopup = popup.getTastePopup();

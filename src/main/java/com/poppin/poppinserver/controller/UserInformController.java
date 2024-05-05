@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,11 +37,13 @@ public class UserInformController {
         return ResponseDto.ok(userInformService.createUserInform(createUserInformDto, images, userId));
     } // 제보 생성
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
     public ResponseDto<?> readUserInform(@RequestParam("informId") Long userInformId) {
         return ResponseDto.ok(userInformService.readUserInform(userInformId));
     } // 제보 조회
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
@@ -53,6 +56,7 @@ public class UserInformController {
         return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images, adminId));
     } // 제보 임시 저장
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                          @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
@@ -65,6 +69,7 @@ public class UserInformController {
         return ResponseDto.ok(userInformService.uploadPopup(updateUserInfromDto, images, adminId));
     } // 제보 업로드 승인
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
     public ResponseDto<?> readUserInformList(){
         return ResponseDto.ok(userInformService.reatUserInformList());
