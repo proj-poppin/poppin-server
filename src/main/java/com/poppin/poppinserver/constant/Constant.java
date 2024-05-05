@@ -34,9 +34,8 @@ public class Constant {
             "/api/v1/noti/android/token/test",
             "/api/v1/noti/android/topic/test",
             "/api/v1/noti/android/topic/test",
-            "/api/v1/noti/apply/FCMtoken"
-
-//            "/api/v1/popup/test"
+            "/api/v1/noti/apply/FCMtoken",
+            "/api/v1/user/support/faqs"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

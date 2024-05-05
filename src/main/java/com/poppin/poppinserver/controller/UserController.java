@@ -135,4 +135,9 @@ public class UserController {
         return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
     }
 
+    /*마이페이지 - 자주 묻는 질문 조회*/
+    @GetMapping("/support/faqs")
+    public ResponseDto<?> readFAQs() {
+        return ResponseDto.ok(userService.readFAQs());
+    }
 }
