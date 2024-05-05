@@ -4,17 +4,21 @@ import com.poppin.poppinserver.domain.FreqQuestion;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
+import com.poppin.poppinserver.dto.user.response.UserListDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -58,5 +62,68 @@ public class AdminService {
         FreqQuestion freqQuestion = freqQuestionRepository.findById(faqId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         freqQuestionRepository.delete(freqQuestion);
+    }
+
+    public UserListDto readUsers(String sortField, String sortOrder) {
+        Sort sort = getSort(sortField, sortOrder);
+        List<User> userList = userRepository.findAll(sort);
+        List<UserAdministrationDto> userAdministrationDtoList = userList.stream()
+                .map(user -> UserAdministrationDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .nickname(user.getNickname())
+                        .requiresSpecialCare(user.getRequiresSpecialCare())
+                        .build())
+                .collect(Collectors.toList());
+        int userCnt = userAdministrationDtoList.size();
+        return UserListDto.builder()
+                .userList(userAdministrationDtoList)
+                .userCnt(userCnt)
+                .build();
+    }
+
+    private Sort getSort(String sortField, String sortOrder) {
+        Sort.Direction dir = Sort.Direction.ASC;
+        if (sortOrder.equalsIgnoreCase("desc")) {
+            dir = Sort.Direction.DESC;
+        }
+
+        switch (sortField) {
+            case "createdAt":
+                return Sort.by(dir, "createdAt");
+            default:
+                return Sort.by(dir, "nickname");
+        }
+    }
+
+    public UserAdministrationDto readUserDetail(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        return UserAdministrationDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .userImageUrl(user.getProfileImageUrl())
+                .nickname(user.getNickname())
+                .provider(user.getProvider())
+                .requiresSpecialCare(user.getRequiresSpecialCare())
+                .build();
+    }
+
+    public UserListDto searchUsers(String text) {
+        List<User> userList = userRepository.findByNicknameContainingOrEmailContainingOrderByNickname(text, text);
+        List<UserAdministrationDto> userAdministrationDtoList = new ArrayList<>();
+        for (User user : userList) {
+            userAdministrationDtoList.add(UserAdministrationDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .requiresSpecialCare(user.getRequiresSpecialCare())
+                    .build());
+        }
+        int userCnt = userAdministrationDtoList.size();
+        return UserListDto.builder()
+                .userList(userAdministrationDtoList)
+                .userCnt(userCnt)
+                .build();
     }
 }
