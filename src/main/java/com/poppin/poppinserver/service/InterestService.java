@@ -6,12 +6,13 @@ import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
-import com.poppin.poppinserver.type.ETopicType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -47,8 +48,13 @@ public class InterestService {
 
         /*알림 구독*/
         String token = addInterestDto.fcmToken();
-        notificationService.fcmAddTopic(token, popup, ETopicType.IP);
-
+        List<String> stringList = new ArrayList<>();
+        stringList.add("MG");
+        stringList.add("CI");
+        stringList.add("OP");
+        for (String x : stringList ){
+            notificationService.fcmAddTopic(token, popup, x);
+        }
         return InterestDto.fromEntity(interest,user,popup);
     }
 
@@ -59,8 +65,13 @@ public class InterestService {
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        notificationService.fcmRemoveTopic(fcmToken, ETopicType.IP);
-
+        List<String> stringList = new ArrayList<>();
+        stringList.add("MG");
+        stringList.add("CI");
+        stringList.add("OP");
+        for (String x : stringList ){
+            notificationService.fcmRemoveTopic(fcmToken, x);
+        }
         return true;
     }
 }

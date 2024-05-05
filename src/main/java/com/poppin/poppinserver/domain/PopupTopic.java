@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.domain;
 
 import com.poppin.poppinserver.type.EPopupTopic;
-import com.poppin.poppinserver.type.ETopicType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,9 +33,8 @@ public class PopupTopic {
     @Column(name = "topic" , nullable = false)
     private EPopupTopic topic; // 팝업 관련 주제
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "topic_type" , nullable = false)
-    private ETopicType type; // 타입
+    private String type; // 타입
 
     @Column(name = "created_at" , nullable = false)
     private LocalDateTime createdAt;
@@ -46,7 +44,7 @@ public class PopupTopic {
 
 
     @Builder
-    public PopupTopic(NotificationToken token, Popup popup, ETopicType type, LocalDateTime mod_dtm, EPopupTopic topic){
+    public PopupTopic(NotificationToken token, Popup popup, String type, LocalDateTime mod_dtm, EPopupTopic topic){
 
         this.tokenId        = token;
         this.popup          = popup;

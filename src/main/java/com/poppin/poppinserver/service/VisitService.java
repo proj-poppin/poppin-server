@@ -10,6 +10,7 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.repository.VisitRepository;
 import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class VisitService {
     private final VisitRepository visitRepository;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
+
+    private final NotificationService notificationService;
 
     /* 실시간 방문자 조회 */
     public Optional<Integer> showRealTimeVisitors(Long popupId){
@@ -61,7 +64,11 @@ public class VisitService {
         int visitors = visitRepository.findDuplicateVisitors(user,popup, thirtyMinutesAgo);
         if (visitors > 0)throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
 
-        visitRepository.save(realTimeVisit); /*마이페이지 - 후기 작성하기 시 보여야하기에 배치돌며 이주일 전 생성된 데이터만 삭제 예정*/
+        visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 이주일 전 생성된 데이터만 삭제 예정*/
+
+        // fcm 구독
+        String token = popupInfoDto.token();
+        notificationService.fcmAddTopic(token, popup, EPopupTopic.BANGMUN.getTopicType());
 
         Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo); /*실시간 방문자 수*/
 

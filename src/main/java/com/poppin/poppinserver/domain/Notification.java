@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 /*
@@ -38,8 +38,10 @@ public class Notification {
     private String content; // 내용
 
     @Column(name = "created_at",nullable = false)
-    private LocalDateTime createdAt; // 생성일자
+    private LocalDate createdAt; // 생성일자
 
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;     // 읽음 여부
     @Column(name = "type" , nullable = false)
     private String type; // 팝업, 공지사항
 
@@ -48,7 +50,27 @@ public class Notification {
         this.user = user;
         this.title = title;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();  // mm-dd
+        this.isRead = false;
         this.type = type;
     }
 }
+
+/**
+ * 알림
+ * 1. id
+ * 2. title
+ * 3. content
+ * 4. createdAt
+ * 5. isRead
+ * 6. icon -> string,
+ */
+
+
+/**
+ * 공지사항 상세
+ * 1. id
+ * 2. title
+ * 3. content
+ * 4. img -> nullable
+ */

@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum EInformationTopic {
 
-    NOTI("NOTIFICATION"),                       // 공지사항
-    ERROR("ERROR"),                             // 에러사항
-    EVT("EVENT");                               // 이벤트
+    NOTI("NOTIFICATION", "NT"),                       // 공지사항
+    ERROR("ERROR", "ER"),                             // 에러사항
+    EVT("EVENT", "EV");                               // 이벤트
 
     private final String topicName;
+    private final String topicType;
 
 }

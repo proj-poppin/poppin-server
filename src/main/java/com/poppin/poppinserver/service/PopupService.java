@@ -12,7 +12,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
-import com.poppin.poppinserver.type.ETopicType;
+import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -319,7 +319,7 @@ public class PopupService {
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
         log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
 
-        notificationService.fcmAddTopic(pushRequestDto.token(), popup, ETopicType.RO);
+        notificationService.fcmAddTopic(pushRequestDto.token(), popup, EPopupTopic.REOPEN.getTopicType());
 
 
         return "재오픈 수요 체크 되었습니다.";

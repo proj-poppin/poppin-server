@@ -12,7 +12,6 @@ import com.poppin.poppinserver.repository.InformationTopicRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 
 import com.poppin.poppinserver.type.EInformationTopic;
-import com.poppin.poppinserver.type.ETopicType;
 import com.poppin.poppinserver.util.SubscribeUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
 
 @Service
 @Slf4j
@@ -42,12 +42,11 @@ public class NotificationService {
         );
 
         notificationTokenRepository.save(notificationToken); // 토큰 저장
+
         for (EInformationTopic topic : EInformationTopic.values()){
-            if (topic.equals(EInformationTopic.EVT) || topic.equals(EInformationTopic.ERROR) || topic.equals(EInformationTopic.NOTI)){ // 공지사항 ETopic 시에만
-                InformationTopic popupTopic = new InformationTopic(notificationToken,ETopicType.NT,LocalDateTime.now(),topic);
-                informationTopicRepository.save(popupTopic); // 구독 저장
-                fcmAddTopic(tokenRequestDto.token(), null,  ETopicType.NT); // 구독
-            }
+            InformationTopic popupTopic = new InformationTopic(notificationToken,topic.getTopicType(),LocalDateTime.now(),topic);
+            informationTopicRepository.save(popupTopic); // 구독 저장
+            fcmAddTopic(tokenRequestDto.token(), null,  topic.getTopicType()); // 구독
         }
 
         return TokenResponseDto.fromEntity(tokenRequestDto);
@@ -58,7 +57,7 @@ public class NotificationService {
       Author : sakang
       Date   : 2024-04-27
     */
-    public void fcmAddTopic(String token, Popup popup, ETopicType type){
+    public void fcmAddTopic(String token, Popup popup, String type){
         if(popup != null){
             // 팝업 관련
             try {
@@ -68,8 +67,7 @@ public class NotificationService {
                 if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
                 if (tk.getDevice().equals("android")){
                     // 안드로이드
-                    if (type.equals(ETopicType.IP))subscribeUtil.androidSubscribeInterestedPopupTopic(tk, popup); // 관심팝업
-                    if (type.equals(ETopicType.RO))subscribeUtil.androidSubscribeReopenPopupTopic(tk, popup); // 재오픈팝업
+                    subscribeUtil.androidSubscribePopupTopic(tk, popup , type); // 관심팝업
                 }else{
                     // 아이폰
                 }
@@ -87,7 +85,9 @@ public class NotificationService {
                 if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
                 if (tk.getDevice().equals("android")){
                     // 안드로이드
-                    if (type.equals(ETopicType.NT))subscribeUtil.androidSubscribeNotificationTopic(tk, popup); // 공지사항(공지, 이벤트, 에러)
+                    for (EInformationTopic x : EInformationTopic.values() ){
+                        if (x.getTopicType().equals(type))subscribeUtil.androidSubscribeNotificationTopic(tk, popup);
+                        } // 공지사항(공지, 이벤트, 에러)
                    }else{
                     // 아이폰
                 }
@@ -98,7 +98,7 @@ public class NotificationService {
         }
     }
 
-    public void fcmRemoveTopic(String token, ETopicType type){
+    public void fcmRemoveTopic(String token, String type){
 
         try {
             log.info("==== unsubscribe topic START ====");
@@ -107,7 +107,7 @@ public class NotificationService {
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             if (tk.getDevice().equals("android")){
                 // 안드로이드
-                if (type.equals(ETopicType.IP))subscribeUtil.androidUnsubscribeInterestedPopupTopic(tk); // 구독 및 저장
+               subscribeUtil.androidUnsubscribeInterestedPopupTopic(tk, type); // 구독 및 저장
             }else {
                 // 아이폰
             }

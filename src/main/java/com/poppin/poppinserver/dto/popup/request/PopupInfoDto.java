@@ -6,7 +6,10 @@ import lombok.Builder;
 @Builder
 public record PopupInfoDto(
         @NotNull
-       Long popupId
+       Long popupId,
+
+        @NotNull
+        String token //fcm
 ) {
 
 }

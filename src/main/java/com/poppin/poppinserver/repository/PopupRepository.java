@@ -49,10 +49,35 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     Popup findTopByPopupId(Long vdPopupId);
 
 
-    @Query("SELECT p FROM Popup p JOIN ReopenDemandUser rod ON p.id = rod.popup.id WHERE p.openDate >= :nowDate ")
+    /**
+     * 
+     * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * 
+     */
+    // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
+    @Query("SELECT p FROM Popup p JOIN ReopenDemandUser rod ON p.id = rod.popup.id WHERE p.openDate >= :nowDate AND p.operationStatus = '' ORDER BY p.id asc")
     List<Popup> findReopenPopup(LocalDate nowDate); // 재오픈 수요 체크 -> 재오픈 알림
 
-    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.closeDate BETWEEN :now AND :tomorrow")
+    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus NOT IN('TERMINATED') AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
     List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
+
+    @Query("SELECT p FROM Popup p " +
+            "JOIN Interest i ON p.id = i.popup.id " +
+            "WHERE p.openDate = :date " +
+            "AND (p.openTime <= :timeNow AND CONCAT(p.openDate, ' ', p.openTime) >= :timeBefore) " +
+            "ORDER BY p.createdAt DESC")
+    List<Popup> findOpenPopup(@Param("date") LocalDate date, @Param("timeNow") String timeNow, @Param("timeBefore") String timeBefore);
+
+    @Query("SELECT p FROM Popup p " +
+            "JOIN Interest i ON p.id = i.popup.id " +
+            "JOIN User u ON i.user.id = u.id " +
+            "WHERE MOD(DATEDIFF(CURRENT_DATE(), u.createdAt), 7) = 0")
+    List<Popup> findHotPopup();
+
+    @Query("SELECT p FROM Popup p " +
+            "JOIN Visit v ON p.id = v.popup.id " +
+            "JOIN User u ON v.user.id = u.id " +
+            "WHERE v.createdAt <= :threeHoursAgo")
+    List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
 }
