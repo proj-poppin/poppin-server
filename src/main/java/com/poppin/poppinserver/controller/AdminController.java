@@ -42,7 +42,7 @@ public class AdminController {
     }
 
     /* 회원 상세 조회 */
-    /* 작성한 전체 후기 조회, 숨겨진 후기 확인하는 로직 추가해야 함 */
+    /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}")
     public ResponseDto<?> readUserDetail(@PathVariable Long userId) {
         return ResponseDto.ok(adminService.readUserDetail(userId));
@@ -53,4 +53,5 @@ public class AdminController {
     public ResponseDto<?> searchUsers(@RequestParam("text") String text) {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
+
 }
