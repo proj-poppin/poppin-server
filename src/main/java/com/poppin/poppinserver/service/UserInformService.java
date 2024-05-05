@@ -98,7 +98,6 @@ public class UserInformService {
 
         UserInform userInform = UserInform.builder()
                 .informerId(user)
-                .informedAt(LocalDateTime.now())
                 .popupId(popup)
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
@@ -204,12 +203,11 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                "EXECUTING"
+                "EXECUTING",
+                admin
         );
 
-        popup = popupRepository.save(popup);
-
-        userInform.update(EInformProgress.EXECUTING, admin);
+        userInform.update(EInformProgress.EXECUTING);
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
@@ -320,12 +318,11 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                operationStatus
+                operationStatus,
+                admin
         );
 
-        popup = popupRepository.save(popup);
-
-        userInform.update(EInformProgress.EXECUTED, admin);
+        userInform.update(EInformProgress.EXECUTED);
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);

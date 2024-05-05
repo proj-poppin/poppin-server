@@ -41,27 +41,22 @@ public class ManagerInform {
     @Column(name = "progress")
     private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private User adminId; // 담당자(관리자) id
-
     @Column(name = "executed_at")
     private LocalDateTime executedAt; // 처리 일자
 
     @Builder
-    public ManagerInform(User informerId, LocalDateTime informedAt, String affiliation,
+    public ManagerInform(User informerId, String affiliation,
                          String informerEmail, Popup popupId, EInformProgress progress) {
         this.informerId = informerId;
-        this.informedAt = informedAt;
+        this.informedAt = LocalDateTime.now();
         this.affiliation = affiliation;
         this.informerEmail = informerEmail;
         this.popupId = popupId;
         this.progress = progress;
     }
 
-    public void update(EInformProgress progress, User adminId) {
+    public void update(EInformProgress progress) {
         this.progress = progress;
-        this.adminId = adminId;
         this.executedAt = LocalDateTime.now();
     }
 }
