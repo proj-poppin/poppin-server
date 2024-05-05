@@ -1,9 +1,11 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.PopupService;
@@ -12,6 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,31 +27,66 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
-    private final S3Service s3Service;
 
-    @PostMapping(value = "/create-popup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    // 팝업생성 !!! 관리자 계정인지 확인하는 로직 필요
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
-                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto) {
+                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
+                                      @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(popupService.createPopup(createPopupDto, images));
-    }
+        return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
+    } // 전체팝업관리 - 팝업생성
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("")
+    public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
+                                    @UserId Long adminId) {
+
+        return ResponseDto.ok(popupService.readPopup(adminId, popupId));
+    } // 전체팝업관리 - 팝업조회
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/list")
+    public ResponseDto<?> readManageList(@RequestParam("page") int page,
+                                         @RequestParam("size") int size,
+                                         @UserId Long adminId) {
+        return ResponseDto.ok(popupService.readManageList(adminId, page, size));
+    } // 전체팝업관리 - 전체 팝업 리스트 조회
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("")
+    public ResponseDto<?> removePopup(@RequestParam("id") Long popupId){
+        return ResponseDto.ok(popupService.removePopup(popupId));
+    } // 전체팝업관리 - 팝업 삭제
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                              @RequestPart(value = "contents") @Valid UpdatePopupDto updatePopupDto,
+                                              @UserId Long adminId) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(popupService.updatePopup(updatePopupDto, images, adminId));
+    } // 전체팝업관리 - 팝업 수정
 
     @GetMapping("/guest/detail")
     public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {
 
         return ResponseDto.ok(popupService.readGuestDetail(popupId));
-    }
+    } // 비로그인 상세조회
 
     @GetMapping("/detail")
     public ResponseDto<?> readDetail(@RequestParam("popupId") Long popupId, @UserId Long userId) {
 
         return ResponseDto.ok(popupService.readDetail(popupId, userId));
-    }
+    } // 로그인 상세조회
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
     public ResponseDto<?> readHotList() {

@@ -7,7 +7,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-public record CreatePopupDto(
+public record UpdatePopupDto(
+        @NotNull
+        Long popupId,
         @NotNull
         String homepageLink,
         @NotNull
@@ -41,5 +43,4 @@ public record CreatePopupDto(
         @NotNull
         List<String> keywords
 ) {
-
 }

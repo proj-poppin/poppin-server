@@ -112,7 +112,6 @@ public class ManagerInformService {
 
         ManagerInform managerInform = ManagerInform.builder()
                 .informerId(user)
-                .informedAt(LocalDateTime.now())
                 .popupId(popup)
                 .informerEmail(createManagerInformDto.informerEmail())
                 .affiliation(createManagerInformDto.affiliation())
@@ -219,12 +218,13 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                "EXECUTING"
+                "EXECUTING",
+                admin
         );
 
         popup = popupRepository.save(popup);
 
-        managerInform.update(EInformProgress.EXECUTING, admin);
+        managerInform.update(EInformProgress.EXECUTING);
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
@@ -335,12 +335,11 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                operationStatus
+                operationStatus,
+                admin
         );
 
-        popup = popupRepository.save(popup);
-
-        managerInform.update(EInformProgress.EXECUTING, admin);
+        managerInform.update(EInformProgress.EXECUTING);
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);

@@ -95,6 +95,10 @@ public class Popup {
     @JoinColumn(name = "taste_id", nullable = false)
     private TastePopup tastePopup;
 
+    @ManyToOne
+    @JoinColumn(name = "agent")
+    private User agent;
+
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
@@ -140,7 +144,8 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, String operationStatus) {
+                 LocalTime closeTime, String operationExcept, String operationStatus,
+                       User agent) {
         this.homepageLink = homepageLink;
         this.name = name;
         this.introduce = introduce;
@@ -161,6 +166,7 @@ public class Popup {
         this.closeTime = closeTime;
         this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
+        this.agent = agent;
     }
 
     public void addInterestCnt() {this.interestCnt += 1;}
@@ -173,4 +179,7 @@ public class Popup {
     public void updatePosterUrl(String url) {this.posterUrl = url;}
 
     public void updateOpStatus(String op) {this.operationStatus = op;}
+
+    public void updateAgent(User agent){
+        this.agent = agent;}
 }

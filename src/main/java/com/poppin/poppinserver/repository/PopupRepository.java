@@ -36,7 +36,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findClosingPopupByAll(Pageable pageable);
 
     //팝업 검색 -> 추후 full text search 변경 필요
-    @Query("SELECT p FROM Popup p WHERE p.name LIKE %:text% OR p.introduce LIKE %:text%")
+    @Query("SELECT p FROM Popup p WHERE (p.name LIKE %:text% OR p.introduce LIKE %:text%) " +
+            "AND (p.operationStatus != 'EXECUTING' and p.operationStatus != 'EXECUTED' and p.operationStatus != 'NOTEXECUTED')")
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
@@ -50,9 +51,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
 
     /**
-     * 
+     *
      * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * 
+     *
      */
     // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
     @Query("SELECT p FROM Popup p JOIN ReopenDemandUser rod ON p.id = rod.popup.id WHERE p.openDate >= :nowDate AND p.operationStatus = '' ORDER BY p.id asc")
@@ -80,4 +81,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "WHERE v.createdAt <= :threeHoursAgo")
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
+    @Query("SELECT p FROM Popup p " +
+            "WHERE p.operationStatus NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED') " +
+            "ORDER BY p.name ASC")
+    List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
 }

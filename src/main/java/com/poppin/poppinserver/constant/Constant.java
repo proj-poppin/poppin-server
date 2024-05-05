@@ -24,7 +24,6 @@ public class Constant {
             "/api/v1/popup/closing-list",    // 종료 임박 팝업 목록 조회
             "/api/v1/popup/guest/detail",     // 팝업 비로그인 상세 조회
             "/api/v1/popup/guest/search", // 비로그인 팝업 검색
-            "/api/v1/popup/create-popup", // 팝업 생성 ---- 임시
             "/api/v1/auth/login/kakao",
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",

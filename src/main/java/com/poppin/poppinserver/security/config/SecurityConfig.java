@@ -6,15 +6,14 @@ import com.poppin.poppinserver.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.security.filter.JwtExceptionFilter;
 import com.poppin.poppinserver.security.handler.CustomSignOutProcessHandler;
 import com.poppin.poppinserver.security.handler.CustomSignOutResultHandler;
-import com.poppin.poppinserver.security.handler.DefaultSignInFailureHandler;
-import com.poppin.poppinserver.security.handler.DefaultSignInSuccessHandler;
 import com.poppin.poppinserver.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.security.service.CustomUserDetailsService;
 import com.poppin.poppinserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,11 +21,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;

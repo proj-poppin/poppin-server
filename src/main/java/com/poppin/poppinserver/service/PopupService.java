@@ -1,10 +1,12 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.dto.popup.response.*;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
@@ -12,6 +14,8 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
+import com.poppin.poppinserver.type.EInformProgress;
+import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
@@ -28,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,6 +47,7 @@ public class PopupService {
     private final InterestRepository interestRepository;
     private final NotificationTokenRepository notificationTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
+    private final AlarmKeywordRepository alarmKeywordRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -50,23 +56,10 @@ public class PopupService {
 
     private final SelectRandomUtil selectRandomUtil;
 
-    public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images) {
-        //날짜 요청 유효성 검증
-        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
-            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
-        }
-
-        //현재 운영상태 정의
-        String operationStatus;
-        if (createPopupDto.openDate().isAfter(LocalDate.now())){
-            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
-            operationStatus = "D-" + period.getDays();
-        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
-        }
-        else{
-            operationStatus = "OPERATING";
-        }
+    @Transactional
+    public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         //카테고리별 엔티티 정의
         CreatePreferedDto createPreferedDto = createPopupDto.prefered();
@@ -98,6 +91,23 @@ public class PopupService {
         preferedPopup = preferedPopupRepository.save(preferedPopup);
         tastePopup = tastePopupRepository.save(tastePopup);
 
+        //날짜 요청 유효성 검증
+        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
+
+        //현재 운영상태 정의
+        String operationStatus;
+        if (createPopupDto.openDate().isAfter(LocalDate.now())){
+            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
+            operationStatus = "D-" + period.getDays();
+        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
+            operationStatus = "TERMINATED";
+        }
+        else{
+            operationStatus = "OPERATING";
+        }
+
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .homepageLink(createPopupDto.homepageLink())
@@ -119,6 +129,8 @@ public class PopupService {
                 .tastePopup(tastePopup)
                 .build();
 
+        popup.updateAgent(admin);
+
         popup = popupRepository.save(popup);
         log.info(popup.toString());
 
@@ -139,7 +151,121 @@ public class PopupService {
         popup = popupRepository.save(popup);
 
         return PopupDto.fromEntity(popup);
-    }
+    } // 전체 팝업 관리 - 팝업 생성
+
+    public PopupDto readPopup(Long adminId, Long popupId){
+        // 팝업 정보 불러오기
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        return PopupDto.fromEntity(popup);
+    } // 전체 팝업 관리 - 팝업 조회
+
+    public List<ManageSummaryDto> readManageList(Long adminId, int page, int size){
+        List<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size));
+
+        return ManageSummaryDto.fromEntityList(popups);
+    } // 전체 팝업 관리 - 전체 팝업 조회
+
+    public Boolean removePopup(Long popupId) {
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        popupRepository.delete(popup);
+
+        return true;
+    } // 전체 팝업 관리 - 팝업 삭제
+
+    @Transactional
+    public PopupDto updatePopup(UpdatePopupDto updatePopupDto,
+                                List<MultipartFile> images,
+                                Long adminId){
+        Popup popup = popupRepository.findById(updatePopupDto.popupId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        CreateTasteDto createTasteDto = updatePopupDto.taste();
+        TastePopup tastePopup = popup.getTastePopup();
+        tastePopup.update(createTasteDto.fashionBeauty(),
+                createTasteDto.characters(),
+                createTasteDto.foodBeverage(),
+                createTasteDto.webtoonAni(),
+                createTasteDto.interiorThings(),
+                createTasteDto.movie(),
+                createTasteDto.musical(),
+                createTasteDto.sports(),
+                createTasteDto.game(),
+                createTasteDto.itTech(),
+                createTasteDto.kpop(),
+                createTasteDto.alcohol(),
+                createTasteDto.animalPlant());
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
+        PreferedPopup preferedPopup = popup.getPreferedPopup();
+        preferedPopup.update(createPreferedDto.market(),
+                createPreferedDto.display(),
+                createPreferedDto.experience(),
+                createPreferedDto.wantFree());
+        preferedPopupRepository.save(preferedPopup);
+
+        // 기존 이미지 싹 지우기
+        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
+        List<String> originUrls = originImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .collect(Collectors.toList());
+        s3Service.deleteMultipleImages(originUrls);
+        posterImageRepository.deleteAllByPopupId(popup);
+
+        //새로운 이미지 추가
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        // 기존 키워드 삭제 및 다시 저장
+        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+
+        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        for(String keyword : updatePopupDto.keywords()){
+            alarmKeywords.add(AlarmKeyword.builder()
+                    .popupId(popup)
+                    .keyword(keyword)
+                    .build());
+        }
+        alarmKeywordRepository.saveAll(alarmKeywords);
+
+        popup.update(
+                updatePopupDto.homepageLink(),
+                updatePopupDto.name(),
+                updatePopupDto.introduce(),
+                updatePopupDto.address(),
+                updatePopupDto.addressDetail(),
+                updatePopupDto.entranceFee(),
+                updatePopupDto.resvRequired(),
+                updatePopupDto.availableAge(),
+                updatePopupDto.parkingAvailable(),
+                updatePopupDto.openDate(),
+                updatePopupDto.closeDate(),
+                updatePopupDto.openTime(),
+                updatePopupDto.closeTime(),
+                updatePopupDto.operationExcept(),
+                popup.getOperationStatus(),
+                admin
+        );
+
+        return PopupDto.fromEntity(popup);
+    } // 전체 팝업 관리 - 팝업 수정
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)

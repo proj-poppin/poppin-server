@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,12 +40,14 @@ public class ManagerInformController {
         return ResponseDto.ok(managerInformService.createManagerInform(createManagerInformDto, images, userId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("") // 운영자 제보 조회
     public ResponseDto<?> readUserInform(@RequestParam("informId") Long managerInformId) {
         return ResponseDto.ok(managerInformService.readManageInform(managerInformId));
     }
 
     // 운영자 제보 임시저장
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
                                          @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
@@ -58,6 +61,7 @@ public class ManagerInformController {
     }
 
     //운영자 제보 업로드
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
@@ -70,6 +74,7 @@ public class ManagerInformController {
         return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInfromDto, images, adminId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
     public ResponseDto<?> readManagerInformList(){
         return ResponseDto.ok(managerInformService.reatManagerInformList());
