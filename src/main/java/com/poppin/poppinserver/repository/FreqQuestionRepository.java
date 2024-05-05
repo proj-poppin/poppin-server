@@ -6,9 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FreqQuestionRepository extends JpaRepository<FreqQuestion, Long> {
     @Query("SELECT fq FROM FreqQuestion fq ORDER BY fq.createdAt DESC")
     List<FreqQuestion> findAllByOrderByCreatedAtDesc();
+
+    Optional<FreqQuestion> findById(Long id);
 }
