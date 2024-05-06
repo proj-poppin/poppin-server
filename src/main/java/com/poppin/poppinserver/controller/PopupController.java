@@ -29,7 +29,7 @@ public class PopupController {
     private final PopupService popupService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
                                       @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
                                       @UserId Long adminId) {
@@ -42,7 +42,7 @@ public class PopupController {
     } // 전체팝업관리 - 팝업생성
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("")
+    @GetMapping("/admin")
     public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
                                     @UserId Long adminId) {
 
@@ -50,7 +50,7 @@ public class PopupController {
     } // 전체팝업관리 - 팝업조회
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/list")
+    @GetMapping("/admin/list")
     public ResponseDto<?> readManageList(@RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long adminId) {
@@ -58,13 +58,13 @@ public class PopupController {
     } // 전체팝업관리 - 전체 팝업 리스트 조회
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("")
+    @DeleteMapping("/admin")
     public ResponseDto<?> removePopup(@RequestParam("id") Long popupId){
         return ResponseDto.ok(popupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
                                               @RequestPart(value = "contents") @Valid UpdatePopupDto updatePopupDto,
                                               @UserId Long adminId) {
@@ -75,6 +75,14 @@ public class PopupController {
 
         return ResponseDto.ok(popupService.updatePopup(updatePopupDto, images, adminId));
     } // 전체팝업관리 - 팝업 수정
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/search")
+    public ResponseDto<?> readManageList(@RequestParam("text") String text,
+                                         @RequestParam("page") int page,
+                                         @RequestParam("size") int size) {
+        return ResponseDto.ok(popupService.readManageList(text, page, size));
+    } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/guest/detail")
     public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {

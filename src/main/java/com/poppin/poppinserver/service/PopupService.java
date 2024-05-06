@@ -17,6 +17,7 @@ import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.EInformProgress;
 import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.type.EPopupTopic;
+import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class PopupService {
     private final NotificationService notificationService;
 
     private final SelectRandomUtil selectRandomUtil;
+    private final PrepardSearchUtil prepardSearchUtil;
 
     @Transactional
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
@@ -171,6 +173,14 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
+        // 카테고리 삭제
+
+        // 팝업 이미지 삭제
+
+        // 알람 키워드 삭제
+
+        //
+
         popupRepository.delete(popup);
 
         return true;
@@ -264,8 +274,18 @@ public class PopupService {
                 admin
         );
 
+        popupRepository.save(popup);
+
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
+
+    public List<ManageSearchingDto> readManageList(String text, int page, int size){
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
+
+        return ManageSearchingDto.fromEntityList(popups);
+    } // 전체 팝업 관리 - 전체 팝업 검색
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
@@ -415,16 +435,20 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
 
         return PopupSearchingDto.fromEntityList(popups, user);
-    }
+    } // 로그인 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
 
         return PopupGuestSearchingDto.fromEntityList(popups);
-    }
+    } // 비로그인 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
         User user = userRepository.findById(userId)
