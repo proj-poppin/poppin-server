@@ -171,6 +171,14 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
+        // 카테고리 삭제
+
+        // 팝업 이미지 삭제
+
+        // 알람 키워드 삭제
+
+        //
+
         popupRepository.delete(popup);
 
         return true;
@@ -263,6 +271,8 @@ public class PopupService {
                 popup.getOperationStatus(),
                 admin
         );
+
+        popupRepository.save(popup);
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
@@ -415,10 +425,18 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        String[] words = text.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (String word : words) {
+            sb.append(word);
+            sb.append("* ");
+        }
+        String
+
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
 
         return PopupSearchingDto.fromEntityList(popups, user);
-    }
+    } // 로그인 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
