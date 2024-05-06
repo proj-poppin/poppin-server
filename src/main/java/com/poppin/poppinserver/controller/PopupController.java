@@ -76,6 +76,13 @@ public class PopupController {
         return ResponseDto.ok(popupService.updatePopup(updatePopupDto, images, adminId));
     } // 전체팝업관리 - 팝업 수정
 
+    @GetMapping("/admin/search")
+    public ResponseDto<?> readManageList(@RequestParam("text") String text,
+                                         @RequestParam("page") int page,
+                                         @RequestParam("size") int size) {
+        return ResponseDto.ok(popupService.readManageList(text, page, size));
+    } // 전체팝업관리 - 전체 팝업 검색
+
     @GetMapping("/guest/detail")
     public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {
 

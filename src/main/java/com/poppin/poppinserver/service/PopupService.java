@@ -279,6 +279,14 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
+    public List<ManageSearchingDto> readManageList(String text, int page, int size){
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
+
+        return ManageSearchingDto.fromEntityList(popups);
+    } // 전체 팝업 관리 - 전체 팝업 검색
+
     public PopupGuestDetailDto readGuestDetail(Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -440,7 +448,7 @@ public class PopupService {
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
 
         return PopupGuestSearchingDto.fromEntityList(popups);
-    }
+    } // 비로그인 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
         User user = userRepository.findById(userId)
