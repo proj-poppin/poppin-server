@@ -17,6 +17,7 @@ import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.EInformProgress;
 import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.type.EPopupTopic;
+import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class PopupService {
     private final NotificationService notificationService;
 
     private final SelectRandomUtil selectRandomUtil;
+    private final PrepardSearchUtil prepardSearchUtil;
 
     @Transactional
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
@@ -425,15 +427,9 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        String[] words = text.split(" ");
-        StringBuilder sb = new StringBuilder();
-        for (String word : words) {
-            sb.append(word);
-            sb.append("* ");
-        }
-        String
+        String searchText = prepardSearchUtil.prepareSearchText(text);
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
 
         return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 팝업 검색
