@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -54,4 +55,16 @@ public class AdminController {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
+    /* 후기 신고 목록 조회 */
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @GetMapping("/reviews")
+//    public ResponseDto<?> readReviewReports() {
+//        return ResponseDto.ok();
+//    }
+
+    /* 후기 신고 상세 조회 */
+
+    /* 팝업 신고 목록 조회 */
+
+    /* 팝업 신고 상세 조회 */
 }
