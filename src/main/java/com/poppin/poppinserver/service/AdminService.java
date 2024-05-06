@@ -4,11 +4,13 @@ import com.poppin.poppinserver.domain.FreqQuestion;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.dto.user.response.UserListDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.FreqQuestionRepository;
+import com.poppin.poppinserver.repository.ReviewRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 public class AdminService {
     private final FreqQuestionRepository freqQuestionRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
         List<FaqResponseDto> faqDtoList = new ArrayList<>();
@@ -96,16 +100,18 @@ public class AdminService {
         }
     }
 
-    public UserAdministrationDto readUserDetail(Long userId) {
+    public UserAdministrationDetailDto readUserDetail(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        return UserAdministrationDto.builder()
+        Long hiddenReviewCount = reviewRepository.countByUserIdAndIsVisibleFalse(userId);
+        return UserAdministrationDetailDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .provider(user.getProvider())
                 .requiresSpecialCare(user.getRequiresSpecialCare())
+                .hiddenReviewCount(hiddenReviewCount)
                 .build();
     }
 
