@@ -435,7 +435,9 @@ public class PopupService {
     } // 로그인 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, PageRequest.of(page, size));
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
 
         return PopupGuestSearchingDto.fromEntityList(popups);
     }
