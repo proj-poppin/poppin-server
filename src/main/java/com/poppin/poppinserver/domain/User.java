@@ -75,6 +75,9 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "require_special_care", columnDefinition = "TINYINT(1)", nullable = false)
+    private Boolean requiresSpecialCare;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Interest> interestes = new HashSet<>();
 
@@ -111,6 +114,7 @@ public class User {
         this.deletedAt = null;
         this.isDeleted = false;
         this.profileImageUrl = profileImageUrl;
+        this.requiresSpecialCare = false;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
@@ -175,6 +179,10 @@ public class User {
     public void softDelete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);
+    }
+
+    public void requiresSpecialCare() {
+        this.requiresSpecialCare = true;
     }
 
     public void recover() {

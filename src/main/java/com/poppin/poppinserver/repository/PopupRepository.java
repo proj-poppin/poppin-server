@@ -61,8 +61,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
      *
      */
     // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
-    @Query("SELECT p FROM Popup p JOIN ReopenDemandUser rod ON p.id = rod.popup.id WHERE p.openDate >= :nowDate AND p.operationStatus = '' ORDER BY p.id asc")
-    List<Popup> findReopenPopup(LocalDate nowDate); // 재오픈 수요 체크 -> 재오픈 알림
+    @Query("SELECT p FROM Popup p " +
+            "JOIN AlarmKeyword al ON p.id = al.popupId.id " +
+            "WHERE p.openDate >= :nowDate " +
+            "AND EXISTS (SELECT 1 FROM ReopenDemandUser rod WHERE p.id = rod.popup.id)")
+    List<Popup> findReopenPopupWithDemand(LocalDate nowDate);
+
 
     @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus NOT IN('TERMINATED') AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
     List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);

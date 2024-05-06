@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,19 +16,55 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AdminService adminService;
 
+    /* FAQ 조회 */
     @GetMapping("/support/faqs")
     public ResponseDto<?> readFaqs() {
         return ResponseDto.ok(adminService.readFAQs());
     }
 
+    /* FAQ 생성 */
     @PostMapping("/support/faqs")
     public ResponseDto<?> createFaq(@UserId Long adminId, @RequestBody FaqRequestDto faqRequestDto) {
         return ResponseDto.ok(adminService.createFAQ(adminId, faqRequestDto));
     }
 
+    /* FAQ 삭제 */
     @DeleteMapping("/support/faqs/{faqId}")
     public ResponseDto<?> deleteFaq(@PathVariable Long faqId) {
         adminService.deleteFAQ(faqId);
         return ResponseDto.ok("FAQ가 삭제되었습니다.");
     }
+
+    /* 회원 관리 목록 조회 */
+    @GetMapping("/users")
+    public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "nickname") String sortField,
+                                    @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+        return ResponseDto.ok(adminService.readUsers(sortField, sortOrder));
+    }
+
+    /* 회원 상세 조회 */
+    /* 작성한 전체 후기 조회 */
+    @GetMapping("/users/{userId}")
+    public ResponseDto<?> readUserDetail(@PathVariable Long userId) {
+        return ResponseDto.ok(adminService.readUserDetail(userId));
+    }
+
+    /* 회원 검색 */
+    @GetMapping("/users/search")
+    public ResponseDto<?> searchUsers(@RequestParam("text") String text) {
+        return ResponseDto.ok(adminService.searchUsers(text));
+    }
+
+    /* 후기 신고 목록 조회 */
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @GetMapping("/reviews")
+//    public ResponseDto<?> readReviewReports() {
+//        return ResponseDto.ok();
+//    }
+
+    /* 후기 신고 상세 조회 */
+
+    /* 팝업 신고 목록 조회 */
+
+    /* 팝업 신고 상세 조회 */
 }
