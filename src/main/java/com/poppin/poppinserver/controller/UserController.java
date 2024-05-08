@@ -140,4 +140,10 @@ public class UserController {
     public ResponseDto<?> readFAQs() {
         return ResponseDto.ok(userService.readFAQs());
     }
+
+    /*마이페이지 - 한글 닉네임 랜덤 생성*/
+    @GetMapping("/random-nickname")
+    public ResponseDto<?> generateRandomNickname() {
+        return ResponseDto.ok(userService.generateRandomNickname());
+    }
 }

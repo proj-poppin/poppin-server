@@ -8,11 +8,13 @@ import com.poppin.poppinserver.dto.review.response.ReviewUncertiDto;
 import com.poppin.poppinserver.dto.review.response.ReviewCertiDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.dto.user.response.NicknameDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.util.RandomNicknameUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -321,5 +323,10 @@ public class UserService {
                     .build());
         }
         return faqDtoList;
+    }
+
+    public NicknameDto generateRandomNickname() {
+        String randomNickname = RandomNicknameUtil.generateRandomNickname();
+        return new NicknameDto(randomNickname);
     }
 }
