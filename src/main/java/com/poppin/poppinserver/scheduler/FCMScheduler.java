@@ -31,7 +31,7 @@ public class FCMScheduler {
     private final NotificationUtil notificationUtil;
 
     @Scheduled(cron = "0 */5 * * * *")
-    public void reopenPopup() throws FirebaseMessagingException {
+    public void reopenPopup(){
 
         /**
          * 재오픈 수요 팝업 재오픈 알림
@@ -47,7 +47,7 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
-    public void magamPopup() throws FirebaseMessagingException {
+    public void magamPopup(){
         /**
          * 마감 팝업 알림
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
@@ -65,7 +65,7 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
-    public void openPopup() throws FirebaseMessagingException {
+    public void openPopup() {
         /**
          * 오픈 팝업 알림
          * 1. popup 을 추출(조건 : 오픈 시간이 현재 시간보다 같거나 클 때 )
@@ -86,7 +86,7 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
-    public void hotPopup() throws FirebaseMessagingException {
+    public void hotPopup() {
         /**
          * 인기 팝업 알림
          * 1. popup 을 추출(조건 : 유저 생성 기점으로 7일 마다 인기 팝업 등록된 팝업 )
@@ -105,8 +105,13 @@ public class FCMScheduler {
         }
     }
 
+    /**
+     * 후기 요청
+     * 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
+     *
+     */
     @Scheduled(cron = "0 */5 * * * *")
-    public void hoogi() throws FirebaseMessagingException {
+    public void hoogi() {
         LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
 
         log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
@@ -125,7 +130,7 @@ public class FCMScheduler {
      * @param info : 푸시 알림 제목, 메시지
      * @throws FirebaseMessagingException
      */
-    private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, String type, EPushInfo info) throws FirebaseMessagingException {
+    private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, String type, EPushInfo info) {
 
         List<FCMRequestDto> fcmRequestDtoList = null;
         for (Popup popup : popupList){
@@ -134,7 +139,8 @@ public class FCMScheduler {
             if (tokenList.isEmpty()) log.info(topic.getTopicName() + "에 대해 구독한 토큰이 없습니다.");
             else{
                 for (String token : tokenList){
-                    FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token, info.getTitle(), info.getBody());
+                    FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token, info.getTitle(), info.getBody() , topic);
+                    assert fcmRequestDtoList != null; // debug
                     fcmRequestDtoList.add(fcmRequestDto);
                 }
             }

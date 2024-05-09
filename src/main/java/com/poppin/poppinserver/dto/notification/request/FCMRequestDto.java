@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.dto.notification.request;
 
+import com.poppin.poppinserver.type.EPopupTopic;
 import jakarta.validation.constraints.NotNull;
 
 public record FCMRequestDto(
@@ -15,7 +16,10 @@ public record FCMRequestDto(
         String title,
 
         @NotNull
-        String body
+        String body,
+
+        @NotNull
+        EPopupTopic topic
 
 ) {
 }
