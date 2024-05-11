@@ -20,11 +20,15 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class NotificationUtil {
 
-    private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
-    private static final String ANDROID_TOPIC_TEST = "[FCM Android Topic Test]";
-    private static final String ANDROID_TOKEN = "[FCM Android Token]";
-    private static final String ANDROID_TOPIC = "[FCM Android Topic]";
-
+    /**=================================================================================== */
+    /**
+     * 로그용
+     */
+          private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
+          private static final String ANDROID_TOPIC_TEST = "[FCM Android Topic Test]";
+          private static final String ANDROID_TOKEN = "[FCM Android Token]";
+          private static final String ANDROID_TOPIC = "[FCM Android Topic]";
+    /**==================================================================================== */
 
     private final FirebaseMessaging firebaseMessaging;
 
@@ -72,11 +76,40 @@ public class NotificationUtil {
     }
 
 
+    /**
+     * 안드로이드 FCM Topic 앱 푸시 알림 메서드
+     * @param fcmRequestDtoList
+     * @throws FirebaseMessagingException
+     */
+    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
+        List<String> registrationTokens = null;
+        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
+            registrationTokens.add(fcmRequestDto.token());
+            Message message = Message.builder()
+                    .setNotification(Notification.builder()
+                            .setTitle(fcmRequestDto.title())
+                            .setBody(fcmRequestDto.body())
+                            .build())
+                    .setTopic(String.valueOf(fcmRequestDto.topic()))
+                    .build();
 
+            log.info("--- 토픽 메시지 발송 시작 ---");
+            try {
+                String result = firebaseMessaging.send(message);
+                log.debug(ANDROID_TOPIC + " Successfully sent message: " + result);
+            } catch (FirebaseMessagingException e) {
+                log.error(ANDROID_TOPIC + " Failed to send message: " + e.getMessage());
+            }
+        }
 
+    }
 
-    /* 안드로이드 토픽 메시지 발송 */
-    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
+    /**
+     * 여러 기기 동시 전송
+     * @param fcmRequestDtoList
+     * @throws FirebaseMessagingException
+     */
+    public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
         List<String> tokenList = null;
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
             tokenList = IntStream.rangeClosed(1, 30)
@@ -106,7 +139,6 @@ public class NotificationUtil {
             }else log.info(ANDROID_TOPIC + " List of tokens send messages SUCCESSFULLY");
         }
     }
-
 
     /* ============================================================================================================*/
     /* ===================================         I O S         ==================================================*/
