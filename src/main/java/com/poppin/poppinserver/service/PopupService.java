@@ -431,18 +431,68 @@ public class PopupService {
         }
     }
 
-    public List<PopupSearchingDto> readSearchingList(String text, int page, int size, Long userId){
+    public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
+                                                     String oper, String order, int page, int size,
+                                                     Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        // 팝업 형태 3개
+        Boolean market = (taste.substring(0, 1).equals("1")) ? true : null;
+        Boolean display = (taste.substring(1,2).equals("1")) ? true : null;
+        Boolean experience = (taste.substring(2,3).equals("1")) ? true : null;
+
+        // 팝업 취향 13개
+        Boolean fashionBeauty = (prepered.substring(0,1).equals("1")) ? true : null;
+        Boolean characters = (prepered.substring(1,2).equals("1")) ? true : null;
+        Boolean foodBeverage = (prepered.substring(2,3).equals("1")) ? true : null;
+        Boolean webtoonAni = (prepered.substring(3,4).equals("1")) ? true : null;
+        Boolean interiorThings = (prepered.substring(4,5).equals("1")) ? true : null;
+        Boolean movie = (prepered.substring(5,6).equals("1")) ? true : null;
+        Boolean musical = (prepered.substring(6,7).equals("1")) ? true : null;
+        Boolean sports = (prepered.substring(7,8).equals("1")) ? true : null;
+        Boolean game = (prepered.substring(8,9).equals("1")) ? true : null;
+        Boolean itTech = (prepered.substring(9,10).equals("1")) ? true : null;
+        Boolean kpop = (prepered.substring(10,11).equals("1")) ? true : null;
+        Boolean alcchol = (prepered.substring(11,12).equals("1")) ? true : null;
+        Boolean animalPlant = (prepered.substring(12,13).equals("1")) ? true : null;
+
+        // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = prepardSearchUtil.prepareSearchText(text);
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));
+        // order에 따른 정렬 방식 설정
+        Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
+        if (order != null) {
+            switch (order) {
+                case "open":
+                    sort = Sort.by(Sort.Direction.DESC, "open_date");
+                    break;
+                case "close":
+                    sort = Sort.by(Sort.Direction.ASC, "close_date");
+                    break;
+                case "view":
+                    sort = Sort.by(Sort.Direction.DESC, "view");
+                    break;
+                case "upload":
+                    sort = Sort.by(Sort.Direction.DESC, "created_at");
+                    break;
+            }
+        }
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+                market, display, experience, // 팝업 형태 3개
+                fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                webtoonAni, interiorThings, movie,
+                musical, sports, game,
+                itTech, kpop, alcchol,
+                animalPlant,
+                oper); // 운영 상태
 
         return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 팝업 검색
 
-    public List<PopupGuestSearchingDto> readGuestSearchingList(String text, int page, int size){
+    public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
+                                                               String oper, String order, int page, int size){
         String searchText = prepardSearchUtil.prepareSearchText(text);
 
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size));

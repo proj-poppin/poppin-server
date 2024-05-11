@@ -119,17 +119,25 @@ public class PopupController {
 
     @GetMapping("/search") // 로그인 팝업 검색
     public ResponseDto<?> readSearchList(@RequestParam("text") String text,
+                                         @RequestParam("taste") String taste,
+                                         @RequestParam("prepered") String prepered,
+                                         @RequestParam("oper") String oper,
+                                         @RequestParam("order") String order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long userId) {
-        return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
+        return ResponseDto.ok(popupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
     }
 
     @GetMapping("/guest/search") // 비로그인 팝업 검색
     public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
+                                              @RequestParam("taste") String taste,
+                                              @RequestParam("prepered") String prepered,
+                                              @RequestParam("oper") String oper,
+                                              @RequestParam("order") String order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readGuestSearchingList(text, page, size));
+        return ResponseDto.ok(popupService.readGuestSearchingList(text, taste, prepered, oper, order, page, size));
     }
 
     @GetMapping("/taste-list") // 취향 저격 팝업 목록

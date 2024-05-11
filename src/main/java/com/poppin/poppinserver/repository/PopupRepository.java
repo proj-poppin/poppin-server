@@ -38,12 +38,45 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     //팝업 검색
     @Query(value = "SELECT p.* FROM popups p WHERE " +
             "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED')",
+            "AND p.operation_status = :oper  " +
+            "AND (:fashionBeauty IS NULL OR p.fashionBeauty = :fashionBeauty) " +
+            "AND (:characters IS NULL OR p.characters = :characters) " +
+            "AND (:foodBeverage IS NULL OR p.foodBeverage = :foodBeverage) " +
+            "AND (:webtoonAni IS NULL OR p.webtoonAni = :webtoonAni) " +
+            "AND (:interiorThings IS NULL OR p.interiorThings = :interiorThings) " +
+            "AND (:movie IS NULL OR p.movie = :movie) " +
+            "AND (:musical IS NULL OR p.musical = :musical) " +
+            "AND (:sports IS NULL OR p.sports = :sports) " +
+            "AND (:game IS NULL OR p.game = :game) " +
+            "AND (:itTech IS NULL OR p.itTech = :itTech) " +
+            "AND (:kpop IS NULL OR p.kpop = :kpop) " +
+            "AND (:alcchol IS NULL OR p.alcchol = :alcchol) " +
+            "AND (:animalPlant IS NULL OR p.animalPlant = :animalPlant)",
             countQuery = "SELECT COUNT(*) FROM popups p WHERE " +
-                    "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED')",
+            "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = :oper " +
+            "AND (:fashionBeauty IS NULL OR p.fashionBeauty = :fashionBeauty) " +
+            "AND (:characters IS NULL OR p.characters = :characters) " +
+            "AND (:foodBeverage IS NULL OR p.foodBeverage = :foodBeverage) " +
+            "AND (:webtoonAni IS NULL OR p.webtoonAni = :webtoonAni) " +
+            "AND (:interiorThings IS NULL OR p.interiorThings = :interiorThings) " +
+            "AND (:movie IS NULL OR p.movie = :movie) " +
+            "AND (:musical IS NULL OR p.musical = :musical) " +
+            "AND (:sports IS NULL OR p.sports = :sports) " +
+            "AND (:game IS NULL OR p.game = :game) " +
+            "AND (:itTech IS NULL OR p.itTech = :itTech) " +
+            "AND (:kpop IS NULL OR p.kpop = :kpop) " +
+            "AND (:alcchol IS NULL OR p.alcchol = :alcchol) " +
+            "AND (:animalPlant IS NULL OR p.animalPlant = :animalPlant)",
             nativeQuery = true)
-    List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
+    List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
+                                            Boolean market,Boolean display,Boolean experience,
+                                            Boolean fashionBeauty,Boolean characters,Boolean foodBeverage,
+                                            Boolean webtoonAni,Boolean interiorThings,Boolean movie,
+                                            Boolean musical,Boolean sports,Boolean game,
+                                            Boolean itTech,Boolean kpop,Boolean alcchol,
+                                            Boolean animalPlant,
+                                            String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();

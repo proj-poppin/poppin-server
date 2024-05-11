@@ -129,10 +129,14 @@ public class UserController {
     /*마이페이지 - 일반후기 팝업 검색*/
     @GetMapping("/popup/search")
     public ResponseDto<?> searchPopupName(@RequestParam("text") String text,
+                                          @RequestParam("taste") String taste,
+                                          @RequestParam("prepered") String prepered,
+                                          @RequestParam("oper") String oper,
+                                          @RequestParam("order") String order,
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,
                                           @UserId Long userId) {
-        return ResponseDto.ok(popupService.readSearchingList(text, page, size, userId));
+        return ResponseDto.ok(popupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/
