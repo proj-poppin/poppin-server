@@ -39,42 +39,42 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query(value = "SELECT p.* FROM popups p WHERE " +
             "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
             "AND p.operation_status = :oper  " +
-            "AND (:fashionBeauty IS NULL OR p.fashionBeauty = :fashionBeauty) " +
+            "AND (:fashionBeauty IS NULL OR p.fashion_beauty = :fashionBeauty) " +
             "AND (:characters IS NULL OR p.characters = :characters) " +
-            "AND (:foodBeverage IS NULL OR p.foodBeverage = :foodBeverage) " +
-            "AND (:webtoonAni IS NULL OR p.webtoonAni = :webtoonAni) " +
-            "AND (:interiorThings IS NULL OR p.interiorThings = :interiorThings) " +
+            "AND (:foodBeverage IS NULL OR p.food_beverage = :foodBeverage) " +
+            "AND (:webtoonAni IS NULL OR p.webtoon_ani = :webtoonAni) " +
+            "AND (:interiorThings IS NULL OR p.interior_things = :interiorThings) " +
             "AND (:movie IS NULL OR p.movie = :movie) " +
             "AND (:musical IS NULL OR p.musical = :musical) " +
             "AND (:sports IS NULL OR p.sports = :sports) " +
             "AND (:game IS NULL OR p.game = :game) " +
-            "AND (:itTech IS NULL OR p.itTech = :itTech) " +
+            "AND (:itTech IS NULL OR p.it_tech = :itTech) " +
             "AND (:kpop IS NULL OR p.kpop = :kpop) " +
-            "AND (:alcchol IS NULL OR p.alcchol = :alcchol) " +
-            "AND (:animalPlant IS NULL OR p.animalPlant = :animalPlant)",
+            "AND (:alcchol IS NULL OR p.alcohol = :alcohol) " +
+            "AND (:animalPlant IS NULL OR p.animal_plant = :animalPlant)",
             countQuery = "SELECT COUNT(*) FROM popups p WHERE " +
             "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
             "AND p.operation_status = :oper " +
-            "AND (:fashionBeauty IS NULL OR p.fashionBeauty = :fashionBeauty) " +
+            "AND (:fashionBeauty IS NULL OR p.fashion_beauty = :fashionBeauty) " +
             "AND (:characters IS NULL OR p.characters = :characters) " +
-            "AND (:foodBeverage IS NULL OR p.foodBeverage = :foodBeverage) " +
-            "AND (:webtoonAni IS NULL OR p.webtoonAni = :webtoonAni) " +
-            "AND (:interiorThings IS NULL OR p.interiorThings = :interiorThings) " +
+            "AND (:foodBeverage IS NULL OR p.food_beverage = :foodBeverage) " +
+            "AND (:webtoonAni IS NULL OR p.webtoon_ani = :webtoonAni) " +
+            "AND (:interiorThings IS NULL OR p.interior_things = :interiorThings) " +
             "AND (:movie IS NULL OR p.movie = :movie) " +
             "AND (:musical IS NULL OR p.musical = :musical) " +
             "AND (:sports IS NULL OR p.sports = :sports) " +
             "AND (:game IS NULL OR p.game = :game) " +
-            "AND (:itTech IS NULL OR p.itTech = :itTech) " +
+            "AND (:itTech IS NULL OR p.it_tech = :itTech) " +
             "AND (:kpop IS NULL OR p.kpop = :kpop) " +
-            "AND (:alcchol IS NULL OR p.alcchol = :alcchol) " +
-            "AND (:animalPlant IS NULL OR p.animalPlant = :animalPlant)",
+            "AND (:alcchol IS NULL OR p.alcchol = :alcohol) " +
+            "AND (:animalPlant IS NULL OR p.animal_plant = :animalPlant)",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
                                             Boolean market,Boolean display,Boolean experience,
                                             Boolean fashionBeauty,Boolean characters,Boolean foodBeverage,
                                             Boolean webtoonAni,Boolean interiorThings,Boolean movie,
                                             Boolean musical,Boolean sports,Boolean game,
-                                            Boolean itTech,Boolean kpop,Boolean alcchol,
+                                            Boolean itTech,Boolean kpop,Boolean alcohol,
                                             Boolean animalPlant,
                                             String oper);
 

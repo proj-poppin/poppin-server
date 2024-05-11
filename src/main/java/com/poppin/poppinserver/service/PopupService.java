@@ -298,7 +298,7 @@ public class PopupService {
         Boolean game = (prepered.charAt(8) == '1') ? true : null;
         Boolean itTech = (prepered.charAt(9) == '1') ? true : null;
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
-        Boolean alcchol = (prepered.charAt(11) == '1') ? true : null;
+        Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
@@ -328,7 +328,7 @@ public class PopupService {
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
-                itTech, kpop, alcchol,
+                itTech, kpop, alcohol,
                 animalPlant,
                 oper); // 운영 상태
 
@@ -502,7 +502,7 @@ public class PopupService {
         Boolean game = (prepered.charAt(8) == '1') ? true : null;
         Boolean itTech = (prepered.charAt(9) == '1') ? true : null;
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
-        Boolean alcchol = (prepered.charAt(11) == '1') ? true : null;
+        Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
@@ -532,7 +532,7 @@ public class PopupService {
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
-                itTech, kpop, alcchol,
+                itTech, kpop, alcohol,
                 animalPlant,
                 oper); // 운영 상태
 
@@ -558,7 +558,7 @@ public class PopupService {
         Boolean game = (prepered.charAt(8) == '1') ? true : null;
         Boolean itTech = (prepered.charAt(9) == '1') ? true : null;
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
-        Boolean alcchol = (prepered.charAt(11) == '1') ? true : null;
+        Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
@@ -588,7 +588,7 @@ public class PopupService {
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
-                itTech, kpop, alcchol,
+                itTech, kpop, alcohol,
                 animalPlant,
                 oper); // 운영 상태
 
