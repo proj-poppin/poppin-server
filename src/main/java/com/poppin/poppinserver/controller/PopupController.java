@@ -133,6 +133,14 @@ public class PopupController {
         return ResponseDto.ok(popupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
     }
 
+    @GetMapping("/search/base") // 로그인 팝업 베이스 검색
+    public ResponseDto<?> readBaseList(@RequestParam("text") String text,
+                                         @RequestParam("page") int page,
+                                         @RequestParam("size") int size,
+                                         @UserId Long userId) {
+        return ResponseDto.ok(popupService.readBaseList(text, page, size, userId));
+    }
+
     @GetMapping("/guest/search") // 비로그인 팝업 검색
     public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
                                               @RequestParam("taste") String taste,
