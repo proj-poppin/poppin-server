@@ -607,6 +607,15 @@ public class PopupService {
         return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 팝업 검색
 
+    public List<PopupGuestSearchingDto> readGuestBaseList(String text, int page, int size){
+        // 검색어 토큰화 및 Full Text 와일드 카드 적용
+        String searchText = prepardSearchUtil.prepareSearchText(text);
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
+
+        return PopupGuestSearchingDto.fromEntityList(popups);
+    } // 비로그인 베이스 팝업 검색
+
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
