@@ -35,6 +35,18 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Pageable pageable);
 
+    //베이스 팝업 검색
+    @Query(value = "SELECT p.* FROM popups p " +
+            "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = 'OPERATING'  " +
+            "ORDER BY p.openDate DESC, p.id ",
+            countQuery = "SELECT COUNT(*) FROM popups p " +
+                    "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = 'OPERATING'  " +
+                    "ORDER BY p.openDate DESC, p.id ",
+            nativeQuery = true)
+    List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
+
     //팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
             "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
