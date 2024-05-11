@@ -315,7 +315,7 @@ public class PopupService {
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
                 case "view":
-                    sort = Sort.by(Sort.Direction.DESC, "view");
+                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
                 case "upload":
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
@@ -519,7 +519,7 @@ public class PopupService {
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
                 case "view":
-                    sort = Sort.by(Sort.Direction.DESC, "view");
+                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
                 case "upload":
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
@@ -575,7 +575,7 @@ public class PopupService {
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
                 case "view":
-                    sort = Sort.by(Sort.Direction.DESC, "view");
+                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
                 case "upload":
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
