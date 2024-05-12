@@ -94,4 +94,13 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "WHERE p.operationStatus NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED') " +
             "ORDER BY p.name ASC")
     List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
+
+
+    @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
+            "ON i.createdAt >= :startOfWeek AND i.createdAt < :endOfWeek " +
+            "GROUP BY p.id " +
+            "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
+    List<Popup> findTopOperatingPopupsByInterestAndViewCountAndUserCreate(@Param("startOfWeek") LocalDateTime startOfWeek,
+                                                                          @Param("endOfWeek") LocalDateTime endOfWeek,
+                                                                          Pageable pageable);
 }

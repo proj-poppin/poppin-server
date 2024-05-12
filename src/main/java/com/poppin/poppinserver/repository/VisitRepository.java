@@ -19,8 +19,8 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     @Query("SELECT COUNT(v) FROM Visit v JOIN v.popup p WHERE v.createdAt >= :thirtyMinutesAgo AND p = :popup")
     Optional<Integer> showRealTimeVisitors(@Param("popup") Popup popup, @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo);
 
-    @Query("SELECT COUNT(v) FROM Visit  v JOIN v.user u JOIN v.popup p WHERE v.createdAt >= :thirtyMinutesAgo AND u = :user AND p = :popup")
-    Integer findDuplicateVisitors(@Param("user") User user , @Param("popup") Popup popup, @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo );
+    @Query("SELECT COUNT(v) FROM Visit  v  WHERE v.createdAt >= :thirtyMinutesAgo AND v.user.id =  :userId AND v.popup.id = :popupId")
+    Integer findDuplicateVisitors(@Param("userId") Long userId , @Param("popupId") Long popupId, @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo );
 
     @Query("SELECT v FROM Visit v JOIN v.user u JOIN v.popup p WHERE v.user.id = :userId AND  v.popup.id = :popupId")
     Visit findByUserIdAndPopupId(@Param("userId") Long userId , @Param("popupId") Long popupId);

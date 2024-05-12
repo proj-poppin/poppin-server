@@ -61,7 +61,7 @@ public class VisitService {
                 .popup(popup)
                 .build();
 
-        int visitors = visitRepository.findDuplicateVisitors(user,popup, thirtyMinutesAgo);
+        Integer visitors = visitRepository.findDuplicateVisitors(userId,popup.getId(), thirtyMinutesAgo);
         if (visitors > 0)throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
 
         visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 이주일 전 생성된 데이터만 삭제 예정*/
