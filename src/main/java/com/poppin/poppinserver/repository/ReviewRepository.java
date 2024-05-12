@@ -1,8 +1,10 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Review;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,4 +31,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.user.id = :userId AND r.isVisible = false")
     Long countByUserIdAndIsVisibleFalse(Long userId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Review r WHERE r.user.id = :userId")
+    void deleteAllByUserId(Long userId);
 }
