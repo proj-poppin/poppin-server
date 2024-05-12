@@ -35,15 +35,69 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Pageable pageable);
 
-    //팝업 검색
-    @Query(value = "SELECT p.* FROM popups p WHERE " +
-            "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED')",
-            countQuery = "SELECT COUNT(*) FROM popups p WHERE " +
-                    "(MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED')",
+    //베이스 팝업 검색
+    @Query(value = "SELECT p.* FROM popups p " +
+            "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = 'OPERATING'  " +
+            "ORDER BY p.openDate DESC, p.id ",
+            countQuery = "SELECT COUNT(*) FROM popups p " +
+                    "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = 'OPERATING'  " +
+                    "ORDER BY p.openDate DESC, p.id ",
             nativeQuery = true)
-    List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable);
+    List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
+
+    //팝업 검색
+    @Query(value = "SELECT p.* FROM popups p " +
+            "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
+            "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
+            "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = :oper  " +
+            "AND (:fashionBeauty IS NULL OR tp.fashion_beauty = :fashionBeauty) " +
+            "AND (:characters IS NULL OR tp.characters = :characters) " +
+            "AND (:foodBeverage IS NULL OR tp.food_beverage = :foodBeverage) " +
+            "AND (:webtoonAni IS NULL OR tp.webtoon_ani = :webtoonAni) " +
+            "AND (:interiorThings IS NULL OR tp.interior_things = :interiorThings) " +
+            "AND (:movie IS NULL OR tp.movie = :movie) " +
+            "AND (:musical IS NULL OR tp.musical = :musical) " +
+            "AND (:sports IS NULL OR tp.sports = :sports) " +
+            "AND (:game IS NULL OR tp.game = :game) " +
+            "AND (:itTech IS NULL OR tp.it_tech = :itTech) " +
+            "AND (:kpop IS NULL OR tp.kpop = :kpop) " +
+            "AND (:alcohol IS NULL OR tp.alcohol = :alcohol) " +
+            "AND (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
+            "AND (:market IS NULL OR pp.market = :market) " +
+            "AND (:display IS NULL OR pp.display = :display) " +
+            "AND (:experience IS NULL OR pp.experience = :experience)",
+            countQuery = "SELECT COUNT(*) FROM popups p " +
+                    "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
+                    "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
+                    "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = :oper " +
+                    "AND (:fashionBeauty IS NULL OR tp.fashion_beauty = :fashionBeauty) " +
+                    "AND (:characters IS NULL OR tp.characters = :characters) " +
+                    "AND (:foodBeverage IS NULL OR tp.food_beverage = :foodBeverage) " +
+                    "AND (:webtoonAni IS NULL OR tp.webtoon_ani = :webtoonAni) " +
+                    "AND (:interiorThings IS NULL OR tp.interior_things = :interiorThings) " +
+                    "AND (:movie IS NULL OR tp.movie = :movie) " +
+                    "AND (:musical IS NULL OR tp.musical = :musical) " +
+                    "AND (:sports IS NULL OR tp.sports = :sports) " +
+                    "AND (:game IS NULL OR tp.game = :game) " +
+                    "AND (:itTech IS NULL OR tp.it_tech = :itTech) " +
+                    "AND (:kpop IS NULL OR tp.kpop = :kpop) " +
+                    "AND (:alcohol IS NULL OR tp.alcohol = :alcohol) " +
+                    "AND (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
+                    "AND (:market IS NULL OR pp.market = :market) " +
+                    "AND (:display IS NULL OR pp.display = :display) " +
+                    "AND (:experience IS NULL OR pp.experience = :experience)",
+            nativeQuery = true)
+    List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
+                                            Boolean market, Boolean display, Boolean experience,
+                                            Boolean fashionBeauty, Boolean characters, Boolean foodBeverage,
+                                            Boolean webtoonAni, Boolean interiorThings, Boolean movie,
+                                            Boolean musical, Boolean sports, Boolean game,
+                                            Boolean itTech, Boolean kpop, Boolean alcohol,
+                                            Boolean animalPlant, String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
