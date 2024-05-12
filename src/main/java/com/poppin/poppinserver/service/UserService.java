@@ -329,4 +329,12 @@ public class UserService {
         String randomNickname = RandomNicknameUtil.generateRandomNickname();
         return new NicknameDto(randomNickname);
     }
+
+    @Transactional
+    public void deleteAllRelatedInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
+        reviewRepository.deleteAllByUserId(userId);     // 유저가 남긴 모든 후기 삭제
+    }
 }
