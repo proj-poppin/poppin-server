@@ -1,24 +1,8 @@
 package com.poppin.poppinserver.scheduler;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
-import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.PopupTopicRepository;
-import com.poppin.poppinserver.type.EPopupTopic;
-import com.poppin.poppinserver.type.EPushInfo;
-import com.poppin.poppinserver.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 
 @RequiredArgsConstructor

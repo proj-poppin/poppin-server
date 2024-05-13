@@ -16,13 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class SubscribeUtil {
+public class FCMSubscribeUtil {
+
     private final PopupTopicRepository popupTopicRepository;
     private final InformationTopicRepository informationTopicRepository;
 
@@ -30,7 +31,9 @@ public class SubscribeUtil {
 
     /* 안드로이드 토픽 구독 */
     public void androidSubscribePopupTopic(NotificationToken token, Popup popup, String type) throws FirebaseMessagingException {
-        List<String> registrationTokens = Collections.singletonList(token.getToken());
+        List<String> registrationTokens = new ArrayList<>();
+        registrationTokens.add(token.getToken());
+
         TopicManagementResponse response = null;
 
         // 관심 팝업 관련 주제에 대해서 구독
@@ -47,8 +50,11 @@ public class SubscribeUtil {
         log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
     }
 
-    public void androidUnsubscribeInterestedPopupTopic(NotificationToken token,String type) throws FirebaseMessagingException {
-        List<String> registrationTokens = Collections.singletonList(token.getToken());
+    public void androidUnsubscribePopupTopic(NotificationToken token,String type) throws FirebaseMessagingException {
+
+        List<String> registrationTokens = new ArrayList<>();
+        registrationTokens.add(token.getToken());
+
         TopicManagementResponse response = null;
 
         // 구독 해제
@@ -67,7 +73,10 @@ public class SubscribeUtil {
 
 
     public void androidSubscribeNotificationTopic(NotificationToken token, Popup popup) throws FirebaseMessagingException {
-        List<String> registrationTokens = Collections.singletonList(token.getToken());
+
+        List<String> registrationTokens = new ArrayList<>();
+        registrationTokens.add(token.getToken());
+
         TopicManagementResponse response = null;
 
         if (popup != null){
@@ -83,6 +92,5 @@ public class SubscribeUtil {
             }
             log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
         }
-
     }
 }

@@ -28,7 +28,7 @@ public class VisitService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
 
-    private final NotificationService notificationService;
+    private final FCMService fcmService;
 
     /* 실시간 방문자 조회 */
     public Optional<Integer> showRealTimeVisitors(Long popupId){
@@ -68,7 +68,7 @@ public class VisitService {
 
         // fcm 구독
         String token = popupInfoDto.token();
-        notificationService.fcmAddTopic(token, popup, EPopupTopic.BANGMUN.getTopicType());
+        fcmService.fcmAddTopic(token, popup, EPopupTopic.BANGMUN.getTopicType());
 
         Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo); /*실시간 방문자 수*/
 

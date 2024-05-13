@@ -52,6 +52,9 @@ dependencies {
 
 	// Firebase sdk
 	implementation 'com.google.firebase:firebase-admin:7.1.0'
+
+	// APNs
+	implementation 'com.github.fernandospr:javapns-jdk16:2.4.0' // IOS >= 10
 }
 
 tasks.named('test') {
