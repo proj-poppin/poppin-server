@@ -39,11 +39,11 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query(value = "SELECT p.* FROM popups p " +
             "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
             "AND p.operation_status = 'OPERATING'  " +
-            "ORDER BY p.openDate DESC, p.id ",
+            "ORDER BY p.open_date DESC, p.id ",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
                     "AND p.operation_status = 'OPERATING'  " +
-                    "ORDER BY p.openDate DESC, p.id ",
+                    "ORDER BY p.open_date DESC, p.id ",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
 
