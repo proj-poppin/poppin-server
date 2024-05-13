@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.util;
 
-import com.poppin.poppinserver.dto.notification.request.ApnRequestDto;
+import com.poppin.poppinserver.dto.notification.request.APNsRequestDto;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
@@ -67,8 +67,8 @@ public class APNsUtil {
 
 
     // APP PUSH
-    public void sendAPNsToken(List<ApnRequestDto> requestDto) throws Exception {
-       for (ApnRequestDto user : requestDto){
+    public void sendAPNsToken(List<APNsRequestDto> requestDto) throws Exception {
+       for (APNsRequestDto user : requestDto){
             if (user.token() != null) {
                 try {
                     PushNotificationPayload payload = PushNotificationPayload.complex();

@@ -2,7 +2,7 @@ package com.poppin.poppinserver.dto.notification.request;
 
 import jakarta.validation.constraints.NotNull;
 
-public record ApnRequestDto(
+public record APNsRequestDto(
 
         @NotNull
         String token,
