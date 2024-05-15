@@ -12,7 +12,7 @@ import com.poppin.poppinserver.repository.InformationTopicRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 
 import com.poppin.poppinserver.type.EInformationTopic;
-import com.poppin.poppinserver.util.SubscribeUtil;
+import com.poppin.poppinserver.util.FCMSubscribeUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,9 @@ public class NotificationService {
     private final NotificationTokenRepository notificationTokenRepository;
     private final InformationTopicRepository informationTopicRepository;
 
-    private final SubscribeUtil subscribeUtil;
+    private final FCMService fcmService;
+
+    private final FCMSubscribeUtil FCMSubscribeUtil;
     /* 알림 동의 */
     public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
 
@@ -46,78 +48,13 @@ public class NotificationService {
         for (EInformationTopic topic : EInformationTopic.values()){
             InformationTopic popupTopic = new InformationTopic(notificationToken,topic.getTopicType(),LocalDateTime.now(),topic);
             informationTopicRepository.save(popupTopic); // 구독 저장
-            fcmAddTopic(tokenRequestDto.token(), null,  topic.getTopicType()); // 구독
+            fcmService.fcmAddTopic(tokenRequestDto.token(), null,  topic.getTopicType()); // 구독
         }
 
         return TokenResponseDto.fromEntity(tokenRequestDto);
     }
 
-    /*
-      Method : 관심 팝업 등록 시 주제 테이블에 데이터 삽입 , 구독 시키기
-      Author : sakang
-      Date   : 2024-04-27
-    */
-    public void fcmAddTopic(String token, Popup popup, String type){
-        if(popup != null){
-            // 팝업 관련
-            try {
-                log.info("==== subscribe topic START ====");
 
-                NotificationToken tk = notificationTokenRepository.findByToken(token);
-                if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                if (tk.getDevice().equals("android")){
-                    // 안드로이드
-                    subscribeUtil.androidSubscribePopupTopic(tk, popup , type); // 관심팝업
-                }else{
-                    // 아이폰
-                }
-            }catch (CommonException | FirebaseMessagingException e){
-                log.error("==== subscribe topic FAILED ====");
-                e.printStackTrace();
-            }
-        }
-        else{
-            // 공지사항 관련
-            try {
-                log.info("==== subscribe topic START ====");
-
-                NotificationToken tk = notificationTokenRepository.findByToken(token);
-                if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                if (tk.getDevice().equals("android")){
-                    // 안드로이드
-                    for (EInformationTopic x : EInformationTopic.values() ){
-                        if (x.getTopicType().equals(type))subscribeUtil.androidSubscribeNotificationTopic(tk, popup);
-                        } // 공지사항(공지, 이벤트, 에러)
-                   }else{
-                    // 아이폰
-                }
-            }catch (CommonException | FirebaseMessagingException e){
-                log.error("==== subscribe topic FAILED ====");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void fcmRemoveTopic(String token, String type){
-
-        try {
-            log.info("==== unsubscribe topic START ====");
-
-            NotificationToken tk = notificationTokenRepository.findByToken(token);
-            if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-            if (tk.getDevice().equals("android")){
-                // 안드로이드
-               subscribeUtil.androidUnsubscribeInterestedPopupTopic(tk, type); // 구독 및 저장
-            }else {
-                // 아이폰
-            }
-
-        }catch (CommonException | FirebaseMessagingException e){
-            log.error("==== unsubscribe topic FAILED ====");
-            e.printStackTrace();
-        }
-
-    }
 
 
     

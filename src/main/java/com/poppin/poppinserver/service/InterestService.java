@@ -23,7 +23,7 @@ public class InterestService {
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
 
-    private final NotificationService notificationService;
+    private final FCMService fcmService;
     @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InterestDto userAddInterest(AddInterestDto addInterestDto, Long userId){
         //중복검사
@@ -53,7 +53,7 @@ public class InterestService {
         stringList.add("CI");
         stringList.add("OP");
         for (String x : stringList ){
-            notificationService.fcmAddTopic(token, popup, x);
+            fcmService.fcmAddTopic(token, popup, x);
         }
         return InterestDto.fromEntity(interest,user,popup);
     }
@@ -70,7 +70,7 @@ public class InterestService {
         stringList.add("CI");
         stringList.add("OP");
         for (String x : stringList ){
-            notificationService.fcmRemoveTopic(fcmToken, x);
+            fcmService.fcmRemoveTopic(fcmToken, x);
         }
         return true;
     }

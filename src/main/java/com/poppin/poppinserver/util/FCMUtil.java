@@ -18,12 +18,9 @@ import java.util.stream.IntStream;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class NotificationUtil {
+public class FCMUtil {
 
     /**=================================================================================== */
-    /**
-     * 로그용
-     */
           private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
           private static final String ANDROID_TOPIC_TEST = "[FCM Android Topic Test]";
           private static final String ANDROID_TOKEN = "[FCM Android Token]";
@@ -139,9 +136,5 @@ public class NotificationUtil {
             }else log.info(ANDROID_TOPIC + " List of tokens send messages SUCCESSFULLY");
         }
     }
-
-    /* ============================================================================================================*/
-    /* ===================================         I O S         ==================================================*/
-    /* ============================================================================================================*/
 
 }

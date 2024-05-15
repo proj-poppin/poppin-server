@@ -54,7 +54,7 @@ public class PopupService {
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
-    private final NotificationService notificationService;
+    private final FCMService fcmService;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
@@ -636,7 +636,7 @@ public class PopupService {
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
         log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
 
-        notificationService.fcmAddTopic(pushRequestDto.token(), popup, EPopupTopic.REOPEN.getTopicType());
+        fcmService.fcmAddTopic(pushRequestDto.token(), popup, EPopupTopic.REOPEN.getTopicType());
 
 
         return "재오픈 수요 체크 되었습니다.";
