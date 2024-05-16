@@ -507,7 +507,10 @@ public class PopupService {
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
@@ -528,31 +531,16 @@ public class PopupService {
             }
         }
 
-        if (searchText == null || searchText.trim().isEmpty()) {
-            // 검색어가 비어있을 때의 처리 로직
-            List<Popup> popups = popupRepository.findAllByOperationStatus(PageRequest.of(page, size, sort),
-                    market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                    webtoonAni, interiorThings, movie,
-                    musical, sports, game,
-                    itTech, kpop, alcohol,
-                    animalPlant,
-                    oper); // 운영 상태
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+                market, display, experience, // 팝업 형태 3개
+                fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                webtoonAni, interiorThings, movie,
+                musical, sports, game,
+                itTech, kpop, alcohol,
+                animalPlant,
+                oper); // 운영 상태
 
-            return PopupSearchingDto.fromEntityList(popups, user);
-        } else {
-            // 검색어가 유효할 때의 처리 로직
-            List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
-                    market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                    webtoonAni, interiorThings, movie,
-                    musical, sports, game,
-                    itTech, kpop, alcohol,
-                    animalPlant,
-                    oper); // 운영 상태
-
-            return PopupSearchingDto.fromEntityList(popups, user);
-        }
+        return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 팝업 검색
 
     public List<PopupSearchingDto> readBaseList(String text, int page, int size, Long userId){
@@ -560,17 +548,14 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
-
-        if (searchText == null || searchText.trim().isEmpty()) {
-            // 검색어가 비어있을 때의 처리 로직
-            List<Popup> popups = popupRepository.findAllByOperationStatusBase(PageRequest.of(page, size));
-            return PopupSearchingDto.fromEntityList(popups, user);
-        } else {
-            // 검색어가 유효할 때의 처리 로직
-            List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
-            return PopupSearchingDto.fromEntityList(popups, user);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
         }
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
+
+        return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 베이스 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
@@ -596,7 +581,10 @@ public class PopupService {
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
@@ -617,47 +605,27 @@ public class PopupService {
             }
         }
 
-        if (searchText == null || searchText.trim().isEmpty()) {
-            // 검색어가 비어있을 때의 처리 로직
-            List<Popup> popups = popupRepository.findAllByOperationStatus(PageRequest.of(page, size, sort),
-                    market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                    webtoonAni, interiorThings, movie,
-                    musical, sports, game,
-                    itTech, kpop, alcohol,
-                    animalPlant,
-                    oper); // 운영 상태
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+                market, display, experience, // 팝업 형태 3개
+                fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                webtoonAni, interiorThings, movie,
+                musical, sports, game,
+                itTech, kpop, alcohol,
+                animalPlant,
+                oper); // 운영 상태
 
-            return PopupGuestSearchingDto.fromEntityList(popups);
-        } else {
-            // 검색어가 유효할 때의 처리 로직
-            List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
-                    market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                    webtoonAni, interiorThings, movie,
-                    musical, sports, game,
-                    itTech, kpop, alcohol,
-                    animalPlant,
-                    oper); // 운영 상태
-
-            return PopupGuestSearchingDto.fromEntityList(popups);
-        }
+        return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestBaseList(String text, int page, int size){
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
-
-        log.info(searchText);
-        if (searchText == null || searchText.trim().isEmpty()) {
-            // 검색어가 비어있을 때의 처리 로직
-            List<Popup> popups = popupRepository.findAllByOperationStatusBase(PageRequest.of(page, size));
-            return PopupGuestSearchingDto.fromEntityList(popups);
-        } else {
-            // 검색어가 유효할 때의 처리 로직
-            List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
-            return PopupGuestSearchingDto.fromEntityList(popups);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
         }
+
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
+        return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 베이스 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
