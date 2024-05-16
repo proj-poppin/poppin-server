@@ -8,6 +8,7 @@ import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.service.PopupService;
 import com.poppin.poppinserver.service.ReviewService;
 import com.poppin.poppinserver.service.UserService;
+import com.poppin.poppinserver.type.EPopupSort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -132,7 +133,7 @@ public class UserController {
                                           @RequestParam("taste") String taste,
                                           @RequestParam("prepered") String prepered,
                                           @RequestParam("oper") String oper,
-                                          @RequestParam("order") String order,
+                                          @RequestParam("order") EPopupSort order,
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,
                                           @UserId Long userId) {

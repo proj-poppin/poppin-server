@@ -37,13 +37,13 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     //베이스 팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
-            "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = 'OPERATING'  " +
-            "ORDER BY p.openDate DESC, p.id ",
+            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = 'OPERATING' " +
+            "ORDER BY p.open_date DESC, p.id",
             countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = 'OPERATING'  " +
-                    "ORDER BY p.openDate DESC, p.id ",
+                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = 'OPERATING' " +
+                    "ORDER BY p.open_date DESC, p.id",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
 
@@ -51,7 +51,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query(value = "SELECT p.* FROM popups p " +
             "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
             "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
-            "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
             "AND p.operation_status = :oper  " +
             "AND (:fashionBeauty IS NULL OR tp.fashion_beauty = :fashionBeauty) " +
             "AND (:characters IS NULL OR tp.characters = :characters) " +
@@ -72,7 +72,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
-                    "WHERE (MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
                     "AND p.operation_status = :oper " +
                     "AND (:fashionBeauty IS NULL OR tp.fashion_beauty = :fashionBeauty) " +
                     "AND (:characters IS NULL OR tp.characters = :characters) " +

@@ -15,6 +15,7 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.EInformProgress;
+import com.poppin.poppinserver.type.EPopupSort;
 import com.poppin.poppinserver.type.EUserRole;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
@@ -280,7 +281,7 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 수정
 
     public List<ManageSearchingDto> readManageList(String text, String taste, String prepered,
-                                                   String oper, String order, int page, int size){
+                                                   String oper, EPopupSort order, int page, int size){
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
@@ -308,16 +309,16 @@ public class PopupService {
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
             switch (order) {
-                case "open":
+                case OPEN:
                     sort = Sort.by(Sort.Direction.DESC, "open_date");
                     break;
-                case "close":
+                case CLOSE:
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
-                case "view":
+                case VIEW:
                     sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
-                case "upload":
+                case UPLOAD:
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
                     break;
             }
@@ -480,7 +481,7 @@ public class PopupService {
     }
 
     public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
-                                                     String oper, String order, int page, int size,
+                                                     String oper, EPopupSort order, int page, int size,
                                                      Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -506,22 +507,25 @@ public class PopupService {
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
             switch (order) {
-                case "open":
+                case OPEN:
                     sort = Sort.by(Sort.Direction.DESC, "open_date");
                     break;
-                case "close":
+                case CLOSE:
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
-                case "view":
+                case VIEW:
                     sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
-                case "upload":
+                case UPLOAD:
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
                     break;
             }
@@ -544,7 +548,10 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
 
@@ -552,7 +559,7 @@ public class PopupService {
     } // 로그인 베이스 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
-                                                               String oper, String order, int page, int size){
+                                                               String oper, EPopupSort order, int page, int size){
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
@@ -574,22 +581,25 @@ public class PopupService {
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
             switch (order) {
-                case "open":
+                case OPEN:
                     sort = Sort.by(Sort.Direction.DESC, "open_date");
                     break;
-                case "close":
+                case CLOSE:
                     sort = Sort.by(Sort.Direction.ASC, "close_date");
                     break;
-                case "view":
+                case VIEW:
                     sort = Sort.by(Sort.Direction.DESC, "view_cnt");
                     break;
-                case "upload":
+                case UPLOAD:
                     sort = Sort.by(Sort.Direction.DESC, "created_at");
                     break;
             }
@@ -609,10 +619,12 @@ public class PopupService {
 
     public List<PopupGuestSearchingDto> readGuestBaseList(String text, int page, int size){
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
-
+        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
         return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 베이스 팝업 검색
 
