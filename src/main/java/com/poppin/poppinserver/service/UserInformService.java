@@ -11,6 +11,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EInformProgress;
+import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,7 @@ public class UserInformService {
                 .name(createUserInformDto.name())
                 .tastePopup(tastePopup)
                 .preferedPopup(preferedPopup)
-                .operationStatus("EXECUTING")
+                .operationStatus(EOperationStatus.EXECUTING)
                 .build();
         popup = popupRepository.save(popup);
         log.info(popup.toString());
@@ -205,7 +206,7 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                "EXECUTING",
+                EOperationStatus.EXECUTING,
                 admin
         );
 
@@ -295,15 +296,14 @@ public class UserInformService {
         }
 
         //현재 운영상태 정의
-        String operationStatus;
+        EOperationStatus operationStatus;
         if (updateUserInfromDto.openDate().isAfter(LocalDate.now())){
-            Period period = Period.between(LocalDate.now(), updateUserInfromDto.openDate());
-            operationStatus = "D-" + period.getDays();
+            operationStatus = EOperationStatus.NOTYET;
         } else if (updateUserInfromDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
+            operationStatus = EOperationStatus.TERMINATED;
         }
         else{
-            operationStatus = "OPERATING";
+            operationStatus = EOperationStatus.OPERATING;
         }
 
         popup.update(

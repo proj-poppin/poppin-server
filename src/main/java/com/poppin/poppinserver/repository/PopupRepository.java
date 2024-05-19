@@ -69,7 +69,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "AND (:market IS NULL OR pp.market = :market) " +
             "AND (:display IS NULL OR pp.display = :display) " +
             "AND (:experience IS NULL OR pp.experience = :experience)" +
-            "AND (:etc IS NULL OR pp.etc = :etc)",
+            "AND (:etc IS NULL OR tp.etc = :etc)",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
@@ -91,7 +91,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND (:market IS NULL OR pp.market = :market) " +
                     "AND (:display IS NULL OR pp.display = :display) " +
                     "AND (:experience IS NULL OR pp.experience = :experience)" +
-                    "AND (:etc IS NULL OR pp.etc = :etc)",
+                    "AND (:etc IS NULL OR tp.etc = :etc)",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
                                             Boolean market, Boolean display, Boolean experience,

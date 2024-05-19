@@ -11,6 +11,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EInformProgress;
+import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +88,7 @@ public class ManagerInformService {
                 .openDate(createManagerInformDto.openDate())
                 .openTime(createManagerInformDto.openTime())
                 .operationExcept(createManagerInformDto.operationExcept())
-                .operationStatus("EXECUTING")
+                .operationStatus(EOperationStatus.EXECUTING)
                 .parkingAvailable(createManagerInformDto.parkingAvailable())
                 .preferedPopup(preferedPopup)
                 .tastePopup(tastePopup)
@@ -220,7 +221,7 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                "EXECUTING",
+                EOperationStatus.EXECUTING,
                 admin
         );
 
@@ -312,15 +313,15 @@ public class ManagerInformService {
         }
 
         //현재 운영상태 정의
-        String operationStatus;
+        EOperationStatus operationStatus;
         if (updateManagerInfromDto.openDate().isAfter(LocalDate.now())){
             Period period = Period.between(LocalDate.now(), updateManagerInfromDto.openDate());
-            operationStatus = "D-" + period.getDays();
+            operationStatus = EOperationStatus.NOTYET;
         } else if (updateManagerInfromDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
+            operationStatus = EOperationStatus.TERMINATED;
         }
         else{
-            operationStatus = "OPERATING";
+            operationStatus = EOperationStatus.OPERATING;
         }
 
         popup.update(

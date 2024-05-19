@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Set;
 public record InterestedPopupDto(
         Long id,
         String image_url,
-        String status,
+        EOperationStatus status,
         String name,
         String open_date,
         String close_date

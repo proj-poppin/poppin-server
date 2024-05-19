@@ -4,6 +4,7 @@ import com.poppin.poppinserver.domain.AlarmKeyword;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.PosterImage;
 import com.poppin.poppinserver.type.EAvailableAge;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public record PopupDto(
         String openTime,
         String closeTime,
         String operationExcept,
-        String operationStatus,
+        EOperationStatus operationStatus,
         PreferedDto prefered,
         TasteDto taste,
         List<String> posterList,

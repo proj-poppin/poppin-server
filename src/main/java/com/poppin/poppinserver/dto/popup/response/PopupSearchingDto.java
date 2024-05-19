@@ -3,6 +3,7 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public record PopupSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        String operationStatus,
+        EOperationStatus operationStatus,
         Boolean isInterested,
         PreferedDto prefered,
         TasteDto taste
