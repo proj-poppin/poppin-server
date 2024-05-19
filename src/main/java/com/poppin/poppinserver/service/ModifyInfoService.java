@@ -11,6 +11,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EInformProgress;
+import com.poppin.poppinserver.type.EOperationStatus;
 import com.poppin.poppinserver.util.ImageUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +92,7 @@ public class ModifyInfoService {
                 .openDate(popup.getOpenDate())
                 .openTime(popup.getOpenTime())
                 .operationExcept(popup.getOperationExcept())
-                .operationStatus("EXECUTING")
+                .operationStatus(EOperationStatus.EXECUTING)
                 .parkingAvailable(popup.getParkingAvailable())
                 .preferedPopup(proxyPrefered)
                 .tastePopup(proxyTaste)
@@ -266,7 +267,7 @@ public class ModifyInfoService {
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
                 updateModifyInfoDto.operationExcept(),
-                "EXECUTING",
+                EOperationStatus.EXECUTING,
                 admin
 
         );
@@ -368,15 +369,15 @@ public class ModifyInfoService {
         }
 
         //현재 운영상태 정의
-        String operationStatus;
+        EOperationStatus operationStatus;
         if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())){
             Period period = Period.between(LocalDate.now(), updateModifyInfoDto.openDate());
-            operationStatus = "D-" + period.getDays();
+            operationStatus = EOperationStatus.NOTYET;
         } else if (updateModifyInfoDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
+            operationStatus = EOperationStatus.TERMINATED;
         }
         else{
-            operationStatus = "OPERATING";
+            operationStatus = EOperationStatus.OPERATING;
         }
 
         // 기존 팝업 업데이트

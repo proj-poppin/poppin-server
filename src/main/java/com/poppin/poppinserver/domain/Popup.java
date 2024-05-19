@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.domain;
 
 import com.poppin.poppinserver.type.EAvailableAge;
+import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -85,7 +86,7 @@ public class Popup {
     private String operationExcept;
 
     @Column(name = "operation_status")
-    private String operationStatus;
+    private EOperationStatus operationStatus;
 
     @OneToOne
     @JoinColumn(name = "prefered_id", nullable = false)
@@ -113,7 +114,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, String operationStatus,
+                 LocalTime closeTime, String operationExcept, EOperationStatus operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup) {
         this.posterUrl = posterUrl;
         this.homepageLink = homepageLink;
@@ -144,7 +145,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, String operationStatus,
+                 LocalTime closeTime, String operationExcept, EOperationStatus operationStatus,
                        User agent) {
         this.homepageLink = homepageLink;
         this.name = name;
@@ -178,7 +179,7 @@ public class Popup {
 
     public void updatePosterUrl(String url) {this.posterUrl = url;}
 
-    public void updateOpStatus(String op) {this.operationStatus = op;}
+    public void updateOpStatus(EOperationStatus op) {this.operationStatus = op;}
 
     public void updateAgent(User agent){
         this.agent = agent;}

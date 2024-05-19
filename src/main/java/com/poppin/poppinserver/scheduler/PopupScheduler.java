@@ -2,6 +2,7 @@ package com.poppin.poppinserver.scheduler;
 
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.repository.PopupRepository;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,10 +24,9 @@ public class PopupScheduler {
         for(Popup popup : popups){
             //현재 운영상태 수정
             if (popup.getOpenDate().isAfter(LocalDate.now())){
-                Period period = Period.between(LocalDate.now(), popup.getOpenDate());
-                popup.updateOpStatus("D-" + period.getDays());
+                popup.updateOpStatus(EOperationStatus.NOTYET);
             } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
-                popup.updateOpStatus("TERMINATED");
+                popup.updateOpStatus(EOperationStatus.TERMINATED);
             }
         }
 

@@ -14,10 +14,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.specification.PopupSpecification;
-import com.poppin.poppinserver.type.EInformProgress;
-import com.poppin.poppinserver.type.EPopupSort;
-import com.poppin.poppinserver.type.EUserRole;
-import com.poppin.poppinserver.type.EPopupTopic;
+import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
 import jakarta.transaction.Transactional;
@@ -101,15 +98,14 @@ public class PopupService {
         }
 
         //현재 운영상태 정의
-        String operationStatus;
+        EOperationStatus operationStatus;
         if (createPopupDto.openDate().isAfter(LocalDate.now())){
-            Period period = Period.between(LocalDate.now(), createPopupDto.openDate());
-            operationStatus = "D-" + period.getDays();
+            operationStatus = EOperationStatus.NOTYET;
         } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = "TERMINATED";
+            operationStatus = EOperationStatus.TERMINATED;
         }
         else{
-            operationStatus = "OPERATING";
+            operationStatus = EOperationStatus.OPERATING;
         }
 
         // 팝업 스토어 정보 저장

@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public record PopupGuestSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        String operationStatus,
+        EOperationStatus operationStatus,
         PreferedDto prefered,
         TasteDto taste
 ) {
