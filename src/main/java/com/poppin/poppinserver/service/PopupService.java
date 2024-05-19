@@ -88,6 +88,7 @@ public class PopupService {
                 .kpop(createTasteDto.kpop())
                 .alchol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
+                .etc(createTasteDto.etc())
                 .build();
 
         //각 카테고리 저장
@@ -211,7 +212,8 @@ public class PopupService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
@@ -301,6 +303,7 @@ public class PopupService {
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
         Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
+        Boolean etc = (prepered.charAt(13) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = prepardSearchUtil.prepareSearchText(text);
@@ -330,7 +333,7 @@ public class PopupService {
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
-                animalPlant,
+                animalPlant, etc,
                 oper); // 운영 상태
 
         return ManageSearchingDto.fromEntityList(popups);
@@ -361,7 +364,7 @@ public class PopupService {
         }
 
         return PopupGuestDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
-    }
+    } // 비로그인 상세조회
 
     public PopupDetailDto readDetail(Long popupId, Long userId){
         Popup popup = popupRepository.findById(popupId)
@@ -391,7 +394,7 @@ public class PopupService {
         Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
 
         return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors);
-    }
+    } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -401,21 +404,21 @@ public class PopupService {
         List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
-    }
+    } // 인기 팝업 조회
 
     public List<PopupSummaryDto> readNewList(){
 
         List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
-    }
+    } // 새로 오픈 팝업 조회
 
     public List<PopupSummaryDto> readClosingList(){
 
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
-    }
+    } // 종료 임박 팝업 조회
 
     @Transactional
     public List<InterestedPopupDto> readInterestedPopups(Long userId){
@@ -425,7 +428,7 @@ public class PopupService {
         Set<Interest> interestes = user.getInterestes();
 
         return InterestedPopupDto.fromEntityList(interestes);
-    }
+    } // 관심 팝업 목록 조회
 
     @Transactional
     public PopupTasteDto readTasteList(Long userId){
@@ -478,7 +481,7 @@ public class PopupService {
 
             return new PopupTasteDto(selectedPreference, PopupSummaryDto.fromEntityList(popups));
         }
-    }
+    } // 취향저격 팝업 조회
 
     public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
                                                      String oper, EPopupSort order, int page, int size,
@@ -505,6 +508,7 @@ public class PopupService {
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
         Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
+        Boolean etc = (prepered.charAt(13) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
@@ -537,7 +541,7 @@ public class PopupService {
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
-                animalPlant,
+                animalPlant, etc,
                 oper); // 운영 상태
 
         return PopupSearchingDto.fromEntityList(popups, user);
@@ -579,6 +583,7 @@ public class PopupService {
         Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
         Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
         Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
+        Boolean etc = (prepered.charAt(13) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
@@ -611,7 +616,7 @@ public class PopupService {
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
-                animalPlant,
+                animalPlant, etc,
                 oper); // 운영 상태
 
         return PopupGuestSearchingDto.fromEntityList(popups);

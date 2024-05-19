@@ -68,7 +68,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "AND (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
             "AND (:market IS NULL OR pp.market = :market) " +
             "AND (:display IS NULL OR pp.display = :display) " +
-            "AND (:experience IS NULL OR pp.experience = :experience)",
+            "AND (:experience IS NULL OR pp.experience = :experience)" +
+            "AND (:etc IS NULL OR pp.etc = :etc)",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
@@ -89,7 +90,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
                     "AND (:market IS NULL OR pp.market = :market) " +
                     "AND (:display IS NULL OR pp.display = :display) " +
-                    "AND (:experience IS NULL OR pp.experience = :experience)",
+                    "AND (:experience IS NULL OR pp.experience = :experience)" +
+                    "AND (:etc IS NULL OR pp.etc = :etc)",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
                                             Boolean market, Boolean display, Boolean experience,
@@ -97,7 +99,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                             Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                                             Boolean musical, Boolean sports, Boolean game,
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
-                                            Boolean animalPlant, String oper);
+                                            Boolean animalPlant, Boolean etc, String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();

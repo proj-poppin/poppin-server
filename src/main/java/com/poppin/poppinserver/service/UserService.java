@@ -138,7 +138,8 @@ public class UserService {
                 createUserTasteDto.taste().itTech(),
                 createUserTasteDto.taste().kpop(),
                 createUserTasteDto.taste().alcohol(),
-                createUserTasteDto.taste().animalPlant());
+                createUserTasteDto.taste().animalPlant(),
+                null);
         tastePopupRepository.save(tastePopup);
 
         WhoWithPopup whoWithPopup = user.getWhoWithPopup();

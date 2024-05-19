@@ -39,7 +39,7 @@ public class ManagerInformService {
     private final S3Service s3Service;
 
     @Transactional
-    public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto, //운영자 제보 생성
+    public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
                                                 List<MultipartFile> images,
                                                 Long userId){
         User user = userRepository.findById(userId)
@@ -60,6 +60,7 @@ public class ManagerInformService {
                 .kpop(createTasteDto.kpop())
                 .alchol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
+                .etc(createTasteDto.etc())
                 .build();
         tastePopupRepository.save(tastePopup);
 
@@ -120,15 +121,15 @@ public class ManagerInformService {
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
-    }
+    } //운영자 제보 생성
 
     @Transactional
-    public ManagerInformDto readManageInform(Long manageInformId){ // 운영자 제보 조회
+    public ManagerInformDto readManageInform(Long manageInformId){
         ManagerInform managerInform = managerInformRepository.findById(manageInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
         return ManagerInformDto.fromEntity(managerInform);
-    }
+    } // 운영자 제보 조회
 
     @Transactional
     public ManagerInformDto updateManageInform(UpdateManagerInfromDto updateManagerInfromDto,
@@ -154,7 +155,8 @@ public class ManagerInformService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
@@ -228,7 +230,7 @@ public class ManagerInformService {
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
-    }
+    } // 운영자 제보 임시저장
 
     @Transactional
     public ManagerInformDto uploadPopup(UpdateManagerInfromDto updateManagerInfromDto,
@@ -254,7 +256,8 @@ public class ManagerInformService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
@@ -343,7 +346,7 @@ public class ManagerInformService {
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
-    }
+    } // 운영자 제보 업로드 승인
 
     @Transactional
     public List<ManagerInformSummaryDto> reatManagerInformList(){
