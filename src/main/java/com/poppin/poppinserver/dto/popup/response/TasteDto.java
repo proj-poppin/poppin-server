@@ -18,7 +18,8 @@ public record TasteDto(
         Boolean itTech,
         Boolean kpop,
         Boolean alcohol,
-        Boolean animalPlant) {
+        Boolean animalPlant,
+        Boolean etc) {
         public static TasteDto fromEntity(TastePopup tastePopup){
                 return TasteDto.builder()
                         .id(tastePopup.getId())
@@ -35,6 +36,7 @@ public record TasteDto(
                         .kpop(tastePopup.getKpop())
                         .alcohol(tastePopup.getAlcohol())
                         .animalPlant(tastePopup.getAnimalPlant())
+                        .etc(tastePopup.getEtc())
                         .build();
         }
 }

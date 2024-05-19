@@ -28,5 +28,7 @@ public record CreateTasteDto(
         @NotNull
         Boolean alcohol,
         @NotNull
-        Boolean animalPlant) {
+        Boolean animalPlant,
+        @NotNull
+        Boolean etc) {
 }

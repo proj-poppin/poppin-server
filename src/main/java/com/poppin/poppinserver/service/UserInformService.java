@@ -60,6 +60,7 @@ public class UserInformService {
                 .kpop(createTasteDto.kpop())
                 .alchol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
+                .etc(createTasteDto.etc())
                 .build();
         tastePopupRepository.save(tastePopup);
 
@@ -108,12 +109,12 @@ public class UserInformService {
     }
 
     @Transactional
-    public UserInformDto readUserInform(Long userInformId){ // 사용자 제보 조회
+    public UserInformDto readUserInform(Long userInformId){
         UserInform userInform = userInformRepository.findById(userInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
         return UserInformDto.fromEntity(userInform);
-    }
+    } // 사용자 제보 조회
 
     @Transactional
     public UserInformDto updateUserInform(UpdateUserInfromDto updateUserInfromDto,
@@ -139,7 +140,8 @@ public class UserInformService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateUserInfromDto.prefered();
@@ -211,7 +213,7 @@ public class UserInformService {
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
-    }
+    } // 임시저장
 
     @Transactional
     public UserInformDto uploadPopup(UpdateUserInfromDto updateUserInfromDto,
@@ -237,7 +239,8 @@ public class UserInformService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateUserInfromDto.prefered();

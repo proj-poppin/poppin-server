@@ -57,12 +57,15 @@ public class TastePopup {
     @Column(name = "animal_plant", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean animalPlant;
 
+    @Column(name = "etc", nullable = true, columnDefinition = "TINYINT(1)")
+    private Boolean etc;
+
     @Builder
     public TastePopup(Boolean fasionBeauty, Boolean characters, Boolean foodBeverage,
                       Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                       Boolean musical, Boolean sports, Boolean game,
                       Boolean itTech, Boolean kpop, Boolean alchol,
-                      Boolean animalPlant) {
+                      Boolean animalPlant, Boolean etc) {
         this.fashionBeauty = fasionBeauty;
         this.characters = characters;
         this.foodBeverage = foodBeverage;
@@ -76,13 +79,14 @@ public class TastePopup {
         this.kpop = kpop;
         this.alcohol = alchol;
         this.animalPlant = animalPlant;
+        this.etc = etc;
     }
 
     public void update(Boolean fasionBeauty, Boolean characters, Boolean foodBeverage,
                        Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                        Boolean musical, Boolean sports, Boolean game,
                        Boolean itTech, Boolean kpop, Boolean alchol,
-                       Boolean animalPlant) {
+                       Boolean animalPlant, Boolean etc) {
         this.fashionBeauty = fasionBeauty;
         this.characters = characters;
         this.foodBeverage = foodBeverage;
@@ -96,5 +100,6 @@ public class TastePopup {
         this.kpop = kpop;
         this.alcohol = alchol;
         this.animalPlant = animalPlant;
+        this.etc = etc;
     }
 }

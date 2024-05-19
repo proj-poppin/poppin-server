@@ -73,6 +73,7 @@ public class ModifyInfoService {
                 .kpop(tastePopup.getKpop())
                 .alchol(tastePopup.getAlcohol())
                 .animalPlant(tastePopup.getAnimalPlant())
+                .etc(tastePopup.getEtc())
                 .build();
         proxyTaste = tastePopupRepository.save(proxyTaste);
 
@@ -200,7 +201,8 @@ public class ModifyInfoService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
@@ -299,7 +301,8 @@ public class ModifyInfoService {
                 createTasteDto.itTech(),
                 createTasteDto.kpop(),
                 createTasteDto.alcohol(),
-                createTasteDto.animalPlant());
+                createTasteDto.animalPlant(),
+                createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
         CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
