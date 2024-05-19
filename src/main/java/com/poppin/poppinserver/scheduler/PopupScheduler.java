@@ -24,7 +24,7 @@ public class PopupScheduler {
         for(Popup popup : popups){
             //현재 운영상태 수정
             if (popup.getOpenDate().isAfter(LocalDate.now())){
-                popup.updateOpStatus(EOperationStatus.NOTYET);
+                popup.updateOpStatus(EOperationStatus.OPERATING);
             } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
                 popup.updateOpStatus(EOperationStatus.TERMINATED);
             }

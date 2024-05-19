@@ -279,7 +279,7 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 수정
 
     public List<ManageSearchingDto> readManageList(String text, String taste, String prepered,
-                                                   String oper, EPopupSort order, int page, int size){
+                                                   EOperationStatus oper, EPopupSort order, int page, int size){
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
@@ -480,7 +480,7 @@ public class PopupService {
     } // 취향저격 팝업 조회
 
     public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
-                                                     String oper, EPopupSort order, int page, int size,
+                                                     EOperationStatus oper, EPopupSort order, int page, int size,
                                                      Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -559,7 +559,7 @@ public class PopupService {
     } // 로그인 베이스 팝업 검색
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
-                                                               String oper, EPopupSort order, int page, int size){
+                                                               EOperationStatus oper, EPopupSort order, int page, int size){
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;

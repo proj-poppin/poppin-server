@@ -8,6 +8,7 @@ import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.service.PopupService;
 import com.poppin.poppinserver.service.ReviewService;
 import com.poppin.poppinserver.service.UserService;
+import com.poppin.poppinserver.type.EOperationStatus;
 import com.poppin.poppinserver.type.EPopupSort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +133,7 @@ public class UserController {
     public ResponseDto<?> searchPopupName(@RequestParam("text") String text,
                                           @RequestParam("taste") String taste,
                                           @RequestParam("prepered") String prepered,
-                                          @RequestParam("oper") String oper,
+                                          @RequestParam("oper") EOperationStatus oper,
                                           @RequestParam("order") EPopupSort order,
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,

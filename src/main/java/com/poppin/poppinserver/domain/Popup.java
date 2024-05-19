@@ -86,6 +86,7 @@ public class Popup {
     private String operationExcept;
 
     @Column(name = "operation_status")
+    @Enumerated(EnumType.STRING)
     private EOperationStatus operationStatus;
 
     @OneToOne
