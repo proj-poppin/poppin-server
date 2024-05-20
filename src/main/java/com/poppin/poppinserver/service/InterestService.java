@@ -46,32 +46,32 @@ public class InterestService {
 
         popup.addInterestCnt();
 
-        /*알림 구독*/
-        String token = addInterestDto.fcmToken();
-        List<String> stringList = new ArrayList<>();
-        stringList.add("MG");
-        stringList.add("CI");
-        stringList.add("OP");
-        for (String x : stringList ){
-            fcmService.fcmAddTopic(token, popup, x);
-        }
+//        /*알림 구독*/
+//        String token = addInterestDto.fcmToken();
+//        List<String> stringList = new ArrayList<>();
+//        stringList.add("MG");
+//        stringList.add("CI");
+//        stringList.add("OP");
+//        for (String x : stringList ){
+//            fcmService.fcmAddTopic(token, popup, x);
+//        }
         return InterestDto.fromEntity(interest,user,popup);
     }
 
-    public Boolean removeInterest(Long userId, Long popupId, String fcmToken) {
+    public Boolean removeInterest(Long userId, Long popupId){//, String fcmToken) {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
         interestRepository.delete(interest);
 
-        /*FCM 구독취소*/
-        List<String> stringList = new ArrayList<>();
-        stringList.add("MG");
-        stringList.add("CI");
-        stringList.add("OP");
-        for (String x : stringList ){
-            fcmService.fcmRemoveTopic(fcmToken, x);
-        }
+//        /*FCM 구독취소*/
+//        List<String> stringList = new ArrayList<>();
+//        stringList.add("MG");
+//        stringList.add("CI");
+//        stringList.add("OP");
+//        for (String x : stringList ){
+//            fcmService.fcmRemoveTopic(fcmToken, x);
+//        }
         return true;
     }
 }

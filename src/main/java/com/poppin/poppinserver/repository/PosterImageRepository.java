@@ -11,5 +11,7 @@ import java.util.List;
 public interface PosterImageRepository extends JpaRepository<PosterImage, Long> {
     List<PosterImage> findByPopupId(Popup popupId);
 
+    List<PosterImage> findAllByPopupId(Popup popupId);
+
     void deleteAllByPopupId(Popup popupId);
 }

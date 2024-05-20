@@ -47,6 +47,7 @@ public class PopupService {
     private final NotificationTokenRepository notificationTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
     private final AlarmKeywordRepository alarmKeywordRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -343,7 +344,19 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+        // 리뷰 이미지 목록 가져오기
+        List<List<String>> reviewImagesList = new ArrayList<>();
+        for (Review review : reviews){
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+
+            List<String> imagesList = new ArrayList<>();
+            for(ReviewImage reviewImage : reviewImages){
+                imagesList.add(reviewImage.getImageUrl());
+            }
+            reviewImagesList.add(imagesList);
+        }
+
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -370,7 +383,19 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+        // 리뷰 이미지 목록 가져오기
+        List<List<String>> reviewImagesList = new ArrayList<>();
+        for (Review review : reviews){
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+
+            List<String> imagesList = new ArrayList<>();
+            for(ReviewImage reviewImage : reviewImages){
+                imagesList.add(reviewImage.getImageUrl());
+            }
+            reviewImagesList.add(imagesList);
+        }
+
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -379,7 +404,7 @@ public class PopupService {
         popupRepository.save(popup);
 
         // 이미지 목록 가져오기
-        List<PosterImage> posterImages  = posterImageRepository.findByPopupId(popup);
+        List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
 
         List<String> imageList = new ArrayList<>();
         for(PosterImage posterImage : posterImages){
