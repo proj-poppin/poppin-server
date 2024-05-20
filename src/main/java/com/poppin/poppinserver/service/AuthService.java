@@ -61,28 +61,36 @@ public class AuthService {
         return jwtToken;
     }
 
-    public Object authKakaoLogin(String accessToken) {
-        String token = refineToken(accessToken);
-        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
-        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
-    }
+//    public Object authKakaoLogin(String accessToken) {
+//        String token = refineToken(accessToken);
+//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
+//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
+//    }
+//
+//    public Object authNaverLogin(String accessToken) {
+//        String token = refineToken(accessToken);
+//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getNaverUserInfo(token);
+//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.NAVER);
+//    }
+//
+//    public Object authGoogleLogin(String accessToken) {
+//        String token = refineToken(accessToken);
+//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getGoogleUserInfo(token);
+//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
+//    }
+//
+//    public Object authAppleLogin(String idToken) {
+//        String token = refineToken(idToken);
+//        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(token);
+//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
+//    }
 
-    public Object authNaverLogin(String accessToken) {
-        String token = refineToken(accessToken);
-        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getNaverUserInfo(token);
-        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.NAVER);
-    }
-
-    public Object authGoogleLogin(String accessToken) {
-        String token = refineToken(accessToken);
-        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getGoogleUserInfo(token);
-        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
-    }
-
-    public Object authAppleLogin(String idToken) {
-        String token = refineToken(idToken);
-        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(token);
-        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
+    public Object authSocialLogin(String token, String provider) {
+        String accessToken = refineToken(token);
+        String loginProvider = provider.toUpperCase();
+        log.info("loginProvider : " + loginProvider);
+        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
+        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.valueOf(loginProvider));
     }
 
     @Transactional
@@ -104,18 +112,18 @@ public class AuthService {
         return jwtTokenDto;
     }
 
-    private OAuth2UserInfo getOAuth2UserInfo(SocialRegisterRequestDto request, String accessToken){
-        if (request.provider().toString().equals(ELoginProvider.KAKAO.toString())){
+    private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken){
+        if (provider.equals(ELoginProvider.KAKAO.toString())){
             return oAuth2Util.getKakaoUserInfo(accessToken);
-        } else if (request.provider().toString().equals(ELoginProvider.NAVER.toString())) {
+        } else if (provider.equals(ELoginProvider.NAVER.toString())) {
             return oAuth2Util.getNaverUserInfo(accessToken);
-        } else if (request.provider().toString().equals(ELoginProvider.GOOGLE.toString())) {
+        } else if (provider.equals(ELoginProvider.GOOGLE.toString())) {
             return oAuth2Util.getGoogleUserInfo(accessToken);
-        } else if (request.provider().toString().equals(ELoginProvider.APPLE.toString())) {
+        } else if (provider.equals(ELoginProvider.APPLE.toString())) {
             return appleOAuthService.getAppleUserInfo(accessToken);
         }
         else {
-            throw new CommonException(ErrorCode.NOT_FOUND_USER);
+            throw new CommonException(ErrorCode.INVALID_OAUTH2_PROVIDER);
         }
     }
 

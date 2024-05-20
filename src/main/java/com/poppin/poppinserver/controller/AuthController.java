@@ -8,6 +8,7 @@ import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.service.AuthService;
+import com.poppin.poppinserver.type.ELoginProvider;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -40,25 +41,32 @@ public class AuthController {
         return ResponseDto.ok(authService.authSignIn(authorizationHeader));
     }
 
-    @PostMapping("/login/kakao")
-    public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+//    @PostMapping("/login/kakao")
+//    public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+//
+//        return ResponseDto.ok(authService.authKakaoLogin(accessToken));
+//    }
+//
+//    @PostMapping("/login/naver")
+//    public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+//        return ResponseDto.ok(authService.authNaverLogin(accessToken));
+//    }
+//
+//    @PostMapping("/login/google")
+//    public ResponseDto<?> authGoogleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+//        return ResponseDto.ok(authService.authGoogleLogin(accessToken));
+//    }
+//
+//    @PostMapping("/login/apple")
+//    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
+//        return ResponseDto.ok(authService.authAppleLogin(idToken));
+//    }
+
+    @PostMapping("/login/{provider}")
+    public ResponseDto<?> authSocialLogin(@PathVariable String provider,
+                                          @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
         log.info("accessToken : " + accessToken);   // 'bearer ' 제거 필요
-        return ResponseDto.ok(authService.authKakaoLogin(accessToken));
-    }
-
-    @PostMapping("/login/naver")
-    public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
-        return ResponseDto.ok(authService.authNaverLogin(accessToken));
-    }
-
-    @PostMapping("/login/google")
-    public ResponseDto<?> authGoogleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
-        return ResponseDto.ok(authService.authGoogleLogin(accessToken));
-    }
-
-    @PostMapping("/login/apple")
-    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
-        return ResponseDto.ok(authService.authAppleLogin(idToken));
+        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider));
     }
 
     @PostMapping("/refresh")

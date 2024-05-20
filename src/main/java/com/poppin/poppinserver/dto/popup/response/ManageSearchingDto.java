@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.dto.popup.response;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 public record ManageSearchingDto(
         Long id,
         String name,
-        String operationStatus,
+        EOperationStatus operationStatus,
         String adminName
 ) {
     public static List<ManageSearchingDto> fromEntityList(List<Popup> popups){
