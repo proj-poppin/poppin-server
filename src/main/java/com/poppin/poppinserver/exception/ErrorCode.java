@@ -29,6 +29,7 @@ public enum ErrorCode {
     MAIL_SEND_ERROR("40018", HttpStatus.BAD_REQUEST, "메일 전송에 실패하였습니다."),
     INVALID_LOGIN("40019", HttpStatus.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."),
     DUPLICATED_RECOMMEND_COUNT("40020" , HttpStatus.BAD_REQUEST, "같은 후기에 추천을 2번 이상 하실 수 없습니다."),
+    INVALID_OAUTH2_PROVIDER("40021", HttpStatus.BAD_REQUEST, "유효하지 않은 OAuth2 제공자입니다."),
 
 
     // Unauthorized Error
