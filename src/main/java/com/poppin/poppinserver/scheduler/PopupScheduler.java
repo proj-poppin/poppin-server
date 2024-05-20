@@ -27,6 +27,8 @@ public class PopupScheduler {
                 popup.updateOpStatus(EOperationStatus.NOTYET);
             } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
                 popup.updateOpStatus(EOperationStatus.TERMINATED);
+            } else {
+                popup.updateOpStatus(EOperationStatus.OPERATING);
             }
         }
 

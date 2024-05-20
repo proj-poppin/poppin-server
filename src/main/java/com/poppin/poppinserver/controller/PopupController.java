@@ -10,6 +10,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.PopupService;
 import com.poppin.poppinserver.service.S3Service;
+import com.poppin.poppinserver.type.EOperationStatus;
 import com.poppin.poppinserver.type.EPopupSort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +83,7 @@ public class PopupController {
     public ResponseDto<?> readManageList(@RequestParam("text") String text,
                                          @RequestParam("taste") String taste,
                                          @RequestParam("prepered") String prepered,
-                                         @RequestParam("oper") String oper,
+                                         @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size) {
@@ -126,7 +127,7 @@ public class PopupController {
     public ResponseDto<?> readSearchList(@RequestParam("text") String text,
                                          @RequestParam("taste") String taste,
                                          @RequestParam("prepered") String prepered,
-                                         @RequestParam("oper") String oper,
+                                         @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
@@ -146,7 +147,7 @@ public class PopupController {
     public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
                                               @RequestParam("taste") String taste,
                                               @RequestParam("prepered") String prepered,
-                                              @RequestParam("oper") String oper,
+                                              @RequestParam("oper") EOperationStatus oper,
                                               @RequestParam("order") EPopupSort order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {

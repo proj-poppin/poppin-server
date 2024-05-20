@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -48,7 +49,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
 
     //팝업 검색
-    @Query(value = "SELECT p.* FROM popups p " +
+    @Query(value = "SELECT * FROM (" +
+            "SELECT p.*, 1 AS QueryOrder FROM popups p " +
             "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
             "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
             "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
@@ -69,12 +71,20 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "AND (:market IS NULL OR pp.market = :market) " +
             "AND (:display IS NULL OR pp.display = :display) " +
             "AND (:experience IS NULL OR pp.experience = :experience)" +
-            "AND (:etc IS NULL OR tp.etc = :etc)",
-            countQuery = "SELECT COUNT(*) FROM popups p " +
+            "AND (:etc IS NULL OR tp.etc = :etc) " +
+            "UNION " +
+            "SELECT p.*, 2 AS QueryOrder FROM popups p " +
+            "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
+            "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
+            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = :oper  " +
+            ") AS combined_results ORDER BY QueryOrder",
+            countQuery = "SELECT COUNT(*) FROM (" +
+                    "SELECT p.id FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
                     "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = :oper " +
+                    "AND p.operation_status = :oper  " +
                     "AND (:fashionBeauty IS NULL OR tp.fashion_beauty = :fashionBeauty) " +
                     "AND (:characters IS NULL OR tp.characters = :characters) " +
                     "AND (:foodBeverage IS NULL OR tp.food_beverage = :foodBeverage) " +
@@ -91,7 +101,14 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND (:market IS NULL OR pp.market = :market) " +
                     "AND (:display IS NULL OR pp.display = :display) " +
                     "AND (:experience IS NULL OR pp.experience = :experience)" +
-                    "AND (:etc IS NULL OR tp.etc = :etc)",
+                    "AND (:etc IS NULL OR tp.etc = :etc) " +
+            "UNION " +
+                    "SELECT p.id FROM popups p " +
+                    "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
+                    "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
+                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = :oper  " +
+            ") AS combined_results",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
                                             Boolean market, Boolean display, Boolean experience,
@@ -99,7 +116,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                             Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                                             Boolean musical, Boolean sports, Boolean game,
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
-                                            Boolean animalPlant, Boolean etc, String oper);
+                                            Boolean animalPlant, Boolean etc, EOperationStatus oper);
+
+
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
@@ -124,7 +143,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findReopenPopupWithDemand(LocalDate nowDate);
 
 
-    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus NOT IN('TERMINATED') AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
+    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus != 'TERMINATED' AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
     List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
 
     @Query("SELECT p FROM Popup p " +
@@ -147,7 +166,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus NOT IN ('EXECUTING', 'EXECUTED', 'NOTEXECUTED') " +
+            "WHERE p.operationStatus != 'EXECUTING' " +
             "ORDER BY p.name ASC")
     List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
 

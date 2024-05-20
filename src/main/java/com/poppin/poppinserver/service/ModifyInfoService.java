@@ -371,7 +371,6 @@ public class ModifyInfoService {
         //현재 운영상태 정의
         EOperationStatus operationStatus;
         if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())){
-            Period period = Period.between(LocalDate.now(), updateModifyInfoDto.openDate());
             operationStatus = EOperationStatus.NOTYET;
         } else if (updateModifyInfoDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED;

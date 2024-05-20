@@ -50,6 +50,7 @@ public class Popup {
     private Boolean resvRequired;
 
     @Column(name = "available_age")
+    @Enumerated(EnumType.STRING)
     private EAvailableAge availableAge;
 
     @Column(name = "parking_available", columnDefinition = "TINYINT(1)")
@@ -86,6 +87,7 @@ public class Popup {
     private String operationExcept;
 
     @Column(name = "operation_status")
+    @Enumerated(EnumType.STRING)
     private EOperationStatus operationStatus;
 
     @OneToOne
