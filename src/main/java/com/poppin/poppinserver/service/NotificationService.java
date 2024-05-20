@@ -32,8 +32,7 @@ public class NotificationService {
 
     private final FCMService fcmService;
 
-    private final FCMSubscribeUtil FCMSubscribeUtil;
-    /* 알림 동의 */
+    /* 알림 동의 - 공지사항 , 팝업은 따로 저장 해야 함 */
     public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
 
         // 토큰 저장
@@ -54,8 +53,4 @@ public class NotificationService {
         return TokenResponseDto.fromEntity(tokenRequestDto);
     }
 
-
-
-
-    
 }

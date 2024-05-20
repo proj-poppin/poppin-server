@@ -5,7 +5,6 @@ import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.NotificationRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.type.EInformationTopic;
 import com.poppin.poppinserver.util.FCMSubscribeUtil;
@@ -62,6 +61,11 @@ public class FCMService {
         }
     }
 
+    /*
+          Method : 관심 팝업 삭제 시 주제 테이블에 구독 해제
+          Author : sakang
+          Date   : 2024-04-27
+        */
     public void fcmRemoveTopic(String token, String type){
 
         try {
