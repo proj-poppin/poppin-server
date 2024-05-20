@@ -166,7 +166,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus p.operationStatus != 'EXECUTING') " +
+            "WHERE p.operationStatus != 'EXECUTING' " +
             "ORDER BY p.name ASC")
     List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
 
