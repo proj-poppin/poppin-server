@@ -26,24 +26,24 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     //새로 오픈 팝업
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus = com.poppin.poppinserver.type.EOperationStatus.OPERATING " +
+            "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.openDate DESC, p.id ")
     List<Popup> findNewOpenPopupByAll(Pageable pageable);
 
     //종료 임박 팝업
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus = com.poppin.poppinserver.type.EOperationStatus.OPERATING " +
+            "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Pageable pageable);
 
     //베이스 팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
             "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = com.poppin.poppinserver.type.EOperationStatus.OPERATING " +
+            "AND p.operation_status = 'OPERATING' " +
             "ORDER BY p.open_date DESC, p.id",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = com.poppin.poppinserver.type.EOperationStatus.OPERATING " +
+                    "AND p.operation_status = 'OPERATING' " +
                     "ORDER BY p.open_date DESC, p.id",
             nativeQuery = true)
     List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
@@ -120,7 +120,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
 
 
-    @Query("SELECT p from Popup p WHERE p.operationStatus != com.poppin.poppinserver.type.EOperationStatus.TERMINATED")
+    @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
 
     @Query("SELECT p FROM Popup p JOIN Review  r ON  p.id = r.popup.id where p.id = :reviewId order by p.createdAt asc ")
@@ -143,7 +143,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findReopenPopupWithDemand(LocalDate nowDate);
 
 
-    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus NOT IN(com.poppin.poppinserver.type.EOperationStatus.TERMINATED) AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
+    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus != 'TERMINATED' AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
     List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
 
     @Query("SELECT p FROM Popup p " +
@@ -166,7 +166,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus NOT IN (com.poppin.poppinserver.type.EOperationStatus.EXECUTING) " +
+            "WHERE p.operationStatus p.operationStatus != 'EXECUTING') " +
             "ORDER BY p.name ASC")
     List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
 
