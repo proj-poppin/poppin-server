@@ -35,11 +35,10 @@ public record PopupDetailDto(Long id,
                              EOperationStatus operationStatus,
                              List<String> images,
                              List<ReviewInfoDto> review,
-                             List<String> reviewImages,
                              VisitorDataInfoDto visitorData,
                              Optional<Integer> realTimeVisit
 ) {
-    public static PopupDetailDto fromEntity(Popup popup, List<String> images, List<String> reviewImagesList, Boolean isInterested, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
+    public static PopupDetailDto fromEntity(Popup popup, List<String> images, Boolean isInterested, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
         Boolean isInstagram = popup.getHomepageLink().contains("instagram");
 
@@ -69,7 +68,6 @@ public record PopupDetailDto(Long id,
                 .operationStatus(popup.getOperationStatus())
                 .images(images)
                 .review(reviewInfoList)
-                .reviewImages(reviewImagesList)
                 .visitorData(visitorDataDto)
                 .realTimeVisit(realTimeVisit)
                 .build();

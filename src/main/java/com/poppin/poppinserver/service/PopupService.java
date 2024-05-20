@@ -344,7 +344,19 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+        // 리뷰 이미지 목록 가져오기
+        List<List<String>> reviewImagesList = new ArrayList<>();
+        for (Review review : reviews){
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review);
+
+            List<String> imagesList = new ArrayList<>();
+            for(ReviewImage reviewImage : reviewImages){
+                imagesList.add(reviewImage.getImageUrl());
+            }
+            reviewImagesList.add(imagesList);
+        }
+
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -370,16 +382,20 @@ public class PopupService {
         popup.addViewCnt(); // 조회수 + 1
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
-        
-        // 리뷰 이미지 목록 가져오기
-        List<ReviewImage> reviewImages = reviewImageRepository.findAllByPopupId(popup);
 
-        List<String> reviewImagesList = new ArrayList<>();
-        for(ReviewImage reviewImage : reviewImages){
-            reviewImagesList.add(reviewImage.getImageUrl());
+        // 리뷰 이미지 목록 가져오기
+        List<List<String>> reviewImagesList = new ArrayList<>();
+        for (Review review : reviews){
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review);
+
+            List<String> imagesList = new ArrayList<>();
+            for(ReviewImage reviewImage : reviewImages){
+                imagesList.add(reviewImage.getImageUrl());
+            }
+            reviewImagesList.add(imagesList);
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -398,7 +414,7 @@ public class PopupService {
         // 관심 여부 확인
         Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
 
-        return PopupDetailDto.fromEntity(popup, imageList, reviewImagesList, isInterested, reviewInfoList, visitorDataDto, visitors);
+        return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors);
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
