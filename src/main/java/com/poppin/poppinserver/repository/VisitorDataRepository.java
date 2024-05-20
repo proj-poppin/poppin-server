@@ -21,7 +21,7 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
             "       AND SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) " +
             "   THEN '보통' " +
             "   ELSE '여유' " +
-            "END AS congestion_rate, " +
+            "END AS congestionRate, " +
             "CASE " +
             "   WHEN COUNT(v) = 0 THEN 0 " +
             "   ELSE " +
@@ -36,7 +36,7 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
             "                                       END FROM VisitorData v WHERE p.id = :popupId AND v.visitDate = :visitDateEnum) THEN 1 ELSE 0 END) * 100 / (SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) + " +
             "                                             SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) + " +
             "                                             SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END)) " +
-            "END AS congestion_ratio " +
+            "END AS congestionRatio " +
             "FROM VisitorData v JOIN Popup p ON p.id = v.popup.id " +
             "WHERE p.id = :popupId AND v.visitDate = :visitDateEnum " +
             "GROUP BY p.id")
