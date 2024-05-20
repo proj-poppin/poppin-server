@@ -47,6 +47,7 @@ public class PopupService {
     private final NotificationTokenRepository notificationTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
     private final AlarmKeywordRepository alarmKeywordRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -369,6 +370,14 @@ public class PopupService {
         popup.addViewCnt(); // 조회수 + 1
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
+        
+        // 리뷰 이미지 목록 가져오기
+        List<ReviewImage> reviewImages = reviewImageRepository.findAllByPopupId(popup);
+
+        List<String> reviewImagesList = new ArrayList<>();
+        for(ReviewImage reviewImage : reviewImages){
+            reviewImagesList.add(reviewImage.getImageUrl());
+        }
 
         List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, 0);
 
@@ -379,7 +388,7 @@ public class PopupService {
         popupRepository.save(popup);
 
         // 이미지 목록 가져오기
-        List<PosterImage> posterImages  = posterImageRepository.findByPopupId(popup);
+        List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
 
         List<String> imageList = new ArrayList<>();
         for(PosterImage posterImage : posterImages){
@@ -389,7 +398,7 @@ public class PopupService {
         // 관심 여부 확인
         Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
 
-        return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors);
+        return PopupDetailDto.fromEntity(popup, imageList, reviewImagesList, isInterested, reviewInfoList, visitorDataDto, visitors);
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
