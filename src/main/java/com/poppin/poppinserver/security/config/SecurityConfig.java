@@ -20,12 +20,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -52,7 +51,7 @@ public class SecurityConfig {
                                 .logoutSuccessHandler(customSignOutResultHandler)
                                 .deleteCookies(Constant.AUTHORIZATION_HEADER, Constant.REAUTHORIZATION))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)), LogoutFilter.class)
-                .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
+                .addFilterAfter(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(), LogoutFilter.class)
                 .build();
     }
