@@ -44,8 +44,8 @@ public class ReviewService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         /*방문 내역 확인*/
-        Visit visit = visitRepository.findByUserId(userId, popup.getId());
-        if (visit == null)throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        Optional<Visit> visit = visitRepository.findByUserId(userId, popup.getId());
+        if (visit.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
 
         Review review = Review.builder()
                 .user(user)

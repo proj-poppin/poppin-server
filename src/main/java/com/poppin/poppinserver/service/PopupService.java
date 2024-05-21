@@ -48,6 +48,7 @@ public class PopupService {
     private final ReopenDemandUserRepository reopenDemandUserRepository;
     private final AlarmKeywordRepository alarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final VisitRepository visitRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -375,7 +376,7 @@ public class PopupService {
         return PopupGuestDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
     } // 비로그인 상세조회
 
-    public PopupDetailDto readDetail(Long popupId, Long userId){
+    public PopupDetailDto readDetail(Long userId, Long popupId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -414,7 +415,13 @@ public class PopupService {
         // 관심 여부 확인
         Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
 
-        return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors);
+        Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
+
+        // 방문 여부 확인
+        if (!visit.isEmpty())return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
+        else return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
+
+
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
