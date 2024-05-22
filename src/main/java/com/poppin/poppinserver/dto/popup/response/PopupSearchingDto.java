@@ -5,12 +5,14 @@ import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Builder
+@Slf4j
 public record PopupSearchingDto(
         Long id,
         String posterUrl,
@@ -21,7 +23,7 @@ public record PopupSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        EOperationStatus operationStatus,
+        String operationStatus,
         Boolean isInterested,
         PreferedDto prefered,
         TasteDto taste
@@ -31,9 +33,9 @@ public record PopupSearchingDto(
 
         Set<Interest> interestes = user.getInterestes();
 
-        List<Popup> interestedPopups = new ArrayList<>();
+        List<Long> interestedPopups = new ArrayList<>();
         for(Interest intereste : interestes){
-            interestedPopups.add(intereste.getPopup());
+            interestedPopups.add(intereste.getPopup().getId());
         }
 
         for(Popup popup : popups){
@@ -42,7 +44,9 @@ public record PopupSearchingDto(
             PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
-            if(interestedPopups.contains(popup)) isInterested = Boolean.TRUE;
+            if(interestedPopups.contains(popup.getId())) {
+                isInterested = Boolean.TRUE;
+            }
             else isInterested = Boolean.FALSE;
 
             PopupSearchingDto popupSummaryDto =

@@ -13,7 +13,7 @@ import java.util.Set;
 public record InterestedPopupDto(
         Long id,
         String image_url,
-        EOperationStatus status,
+        String status,
         String name,
         String open_date,
         String close_date

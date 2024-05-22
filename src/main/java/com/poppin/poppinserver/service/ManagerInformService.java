@@ -88,7 +88,7 @@ public class ManagerInformService {
                 .openDate(createManagerInformDto.openDate())
                 .openTime(createManagerInformDto.openTime())
                 .operationExcept(createManagerInformDto.operationExcept())
-                .operationStatus(EOperationStatus.EXECUTING)
+                .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .parkingAvailable(createManagerInformDto.parkingAvailable())
                 .preferedPopup(preferedPopup)
                 .tastePopup(tastePopup)
@@ -221,7 +221,7 @@ public class ManagerInformService {
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
                 updateManagerInfromDto.operationExcept(),
-                EOperationStatus.EXECUTING,
+                EOperationStatus.EXECUTING.getStatus(),
                 admin
         );
 
@@ -313,15 +313,15 @@ public class ManagerInformService {
         }
 
         //현재 운영상태 정의
-        EOperationStatus operationStatus;
+        String operationStatus;
         if (updateManagerInfromDto.openDate().isAfter(LocalDate.now())){
             Period period = Period.between(LocalDate.now(), updateManagerInfromDto.openDate());
-            operationStatus = EOperationStatus.NOTYET;
+            operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateManagerInfromDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED;
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
         }
         else{
-            operationStatus = EOperationStatus.OPERATING;
+            operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         popup.update(

@@ -86,9 +86,8 @@ public class Popup {
     @Column(name = "operation_except")
     private String operationExcept;
 
-    @Column(name = "operation_status")
-    @Enumerated(EnumType.STRING)
-    private EOperationStatus operationStatus;
+    @Column(name = "operation_status", nullable = false)
+    private String operationStatus;
 
     @OneToOne
     @JoinColumn(name = "prefered_id", nullable = false)
@@ -116,7 +115,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, EOperationStatus operationStatus,
+                 LocalTime closeTime, String operationExcept, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup) {
         this.posterUrl = posterUrl;
         this.homepageLink = homepageLink;
@@ -147,7 +146,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, EOperationStatus operationStatus,
+                 LocalTime closeTime, String operationExcept, String operationStatus,
                        User agent) {
         this.homepageLink = homepageLink;
         this.name = name;
@@ -181,7 +180,7 @@ public class Popup {
 
     public void updatePosterUrl(String url) {this.posterUrl = url;}
 
-    public void updateOpStatus(EOperationStatus op) {this.operationStatus = op;}
+    public void updateOpStatus(String op) {this.operationStatus = op;}
 
     public void updateAgent(User agent){
         this.agent = agent;}

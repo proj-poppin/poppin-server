@@ -11,7 +11,7 @@ import java.util.List;
 public record ManageSearchingDto(
         Long id,
         String name,
-        EOperationStatus operationStatus,
+        String operationStatus,
         String adminName
 ) {
     public static List<ManageSearchingDto> fromEntityList(List<Popup> popups){

@@ -32,7 +32,7 @@ public record PopupGuestDetailDto(
          String openTime,
          String closeTime,
          String operationExcept,
-         EOperationStatus operationStatus,
+         String operationStatus,
          List<String> images,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,

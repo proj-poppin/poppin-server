@@ -100,14 +100,14 @@ public class PopupService {
         }
 
         //현재 운영상태 정의
-        EOperationStatus operationStatus;
+        String operationStatus;
         if (createPopupDto.openDate().isAfter(LocalDate.now())){
-            operationStatus = EOperationStatus.NOTYET;
+            operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED;
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
         }
         else{
-            operationStatus = EOperationStatus.OPERATING;
+            operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         // 팝업 스토어 정보 저장
@@ -332,7 +332,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return ManageSearchingDto.fromEntityList(popups);
     } // 전체 팝업 관리 - 전체 팝업 검색
@@ -517,6 +517,11 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        // 카테고리 요청 코드 길이 유효성 체크
+        if(taste.length() < 3 || prepered.length() < 14){
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
+        }
+
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
@@ -570,7 +575,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 팝업 검색
@@ -592,6 +597,11 @@ public class PopupService {
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
                                                                EOperationStatus oper, EPopupSort order, int page, int size){
+        // 카테고리 요청 코드 길이 유효성 체크
+        if(taste.length() < 3 || prepered.length() < 14){
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
+        }
+
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
@@ -645,7 +655,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 팝업 검색

@@ -24,11 +24,11 @@ public class PopupScheduler {
         for(Popup popup : popups){
             //현재 운영상태 수정
             if (popup.getOpenDate().isAfter(LocalDate.now())){
-                popup.updateOpStatus(EOperationStatus.NOTYET);
+                popup.updateOpStatus(EOperationStatus.NOTYET.getStatus());
             } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
-                popup.updateOpStatus(EOperationStatus.TERMINATED);
+                popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());
             } else {
-                popup.updateOpStatus(EOperationStatus.OPERATING);
+                popup.updateOpStatus(EOperationStatus.OPERATING.getStatus());
             }
         }
 

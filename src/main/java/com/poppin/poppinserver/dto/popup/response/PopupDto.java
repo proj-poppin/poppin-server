@@ -33,7 +33,7 @@ public record PopupDto(
         String openTime,
         String closeTime,
         String operationExcept,
-        EOperationStatus operationStatus,
+        String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
         List<String> posterList,

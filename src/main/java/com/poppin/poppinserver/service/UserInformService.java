@@ -77,7 +77,7 @@ public class UserInformService {
                 .name(createUserInformDto.name())
                 .tastePopup(tastePopup)
                 .preferedPopup(preferedPopup)
-                .operationStatus(EOperationStatus.EXECUTING)
+                .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .build();
         popup = popupRepository.save(popup);
         log.info(popup.toString());
@@ -206,7 +206,7 @@ public class UserInformService {
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
                 updateUserInfromDto.operationExcept(),
-                EOperationStatus.EXECUTING,
+                EOperationStatus.EXECUTING.getStatus(),
                 admin
         );
 
@@ -296,14 +296,14 @@ public class UserInformService {
         }
 
         //현재 운영상태 정의
-        EOperationStatus operationStatus;
+        String operationStatus;
         if (updateUserInfromDto.openDate().isAfter(LocalDate.now())){
-            operationStatus = EOperationStatus.NOTYET;
+            operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateUserInfromDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED;
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
         }
         else{
-            operationStatus = EOperationStatus.OPERATING;
+            operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         popup.update(

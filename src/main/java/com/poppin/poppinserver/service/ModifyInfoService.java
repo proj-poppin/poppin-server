@@ -92,7 +92,7 @@ public class ModifyInfoService {
                 .openDate(popup.getOpenDate())
                 .openTime(popup.getOpenTime())
                 .operationExcept(popup.getOperationExcept())
-                .operationStatus(EOperationStatus.EXECUTING)
+                .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .parkingAvailable(popup.getParkingAvailable())
                 .preferedPopup(proxyPrefered)
                 .tastePopup(proxyTaste)
@@ -267,7 +267,7 @@ public class ModifyInfoService {
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
                 updateModifyInfoDto.operationExcept(),
-                EOperationStatus.EXECUTING,
+                EOperationStatus.EXECUTING.getStatus(),
                 admin
 
         );
@@ -369,14 +369,14 @@ public class ModifyInfoService {
         }
 
         //현재 운영상태 정의
-        EOperationStatus operationStatus;
+        String operationStatus;
         if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())){
-            operationStatus = EOperationStatus.NOTYET;
+            operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateModifyInfoDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED;
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
         }
         else{
-            operationStatus = EOperationStatus.OPERATING;
+            operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         // 기존 팝업 업데이트
