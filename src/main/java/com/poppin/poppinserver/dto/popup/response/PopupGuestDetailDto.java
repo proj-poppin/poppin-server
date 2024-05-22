@@ -36,7 +36,8 @@ public record PopupGuestDetailDto(
          List<String> images,
          List<ReviewInfoDto> review,
          VisitorDataInfoDto visitorData,
-         Optional<Integer> realTimeVisit
+         Optional<Integer> realTimeVisit,
+         Boolean isVisited
 ) {
     public static PopupGuestDetailDto fromEntity(Popup popup, List<String> images, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit){
 
@@ -69,6 +70,7 @@ public record PopupGuestDetailDto(
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)
                 .realTimeVisit(realTimeVisit)
+                .isVisited(true)
                 .build();
     }
 }
