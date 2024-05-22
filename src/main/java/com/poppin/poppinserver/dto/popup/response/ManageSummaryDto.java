@@ -11,7 +11,7 @@ import java.util.List;
 public record ManageSummaryDto(
         Long id,
         String name,
-        EOperationStatus operationStatus,
+        String operationStatus,
         String adminName
 ) {
     public static List<ManageSummaryDto> fromEntityList(List<Popup> popups){

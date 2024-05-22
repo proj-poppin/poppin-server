@@ -1,8 +1,10 @@
 package com.poppin.poppinserver.type;
 
-import lombok.RequiredArgsConstructor;
+        import lombok.Getter;
+        import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Getter
 public enum EOperationStatus {
     NOTYET("NOTYET"),
     OPERATING("OPERATING"),

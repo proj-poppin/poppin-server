@@ -18,7 +18,7 @@ public record PopupGuestSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        EOperationStatus operationStatus,
+        String operationStatus,
         PreferedDto prefered,
         TasteDto taste
 ) {

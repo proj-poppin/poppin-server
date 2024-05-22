@@ -100,14 +100,14 @@ public class PopupService {
         }
 
         //현재 운영상태 정의
-        EOperationStatus operationStatus;
+        String operationStatus;
         if (createPopupDto.openDate().isAfter(LocalDate.now())){
-            operationStatus = EOperationStatus.NOTYET;
+            operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED;
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
         }
         else{
-            operationStatus = EOperationStatus.OPERATING;
+            operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         // 팝업 스토어 정보 저장
@@ -332,7 +332,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return ManageSearchingDto.fromEntityList(popups);
     } // 전체 팝업 관리 - 전체 팝업 검색
@@ -514,6 +514,7 @@ public class PopupService {
     public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
                                                      EOperationStatus oper, EPopupSort order, int page, int size,
                                                      Long userId){
+        log.info(oper.getStatus());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -570,7 +571,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return PopupSearchingDto.fromEntityList(popups, user);
     } // 로그인 팝업 검색
@@ -645,7 +646,7 @@ public class PopupService {
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper); // 운영 상태
+                oper.getStatus()); // 운영 상태
 
         return PopupGuestSearchingDto.fromEntityList(popups);
     } // 비로그인 팝업 검색

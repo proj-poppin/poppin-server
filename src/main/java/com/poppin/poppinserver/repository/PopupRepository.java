@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.type.EOperationStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -100,7 +99,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                             Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                                             Boolean musical, Boolean sports, Boolean game,
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
-                                            Boolean animalPlant, Boolean etc, EOperationStatus oper);
+                                            Boolean animalPlant, Boolean etc, String oper);
 
 
 

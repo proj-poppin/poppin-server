@@ -30,6 +30,7 @@ public enum ErrorCode {
     INVALID_LOGIN("40019", HttpStatus.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."),
     DUPLICATED_RECOMMEND_COUNT("40020" , HttpStatus.BAD_REQUEST, "같은 후기에 추천을 2번 이상 하실 수 없습니다."),
     INVALID_OAUTH2_PROVIDER("40021", HttpStatus.BAD_REQUEST, "유효하지 않은 OAuth2 제공자입니다."),
+    INVALID_CATEGORY_REQUEST("40022", HttpStatus.BAD_REQUEST, "prepered 코드는 3개, taste 코드는 14개 이상이어야 합니다."),
 
 
     // Unauthorized Error

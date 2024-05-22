@@ -21,7 +21,7 @@ public record PopupSearchingDto(
         String editedAt,
         String openDate,
         String closeDate,
-        EOperationStatus operationStatus,
+        String operationStatus,
         Boolean isInterested,
         PreferedDto prefered,
         TasteDto taste
