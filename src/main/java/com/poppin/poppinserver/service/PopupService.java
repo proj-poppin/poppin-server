@@ -514,9 +514,13 @@ public class PopupService {
     public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
                                                      EOperationStatus oper, EPopupSort order, int page, int size,
                                                      Long userId){
-        log.info(oper.getStatus());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        // 카테고리 요청 코드 길이 유효성 체크
+        if(taste.length() < 3 || prepered.length() < 14){
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
+        }
 
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
@@ -593,6 +597,11 @@ public class PopupService {
 
     public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
                                                                EOperationStatus oper, EPopupSort order, int page, int size){
+        // 카테고리 요청 코드 길이 유효성 체크
+        if(taste.length() < 3 || prepered.length() < 14){
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
+        }
+
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
