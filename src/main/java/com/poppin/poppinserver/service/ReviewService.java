@@ -56,20 +56,24 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        // 리뷰 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
+        // 이미지 없을 시 넘어감
+        if (images.isEmpty()) {
 
-        List<ReviewImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            ReviewImage posterImage = ReviewImage.builder()
-                    .imageUrl(url)
-                    .review(review)
-                    .build();
-            posterImages.add(posterImage);
+        }else{
+            // 리뷰 이미지 처리 및 저장
+            List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
+
+            List<ReviewImage> posterImages = new ArrayList<>();
+            for (String url : fileUrls) {
+                ReviewImage posterImage = ReviewImage.builder()
+                        .imageUrl(url)
+                        .review(review)
+                        .build();
+                posterImages.add(posterImage);
+            }
+            reviewImageRepository.saveAll(posterImages);
+            review.updateReviewUrl(fileUrls.get(0));
         }
-        reviewImageRepository.saveAll(posterImages);
-        review.updateReviewUrl(fileUrls.get(0));
-
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(createReviewDto.visitDate())
@@ -102,19 +106,24 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        // 리뷰 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
+        // 이미지 없을 시 넘어감
+        if (images.isEmpty()) {
 
-        List<ReviewImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            ReviewImage posterImage = ReviewImage.builder()
-                    .imageUrl(url)
-                    .review(review)
-                    .build();
-            posterImages.add(posterImage);
+        }else{
+            // 리뷰 이미지 처리 및 저장
+            List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
+
+            List<ReviewImage> posterImages = new ArrayList<>();
+            for (String url : fileUrls) {
+                ReviewImage posterImage = ReviewImage.builder()
+                        .imageUrl(url)
+                        .review(review)
+                        .build();
+                posterImages.add(posterImage);
+            }
+            reviewImageRepository.saveAll(posterImages);
+            review.updateReviewUrl(fileUrls.get(0));
         }
-        reviewImageRepository.saveAll(posterImages);
-        review.updateReviewUrl(fileUrls.get(0));
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(createReviewDto.visitDate())

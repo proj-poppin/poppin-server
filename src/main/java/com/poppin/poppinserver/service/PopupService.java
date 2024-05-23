@@ -376,7 +376,7 @@ public class PopupService {
         return PopupGuestDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
     } // 비로그인 상세조회
 
-    public PopupDetailDto readDetail(Long userId, Long popupId){
+    public PopupDetailDto readDetail(Long popupId, Long userId){
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
