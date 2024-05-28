@@ -26,8 +26,9 @@ public class ReviewController {
     public ResponseDto<?> createCertifiedReview(
             @UserId Long userId,
             @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto ,
-            @RequestPart(value = "images" , required = false) List<MultipartFile> images)
+            @RequestPart(value = "images" ) List<MultipartFile> images)
     {
+
         return ResponseDto.ok(reviewService.createCertifiedReview(userId,createReviewDto, images));
     }
 
@@ -36,7 +37,7 @@ public class ReviewController {
     public ResponseDto<?> createUncertiReview(
             @UserId Long userId,
             @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
-            @RequestPart(value = "images" , required = false) List<MultipartFile> images)
+            @RequestPart(value = "images" ) List<MultipartFile> images)
     {
         return ResponseDto.ok(reviewService.createUncertifiedReview(userId, createReviewDto, images));
     }

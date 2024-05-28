@@ -56,10 +56,10 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
+        String fileName = images.get(0).getOriginalFilename();
         // 이미지 없을 시 넘어감
-        if (images.isEmpty()) {
+        if (fileName != "") {
 
-        }else{
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
 
@@ -106,10 +106,10 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        // 이미지 없을 시 넘어감
-        if (images.isEmpty()) {
+        String fileName = images.get(0).getOriginalFilename();
 
-        }else{
+        // 이미지 없을 시 넘어감
+        if (fileName != "") {
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
 
