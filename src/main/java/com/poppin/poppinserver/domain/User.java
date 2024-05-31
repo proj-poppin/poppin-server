@@ -192,4 +192,8 @@ public class User {
         this.isDeleted = false;
         this.deletedAt = null;
     }
+
+    public void addReviewCnt(){
+        this.reviewCnt ++;
+    }
 }

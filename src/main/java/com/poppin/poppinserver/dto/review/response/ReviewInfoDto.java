@@ -17,7 +17,7 @@ public record ReviewInfoDto(
         String nickname,
 
         @NotNull
-        int totalReviewWrite, // 사용자가 쓴 리뷰 개수
+        Long reviewCnt, // 사용자가 쓴 리뷰 개수
 
         @NotNull
         String text,
@@ -31,14 +31,14 @@ public record ReviewInfoDto(
         @NotNull
         int recommendCnt
 ) {
-    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, int totalReviewWrite){
+    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, List<Long> reviewCnt){
         List<ReviewInfoDto> reviewInfoDtoList = new ArrayList<>();
 
         for (int i = 0; i < reviews.size(); i++) {
             ReviewInfoDto reviewInfoDto = ReviewInfoDto.builder()
                     .reviewId(reviews.get(i).getId())
                     .nickname(reviews.get(i).getNickname())
-                    .totalReviewWrite(totalReviewWrite)
+                    .reviewCnt(reviewCnt.get(i))
                     .text(reviews.get(i).getText())
                     .imageUrls(imageUrls.get(i))
                     .isCertificated(reviews.get(i).getIsCertificated())

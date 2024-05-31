@@ -33,6 +33,7 @@ public class ReviewService {
     private final VisitorDataRepository visitorDataRepository;
     private final VisitRepository visitRepository;
     private final S3Service s3Service;
+    private final UserService userService;
 
     /*방문(인증)후기 생성*/
     @Transactional
@@ -85,6 +86,8 @@ public class ReviewService {
 
         visitorDataRepository.save(visitorData);
 
+        userService.addReviewCnt(user);
+
         return ReviewDto.fromEntity(reviewRepository.save(review), visitorData);
     }
 
@@ -134,6 +137,8 @@ public class ReviewService {
         );
 
         visitorDataRepository.save(visitorData);
+
+        userService.addReviewCnt(user);
 
         return ReviewDto.fromEntity(reviewRepository.save(review), visitorData);
     }

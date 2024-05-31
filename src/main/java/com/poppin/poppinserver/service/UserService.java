@@ -338,4 +338,9 @@ public class UserService {
         s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
         reviewRepository.deleteAllByUserId(userId);     // 유저가 남긴 모든 후기 삭제
     }
+
+    public void addReviewCnt(User user){
+        user.addReviewCnt();
+        userRepository.save(user);
+    }
 }

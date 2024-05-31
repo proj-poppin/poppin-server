@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -338,6 +336,7 @@ public class PopupService {
     } // 전체 팝업 관리 - 전체 팝업 검색
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
+
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -347,6 +346,7 @@ public class PopupService {
 
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
+        List<Long> reviewCntList = new ArrayList<>();
         for (Review review : reviews){
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
@@ -355,9 +355,11 @@ public class PopupService {
                 imagesList.add(reviewImage.getImageUrl());
             }
             reviewImagesList.add(imagesList);
+
+            reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -377,6 +379,7 @@ public class PopupService {
     } // 비로그인 상세조회
 
     public PopupDetailDto readDetail(Long popupId, Long userId){
+
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -386,6 +389,7 @@ public class PopupService {
 
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
+        List<Long> reviewCntList = new ArrayList<>();
         for (Review review : reviews){
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
@@ -394,9 +398,11 @@ public class PopupService {
                 imagesList.add(reviewImage.getImageUrl());
             }
             reviewImagesList.add(imagesList);
+
+            reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, 0);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
