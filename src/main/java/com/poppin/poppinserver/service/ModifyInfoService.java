@@ -141,17 +141,21 @@ public class ModifyInfoService {
         modifyInformRepository.save(modifyInfo);
 
         // 정보수정요청 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
+        List<String> fileUrls = new ArrayList<>();
+        if(images.get(0).getOriginalFilename() != ""){ // 이미지가 비었을 시 넘어감
+            fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
 
-        List<ModifyImages> modifyImagesList = new ArrayList<>();
-        for(String url : fileUrls){
-            ModifyImages modifyImage = ModifyImages.builder()
-                    .modifyId(modifyInfo)
-                    .imageUrl(url)
-                    .build();
-            modifyImagesList.add(modifyImage);
+            List<ModifyImages> modifyImagesList = new ArrayList<>();
+            for(String url : fileUrls){
+                ModifyImages modifyImage = ModifyImages.builder()
+                        .modifyId(modifyInfo)
+                        .imageUrl(url)
+                        .build();
+                modifyImagesList.add(modifyImage);
+            }
+            modifyImageReposiroty.saveAll(modifyImagesList);
         }
-        modifyImageReposiroty.saveAll(modifyImagesList);
+
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 요청 생성
@@ -223,22 +227,28 @@ public class ModifyInfoService {
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        if(originUrls.size() != 0){
+            s3Service.deleteMultipleImages(originUrls);
+            posterImageRepository.deleteAllByPopupId(popup);
+        }
+        
 
         //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+        List<String> fileUrls = new ArrayList<>();
+        if(images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
+            fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
+            List<PosterImage> posterImages = new ArrayList<>();
+            for (String url : fileUrls) {
+                PosterImage posterImage = PosterImage.builder()
+                        .posterUrl(url)
+                        .popup(popup)
+                        .build();
+                posterImages.add(posterImage);
+            }
+            posterImageRepository.saveAll(posterImages);
+            popup.updatePosterUrl(fileUrls.get(0));
         }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
@@ -322,8 +332,10 @@ public class ModifyInfoService {
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(originPopup);
+        if(originUrls.size() != 0){
+            s3Service.deleteMultipleImages(originUrls);
+            posterImageRepository.deleteAllByPopupId(originPopup);
+        }
 
         // 프록시 이미지 싹 지우기
         Popup proxyPopup = modifyInfo.getProxyPopup();
@@ -331,22 +343,27 @@ public class ModifyInfoService {
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        s3Service.deleteMultipleImages(proxyUrls);
-        posterImageRepository.deleteAllByPopupId(proxyPopup);
+        if(originUrls.size() != 0){
+            s3Service.deleteMultipleImages(proxyUrls);
+            posterImageRepository.deleteAllByPopupId(proxyPopup);
+        }
 
         //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, originPopup.getId());
+        List<String> fileUrls = new ArrayList<>();
+        if(images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
+            fileUrls = s3Service.uploadPopupPoster(images, originPopup.getId());
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(originPopup)
-                    .build();
-            posterImages.add(posterImage);
+            List<PosterImage> posterImages = new ArrayList<>();
+            for (String url : fileUrls) {
+                PosterImage posterImage = PosterImage.builder()
+                        .posterUrl(url)
+                        .popup(originPopup)
+                        .build();
+                posterImages.add(posterImage);
+            }
+            posterImageRepository.saveAll(posterImages);
+            originPopup.updatePosterUrl(fileUrls.get(0));
         }
-        posterImageRepository.saveAll(posterImages);
-        originPopup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         alarmKeywordRepository.deleteAll(originPopup.getAlarmKeywords());
