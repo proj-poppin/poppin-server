@@ -74,6 +74,9 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "review_cnt", nullable = false)
+    private Long reviewCnt;
+
     @Column(name = "require_special_care", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean requiresSpecialCare;
 
@@ -114,6 +117,7 @@ public class User {
         this.isDeleted = false;
         this.profileImageUrl = profileImageUrl;
         this.requiresSpecialCare = false;
+        this.reviewCnt = 0L;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
