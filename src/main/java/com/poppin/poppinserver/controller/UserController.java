@@ -115,7 +115,7 @@ public class UserController {
               @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
               @RequestPart(value = "images") List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.createCertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, createReviewDto, images));
     }
 
     /*마이페이지 - 방문한 팝업 일반 후기 작성*/
@@ -125,7 +125,7 @@ public class UserController {
             @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
             @RequestPart(value = "images") List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.createUncertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, createReviewDto, images));
     }
 
     /*마이페이지 - 일반후기 팝업 검색*/

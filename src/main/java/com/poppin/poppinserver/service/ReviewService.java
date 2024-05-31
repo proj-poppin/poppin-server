@@ -36,7 +36,7 @@ public class ReviewService {
 
     /*방문(인증)후기 생성*/
     @Transactional
-    public ReviewDto createCertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
+    public ReviewDto writeCertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -89,7 +89,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto createUncertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
+    public ReviewDto writeUncertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));

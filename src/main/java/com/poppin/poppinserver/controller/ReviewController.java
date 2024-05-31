@@ -29,7 +29,7 @@ public class ReviewController {
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
 
-        return ResponseDto.ok(reviewService.createCertifiedReview(userId,createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId,createReviewDto, images));
     }
 
     /*일반 후기 작성*/
@@ -39,7 +39,7 @@ public class ReviewController {
             @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.createUncertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, createReviewDto, images));
     }
 
     @PostMapping("/add-recommend") // 후기 추천
