@@ -3,7 +3,6 @@ package com.poppin.poppinserver.dto.popup.response;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
-import com.poppin.poppinserver.type.EOperationStatus;
 import lombok.Builder;
 
 import java.util.List;
@@ -31,6 +30,8 @@ public record PopupGuestDetailDto(
          String closeDate,
          String openTime,
          String closeTime,
+         Double latitude,
+         Double longitude,
          String operationExcept,
          String operationStatus,
          List<String> images,
@@ -64,6 +65,8 @@ public record PopupGuestDetailDto(
                 .closeDate(popup.getCloseDate().toString())
                 .openTime(popup.getOpenTime().toString())
                 .closeTime(popup.getCloseTime().toString())
+                .latitude(popup.getLatitude())
+                .longitude(popup.getLongitude())
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
                 .images(images)
