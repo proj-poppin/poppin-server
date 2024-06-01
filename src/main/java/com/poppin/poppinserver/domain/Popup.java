@@ -83,6 +83,12 @@ public class Popup {
     @Column(name = "close_time")
     private LocalTime closeTime;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     @Column(name = "operation_except")
     private String operationExcept;
 
@@ -115,7 +121,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, String operationStatus,
+                 LocalTime closeTime, Double latitude, Double longitude, String operationExcept, String operationStatus,
                  PreferedPopup preferedPopup, TastePopup tastePopup) {
         this.posterUrl = posterUrl;
         this.homepageLink = homepageLink;
@@ -136,6 +142,8 @@ public class Popup {
         this.closeDate = closeDate;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
         this.tastePopup = tastePopup;
@@ -146,7 +154,7 @@ public class Popup {
                  String address, String addressDetail, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, String operationExcept, String operationStatus,
+                 LocalTime closeTime, Double latitude, Double longitude, String operationExcept, String operationStatus,
                        User agent) {
         this.homepageLink = homepageLink;
         this.name = name;
@@ -166,6 +174,8 @@ public class Popup {
         this.closeDate = closeDate;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.operationExcept = operationExcept;
         this.operationStatus = operationStatus; // 내부 동기화
         this.agent = agent;

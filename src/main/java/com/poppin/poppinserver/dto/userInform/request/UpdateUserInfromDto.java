@@ -3,8 +3,6 @@ package com.poppin.poppinserver.dto.userInform.request;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.type.EAvailableAge;
-import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -24,6 +22,10 @@ public record UpdateUserInfromDto(
         LocalDate closeDate,
         LocalTime openTime,
         LocalTime closeTime,
+
+        Double latitude,
+
+        Double longitude,
         String operationExcept,
         CreatePreferedDto prefered,
         CreateTasteDto taste,

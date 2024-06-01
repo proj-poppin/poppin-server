@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
@@ -220,6 +219,8 @@ public class ManagerInformService {
                 updateManagerInfromDto.closeDate(),
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
+                updateManagerInfromDto.latitude(),
+                updateManagerInfromDto.longitude(),
                 updateManagerInfromDto.operationExcept(),
                 EOperationStatus.EXECUTING.getStatus(),
                 admin
@@ -338,6 +339,8 @@ public class ManagerInformService {
                 updateManagerInfromDto.closeDate(),
                 updateManagerInfromDto.openTime(),
                 updateManagerInfromDto.closeTime(),
+                updateManagerInfromDto.latitude(),
+                updateManagerInfromDto.longitude(),
                 updateManagerInfromDto.operationExcept(),
                 operationStatus,
                 admin

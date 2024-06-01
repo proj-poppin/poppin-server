@@ -10,9 +10,7 @@ import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
-import com.poppin.poppinserver.type.EInformProgress;
 import com.poppin.poppinserver.type.EOperationStatus;
-import com.poppin.poppinserver.util.ImageUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,6 +88,8 @@ public class ModifyInfoService {
                 .addressDetail(popup.getAddressDetail())
                 .openDate(popup.getOpenDate())
                 .openTime(popup.getOpenTime())
+                .latitude(popup.getLatitude())
+                .longitude(popup.getLongitude())
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .parkingAvailable(popup.getParkingAvailable())
@@ -276,6 +275,8 @@ public class ModifyInfoService {
                 updateModifyInfoDto.closeDate(),
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
+                updateModifyInfoDto.latitude(),
+                updateModifyInfoDto.longitude(),
                 updateModifyInfoDto.operationExcept(),
                 EOperationStatus.EXECUTING.getStatus(),
                 admin
@@ -411,6 +412,8 @@ public class ModifyInfoService {
                 updateModifyInfoDto.closeDate(),
                 updateModifyInfoDto.openTime(),
                 updateModifyInfoDto.closeTime(),
+                updateModifyInfoDto.latitude(),
+                updateModifyInfoDto.longitude(),
                 updateModifyInfoDto.operationExcept(),
                 operationStatus,
                 admin

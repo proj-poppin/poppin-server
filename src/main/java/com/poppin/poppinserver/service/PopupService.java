@@ -122,6 +122,8 @@ public class PopupService {
                 .addressDetail(createPopupDto.addressDetail())
                 .openDate(createPopupDto.openDate())
                 .openTime(createPopupDto.openTime())
+                .latitude(createPopupDto.latitude())
+                .longitude(createPopupDto.longitude())
                 .operationExcept(createPopupDto.operationExcept())
                 .operationStatus(operationStatus)
                 .parkingAvailable(createPopupDto.parkingAvailable())
@@ -268,6 +270,8 @@ public class PopupService {
                 updatePopupDto.closeDate(),
                 updatePopupDto.openTime(),
                 updatePopupDto.closeTime(),
+                updatePopupDto.latitude(),
+                updatePopupDto.longitude(),
                 updatePopupDto.operationExcept(),
                 popup.getOperationStatus(),
                 admin

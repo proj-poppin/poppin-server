@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -205,6 +203,8 @@ public class UserInformService {
                 updateUserInfromDto.closeDate(),
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
+                updateUserInfromDto.latitude(),
+                updateUserInfromDto.longitude(),
                 updateUserInfromDto.operationExcept(),
                 EOperationStatus.EXECUTING.getStatus(),
                 admin
@@ -320,6 +320,8 @@ public class UserInformService {
                 updateUserInfromDto.closeDate(),
                 updateUserInfromDto.openTime(),
                 updateUserInfromDto.closeTime(),
+                updateUserInfromDto.latitude(),
+                updateUserInfromDto.longitude(),
                 updateUserInfromDto.operationExcept(),
                 operationStatus,
                 admin

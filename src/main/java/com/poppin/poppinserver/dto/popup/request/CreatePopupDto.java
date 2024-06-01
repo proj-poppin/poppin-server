@@ -33,6 +33,13 @@ public record CreatePopupDto(
         LocalTime openTime,
         @NotNull
         LocalTime closeTime,
+
+        @NotNull
+        Double latitude,
+
+        @NotNull
+        Double longitude,
+
         String operationExcept,
         @NotNull
         CreatePreferedDto prefered,

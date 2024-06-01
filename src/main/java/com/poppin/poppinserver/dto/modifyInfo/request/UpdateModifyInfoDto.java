@@ -25,6 +25,10 @@ public record UpdateModifyInfoDto(
         LocalDate closeDate,
         LocalTime openTime,
         LocalTime closeTime,
+
+        Double latitude,
+
+        Double longitude,
         String operationExcept,
         CreatePreferedDto prefered,
         CreateTasteDto taste,

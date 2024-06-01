@@ -35,6 +35,13 @@ public record UpdatePopupDto(
         LocalTime openTime,
         @NotNull
         LocalTime closeTime,
+
+        @NotNull
+        Double latitude,
+
+        @NotNull
+        Double longitude,
+
         String operationExcept,
         @NotNull
         CreatePreferedDto prefered,
