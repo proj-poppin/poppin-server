@@ -3,8 +3,7 @@ package com.poppin.poppinserver.repository;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Visit;
 
-import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.domain.VisitorData;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,4 +29,10 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId AND v.popup.id = :popupId")
     Optional<Visit> findByUserId(@Param("userId")Long userId, @Param("popupId") Long popupId);
+
+    // createdAt 칼럼이 주어진 날짜 시간 이전인 모든 Visit을 찾습니다.
+    List<Visit> findAllByCreatedAtBefore(LocalDateTime dateTime);
+
+    // createdAt 칼럼이 주어진 날짜 시간 이전인 모든 Visit을 삭제합니다.
+    void deleteAllByCreatedAtBefore(LocalDateTime dateTime);
 }
