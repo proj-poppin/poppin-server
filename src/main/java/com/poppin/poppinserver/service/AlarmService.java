@@ -28,31 +28,31 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final PopupRepository popupRepository;
 
-    @Value("${cloud.s3.alarm.bucket.name}")
+    @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
 
-    @Value("${cloud.s3.alarm.icon.magam}")
+    @Value("${cloud.aws.s3.alarm.icon.magam}")
     private String magam;
 
-    @Value("${cloud.s3.alarm.icon.info}")
+    @Value("${cloud.aws.s3.alarm.icon.info}")
     private String info;
 
-    @Value("${cloud.s3.alarm.icon.jaebo}")
+    @Value("${cloud.aws.s3.alarm.icon.jaebo}")
     private String jaebo;
 
-    @Value("${cloud.s3.alarm.icon.reopen}")
+    @Value("${cloud.aws.s3.alarm.icon.reopen}")
     private String reopen;
 
-    @Value("${cloud.s3.alarm.icon.hot}")
+    @Value("${cloud.aws.s3.alarm.icon.hot}")
     private String hot;
 
-    @Value("${cloud.s3.alarm.icon.keyword}")
+    @Value("${cloud.aws.s3.alarm.icon.keyword}")
     private String key;
 
-    @Value("${cloud.s3.alarm.icon.open}")
+    @Value("${cloud.aws.s3.alarm.icon.open}")
     private String open;
 
-    @Value("${cloud.s3.alarm.icon.hoogi}")
+    @Value("${cloud.aws.s3.alarm.icon.hoogi}")
     private String hoogi;
 
     public String insertAlarmKeyword(FCMRequestDto fcmRequestDto) {
