@@ -2,12 +2,10 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.Alarm;
-import com.poppin.poppinserver.domain.AlarmKeyword;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.AlarmKeywordRepository;
 import com.poppin.poppinserver.repository.AlarmRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
