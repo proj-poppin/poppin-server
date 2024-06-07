@@ -1,18 +1,34 @@
-package com.poppin.poppinserver.scheduler;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-
-
-@RequiredArgsConstructor
-@Configuration
-@Slf4j
-public class FCMScheduler {
-
+//package com.poppin.poppinserver.scheduler;
+//
+//import com.google.firebase.messaging.FirebaseMessagingException;
+//import com.poppin.poppinserver.domain.Popup;
+//import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
+//import com.poppin.poppinserver.repository.PopupRepository;
+//import com.poppin.poppinserver.repository.PopupTopicRepository;
+//import com.poppin.poppinserver.type.EPopupTopic;
+//import com.poppin.poppinserver.type.EPushInfo;
+//import com.poppin.poppinserver.util.FCMSendUtil;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.data.domain.PageRequest;
+//import org.springframework.scheduling.annotation.Scheduled;
+//
+//import java.time.LocalDate;
+//import java.time.LocalDateTime;
+//import java.time.LocalTime;
+//import java.time.format.DateTimeFormatter;
+//import java.util.List;
+//
+//
+//@RequiredArgsConstructor
+//@Configuration
+//@Slf4j
+//public class FCMScheduler {
+//
 //    private final PopupRepository popupRepository;
 //    private final PopupTopicRepository popupTopicRepository;
-//    private final NotificationUtil notificationUtil;
+//    private final FCMSendUtil fcmSendUtil;
 //
 //    @Scheduled(cron = "0 */5 * * * *")
 //    public void reopenPopup(){
@@ -153,6 +169,6 @@ public class FCMScheduler {
 //            }
 //        }
 //        if (fcmRequestDtoList == null) {log.info(topic.getTopicName() + "에 대해 메시지 발송할 토큰이 없습니다.");}
-//        else {notificationUtil.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
+//        else {fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
 //    }
-}
+//}

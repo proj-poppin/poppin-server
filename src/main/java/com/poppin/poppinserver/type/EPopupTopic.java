@@ -20,7 +20,7 @@ public enum EPopupTopic {
     MAGAM("MAGAM_POPUP", "MG"),                      // 관심 팝업 마감 임박
     CHANGE_INFO("CHANGE_INFO_POPUP","CI"),          // 관심 팝업 정보 변경
     HOT("HOT_POPUP", "HT"),                         // 인기 팝업
-HOOGI("HOOGI", "HG"),                               // 방문한 팝업 후기 요청
+    HOOGI("HOOGI", "HG"),                           // 방문한 팝업 후기 요청
     CHOOCHUN("CHOOCHUN_POPUP", "CH" ),              // 도움된 후기 알림
     REOPEN("REOPEN_POPUP", "RO"),                   // 재오픈 수요체크 팝업 오픈
     KEYWORD("KEYWORD_POPUP", "KW" ),                // 키워드알림 팝업 오픈

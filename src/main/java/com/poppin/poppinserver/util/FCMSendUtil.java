@@ -5,6 +5,7 @@ import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
 
+import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class FCMUtil {
+public class FCMSendUtil {
 
     /**=================================================================================== */
           private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
@@ -28,6 +29,8 @@ public class FCMUtil {
     /**==================================================================================== */
 
     private final FirebaseMessaging firebaseMessaging;
+
+    private final AlarmService alarmService;
 
     /* 안드로이드 토큰 테스트 */
     public void sendAndroidNotificationByTokenTest(PushDto pushDto) {
@@ -94,6 +97,9 @@ public class FCMUtil {
             try {
                 String result = firebaseMessaging.send(message);
                 log.debug(ANDROID_TOPIC + " Successfully sent message: " + result);
+
+                // 알림 키워드 등록
+                String flag = alarmService.insertAlarmKeyword(fcmRequestDto);
             } catch (FirebaseMessagingException e) {
                 log.error(ANDROID_TOPIC + " Failed to send message: " + e.getMessage());
             }
