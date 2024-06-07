@@ -55,6 +55,9 @@ public class AlarmService {
     @Value("${cloud.aws.s3.alarm.icon.hoogi}")
     private String hoogi;
 
+    @Value("${cloud.aws.s3.alarm.icon.bangmun}")
+    private String bangmun;
+
     public String insertAlarmKeyword(FCMRequestDto fcmRequestDto) {
 
         log.info("--- 알람 저장 시작  ---");
@@ -67,7 +70,7 @@ public class AlarmService {
                     Popup popup = popupRepository.findById(fcmRequestDto.popupId())
                             .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-                    String keyword = "POPUP";
+                    String keyword = "POPUP"; // 팝업 후기
 
                     String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
 
@@ -116,6 +119,9 @@ public class AlarmService {
             }
             case HOOGI -> {
                 return s3Client.getUrl(alarmBucket, hoogi);
+            }
+            case BANGMUN -> {
+                return s3Client.getUrl(alarmBucket, bangmun);
             }
             default -> {
                 return null;
