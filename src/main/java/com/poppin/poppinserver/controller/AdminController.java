@@ -36,9 +36,9 @@ public class AdminController {
 
     /* 회원 관리 목록 조회 */
     @GetMapping("/users")
-    public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "nickname") String sortField,
-                                    @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
-        return ResponseDto.ok(adminService.readUsers(sortField, sortOrder));
+    public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "1") Long page,
+                                    @RequestParam(required = false, defaultValue = "44") Long size) {
+        return ResponseDto.ok(adminService.readUsers(page, size));
     }
 
     /* 회원 상세 조회 */

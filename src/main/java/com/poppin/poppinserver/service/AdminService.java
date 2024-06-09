@@ -14,7 +14,9 @@ import com.poppin.poppinserver.repository.ReviewRepository;
 import com.poppin.poppinserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -68,10 +70,11 @@ public class AdminService {
         freqQuestionRepository.delete(freqQuestion);
     }
 
-    public UserListDto readUsers(String sortField, String sortOrder) {
-        Sort sort = getSort(sortField, sortOrder);
-        List<User> userList = userRepository.findAll(sort);
-        List<UserAdministrationDto> userAdministrationDtoList = userList.stream()
+    public UserListDto readUsers(Long page, Long size) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+        Page<User> userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
+
+        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
                 .map(user -> UserAdministrationDto.builder()
                         .id(user.getId())
                         .email(user.getEmail())
@@ -86,20 +89,6 @@ public class AdminService {
                 .build();
     }
 
-    private Sort getSort(String sortField, String sortOrder) {
-        Sort.Direction dir = Sort.Direction.ASC;
-        if (sortOrder.equalsIgnoreCase("desc")) {
-            dir = Sort.Direction.DESC;
-        }
-
-        switch (sortField) {
-            case "createdAt":
-                return Sort.by(dir, "createdAt");
-            default:
-                return Sort.by(dir, "nickname");
-        }
-    }
-
     public UserAdministrationDetailDto readUserDetail(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -110,6 +99,7 @@ public class AdminService {
                 .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .provider(user.getProvider())
+                .birthDate(user.getBirthDate())
                 .requiresSpecialCare(user.getRequiresSpecialCare())
                 .hiddenReviewCount(hiddenReviewCount)
                 .build();
