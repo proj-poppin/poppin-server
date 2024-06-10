@@ -2,7 +2,9 @@ package com.poppin.poppinserver.dto.notification.request;
 
 import com.poppin.poppinserver.type.EPopupTopic;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record FCMRequestDto(
 
 
@@ -22,4 +24,13 @@ public record FCMRequestDto(
         EPopupTopic topic
 
 ) {
+        public static FCMRequestDto fromEntity(Long popupId, String token, String title, String body, EPopupTopic topic){
+                return FCMRequestDto.builder()
+                        .popupId(popupId)
+                        .token(token)
+                        .title(title)
+                        .body(body)
+                        .topic(topic)
+                        .build();
+        }
 }

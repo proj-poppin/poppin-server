@@ -16,6 +16,7 @@ import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
+import com.poppin.poppinserver.util.push.android.FCMSendUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class PopupService {
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
-    private final FCMService fcmService;
+    private final FCMSendUtil fcmSendUtil;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
@@ -278,6 +279,22 @@ public class PopupService {
         );
 
         popupRepository.save(popup);
+
+        // 팝업 정보 변경 시 앱푸시 보내기 (수정 필요)
+        // popup topic repository -> interest 와 join해서 popup id 같고, popup topic 이 change_info인 애들 의 NT
+        // for문으로 FCMRequestDto -> 리스트에 담아 전송
+//        Optional<Interest> interest = interestRepository.findByUserIdAndPopupId(adminId, popup.getId());
+//        if (interest.isPresent()){
+//            List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
+//            NotificationToken notificationToken = notificationTokenRepository.findByToken(updatePopupDto.token());
+//            if (notificationToken.equals(null))throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+//            else {
+//                FCMRequestDto fcmRequestDto = FCMRequestDto.fromEntity(popup.getId(), updatePopupDto.token(), EPushInfo.CHANGE_INFO.getTitle(), EPushInfo.CHANGE_INFO.getBody(), EPopupTopic.CHANGE_INFO);
+//                fcmRequestDtoList.add(fcmRequestDto);
+//                fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);
+//            }
+//        }
+
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
@@ -699,8 +716,8 @@ public class PopupService {
 
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
         log.info("재오픈 수요 체크 시 FCM TOPIC 등록");
-        String push_token = pushRequestDto.token();
-        fcmService.fcmAddTopic(push_token, popup, EPopupTopic.REOPEN);
+//        String pushToken = pushRequestDto.token();
+//        fcmService.fcmAddTopic(pushToken, popup, EPopupTopic.REOPEN);
 
 
         return "재오픈 수요 체크 되었습니다.";
