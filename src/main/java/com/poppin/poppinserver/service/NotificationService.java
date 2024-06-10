@@ -30,22 +30,19 @@ public class NotificationService {
     /* 알림 동의 - 공지사항 , 팝업은 따로 저장 해야 함 */
     public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
 
-        // 토큰 저장
-        NotificationToken notificationToken = new NotificationToken(
-                tokenRequestDto.token(),
-                LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
-                tokenRequestDto.device() // android or ios
-        );
-
-        notificationTokenRepository.save(notificationToken); // 토큰 저장
-
-        for (EInformationTopic topic : EInformationTopic.values()){
-            InformationTopic popupTopic = new InformationTopic(notificationToken,topic.getTopicType(),LocalDateTime.now(),topic);
-            informationTopicRepository.save(popupTopic); // 구독 저장
-            fcmService.fcmAddTopic(tokenRequestDto.token(), null,  topic.getTopicType()); // 구독
+        try {
+            // 토큰 저장
+            NotificationToken notificationToken = new NotificationToken(
+                    tokenRequestDto.token(),
+                    LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
+                    tokenRequestDto.device() // android or ios
+            );
+            NotificationToken token = notificationTokenRepository.save(notificationToken); // 토큰 저장
+            return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 성공" , token.getToken());
+        }catch (Exception e){
+           log.error("토큰 등록 실패: " + e.getMessage());
+            return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 실패" , e.getMessage());
         }
-
-        return TokenResponseDto.fromEntity(tokenRequestDto);
     }
 
 }

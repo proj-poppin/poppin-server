@@ -11,13 +11,21 @@ public record TokenResponseDto(
         String token,
 
         @NotNull
-        String device // android or ios
+        String device ,// android or ios
+
+        @NotNull
+        String response,
+
+        @NotNull
+        String description
 
 ) {
-    public static TokenResponseDto fromEntity(TokenRequestDto tokenRequestDto){
+    public static TokenResponseDto fromEntity(TokenRequestDto tokenRequestDto, String response, String description){
         return TokenResponseDto.builder()
                 .token(tokenRequestDto.token())
                 .device(tokenRequestDto.device())
+                .response(response)
+                .description(description)
                 .build();
     }
 }
