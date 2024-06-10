@@ -6,7 +6,7 @@ import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
-import com.poppin.poppinserver.type.EInformationTopic;
+import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.util.push.android.FCMSubscribeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +24,15 @@ public class FCMService {
           Author : sakang
           Date   : 2024-04-27
         */
-    public void fcmAddTopic(String token, Popup popup, String type){
+    public void fcmAddTopic(String token, Popup popup, EPopupTopic topic){
         if(token != null){
             // 팝업 관련
             try {
                 log.info("앱푸시 팝업 주제 추가 시작");
 
-                NotificationToken tk = notificationTokenRepository.findByToken(token);
-                if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                fcmSubscribeUtil.subscribePopupTopic(tk, popup , type); // 관심팝업
+                NotificationToken pushToken = notificationTokenRepository.findByToken(token);
+                if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+                fcmSubscribeUtil.subscribePopupTopic(pushToken, popup , topic); // 관심팝업
             }catch (CommonException | FirebaseMessagingException e){
                 log.error("앱푸시 팝업 주제 추가 실패");
                 e.printStackTrace();
@@ -47,13 +47,13 @@ public class FCMService {
           Author : sakang
           Date   : 2024-04-27
         */
-    public void fcmRemoveTopic(String token, String type){
+    public void fcmRemoveTopic(String token, Popup popup, EPopupTopic topic){
 
         try {
             log.info("앱푸시 팝업 주제 삭제 시작");
-            NotificationToken tk = notificationTokenRepository.findByToken(token);
-            if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-            fcmSubscribeUtil.unsubscribePopupTopic(tk, type); // 구독 및 저장
+            NotificationToken pushToken = notificationTokenRepository.findByToken(token);
+            if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+            fcmSubscribeUtil.unsubscribePopupTopic(pushToken, popup, topic); // 구독 및 저장
         }catch (CommonException | FirebaseMessagingException e){
             log.error("앱푸시 팝업 주제 삭제 실패");
             e.printStackTrace();

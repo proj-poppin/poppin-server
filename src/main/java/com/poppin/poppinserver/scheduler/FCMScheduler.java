@@ -44,7 +44,7 @@
 //        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
 //        if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
 //        else{
-//            schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPopupTopic.REOPEN.getTopicType(), EPushInfo.REOPEN);
+//            schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPushInfo.REOPEN);
 //        }
 //    }
 //
@@ -62,7 +62,7 @@
 //        List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow); // null, 1, many
 //        if (magamPopup.isEmpty())log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
 //        else{
-//            schedulerFcmPopupTopicByType(magamPopup, EPopupTopic.MAGAM, EPopupTopic.MAGAM.getTopicType(), EPushInfo.MAGAM);
+//            schedulerFcmPopupTopicByType(magamPopup, EPopupTopic.MAGAM, EPushInfo.MAGAM);
 //        }
 //    }
 //
@@ -83,7 +83,7 @@
 //
 //        if (openPopup.isEmpty())log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
 //        else {
-//            schedulerFcmPopupTopicByType(openPopup,EPopupTopic.OPEN, EPopupTopic.OPEN.getTopicType(), EPushInfo.OPEN);
+//            schedulerFcmPopupTopicByType(openPopup,EPopupTopic.OPEN, EPushInfo.OPEN);
 //        }
 //    }
 //
@@ -104,7 +104,7 @@
 //
 //        if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
 //        else {
-//            schedulerFcmPopupTopicByType(hotPopup,EPopupTopic.HOT, EPopupTopic.HOT.getTopicType(), EPushInfo.HOTPOPUP);
+//            schedulerFcmPopupTopicByType(hotPopup,EPopupTopic.HOT, EPushInfo.HOTPOPUP);
 //        }
 //    }
 //
@@ -121,7 +121,7 @@
 //        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAgo);
 //        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
 //        else{
-//            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPopupTopic.HOOGI.getTopicType(), EPushInfo.HOOGI);
+//            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
 //        }
 //    }
 //
@@ -141,7 +141,7 @@
 //
 //        if (hotPopup.isEmpty())log.info("제보할 팝업이 없습니다");
 //        else {
-//            schedulerFcmPopupTopicByType(hotPopup,EPopupTopic.JAEBO, EPopupTopic.JAEBO.getTopicType(), EPushInfo.JAEBO);
+//            schedulerFcmPopupTopicByType(hotPopup,EPopupTopic.JAEBO, EPushInfo.JAEBO);
 //        }
 //    }
 //
@@ -149,17 +149,16 @@
 //     * 스케줄러 FCM 앱 푸시 팝업 알림 공통 메서드
 //     * @param popupList : 팝업 리스트
 //     * @param topic : 팝업 주제
-//     * @param type : 팝업 주제 타입
 //     * @param info : 푸시 알림 제목, 메시지
 //     * @throws FirebaseMessagingException
 //     */
-//    private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, String type, EPushInfo info) {
+//    private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
 //
 //        List<FCMRequestDto> fcmRequestDtoList = null;
 //        for (Popup popup : popupList){
 //            Long popupId = popup.getId();
-//            List<String> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic, type, popupId));
-//            if (tokenList.isEmpty()) log.info(topic.getTopicName() + "에 대해 구독한 토큰이 없습니다.");
+//            List<String> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic, popupId));
+//            if (tokenList.isEmpty()) log.info(topic + "에 대해 구독한 토큰이 없습니다.");
 //            else{
 //                for (String token : tokenList){
 //                    FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token, info.getTitle(), info.getBody() , topic);
@@ -168,7 +167,7 @@
 //                }
 //            }
 //        }
-//        if (fcmRequestDtoList == null) {log.info(topic.getTopicName() + "에 대해 메시지 발송할 토큰이 없습니다.");}
+//        if (fcmRequestDtoList == null) {log.info(topic + "에 대해 메시지 발송할 토큰이 없습니다.");}
 //        else {fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
 //    }
 //}

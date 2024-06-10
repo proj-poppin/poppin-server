@@ -40,4 +40,10 @@ public class NotificationToken {
         this.exp_dtm    = mod_dtm.plusMonths(2); // 2달 뒤
         this.device     = device;
     }
+
+    // 토큰 갱신
+    public void regenerateToken(){
+        this.mod_dtm = LocalDateTime.now();
+        this.exp_dtm = mod_dtm.plusMonths(2);
+    }
 }

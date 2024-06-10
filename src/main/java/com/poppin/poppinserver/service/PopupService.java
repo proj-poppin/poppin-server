@@ -698,9 +698,9 @@ public class PopupService {
         popupRepository.save(popup);
 
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
-        log.info("==== 재오픈 수요 체크 시 FCM 관심팝업 TOPIC 등록 ====");
-
-        fcmService.fcmAddTopic(pushRequestDto.token(), popup, EPopupTopic.REOPEN.getTopicType());
+        log.info("재오픈 수요 체크 시 FCM TOPIC 등록");
+        String push_token = pushRequestDto.token();
+        fcmService.fcmAddTopic(push_token, popup, EPopupTopic.REOPEN);
 
 
         return "재오픈 수요 체크 되었습니다.";

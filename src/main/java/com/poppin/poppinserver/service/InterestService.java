@@ -43,15 +43,13 @@ public class InterestService {
 
         popup.addInterestCnt();
 
-//        /*알림 구독*/
+        /*알림 구독*/
 //        String token = addInterestDto.fcmToken();
-//        List<String> stringList = new ArrayList<>();
-//        stringList.add("MG"); // 관심 팝업 마감 임박
-//        stringList.add("CI"); // 관심 팝업 정보수정
-//        stringList.add("OP"); // 관심 팝업 오픈
-//        for (String x : stringList ){
-//            fcmService.fcmAddTopic(token, popup, x);
-//        }
+
+//        fcmService.fcmAddTopic(token, popup, EPopupTopic.MAGAM);
+//        fcmService.fcmAddTopic(token, popup, EPopupTopic.OPEN);
+//        fcmService.fcmAddTopic(token, popup, EPopupTopic.CHANGE_INFO);
+
         return InterestDto.fromEntity(interest,user,popup);
     }
 
@@ -62,13 +60,9 @@ public class InterestService {
         interestRepository.delete(interest);
 
 //        /*FCM 구독취소*/
-//        List<String> stringList = new ArrayList<>();
-//        stringList.add("MG");
-//        stringList.add("CI");
-//        stringList.add("OP");
-//        for (String x : stringList ){
-//            fcmService.fcmRemoveTopic(fcmToken, x);
-//        }
+//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.MAGAM);
+//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.OPEN);
+//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.CHANGE_INFO);
         return true;
     }
 }

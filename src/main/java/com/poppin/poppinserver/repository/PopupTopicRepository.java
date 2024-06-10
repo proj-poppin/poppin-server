@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.repository;
 
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.PopupTopic;
 import com.poppin.poppinserver.type.EPopupTopic;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +14,9 @@ import java.util.List;
 @Repository
 public interface PopupTopicRepository extends JpaRepository<PopupTopic, Long> {
 
-    @Query("SELECT PT FROM PopupTopic PT WHERE PT.tokenId = :token AND PT.topic = :topic")
-    PopupTopic findByTokenAndTopic(@Param("token") String token , @Param("topic") EPopupTopic topic);
+    @Query("SELECT PT FROM PopupTopic PT WHERE PT.tokenId = :token AND PT.topic = :topic AND Popup = :popup")
+    PopupTopic findByTokenAndTopic(@Param("token") String token , @Param("topic") EPopupTopic topic, @Param("popup") Popup popup);
 
-    @Query("SELECT t.tokenId FROM PopupTopic t WHERE t.topic IN (:topic) AND t.type IN(:type) AND t.popup.id = :popupId")
-    List<String>findTokenIdByTopicAndType(EPopupTopic topic, String type, @Param("popupId")Long popupId);
+    @Query("SELECT t.tokenId FROM PopupTopic t WHERE t.topic IN (:topic)  AND t.popup.id = :popupId")
+    List<String>findTokenIdByTopicAndType(EPopupTopic topic, @Param("popupId")Long popupId);
 }

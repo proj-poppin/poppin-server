@@ -37,19 +37,19 @@ public class Alarm {
     private String keyword; // popup, notify
 
     @Column(name = "icon" , nullable = false)
-    private String url;
+    private String icon; // icon
 
     @Column(name = "created_at" , nullable = false)
     private LocalDate createdAt;
 
     @Builder
-    public Alarm(Popup popupId,String token, String title, String body, String keyword, String url, LocalDate createdAt) {
+    public Alarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt) {
         this.popupId = popupId;
         this.token = token;
         this.title = title;
         this.body = body;
         this.keyword = keyword;
-        this.url = url;
+        this.icon = icon;
         this.createdAt = createdAt;
     }
 }

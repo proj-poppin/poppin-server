@@ -30,7 +30,6 @@ public class APNsConfig {
                         .setCategory("push_click")
                         .setBadge(1)
                         .setContentAvailable(true)
-
                         .build())
                 .build();
     }

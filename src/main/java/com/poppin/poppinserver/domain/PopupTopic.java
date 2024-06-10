@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -29,29 +28,13 @@ public class PopupTopic {
     @JoinColumn(name = "popup_id", nullable = false)
     private Popup popup; // 팝업 id
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "topic" , nullable = false)
-    private EPopupTopic topic; // 팝업 관련 주제
-
-    @Column(name = "topic_type" , nullable = false)
-    private String type; // 타입
-
-    @Column(name = "created_at" , nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modify_date" , nullable = false)
-    private LocalDateTime mod_dtm;
-
+    private EPopupTopic topic; // 타입
 
     @Builder
-    public PopupTopic(NotificationToken token, Popup popup, String type, LocalDateTime mod_dtm, EPopupTopic topic){
-
+    public PopupTopic(NotificationToken token, Popup popup, EPopupTopic topic){
         this.tokenId        = token;
         this.popup          = popup;
         this.topic          = topic;
-        this.type           = type;
-        this.createdAt      = LocalDateTime.now();
-        this.mod_dtm        = mod_dtm;
-
     }
 }

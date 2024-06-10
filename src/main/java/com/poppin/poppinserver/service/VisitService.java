@@ -68,7 +68,7 @@ public class VisitService {
 
         // fcm 구독
         String token = popupInfoDto.token();
-        fcmService.fcmAddTopic(token, popup, EPopupTopic.BANGMUN.getTopicType());
+        fcmService.fcmAddTopic(token, popup, EPopupTopic.HOOGI);
 
         Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo); /*실시간 방문자 수*/
 

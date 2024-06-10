@@ -62,9 +62,9 @@ public class AlarmService {
     @Value("${cloud.aws.s3.alarm.icon.bangmun}")
     private String bangmun;
 
-    public String insertAlarmKeyword(FCMRequestDto fcmRequestDto) {
+    public String insertPopupAlarmKeyword(FCMRequestDto fcmRequestDto) {
 
-        log.info("--- 알람 저장 시작  ---");
+        log.info("알람 저장 시작");
 
         try {
 
@@ -74,7 +74,7 @@ public class AlarmService {
                     Popup popup = popupRepository.findById(fcmRequestDto.popupId())
                             .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-                    String keyword = "POPUP"; // 팝업 후기
+                    String keyword = "POPUP"; // 팝업 알림
 
                     String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
 
@@ -84,7 +84,7 @@ public class AlarmService {
                             .title(fcmRequestDto.title())
                             .body(fcmRequestDto.body())
                             .keyword(keyword)
-                            .url(url)
+                            .icon(url)
                             .createdAt(LocalDate.now())
                             .build();
 
