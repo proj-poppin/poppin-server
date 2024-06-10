@@ -30,7 +30,7 @@ public class FCMSubscribeUtil {
     private final FirebaseMessaging firebaseMessaging;
 
     /* 안드로이드 토픽 구독 */
-    public void androidSubscribePopupTopic(NotificationToken token, Popup popup, String type) throws FirebaseMessagingException {
+    public void subscribePopupTopic(NotificationToken token, Popup popup, String type) throws FirebaseMessagingException {
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());
 
@@ -47,10 +47,10 @@ public class FCMSubscribeUtil {
             }
         }
 
-        log.info(response.getSuccessCount() + " token(s) were subscribed successfully");
+        log.info(response.getSuccessCount() + " token(s) were subscribed successfully : " + token.getToken());
     }
 
-    public void androidUnsubscribePopupTopic(NotificationToken token,String type) throws FirebaseMessagingException {
+    public void unsubscribePopupTopic(NotificationToken token,String type) throws FirebaseMessagingException {
 
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());

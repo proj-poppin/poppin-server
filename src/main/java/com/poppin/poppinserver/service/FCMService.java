@@ -25,39 +25,20 @@ public class FCMService {
           Date   : 2024-04-27
         */
     public void fcmAddTopic(String token, Popup popup, String type){
-        if(popup != null){
+        if(token != null){
             // 팝업 관련
             try {
-                log.info("==== subscribe topic START ====");
+                log.info("앱푸시 팝업 주제 추가 시작");
 
                 NotificationToken tk = notificationTokenRepository.findByToken(token);
                 if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                if (tk.getDevice().equals("android")){
-                    // 안드로이드
-                    fcmSubscribeUtil.androidSubscribePopupTopic(tk, popup , type); // 관심팝업
-                }
+                fcmSubscribeUtil.subscribePopupTopic(tk, popup , type); // 관심팝업
             }catch (CommonException | FirebaseMessagingException e){
-                log.error("==== subscribe topic FAILED ====");
+                log.error("앱푸시 팝업 주제 추가 실패");
                 e.printStackTrace();
             }
-        }
-        else{
-            // 공지사항 관련
-            try {
-                log.info("==== subscribe topic START ====");
-
-                NotificationToken tk = notificationTokenRepository.findByToken(token);
-                if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                if (tk.getDevice().equals("android")){
-                    // 안드로이드
-                    for (EInformationTopic x : EInformationTopic.values() ){
-                        if (x.getTopicType().equals(type)) fcmSubscribeUtil.androidSubscribeNotificationTopic(tk, popup);
-                    } // 공지사항(공지, 이벤트, 에러)
-                }
-            }catch (CommonException | FirebaseMessagingException e){
-                log.error("==== subscribe topic FAILED ====");
-                e.printStackTrace();
-            }
+        }else{
+            log.error("토큰이 존재하지 않아 앱푸시 팝업 주제 추가하지 않습니다");
         }
     }
 
@@ -69,19 +50,14 @@ public class FCMService {
     public void fcmRemoveTopic(String token, String type){
 
         try {
-            log.info("==== unsubscribe topic START ====");
-
+            log.info("앱푸시 팝업 주제 삭제 시작");
             NotificationToken tk = notificationTokenRepository.findByToken(token);
             if (tk == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-            if (tk.getDevice().equals("android")){
-                // 안드로이드
-                fcmSubscribeUtil.androidUnsubscribePopupTopic(tk, type); // 구독 및 저장
-            }
+            fcmSubscribeUtil.unsubscribePopupTopic(tk, type); // 구독 및 저장
         }catch (CommonException | FirebaseMessagingException e){
-            log.error("==== unsubscribe topic FAILED ====");
+            log.error("앱푸시 팝업 주제 삭제 실패");
             e.printStackTrace();
         }
-
     }
 
 }

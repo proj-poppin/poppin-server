@@ -27,7 +27,7 @@ public class PopupTopic {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id", nullable = false)
-    private Popup popup; // 토큰 id
+    private Popup popup; // 팝업 id
 
     @Enumerated(EnumType.STRING)
     @Column(name = "topic" , nullable = false)
