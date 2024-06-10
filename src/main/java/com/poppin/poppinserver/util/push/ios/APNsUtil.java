@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.util;
+package com.poppin.poppinserver.util.push.ios;
 
 import com.poppin.poppinserver.dto.notification.request.APNsRequestDto;
 

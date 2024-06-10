@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.util;
+package com.poppin.poppinserver.util.push.android;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;

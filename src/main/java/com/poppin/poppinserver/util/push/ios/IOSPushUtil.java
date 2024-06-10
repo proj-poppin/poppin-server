@@ -1,10 +1,9 @@
-package com.poppin.poppinserver.util;
+package com.poppin.poppinserver.util.push.ios;
 
 import com.google.firebase.messaging.*;
-
+import com.poppin.poppinserver.config.APNsConfig;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
-
 import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,40 +18,39 @@ import java.util.stream.IntStream;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class FCMSendUtil {
-
+public class IOSPushUtil {
     /**=================================================================================== */
-          private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
-          private static final String ANDROID_TOPIC_TEST = "[FCM Android Topic Test]";
-          private static final String ANDROID_TOKEN = "[FCM Android Token]";
-          private static final String ANDROID_TOPIC = "[FCM Android Topic]";
+    private static final String IOS_TOKEN_TEST = "[FCM IOS Token Test]";
+    private static final String IOS_TOPIC_TEST = "[FCM IOS Topic Test]";
+    private static final String IOS_TOKEN = "[FCM IOS Token]";
+    private static final String IOS_TOPIC = "[FCM IOS Topic]";
     /**==================================================================================== */
 
     private final FirebaseMessaging firebaseMessaging;
+    private final APNsConfig apnsConfiguration;
 
     private final AlarmService alarmService;
 
-    /* 안드로이드 토큰 테스트 */
-    public void sendAndroidNotificationByTokenTest(PushDto pushDto) {
 
+    /* 아이폰 토큰 테스트 */
+    public void sendIOSNotificationByTokenTest(PushDto pushDto) {
+
+        ApnsConfig apNsConfig = apnsConfiguration.createApnsConfig(pushDto.title(), pushDto.body());
         Message message = Message.builder()
-                .setNotification(Notification.builder()
-                        .setTitle(pushDto.title())
-                        .setBody(pushDto.body())
-                        .build())
                 .setToken(pushDto.token())
+                .setApnsConfig(apNsConfig)
                 .build();
 
         try {
             String result = firebaseMessaging.send(message);
-            log.debug(ANDROID_TOKEN_TEST + " Successfully sent message: " + result);
+            log.debug(IOS_TOKEN_TEST + " Successfully sent message: " + result);
         } catch (FirebaseMessagingException e) {
-            log.error(ANDROID_TOKEN_TEST + " Failed to send message: " + e.getMessage());
+            log.error(IOS_TOKEN_TEST + " Failed to send message: " + e.getMessage());
         }
     }
 
     /* 안드로이드 토픽 구독 & 발송 테스트 */
-    public void sendAndroidNotificationByTopicTest(PushDto pushDto) throws FirebaseMessagingException {
+    public void sendIOSNotificationByTopicTest(PushDto pushDto) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(pushDto.token());
 
         TopicManagementResponse response = firebaseMessaging.subscribeToTopic(registrationTokens, "Test");
@@ -69,18 +67,14 @@ public class FCMSendUtil {
 
         try {
             String result = firebaseMessaging.send(message);
-            log.debug(ANDROID_TOPIC_TEST + " Successfully sent message: " + result);
+            log.debug(IOS_TOPIC_TEST + " Successfully sent message: " + result);
         } catch (FirebaseMessagingException e) {
-            log.error(ANDROID_TOPIC_TEST + " Failed to send message: " + e.getMessage());
+            log.error(IOS_TOPIC_TEST + " Failed to send message: " + e.getMessage());
         }
     }
 
 
-    /**
-     * 안드로이드 FCM Topic 앱 푸시 알림 메서드
-     * @param fcmRequestDtoList
-     * @throws FirebaseMessagingException
-     */
+
     public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
         List<String> registrationTokens = null;
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
@@ -96,7 +90,7 @@ public class FCMSendUtil {
             log.info("--- 토픽 메시지 발송 시작 ---");
             try {
                 String result = firebaseMessaging.send(message);
-                log.debug(ANDROID_TOPIC + " Successfully sent message: " + result);
+                log.debug(IOS_TOPIC + " Successfully sent message: " + result);
 
                 // 알림 키워드 등록
                 String flag = alarmService.insertAlarmKeyword(fcmRequestDto);
@@ -106,7 +100,7 @@ public class FCMSendUtil {
                     log.error(fcmRequestDto.token() + "에 대한 알림 키워드 등록 실패");
                 }
             } catch (FirebaseMessagingException e) {
-                log.error(ANDROID_TOPIC + " Failed to send message: " + e.getMessage());
+                log.error(IOS_TOPIC + " Failed to send message: " + e.getMessage());
             }
         }
 
@@ -143,8 +137,8 @@ public class FCMSendUtil {
                         failedTokens.add(tokenList.get(i));
                     }
                 }
-                log.error(ANDROID_TOPIC + " List of tokens that caused failures: " + failedTokens);
-            }else log.info(ANDROID_TOPIC + " List of tokens send messages SUCCESSFULLY");
+                log.error(IOS_TOPIC + " List of tokens that caused failures: " + failedTokens);
+            }else log.info(IOS_TOPIC + " List of tokens send messages SUCCESSFULLY");
         }
     }
 

@@ -5,7 +5,7 @@ import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
 import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
 import com.poppin.poppinserver.service.NotificationService;
-import com.poppin.poppinserver.util.FCMSendUtil;
+import com.poppin.poppinserver.util.push.android.FCMTestUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final FCMSendUtil FCMSendUtil;
+    private final FCMTestUtil FCMTestUtil;
 
     @PostMapping("/android/token/test")
     public void sendAndroidNotificationByTokenTest(@Valid @RequestBody PushDto pushDto){
-        FCMSendUtil.sendAndroidNotificationByTokenTest(pushDto);
+        FCMTestUtil.sendAndroidNotificationByTokenTest(pushDto);
     }
 
     @PostMapping("/android/topic/test")
     public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto) throws FirebaseMessagingException {
-        FCMSendUtil.sendAndroidNotificationByTopicTest(pushDto);
+        FCMTestUtil.sendAndroidNotificationByTopicTest(pushDto);
     }
 
     /*알림 허용 시 데이터 저장*/

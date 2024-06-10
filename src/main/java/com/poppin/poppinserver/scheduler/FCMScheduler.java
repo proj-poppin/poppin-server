@@ -7,7 +7,7 @@
 //import com.poppin.poppinserver.repository.PopupTopicRepository;
 //import com.poppin.poppinserver.type.EPopupTopic;
 //import com.poppin.poppinserver.type.EPushInfo;
-//import com.poppin.poppinserver.util.FCMSendUtil;
+//import com.poppin.poppinserver.util.push.android.FCMSendUtil;
 //import lombok.RequiredArgsConstructor;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.context.annotation.Configuration;

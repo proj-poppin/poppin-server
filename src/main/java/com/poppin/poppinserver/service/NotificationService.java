@@ -1,18 +1,13 @@
 package com.poppin.poppinserver.service;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.InformationTopic;
 import com.poppin.poppinserver.domain.NotificationToken;
-import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
 import com.poppin.poppinserver.dto.notification.response.TokenResponseDto;
-import com.poppin.poppinserver.exception.CommonException;
-import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.InformationTopicRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 
 import com.poppin.poppinserver.type.EInformationTopic;
-import com.poppin.poppinserver.util.FCMSubscribeUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
