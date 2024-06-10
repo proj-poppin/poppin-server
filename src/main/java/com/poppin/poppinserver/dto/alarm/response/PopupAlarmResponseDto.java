@@ -1,0 +1,27 @@
+package com.poppin.poppinserver.dto.alarm.response;
+
+import com.poppin.poppinserver.domain.Alarm;
+import lombok.Builder;
+
+import java.time.LocalDate;
+
+
+@Builder
+public record PopupAlarmResponseDto(
+
+    String title,
+    String body,
+
+    LocalDate createdAt,
+    String iconUrl
+) {
+    public static PopupAlarmResponseDto fromEntity(Alarm alarm){
+
+        return PopupAlarmResponseDto.builder()
+                .title(alarm.getTitle())
+                .body(alarm.getBody())
+                .createdAt(alarm.getCreatedAt())
+                .iconUrl(alarm.getUrl())
+                .build();
+    }
+}

@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.dto.interest.requeste;
+package com.poppin.poppinserver.dto.interest.request;
 
 import jakarta.validation.constraints.NotNull;
 

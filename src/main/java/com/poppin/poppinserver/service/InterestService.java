@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.interest.requeste.AddInterestDto;
+import com.poppin.poppinserver.dto.interest.request.AddInterestDto;
 import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -10,9 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -49,9 +46,9 @@ public class InterestService {
 //        /*알림 구독*/
 //        String token = addInterestDto.fcmToken();
 //        List<String> stringList = new ArrayList<>();
-//        stringList.add("MG");
-//        stringList.add("CI");
-//        stringList.add("OP");
+//        stringList.add("MG"); // 관심 팝업 마감 임박
+//        stringList.add("CI"); // 관심 팝업 정보수정
+//        stringList.add("OP"); // 관심 팝업 오픈
 //        for (String x : stringList ){
 //            fcmService.fcmAddTopic(token, popup, x);
 //        }

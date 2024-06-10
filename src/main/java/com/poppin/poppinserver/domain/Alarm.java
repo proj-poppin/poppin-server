@@ -24,6 +24,9 @@ public class Alarm {
     @JoinColumn(name = "popup_id", nullable = false)
     private Popup popupId;
 
+    @Column(name = "token" , nullable = false)
+    private String token;
+
     @Column(name = "title" , nullable = false)
     private String title;
 
@@ -40,8 +43,9 @@ public class Alarm {
     private LocalDate createdAt;
 
     @Builder
-    public Alarm(Popup popupId, String title, String body, String keyword, String url, LocalDate createdAt) {
+    public Alarm(Popup popupId,String token, String title, String body, String keyword, String url, LocalDate createdAt) {
         this.popupId = popupId;
+        this.token = token;
         this.title = title;
         this.body = body;
         this.keyword = keyword;

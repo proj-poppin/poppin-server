@@ -1,8 +1,10 @@
 package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.domain.Alarm;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -76,6 +80,7 @@ public class AlarmService {
 
                     Alarm alarm = Alarm.builder()
                             .popupId(popup)
+                            .token(fcmRequestDto.token())
                             .title(fcmRequestDto.title())
                             .body(fcmRequestDto.body())
                             .keyword(keyword)
@@ -92,6 +97,21 @@ public class AlarmService {
             return "0";
         }
     }
+
+    // 알림 - 팝업 공지사항
+    public List<PopupAlarmResponseDto> readPopupAlarmList(@UserId Long userId, String token){
+
+        List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
+        List<Alarm> alarmList = alarmRepository.findByKeywordOrderByCreatedAtDesc(token);
+
+        for (Alarm a : alarmList){
+            PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(a);
+            popupAlarmResponseDtoList.add(popupAlarmResponseDto);
+        }
+        return popupAlarmResponseDtoList;
+    }
+
+
 
 
     private URL getUrlForTopic(EPopupTopic topic) {
@@ -128,6 +148,8 @@ public class AlarmService {
             }
         }
     }
+
+
 }
 
 
