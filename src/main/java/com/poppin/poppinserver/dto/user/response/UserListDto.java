@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record UserListDto(
         List<UserAdministrationDto> userList,
-        int userCnt
+        Long userCnt
 ) {
 }
