@@ -82,7 +82,7 @@ public class AdminService {
                         .requiresSpecialCare(user.getRequiresSpecialCare())
                         .build())
                 .collect(Collectors.toList());
-        int userCnt = userAdministrationDtoList.size();
+        Long userCnt = userPage.getTotalElements();
         return UserListDto.builder()
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
@@ -116,7 +116,7 @@ public class AdminService {
                     .requiresSpecialCare(user.getRequiresSpecialCare())
                     .build());
         }
-        int userCnt = userAdministrationDtoList.size();
+        Long userCnt = Long.valueOf(userAdministrationDtoList.size());
         return UserListDto.builder()
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
