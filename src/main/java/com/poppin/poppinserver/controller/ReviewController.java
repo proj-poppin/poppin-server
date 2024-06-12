@@ -3,6 +3,7 @@ package com.poppin.poppinserver.controller;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
+import com.poppin.poppinserver.dto.review.request.TestDto;
 import com.poppin.poppinserver.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,13 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     /*방문 후기 작성하기*/
-    @PostMapping(value = "/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
+    @PostMapping(value = "/w/certi") // 후기 생성
     public ResponseDto<?> createCertifiedReview(
             @UserId Long userId,
-            @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto ,
-            @RequestPart(value = "images" ) List<MultipartFile> images)
+            @ModelAttribute TestDto testDto)
     {
 
-        return ResponseDto.ok(reviewService.writeCertifiedReview(userId,createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId,testDto.createReviewDto(), testDto.images()));
     }
 
     /*일반 후기 작성*/

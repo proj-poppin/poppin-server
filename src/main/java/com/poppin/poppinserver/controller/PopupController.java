@@ -30,7 +30,7 @@ import java.util.List;
 public class PopupController {
     private final PopupService popupService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
                                       @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
