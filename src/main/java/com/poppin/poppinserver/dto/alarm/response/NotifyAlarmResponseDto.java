@@ -23,7 +23,7 @@ public record NotifyAlarmResponseDto(
                 .body(alarm.getBody())
 //                .detailUrl() // 공지사항 url
                 .createdAt(alarm.getCreatedAt())
-                .iconUrl(alarm.getUrl())
+                .iconUrl(alarm.getIcon())
                 .build();
     }
 }
