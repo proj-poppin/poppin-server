@@ -318,7 +318,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
-    public List<ManageSearchingDto> readManageList(String text, String taste, String prepered,
+    public ManageListDto readManageList(String text, String taste, String prepered,
                                                    EOperationStatus oper, EPopupSort order, int page, int size){
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
@@ -374,7 +374,7 @@ public class PopupService {
 
         Long num = popupRepository.count();
 
-        return ManageSearchingDto.fromEntityList(popups);
+        return ManageListDto.fromEntityList(popups, num);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){
