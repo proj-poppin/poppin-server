@@ -173,14 +173,31 @@ public class PopupService {
     public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        // 후기 관련 데이터
 
-        // 카테고리 삭제
+        // 알람 관련 데이터
 
-        // 팝업 이미지 삭제
+        // 관심 추가 데이터
 
-        // 알람 키워드 삭제
+        // 신고 관련 데이터
 
-        //
+        // 실시간 방문자 수 관련 데이터
+
+        // 제보 관련 데이터
+            // 관리자 직접 추가일 수도 있다
+            // 운영자 제보
+            // 사용자 제보
+            // 완료된 건 놔두기?
+
+        // 정보수정요청 관련 데이터
+
+        // 팝업 이미지
+            // S3 삭제
+            // 팝업 이미지 테이블 정리
+
+        // 알람 키워드
+
+        // 카테고리
 
         popupRepository.delete(popup);
 
