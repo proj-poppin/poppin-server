@@ -24,7 +24,7 @@ public class AdminController {
     /* FAQ 생성 */
     @PostMapping("/support/faqs")
     public ResponseDto<?> createFaq(@UserId Long adminId, @RequestBody FaqRequestDto faqRequestDto) {
-        return ResponseDto.ok(adminService.createFAQ(adminId, faqRequestDto));
+        return ResponseDto.created(adminService.createFAQ(adminId, faqRequestDto));
     }
 
     /* FAQ 삭제 */
