@@ -31,7 +31,7 @@ public class PreferedPopup {
     @Column(name = "experience", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean experience;
 
-    @Column(name = "want_free", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "want_free", nullable = true, columnDefinition = "TINYINT(1)")
     private Boolean wantFree;
 
     @Builder

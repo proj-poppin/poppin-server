@@ -372,6 +372,8 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
+        Long num = popupRepository.count();
+
         return ManageSearchingDto.fromEntityList(popups);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
