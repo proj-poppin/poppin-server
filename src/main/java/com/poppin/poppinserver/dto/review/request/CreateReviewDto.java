@@ -6,7 +6,6 @@ public record CreateReviewDto (
 
     @NotNull
     Long popupId,
-
     @NotNull
     String nickname,
     @NotNull

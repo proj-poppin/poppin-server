@@ -164,10 +164,12 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
-    public List<ManageSummaryDto> readManageList(Long adminId, int page, int size){
+    public ManageListDto readManageList(Long adminId, int page, int size){
         List<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size));
 
-        return ManageSummaryDto.fromEntityList(popups);
+        Long num = popupRepository.count();
+
+        return ManageListDto.fromEntityList(popups, num);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
     public Boolean removePopup(Long popupId) {
