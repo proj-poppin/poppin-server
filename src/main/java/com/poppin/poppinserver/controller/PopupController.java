@@ -81,13 +81,10 @@ public class PopupController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/search")
     public ResponseDto<?> readManageList(@RequestParam("text") String text,
-                                         @RequestParam("taste") String taste,
-                                         @RequestParam("prepered") String prepered,
                                          @RequestParam("oper") EOperationStatus oper,
-                                         @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readManageList(text, taste, prepered, oper, order, page, size));
+        return ResponseDto.ok(popupService.readManageList(text, oper, page, size));
     } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/guest/detail")

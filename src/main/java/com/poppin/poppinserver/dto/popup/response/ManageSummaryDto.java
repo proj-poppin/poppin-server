@@ -12,7 +12,8 @@ public record ManageSummaryDto(
         Long id,
         String name,
         String operationStatus,
-        String adminName
+        String adminName,
+        String createdAt
 ) {
     public static List<ManageSummaryDto> fromEntityList(List<Popup> popups){
         List<ManageSummaryDto> dtoList = new ArrayList<>();
@@ -24,6 +25,7 @@ public record ManageSummaryDto(
                             .name(popup.getName())
                             .operationStatus(popup.getOperationStatus())
                             .adminName(popup.getAgent().getNickname())
+                            .createdAt(popup.getCreatedAt().toString())
                             .build();
 
             dtoList.add(manageSummaryDto);

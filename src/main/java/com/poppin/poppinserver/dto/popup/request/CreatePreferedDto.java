@@ -9,7 +9,7 @@ public record CreatePreferedDto(
         Boolean display,
         @NotNull
         Boolean experience,
-        @NotNull
+
         Boolean wantFree
 ) {
 }
