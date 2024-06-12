@@ -26,7 +26,6 @@ import java.util.List;
 public class ModifyInfoController {
     private final ModifyInfoService modifyInfoService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestPart(value = "contents") @Valid CreateModifyInfoDto createModifyInfoDto,

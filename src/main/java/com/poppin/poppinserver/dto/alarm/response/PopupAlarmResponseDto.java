@@ -21,7 +21,7 @@ public record PopupAlarmResponseDto(
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())
-                .iconUrl(alarm.getUrl())
+                .iconUrl(alarm.getIcon())
                 .build();
     }
 }
