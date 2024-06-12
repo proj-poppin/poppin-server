@@ -320,7 +320,10 @@ public class PopupService {
 
     public ManageListDto readManageList(String text, EOperationStatus oper,int page, int size){
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = prepardSearchUtil.prepareSearchText(text);
+        String searchText = null;
+        if (text != null && text.trim() != ""){
+            searchText = prepardSearchUtil.prepareSearchText(text);
+        }
 
         List<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size), oper.getStatus()); // 운영 상태
 

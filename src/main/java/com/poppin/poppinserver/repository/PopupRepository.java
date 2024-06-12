@@ -106,8 +106,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "AND p.operation_status = :oper " +
             "ORDER BY p.name",
             countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = :oper",
+                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = :oper " +
+                    "ORDER BY p.name",
             nativeQuery = true)
     List<Popup> findByTextInName(String text, Pageable pageable, String oper);
 
