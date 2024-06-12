@@ -103,7 +103,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     @Query(value = "SELECT p.* FROM popups p " +
             "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = :oper",
+            "AND p.operation_status = :oper " +
+            "ORDER BY p.name",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
                     "AND p.operation_status = :oper",
