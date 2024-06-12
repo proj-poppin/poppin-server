@@ -101,7 +101,14 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
                                             Boolean animalPlant, Boolean etc, String oper);
 
-
+    @Query(value = "SELECT p.* FROM popups p " +
+            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND p.operation_status = :oper",
+            countQuery = "SELECT COUNT(*) FROM popups p " +
+                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND p.operation_status = :oper",
+            nativeQuery = true)
+    List<Popup> findByTextInName(String text, Pageable pageable, String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();

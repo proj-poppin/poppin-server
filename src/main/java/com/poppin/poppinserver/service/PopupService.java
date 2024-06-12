@@ -318,59 +318,13 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
-    public ManageListDto readManageList(String text, String taste, String prepered,
-                                                   EOperationStatus oper, EPopupSort order, int page, int size){
-        // 팝업 형태 3개
-        Boolean market = (taste.charAt(0) == '1') ? true : null;
-        Boolean display = (taste.charAt(1) == '1') ? true : null;
-        Boolean experience = (taste.charAt(2) == '1') ? true : null;
+    public ManageListDto readManageList(String text, EOperationStatus oper,int page, int size){
 
-        // 팝업 취향 13개
-        Boolean fashionBeauty = (prepered.charAt(0) == '1') ? true : null;
-        Boolean characters = (prepered.charAt(1) == '1') ? true : null;
-        Boolean foodBeverage = (prepered.charAt(2) == '1') ? true : null;
-        Boolean webtoonAni = (prepered.charAt(3) == '1') ? true : null;
-        Boolean interiorThings = (prepered.charAt(4) == '1') ? true : null;
-        Boolean movie = (prepered.charAt(5) == '1') ? true : null;
-        Boolean musical = (prepered.charAt(6) == '1') ? true : null;
-        Boolean sports = (prepered.charAt(7) == '1') ? true : null;
-        Boolean game = (prepered.charAt(8) == '1') ? true : null;
-        Boolean itTech = (prepered.charAt(9) == '1') ? true : null;
-        Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
-        Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
-        Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
-        Boolean etc = (prepered.charAt(13) == '1') ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = prepardSearchUtil.prepareSearchText(text);
 
-        // order에 따른 정렬 방식 설정
-        Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
-        if (order != null) {
-            switch (order) {
-                case OPEN:
-                    sort = Sort.by(Sort.Direction.DESC, "open_date");
-                    break;
-                case CLOSE:
-                    sort = Sort.by(Sort.Direction.ASC, "close_date");
-                    break;
-                case VIEW:
-                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
-                    break;
-                case UPLOAD:
-                    sort = Sort.by(Sort.Direction.DESC, "created_at");
-                    break;
-            }
-        }
-
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
-                market, display, experience, // 팝업 형태 3개
-                fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                webtoonAni, interiorThings, movie,
-                musical, sports, game,
-                itTech, kpop, alcohol,
-                animalPlant, etc,
-                oper.getStatus()); // 운영 상태
+        List<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size), oper.getStatus()); // 운영 상태
 
         Long num = popupRepository.count();
 
