@@ -54,6 +54,12 @@ public class AdminController {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
+    @GetMapping("/users/special-care")
+    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "1") Long page,
+                                               @RequestParam(required = false, defaultValue = "44") Long size) {
+        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
+    }
+
     /* 후기 신고 목록 조회 */
 //    @GetMapping("/reviews")
 //    public ResponseDto<?> readReviewReports() {
