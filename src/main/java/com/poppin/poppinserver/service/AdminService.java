@@ -122,4 +122,23 @@ public class AdminService {
                 .userCnt(userCnt)
                 .build();
     }
+
+    public UserListDto readSpecialCareUsers(Long page, Long size) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+        Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
+
+        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
+                .map(user -> UserAdministrationDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .nickname(user.getNickname())
+                        .requiresSpecialCare(user.getRequiresSpecialCare())
+                        .build())
+                .collect(Collectors.toList());
+        Long userCnt = userPage.getTotalElements();
+        return UserListDto.builder()
+                .userList(userAdministrationDtoList)
+                .userCnt(userCnt)
+                .build();
+    }
 }

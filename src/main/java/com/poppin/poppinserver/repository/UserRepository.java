@@ -44,4 +44,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u ORDER BY u.nickname ASC")
     Page<User> findAllByOrderByNicknameAsc(Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.requiresSpecialCare = :requiresSpecialCare ORDER BY u.nickname ASC")
+    Page<User> findByRequiresSpecialCareOrderByNicknameAsc(boolean requiresSpecialCare, Pageable pageable);
 }
