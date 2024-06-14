@@ -166,6 +166,18 @@ public class User {
         this.whoWithPopup = whoWithPopup;
     }
 
+    public void updatePopupTaste(PreferedPopup preferedPopup) {
+        this.preferedPopup = preferedPopup;
+    }
+
+    public void updatePopupTaste(TastePopup tastePopup) {
+        this.tastePopup = tastePopup;
+    }
+
+    public void updatePopupTaste(WhoWithPopup whoWithPopup) {
+        this.whoWithPopup = whoWithPopup;
+    }
+
     public void updateUserNicknameAndBirthDate(String nickname, String birthDate) {
         this.nickname = nickname;
         this.birthDate = birthDate;

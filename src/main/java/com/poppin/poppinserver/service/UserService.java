@@ -106,6 +106,48 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        if (user.getPreferedPopup() == null) {
+            PreferedPopup preferedPopup = PreferedPopup.builder()
+                    .market(false)
+                    .display(false)
+                    .experience(false)
+                    .wantFree(false)
+                    .build();
+            preferedPopupRepository.save(preferedPopup);
+            user.updatePopupTaste(preferedPopup);
+        }
+
+        if (user.getTastePopup() == null) {
+            TastePopup tastePopup = TastePopup.builder()
+                    .fasionBeauty(false)
+                    .characters(false)
+                    .foodBeverage(false)
+                    .webtoonAni(false)
+                    .interiorThings(false)
+                    .movie(false)
+                    .musical(false)
+                    .sports(false)
+                    .game(false)
+                    .itTech(false)
+                    .kpop(false)
+                    .alchol(false)
+                    .animalPlant(false)
+                    .build();
+            tastePopupRepository.save(tastePopup);
+            user.updatePopupTaste(tastePopup);
+        }
+
+        if (user.getWhoWithPopup() == null) {
+            WhoWithPopup whoWithPopup = WhoWithPopup.builder()
+                    .solo(false)
+                    .withFriend(false)
+                    .withFamily(false)
+                    .withLover(false)
+                    .build();
+            whoWithPopupRepository.save(whoWithPopup);
+            user.updatePopupTaste(whoWithPopup);
+        }
+
         return UserTasteDto.builder()
                 .preference(PreferedDto.fromEntity(user.getPreferedPopup()))
                 .taste(TasteDto.fromEntity(user.getTastePopup()))
