@@ -9,6 +9,7 @@ import com.poppin.poppinserver.dto.review.response.ReviewCertiDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.NicknameDto;
+import com.poppin.poppinserver.dto.user.response.UserMypageDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -198,6 +199,18 @@ public class UserService {
                 .preference(PreferedDto.fromEntity(preferedPopup))
                 .taste(TasteDto.fromEntity(tastePopup))
                 .whoWith(WhoWithDto.fromEntity(whoWithPopup))
+                .build();
+    }
+
+    public UserMypageDto readUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        return UserMypageDto.builder()
+                .userImageUrl(user.getProfileImageUrl())
+                .nickname(user.getNickname())
+                .writtenReview(user.getReviewCnt())
+                .reviewCnt(user.getReviewCnt())
                 .build();
     }
 
