@@ -50,6 +50,11 @@ public class UserController {
     }
 
     @GetMapping("")
+    public ResponseDto<?> readUser(@UserId Long userId) {
+        return ResponseDto.ok(userService.readUser(userId));
+    }
+
+    @GetMapping("/settings")
     public ResponseDto<?> readUserProfile(@UserId Long userId) {
         return ResponseDto.ok(userService.readUserProfile(userId));
     }
