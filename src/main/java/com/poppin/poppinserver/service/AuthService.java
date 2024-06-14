@@ -2,10 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.constant.Constant;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
-import com.poppin.poppinserver.dto.auth.request.EmailRequestDto;
-import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
-import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
+import com.poppin.poppinserver.dto.auth.request.*;
 import com.poppin.poppinserver.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.dto.auth.response.JwtTokenDto;
@@ -60,30 +57,6 @@ public class AuthService {
         userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
         return jwtToken;
     }
-
-//    public Object authKakaoLogin(String accessToken) {
-//        String token = refineToken(accessToken);
-//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getKakaoUserInfo(token);
-//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.KAKAO);
-//    }
-//
-//    public Object authNaverLogin(String accessToken) {
-//        String token = refineToken(accessToken);
-//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getNaverUserInfo(token);
-//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.NAVER);
-//    }
-//
-//    public Object authGoogleLogin(String accessToken) {
-//        String token = refineToken(accessToken);
-//        OAuth2UserInfo oAuth2UserInfoDto = oAuth2Util.getGoogleUserInfo(token);
-//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.GOOGLE);
-//    }
-//
-//    public Object authAppleLogin(String idToken) {
-//        String token = refineToken(idToken);
-//        OAuth2UserInfo oAuth2UserInfoDto = appleOAuthService.getAppleUserInfo(token);
-//        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.APPLE);
-//    }
 
     public Object authSocialLogin(String token, String provider) {
         String accessToken = refineToken(token);
@@ -160,7 +133,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(Long userId, PasswordRequestDto passwordRequestDto) {
+    public void resetPassword(Long userId, PasswordUpdateDto passwordRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!passwordRequestDto.password().equals(passwordRequestDto.passwordConfirm())) {
@@ -190,6 +163,15 @@ public class AuthService {
         return EmailResponseDto.builder()
                 .authCode(authCode)
                 .build();
+    }
+
+    public Boolean verifyPassword(Long userId, PasswordVerificationDto passwordVerificationDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!bCryptPasswordEncoder.matches(passwordVerificationDto.password(), user.getPassword())) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        return Boolean.TRUE;
     }
 
     @Transactional
