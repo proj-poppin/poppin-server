@@ -170,7 +170,7 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 조회
 
     public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size){
-        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper);
+        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper.getStatus());
 
         Long num = popupRepository.count();
 
