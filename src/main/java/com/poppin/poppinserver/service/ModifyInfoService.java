@@ -179,8 +179,8 @@ public class ModifyInfoService {
     } // 조회
 
     @Transactional
-    public PagingResponseDto readModifyInfoList(int page, int size){
-        Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAll(PageRequest.of(page, size));
+    public PagingResponseDto readModifyInfoList(int page, int size, Boolean isExec){
+        Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByIsExecuted(PageRequest.of(page, size), isExec);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(modifyInfoList);
         List<ModifyInfoSummaryDto> modifyInfoSummaryDtos = ModifyInfoSummaryDto.fromEntityList(modifyInfoList.getContent());
