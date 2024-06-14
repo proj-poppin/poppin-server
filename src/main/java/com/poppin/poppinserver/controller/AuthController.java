@@ -2,13 +2,9 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.constant.Constant;
-import com.poppin.poppinserver.dto.auth.request.EmailRequestDto;
-import com.poppin.poppinserver.dto.auth.request.PasswordRequestDto;
-import com.poppin.poppinserver.dto.auth.request.SocialRegisterRequestDto;
+import com.poppin.poppinserver.dto.auth.request.*;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.service.AuthService;
-import com.poppin.poppinserver.type.ELoginProvider;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -41,27 +37,6 @@ public class AuthController {
         return ResponseDto.ok(authService.authSignIn(authorizationHeader));
     }
 
-//    @PostMapping("/login/kakao")
-//    public ResponseDto<?> authKakaoLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
-//
-//        return ResponseDto.ok(authService.authKakaoLogin(accessToken));
-//    }
-//
-//    @PostMapping("/login/naver")
-//    public ResponseDto<?> authNaverLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
-//        return ResponseDto.ok(authService.authNaverLogin(accessToken));
-//    }
-//
-//    @PostMapping("/login/google")
-//    public ResponseDto<?> authGoogleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
-//        return ResponseDto.ok(authService.authGoogleLogin(accessToken));
-//    }
-//
-//    @PostMapping("/login/apple")
-//    public ResponseDto<?> authAppleLogin(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String idToken) {
-//        return ResponseDto.ok(authService.authAppleLogin(idToken));
-//    }
-
     @PostMapping("/login/{provider}")
     public ResponseDto<?> authSocialLogin(@PathVariable String provider,
                                           @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
@@ -76,9 +51,14 @@ public class AuthController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseDto<?> resetPassword(@UserId Long userId, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
+    public ResponseDto<?> resetPassword(@UserId Long userId, @RequestBody @Valid PasswordUpdateDto passwordRequestDto) {
         authService.resetPassword(userId, passwordRequestDto);
         return ResponseDto.ok("비밀번호 변경 성공");
+    }
+
+    @PostMapping("/verification/password")
+    public ResponseDto<?> verifyPassword(@UserId Long userId, @RequestBody @Valid PasswordVerificationDto passwordVerificationDto) {
+        return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationDto));
     }
 
     @PostMapping("/email/verification/password")
