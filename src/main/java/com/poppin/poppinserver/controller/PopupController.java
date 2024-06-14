@@ -40,6 +40,8 @@ public class PopupController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
+        log.info("전체팝업관리 - 팝업생성");
+
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 
@@ -53,10 +55,11 @@ public class PopupController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/list")
-    public ResponseDto<?> readManageList(@RequestParam("page") int page,
+    public ResponseDto<?> readManageList(@RequestParam("oper") EOperationStatus oper,
+                                         @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long adminId) {
-        return ResponseDto.ok(popupService.readManageList(adminId, page, size));
+        return ResponseDto.ok(popupService.readManageList(adminId, oper, page, size));
     } // 전체팝업관리 - 전체 팝업 리스트 조회
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -84,7 +87,7 @@ public class PopupController {
                                          @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readManageList(text, oper, page, size));
+        return ResponseDto.ok(popupService.searchManageList(text, page, size, oper));
     } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/guest/detail")

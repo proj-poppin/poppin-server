@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -101,16 +103,11 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
                                             Boolean animalPlant, Boolean etc, String oper);
 
-    @Query(value = "SELECT p.* FROM popups p " +
+    @Query(value = "SELECT * FROM popups p " +
             "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
             "AND p.operation_status = :oper " +
-            "ORDER BY p.name",
-            countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = :oper " +
-                    "ORDER BY p.name",
-            nativeQuery = true)
-    List<Popup> findByTextInName(String text, Pageable pageable, String oper);
+            "ORDER BY p.name", nativeQuery = true)
+    Page<Popup> findByTextInName(String text, Pageable pageable, String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
@@ -158,9 +155,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus != 'EXECUTING' " +
+            "WHERE p.operationStatus = :oper " +
             "ORDER BY p.name ASC")
-    List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
+    Page<Popup> findByOperationStatusAndOrderByName(Pageable pageable, String oper);
 
 
     @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
