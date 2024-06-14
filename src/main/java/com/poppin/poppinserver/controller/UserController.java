@@ -2,7 +2,6 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.service.PopupService;
@@ -116,21 +115,31 @@ public class UserController {
     /*마이페이지 - 방문한 팝업 후기 작성*/
     @PostMapping(value = "review/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createMPCertiReview(
-              @UserId Long userId,
-              @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
-              @RequestPart(value = "images") List<MultipartFile> images)
+            @UserId Long userId,
+            @RequestParam("popupId") Long popupId,
+            @RequestParam("text") String text,
+            @RequestParam("visitDate") String visitDate,
+            @RequestParam("satisfaction") String satisfaction,
+            @RequestParam("congestion") String congestion,
+            @RequestParam("nickname") String nickname,
+            @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
     }
 
     /*마이페이지 - 방문한 팝업 일반 후기 작성*/
     @PostMapping(value = "review/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createMPUncertiReview(
             @UserId Long userId,
-            @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
-            @RequestPart(value = "images") List<MultipartFile> images)
+            @RequestParam("popupId") Long popupId,
+            @RequestParam("text") String text,
+            @RequestParam("visitDate") String visitDate,
+            @RequestParam("satisfaction") String satisfaction,
+            @RequestParam("congestion") String congestion,
+            @RequestParam("nickname") String nickname,
+            @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
     }
 
     /*마이페이지 - 일반후기 팝업 검색*/

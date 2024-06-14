@@ -18,7 +18,6 @@ import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
-import com.poppin.poppinserver.util.push.android.FCMSendUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +54,6 @@ public class PopupService {
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
-    private final FCMSendUtil fcmSendUtil;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;

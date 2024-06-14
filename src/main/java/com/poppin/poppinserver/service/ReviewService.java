@@ -4,7 +4,6 @@ import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.type.ECongestion;
 import com.poppin.poppinserver.type.ESatisfaction;
 import com.poppin.poppinserver.type.EVisitDate;
-import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -35,13 +34,15 @@ public class ReviewService {
     private final S3Service s3Service;
     private final UserService userService;
 
+
+
     /*방문(인증)후기 생성*/
     @Transactional
-    public ReviewDto writeCertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
+    public ReviewDto writeCertifiedReview(Long userId, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(createReviewDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         /*방문 내역 확인*/
@@ -51,7 +52,7 @@ public class ReviewService {
         Review review = Review.builder()
                 .user(user)
                 .popup(popup)
-                .text(createReviewDto.text())
+                .text(text)
                 .isCertificated(true)
                 .build();
 
@@ -77,11 +78,11 @@ public class ReviewService {
         }
 
         VisitorData visitorData = new VisitorData(
-                EVisitDate.fromValue(createReviewDto.visitDate())
+                EVisitDate.fromValue(visitDate)
                 , popup
                 , review
-                , ECongestion.fromValue(createReviewDto.congestion())
-                , ESatisfaction.fromValue(createReviewDto.satisfaction())
+                , ECongestion.fromValue(congestion)
+                , ESatisfaction.fromValue(satisfaction)
         );
 
         visitorDataRepository.save(visitorData);
@@ -92,18 +93,18 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto writeUncertifiedReview(Long userId, CreateReviewDto createReviewDto, List<MultipartFile> images) {
+    public ReviewDto writeUncertifiedReview(Long userId, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(createReviewDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         Review review = Review.builder()
                 .user(user)
                 .popup(popup)
-                .text(createReviewDto.text())
+                .text(text)
                 .isCertificated(false)
                 .build();
 
@@ -129,11 +130,11 @@ public class ReviewService {
         }
 
         VisitorData visitorData = new VisitorData(
-                EVisitDate.fromValue(createReviewDto.visitDate())
+                EVisitDate.fromValue(visitDate)
                 , popup
                 , review
-                , ECongestion.fromValue(createReviewDto.congestion())
-                , ESatisfaction.fromValue(createReviewDto.satisfaction())
+                , ECongestion.fromValue(congestion)
+                , ESatisfaction.fromValue(satisfaction)
         );
 
         visitorDataRepository.save(visitorData);

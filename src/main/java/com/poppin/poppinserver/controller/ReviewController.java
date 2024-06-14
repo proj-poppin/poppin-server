@@ -4,13 +4,13 @@ import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
 import com.poppin.poppinserver.service.ReviewService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,25 +21,57 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    /*방문 후기 작성하기*/
-    @PostMapping(value = "/w/certi") // 후기 생성
-    public ResponseDto<?> createCertifiedReview(
-            @UserId Long userId,
-            @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
+    /*
+        이미지 테스트용
+     */
+    @PostMapping(value = "/test/image", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
+    public ResponseDto<?> imageTest(
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
+        if (!images.isEmpty()){return ResponseDto.ok("이미지 전달 완료");}
+        else return ResponseDto.ok("이미지 전달 실패");
+    }
 
-        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, createReviewDto, images));
+    /*
+        콘텐츠 테스트용
+     */
+    @PostMapping(value = "/test/contents", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
+    public ResponseDto<?> contentTest(
+            @RequestPart(value = "contents" ) CreateReviewDto createReviewDto)
+    {
+
+        return ResponseDto.ok("콘텐츠 전달 완료");
+    }
+
+    /*방문 후기 작성하기*/
+    @PostMapping(value = "/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
+    public ResponseDto<?> createCertifiedReview(
+            @UserId Long userId,
+            @RequestParam("popupId") Long popupId,
+            @RequestParam("text") String text,
+            @RequestParam("visitDate") String visitDate,
+            @RequestParam("satisfaction") String satisfaction,
+            @RequestParam("congestion") String congestion,
+            @RequestParam("nickname") String nickname,
+            @RequestPart(value = "images" ) List<MultipartFile> images) throws IOException
+    {
+
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
     }
 
     /*일반 후기 작성*/
     @PostMapping(value = "/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUncertiReview(
             @UserId Long userId,
-            @RequestPart(value = "contents") @Valid CreateReviewDto createReviewDto,
+            @RequestParam("popupId") Long popupId,
+            @RequestParam("text") String text,
+            @RequestParam("visitDate") String visitDate,
+            @RequestParam("satisfaction") String satisfaction,
+            @RequestParam("congestion") String congestion,
+            @RequestParam("nickname") String nickname,
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, createReviewDto, images));
+        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
     }
 
     @PostMapping("/add-recommend") // 후기 추천
