@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.common.PageInfoDto;
+import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
@@ -20,6 +22,7 @@ import com.poppin.poppinserver.util.push.android.FCMSendUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -153,6 +156,8 @@ public class PopupService {
 
         popup = popupRepository.save(popup);
 
+        log.info(popup.getName() + " 팝업생성");
+
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
@@ -164,12 +169,15 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
-    public ManageListDto readManageList(Long adminId, int page, int size){
-        List<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size));
+    public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size){
+        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper);
 
         Long num = popupRepository.count();
 
-        return ManageListDto.fromEntityList(popups, num);
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+        ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
+
+        return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
     public Boolean removePopup(Long popupId) {
@@ -318,18 +326,22 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
-    public ManageListDto readManageList(String text, EOperationStatus oper,int page, int size){
+    public PagingResponseDto searchManageList(String text, int page, int size,
+                                        EOperationStatus oper){
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
         if (text != null && text.trim() != ""){
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        List<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size), oper.getStatus()); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size), oper.getStatus()); // 운영 상태
 
         Long num = popupRepository.count();
 
-        return ManageListDto.fromEntityList(popups, num);
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+        ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
+
+        return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
     public PopupGuestDetailDto readGuestDetail(Long popupId){

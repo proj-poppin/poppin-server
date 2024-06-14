@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -110,7 +112,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND p.operation_status = :oper " +
                     "ORDER BY p.name",
             nativeQuery = true)
-    List<Popup> findByTextInName(String text, Pageable pageable, String oper);
+    Page<Popup> findByTextInName(String text, Pageable pageable, String oper);
 
     @Query("SELECT p from Popup p WHERE p.operationStatus != 'TERMINATED'")
     List<Popup> findAllByOpStatusNotTerminated();
@@ -158,9 +160,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
-            "WHERE p.operationStatus != 'EXECUTING' " +
+            "WHERE p.operationStatus = :oper " +
             "ORDER BY p.name ASC")
-    List<Popup> findByOperationStatusAndOrderByName(Pageable pageable);
+    Page<Popup> findByOperationStatusAndOrderByName(Pageable pageable, EOperationStatus oper);
 
 
     @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
