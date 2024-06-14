@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.common.PageInfoDto;
+import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
@@ -14,6 +16,8 @@ import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -175,10 +179,13 @@ public class ModifyInfoService {
     } // 조회
 
     @Transactional
-    public List<ModifyInfoSummaryDto> readModifyInfoList(){
-        List<ModifyInfo> modifyInfoList = modifyInformRepository.findAll();
+    public PagingResponseDto readModifyInfoList(int page, int size){
+        Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAll(PageRequest.of(page, size));
 
-        return ModifyInfoSummaryDto.fromEntityList(modifyInfoList);
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(modifyInfoList);
+        List<ModifyInfoSummaryDto> modifyInfoSummaryDtos = ModifyInfoSummaryDto.fromEntityList(modifyInfoList.getContent());
+
+        return PagingResponseDto.fromEntityAndPageInfo(modifyInfoSummaryDtos, pageInfoDto);
     }// 목록 조회
 
     @Transactional

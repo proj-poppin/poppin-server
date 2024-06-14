@@ -46,8 +46,9 @@ public class ModifyInfoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping ("/list")
-    public ResponseDto<?> readModifyInfoList(){
-        return ResponseDto.ok(modifyInfoService.readModifyInfoList());
+    public ResponseDto<?> readModifyInfoList(@RequestParam("page") int page,
+                                             @RequestParam("size") int size){
+        return ResponseDto.ok(modifyInfoService.readModifyInfoList(page, size));
     } // 목록 조회
 
     @PreAuthorize("hasRole('ADMIN')")
