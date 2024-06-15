@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReportPopupRepository extends JpaRepository<ReportPopup, Long> {
+    void deleteAllByPopup(Popup popup);
 }
