@@ -351,7 +351,7 @@ public class ModifyInfoService {
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        if(originUrls.size() != 0){
+        if(proxyUrls.size() != 0){
             s3Service.deleteMultipleImages(proxyUrls);
             posterImageRepository.deleteAllByPopupId(proxyPopup);
         }
@@ -433,4 +433,43 @@ public class ModifyInfoService {
 
         return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
+
+    @Transactional
+    public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
+        List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
+
+        for (ModifyInfo modifyInfo : modifyInfoList) {
+            // proxy popup 삭제
+            Popup proxyPopup = modifyInfo.getProxyPopup();
+
+                // proxy popup 이미지 삭제
+            List<PosterImage> proxyImages = posterImageRepository.findAllByPopupId(proxyPopup);
+            List<String> proxyUrls = proxyImages.stream()
+                    .map(PosterImage::getPosterUrl)
+                    .toList();
+            if(proxyUrls.size() != 0){
+                s3Service.deleteMultipleImages(proxyUrls);
+                posterImageRepository.deleteAllByPopupId(proxyPopup);
+            }
+
+                // proxy popup 알람 키워드 삭제
+            alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
+
+                // proxy popup 삭제
+            popupRepository.delete(proxyPopup);
+
+            // modify info 삭제
+                // modify info 이미지 삭제
+            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
+            List<String> modifyUrls = proxyImages.stream()
+                    .map(PosterImage::getPosterUrl)
+                    .toList();
+            if(modifyUrls.size() != 0){
+                s3Service.deleteMultipleImages(modifyUrls);
+                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
+            }
+                // modify info 삭제
+            modifyInformRepository.delete(modifyInfo);
+        }
+    }
 }

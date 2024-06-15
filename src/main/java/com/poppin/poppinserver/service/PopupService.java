@@ -50,6 +50,9 @@ public class PopupService {
     private final AlarmKeywordRepository alarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitRepository visitRepository;
+    private final ManagerInformRepository managerInformRepository;
+    private final UserInformRepository userInformRepository;
+    private final ModifyInfoService modifyInfoService;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -186,26 +189,33 @@ public class PopupService {
         // 알람 관련 데이터
 
         // 관심 추가 데이터
+        interestRepository.deleteAllByPopupId(popupId);
 
         // 신고 관련 데이터
 
         // 실시간 방문자 수 관련 데이터
 
         // 제보 관련 데이터
-            // 관리자 직접 추가일 수도 있다
             // 운영자 제보
+        managerInformRepository.deleteAllByPopupId(popup);
             // 사용자 제보
-            // 완료된 건 놔두기?
+        userInformRepository.deleteAllByPopupId(popup);
 
         // 정보수정요청 관련 데이터
-
-        // 팝업 이미지
-            // S3 삭제
-            // 팝업 이미지 테이블 정리
+        modifyInfoService.deleteProxyPopupAndModifyInfoByPopupId(popupId);
 
         // 알람 키워드
+        alarmKeywordRepository.deleteAllByPopupId(popup);
 
-        // 카테고리
+        // 팝업 이미지
+        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
+        List<String> fileUrls = posterImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+        if(fileUrls.size() != 0){
+            s3Service.deleteMultipleImages(fileUrls);
+            posterImageRepository.deleteAllByPopupId(popup);
+        }
 
         popupRepository.delete(popup);
 

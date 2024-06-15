@@ -95,11 +95,11 @@ public class Popup {
     @Column(name = "operation_status", nullable = false)
     private String operationStatus;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "prefered_id", nullable = false)
     private PreferedPopup preferedPopup;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "taste_id", nullable = false)
     private TastePopup tastePopup;
 
