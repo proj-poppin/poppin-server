@@ -77,6 +77,9 @@ public class User {
     @Column(name = "review_cnt", nullable = false)
     private Long reviewCnt;
 
+    @Column(name = "certified_review")
+    private Long certifiedReview;
+
     @Column(name = "require_special_care", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean requiresSpecialCare;
 
@@ -118,6 +121,7 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.requiresSpecialCare = false;
         this.reviewCnt = 0L;
+        this.certifiedReview = 0L;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
