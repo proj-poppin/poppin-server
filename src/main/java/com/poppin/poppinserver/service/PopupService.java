@@ -182,6 +182,7 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
+    @Transactional
     public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -194,7 +195,7 @@ public class PopupService {
         interestRepository.deleteAllByPopupId(popupId);
 
         // 신고 관련 데이터
-        reportPopupRepository.deleteAllByPopup(popup);
+        reportPopupRepository.deleteAllByPopupId(popup);
 
         // 실시간 방문자 수 관련 데이터
         visitRepository.deleteAllByPopup(popup);
