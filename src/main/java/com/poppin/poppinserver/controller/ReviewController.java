@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -53,7 +52,7 @@ public class ReviewController {
             @RequestParam("satisfaction") String satisfaction,
             @RequestParam("congestion") String congestion,
             @RequestParam("nickname") String nickname,
-            @RequestPart(value = "images" ) List<MultipartFile> images) throws IOException
+            @RequestPart(value = "images" ) List<MultipartFile> images)
     {
 
         return ResponseDto.ok(reviewService.writeCertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
@@ -75,7 +74,10 @@ public class ReviewController {
     }
 
     @PostMapping("/add-recommend") // 후기 추천
-    public ResponseDto<?> addRecommendReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId")Long popupId){
+    public ResponseDto<?> addRecommendReview(@UserId Long userId,
+                                             @RequestParam(value = "reviewId") Long reviewId,
+                                             @RequestParam(value = "popupId")Long popupId)
+    {
         return ResponseDto.ok(reviewService.addRecommendReview(userId, reviewId, popupId));
     }
 

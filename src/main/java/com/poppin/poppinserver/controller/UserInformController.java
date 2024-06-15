@@ -2,7 +2,6 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -25,16 +24,32 @@ public class UserInformController {
     private final UserInformService userInformService;
 
     //사용자 제보 생성
-    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/report", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid CreateUserInformDto createUserInformDto,
+                                           @RequestParam(value = "name") String name,
+                                           @RequestParam(value = "contactLink") String contactLink,
+                                           @RequestParam(value = "fashionBeauty") Boolean fashionBeauty,
+                                           @RequestParam(value = "characters") Boolean characters,
+                                           @RequestParam(value = "foodBeverage") Boolean foodBeverage,
+                                           @RequestParam(value = "webtoonAni") Boolean webtoonAni,
+                                           @RequestParam(value = "interiorThings") Boolean interiorThings,
+                                           @RequestParam(value = "movie") Boolean movie,
+                                           @RequestParam(value = "musical") Boolean musical,
+                                           @RequestParam(value = "sports") Boolean sports,
+                                           @RequestParam(value = "game") Boolean game,
+                                           @RequestParam(value = "itTech") Boolean itTech,
+                                           @RequestParam(value = "kpop") Boolean kpop,
+                                           @RequestParam(value = "alcohol") Boolean alcohol,
+                                           @RequestParam(value = "animalPlant") Boolean animalPlant,
+                                           @RequestParam(value = "etc") Boolean etc,
                                            @UserId Long userId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.createUserInform(createUserInformDto, images, userId));
+        return ResponseDto.ok(userInformService.createUserInform(name, contactLink, fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings, movie,
+                musical, sports, game, itTech, kpop, alcohol, animalPlant, etc, images, userId));
     } // 제보 생성
 
     @PreAuthorize("hasRole('ADMIN')")

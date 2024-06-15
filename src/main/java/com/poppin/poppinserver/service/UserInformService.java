@@ -3,7 +3,6 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
@@ -38,28 +37,29 @@ public class UserInformService {
     private final S3Service s3Service;
 
     @Transactional
-    public UserInformDto createUserInform(CreateUserInformDto createUserInformDto, //사용자 제보 생성
-                                          List<MultipartFile> images,
-                                          Long userId){
+    public UserInformDto createUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
+                                          Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
+                                          Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
+                                          Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
+                                          List<MultipartFile> images, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        CreateTasteDto createTasteDto = createUserInformDto.taste();
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAni())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alchol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
+                .fasionBeauty(fashionBeauty)
+                .characters(characters)
+                .foodBeverage(foodBeverage)
+                .webtoonAni(webtoonAni)
+                .interiorThings(interiorThings)
+                .movie(movie)
+                .musical(musical)
+                .sports(sports)
+                .game(game)
+                .itTech(itTech)
+                .kpop(kpop)
+                .alchol(alcohol)
+                .animalPlant(animalPlant)
+                .etc(etc)
                 .build();
         tastePopupRepository.save(tastePopup);
 
@@ -72,7 +72,7 @@ public class UserInformService {
         preferedPopupRepository.save(preferedPopup);
 
         Popup popup = Popup.builder()
-                .name(createUserInformDto.name())
+                .name(name)
                 .tastePopup(tastePopup)
                 .preferedPopup(preferedPopup)
                 .operationStatus(EOperationStatus.EXECUTING.getStatus())
@@ -84,7 +84,7 @@ public class UserInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -99,13 +99,14 @@ public class UserInformService {
         UserInform userInform = UserInform.builder()
                 .informerId(user)
                 .popupId(popup)
-                .contactLink(createUserInformDto.contactLink())
+                .contactLink(contactLink)
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     }
+
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId){
