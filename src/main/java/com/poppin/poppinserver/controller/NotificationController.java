@@ -23,14 +23,14 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final FCMTestUtil FCMTestUtil;
 
-    @PostMapping("/android/token/test")
-    public void sendAndroidNotificationByTokenTest(@Valid @RequestBody PushDto pushDto){
-        FCMTestUtil.sendAndroidNotificationByTokenTest(pushDto);
+    @PostMapping("/token/test")
+    public void sendNotificationByTokenTest(@Valid @RequestBody PushDto pushDto){
+        FCMTestUtil.sendNotificationByTokenTest(pushDto);
     }
 
-    @PostMapping("/android/topic/test")
+    @PostMapping("topic/test")
     public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto) throws FirebaseMessagingException {
-        FCMTestUtil.sendAndroidNotificationByTopicTest(pushDto);
+        FCMTestUtil.sendNotificationByTopicTest(pushDto);
     }
 
     /*알림 허용 시 데이터 저장*/

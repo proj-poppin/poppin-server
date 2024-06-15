@@ -1,8 +1,8 @@
 package com.poppin.poppinserver.util.push.android;
 
 import com.google.firebase.messaging.*;
+import com.poppin.poppinserver.config.APNsConfig;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
-import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -15,35 +15,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FCMTestUtil {
 
-    private static final String ANDROID_TOKEN_TEST = "[FCM Android Token Test]";
-    private static final String ANDROID_TOPIC_TEST = "[FCM Android Topic Test]";
+    private static final String TOKEN_TEST = "[FCM Token Test]";
+    private static final String TOPIC_TEST = "[FCM Topic Test]";
 
     private final FirebaseMessaging firebaseMessaging;
-
+    private final APNsConfig apnsConfiguration;
 
     /* 안드로이드 토큰 테스트 */
-    public void sendAndroidNotificationByTokenTest(PushDto pushDto) {
+    public void sendNotificationByTokenTest(PushDto pushDto) {
+        ApnsConfig apnsConfig = apnsConfiguration.createApnsConfig(pushDto.title(), pushDto.body());
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(pushDto.title())
                         .setBody(pushDto.body())
                         .build())
+                .setApnsConfig(apnsConfig)
                 .setToken(pushDto.token())
                 .build();
 
         try {
             String result = firebaseMessaging.send(message);
-            log.debug(ANDROID_TOKEN_TEST + " Successfully sent message: " + result);
+            log.debug(TOKEN_TEST + " Successfully sent message: " + result);
         } catch (FirebaseMessagingException e) {
-            log.error(ANDROID_TOKEN_TEST + " Failed to send message: " + e.getMessage());
+            log.error(TOKEN_TEST + " Failed to send message: " + e.getMessage());
         }
     }
 
     /* 안드로이드 토픽 구독 & 발송 테스트 */
-    public void sendAndroidNotificationByTopicTest(PushDto pushDto) throws FirebaseMessagingException {
+    public void sendNotificationByTopicTest(PushDto pushDto) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(pushDto.token());
-
+        ApnsConfig apnsConfig = apnsConfiguration.createApnsConfig(pushDto.title(), pushDto.body());
         TopicManagementResponse response = firebaseMessaging.subscribeToTopic(registrationTokens, "Test");
 
         log.info(response.getSuccessCount() + " tokens were subscribed successfully");
@@ -53,15 +55,16 @@ public class FCMTestUtil {
                         .setTitle(pushDto.title())
                         .setBody(pushDto.body())
                         .build())
+                .setApnsConfig(apnsConfig)
                 .setToken(pushDto.token())
                 .setTopic("Test")
                 .build();
 
         try {
             String result = firebaseMessaging.send(message);
-            log.debug(ANDROID_TOPIC_TEST + " Successfully sent message: " + result);
+            log.debug(TOPIC_TEST + " Successfully sent message: " + result);
         } catch (FirebaseMessagingException e) {
-            log.error(ANDROID_TOPIC_TEST + " Failed to send message: " + e.getMessage());
+            log.error(TOPIC_TEST + " Failed to send message: " + e.getMessage());
         }
     }
 
