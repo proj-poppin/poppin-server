@@ -58,9 +58,15 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        String fileName = images.get(0).getOriginalFilename();
+        String imageStaus = "0";
+        log.info("imageStatus : " + imageStaus);
+
         // 이미지 없을 시 넘어감
-        if (fileName != "") {
+        if (!images.get(0).getOriginalFilename().equals("empty")) {
+
+            log.info("images 객체 : " + images);
+            log.info("images 사이즈 : " + images.size());
+            log.info("images 첫번째 요소 파일 명: " + images.get(0).getOriginalFilename());
 
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
@@ -76,6 +82,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
+        log.info("image Status : " + imageStaus);
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
@@ -110,10 +117,19 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        String fileName = images.get(0).getOriginalFilename();
+        String imageStaus = "0";
+        log.info("imageStatus : " + imageStaus);
 
         // 이미지 없을 시 넘어감
-        if (fileName != "") {
+        if (!images.get(0).getOriginalFilename().equals("empty")) {
+
+            log.info("images 객체 : " + images);
+            log.info("images 사이즈 : " + images.size());
+            log.info("images 첫번째 요소 파일 명: " + images.get(0).getOriginalFilename());
+
+            imageStaus = "1"; // 이미지가 null 이 아닐때
+
+            log.info("이미지 파일명 : " + images.get(0).getOriginalFilename());
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
 
@@ -128,7 +144,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-
+        log.info("image Status : " + imageStaus);
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
                 , popup

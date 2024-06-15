@@ -26,9 +26,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r WHERE r.id = :reviewId AND r.popup.id = :popupId ")
     Review findByIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);
 
-    @Query("SELECT r FROM Review r WHERE r.user.id = :userId")
-    List<Review> findAllByUserId(@Param("userId")Long userId);
-
     @Query("SELECT COUNT(r) FROM Review r WHERE r.user.id = :userId AND r.isVisible = false")
     Long countByUserIdAndIsVisibleFalse(Long userId);
 
@@ -36,4 +33,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Transactional
     @Query("DELETE FROM Review r WHERE r.user.id = :userId")
     void deleteAllByUserId(Long userId);
+
+    void deleteAllByPopupId(Long popupId);
 }
