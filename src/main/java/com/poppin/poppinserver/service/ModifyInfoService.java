@@ -429,8 +429,6 @@ public class ModifyInfoService {
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        tastePopupRepository.delete
-
         popupRepository.delete(proxyPopup);
 
         return ModifyInfoDto.fromEntity(modifyInfo, null);
@@ -443,9 +441,9 @@ public class ModifyInfoService {
         for (ModifyInfo modifyInfo : modifyInfoList) {
             // proxy popup 삭제
             Popup proxyPopup = modifyInfo.getProxyPopup();
-            posterImageRepository.deleteAllByPopupId(proxyPopup);
 
-            List<PosterImage> proxyImages = posterImageRepository.findByPopupId(proxyPopup);
+                // proxy popup 이미지 삭제
+            List<PosterImage> proxyImages = posterImageRepository.findAllByPopupId(proxyPopup);
             List<String> proxyUrls = proxyImages.stream()
                     .map(PosterImage::getPosterUrl)
                     .toList();
@@ -454,7 +452,24 @@ public class ModifyInfoService {
                 posterImageRepository.deleteAllByPopupId(proxyPopup);
             }
 
+                // proxy popup 알람 키워드 삭제
+            alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
+
+                // proxy popup 삭제
+            popupRepository.delete(proxyPopup);
+
             // modify info 삭제
+                // modify info 이미지 삭제
+            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
+            List<String> modifyUrls = proxyImages.stream()
+                    .map(PosterImage::getPosterUrl)
+                    .toList();
+            if(modifyUrls.size() != 0){
+                s3Service.deleteMultipleImages(modifyUrls);
+                modifyImageReposiroty.deleteAllByModifyId(modifyInfo.getId());
+            }
+                // modify info 삭제
+            modifyInformRepository.delete(modifyInfo);
         }
     }
 }
