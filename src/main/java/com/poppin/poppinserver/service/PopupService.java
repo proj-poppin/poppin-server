@@ -52,11 +52,12 @@ public class PopupService {
     private final VisitRepository visitRepository;
     private final ManagerInformRepository managerInformRepository;
     private final UserInformRepository userInformRepository;
-    private final ModifyInfoService modifyInfoService;
+    private final ReportPopupRepository reportPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
+    private final ModifyInfoService modifyInfoService;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
