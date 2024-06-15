@@ -36,5 +36,5 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     // createdAt 칼럼이 주어진 날짜 시간 이전인 모든 Visit을 삭제합니다.
     void deleteAllByCreatedAtBefore(LocalDateTime dateTime);
 
-    void deleteAllByPopupId(Long popupId);
+    void deleteAllByPopup(Popup popup);
 }

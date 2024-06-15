@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.repository;
 
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Review;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
@@ -34,5 +35,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("DELETE FROM Review r WHERE r.user.id = :userId")
     void deleteAllByUserId(Long userId);
 
-    void deleteAllByPopupId(Long popupId);
+    void deleteAllByPopup(Popup popup);
 }

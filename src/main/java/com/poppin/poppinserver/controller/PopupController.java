@@ -40,8 +40,6 @@ public class PopupController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        log.info("전체팝업관리 - 팝업생성");
-
         return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 

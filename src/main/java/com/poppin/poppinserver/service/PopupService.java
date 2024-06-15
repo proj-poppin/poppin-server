@@ -52,11 +52,12 @@ public class PopupService {
     private final VisitRepository visitRepository;
     private final ManagerInformRepository managerInformRepository;
     private final UserInformRepository userInformRepository;
-    private final ModifyInfoService modifyInfoService;
+    private final ReportPopupRepository reportPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
+    private final ModifyInfoService modifyInfoService;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
@@ -181,11 +182,12 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 조회
 
+    @Transactional
     public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
         // 후기 관련 데이터
-        reviewRepository.deleteAllByPopupId(popupId);
+        reviewRepository.deleteAllByPopup(popup);
 
         // 알람 관련 데이터
 
@@ -193,9 +195,10 @@ public class PopupService {
         interestRepository.deleteAllByPopupId(popupId);
 
         // 신고 관련 데이터
+        reportPopupRepository.deleteAllByPopupId(popup);
 
         // 실시간 방문자 수 관련 데이터
-        visitRepository.deleteAllByPopupId(popupId);
+        visitRepository.deleteAllByPopup(popup);
 
         // 제보 관련 데이터
             // 운영자 제보

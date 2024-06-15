@@ -471,5 +471,5 @@ public class ModifyInfoService {
                 // modify info 삭제
             modifyInformRepository.delete(modifyInfo);
         }
-    }
+    } // 프록시 팝업 삭제 및 정보수정요청 삭제
 }
