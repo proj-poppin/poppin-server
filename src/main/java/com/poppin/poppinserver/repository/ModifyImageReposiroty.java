@@ -9,5 +9,5 @@ import java.util.List;
 public interface ModifyImageReposiroty extends JpaRepository<ModifyImages, Long> {
     List<ModifyImages> findByModifyId(ModifyInfo modifyId);
 
-    void deleteAllByModifyId(Long modifyId);
+    void deleteAllByModifyId(ModifyInfo modifyId);
 }

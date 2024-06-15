@@ -197,12 +197,15 @@ public class PopupService {
 
         // 제보 관련 데이터
             // 운영자 제보
-        managerInformRepository.deleteAllByPopupId(popupId);
+        managerInformRepository.deleteAllByPopupId(popup);
             // 사용자 제보
-        userInformRepository.deleteAllByPopupId(popupId);
+        userInformRepository.deleteAllByPopupId(popup);
 
         // 정보수정요청 관련 데이터
         modifyInfoService.deleteProxyPopupAndModifyInfoByPopupId(popupId);
+
+        // 알람 키워드
+        alarmKeywordRepository.deleteAllByPopupId(popup);
 
         // 팝업 이미지
         List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
@@ -213,8 +216,6 @@ public class PopupService {
             s3Service.deleteMultipleImages(fileUrls);
             posterImageRepository.deleteAllByPopupId(popup);
         }
-
-        // 알람 키워드
 
         popupRepository.delete(popup);
 

@@ -466,7 +466,7 @@ public class ModifyInfoService {
                     .toList();
             if(modifyUrls.size() != 0){
                 s3Service.deleteMultipleImages(modifyUrls);
-                modifyImageReposiroty.deleteAllByModifyId(modifyInfo.getId());
+                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
             }
                 // modify info 삭제
             modifyInformRepository.delete(modifyInfo);
