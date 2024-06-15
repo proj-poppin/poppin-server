@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface InterestRepository extends JpaRepository<Interest, Interest.InterestId> {
     Optional<Interest> findByUserIdAndPopupId(Long userId, Long popupId);
+
+    void deleteAllByPopupId(Long popupId);
 }

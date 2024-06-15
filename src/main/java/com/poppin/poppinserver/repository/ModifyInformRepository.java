@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ModifyInformRepository extends JpaRepository<ModifyInfo, Long> {
     @Query("select m from ModifyInfo m where m.isExecuted = :isExecuted")
     Page<ModifyInfo> findAllByIsExecuted(Pageable pageable, @Param("isExecuted") Boolean isExecuted);
+
+    List<ModifyInfo> findAllByOriginPopupId(Long originPopupId);
 }

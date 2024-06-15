@@ -351,7 +351,7 @@ public class ModifyInfoService {
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        if(originUrls.size() != 0){
+        if(proxyUrls.size() != 0){
             s3Service.deleteMultipleImages(proxyUrls);
             posterImageRepository.deleteAllByPopupId(proxyPopup);
         }
@@ -429,8 +429,32 @@ public class ModifyInfoService {
         modifyInfo.update(true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
+        tastePopupRepository.delete
+
         popupRepository.delete(proxyPopup);
 
         return ModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
+
+    @Transactional
+    public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
+        List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
+
+        for (ModifyInfo modifyInfo : modifyInfoList) {
+            // proxy popup 삭제
+            Popup proxyPopup = modifyInfo.getProxyPopup();
+            posterImageRepository.deleteAllByPopupId(proxyPopup);
+
+            List<PosterImage> proxyImages = posterImageRepository.findByPopupId(proxyPopup);
+            List<String> proxyUrls = proxyImages.stream()
+                    .map(PosterImage::getPosterUrl)
+                    .toList();
+            if(proxyUrls.size() != 0){
+                s3Service.deleteMultipleImages(proxyUrls);
+                posterImageRepository.deleteAllByPopupId(proxyPopup);
+            }
+
+            // modify info 삭제
+        }
+    }
 }
