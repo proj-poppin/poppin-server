@@ -89,19 +89,19 @@ public class UserController {
     }
 
     /*작성완료 후기 조회*/
-    @GetMapping("/review/r")
+    @GetMapping("/review/finish")
     public ResponseDto<?> getFinishReviewList(@UserId Long userId ){
         return ResponseDto.ok(userService.getFinishReviewList(userId));
     }
 
     /*작성완료 인증후기 보기*/
-    @PostMapping("/review/r/certi")
+    @PostMapping("/review/finish/certi")
     public ResponseDto<?> getCertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getCertifiedReview(userId, reviewId, popupId));
     }
 
     /*작성완료 미인증후기 보기*/
-    @PostMapping("/review/r/uncerti")
+    @PostMapping("/review/finish/uncerti")
     public ResponseDto<?> getUncertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getUncertifiedReview(userId, reviewId, popupId));
     }

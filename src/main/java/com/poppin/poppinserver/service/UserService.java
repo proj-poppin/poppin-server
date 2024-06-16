@@ -278,7 +278,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /*작성완료 후기 조회*/
+    /*마이페이지 - 작성완료 후기 조회*/
     public List<ReviewFinishDto> getFinishReviewList(Long userId){
 
         List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
@@ -306,7 +306,7 @@ public class UserService {
         return reviewFinishDtoList;
     }
 
-    /*마이페이지 인증 후기 보기*/
+    /*마이페이지 - 작성 완료 후기 조회 - 인증 후기 보기*/
     public ReviewCertiDto getCertifiedReview(Long userId, Long reviewId, Long popupId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -337,7 +337,7 @@ public class UserService {
         );
     }
 
-    /*마이페이지 인증 후기 보기*/
+    /*마이페이지 - 작성완료 후기 조회 - 일반 후기 보기*/
     public ReviewUncertiDto getUncertifiedReview(Long userId, Long reviewId, Long popupId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
