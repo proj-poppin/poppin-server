@@ -74,7 +74,7 @@ public class UserController {
         return ResponseDto.ok("프로필 이미지가 삭제되었습니다.");
     }
 
-    @PatchMapping("")
+    @PatchMapping("/settings")
     public ResponseDto<?> updateUserNicknameAndBirthDate(
             @UserId Long userId,
             @RequestBody UserInfoDto userInfoDto

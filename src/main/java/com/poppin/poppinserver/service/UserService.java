@@ -210,7 +210,7 @@ public class UserService {
                 .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .writtenReview(user.getReviewCnt())
-                .reviewCnt(user.getReviewCnt())
+                .reviewCnt(user.getCertifiedReview())
                 .build();
     }
 
