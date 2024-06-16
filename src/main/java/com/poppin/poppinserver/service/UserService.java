@@ -41,6 +41,7 @@ public class UserService {
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
     private final FreqQuestionRepository freqQuestionRepository;
+    private final PosterImageRepository posterImageRepository;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -284,8 +285,22 @@ public class UserService {
         List<Review> reviewList = reviewRepository.findByUserId(userId);
 
         for (Review review : reviewList){
+            // 팝업 정보
             Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
-            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt());
+
+            // 팝업 이미지 정보
+            List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
+            List<String> imageList = new ArrayList<>();
+            if (!posterImages.isEmpty())
+            {
+                for(PosterImage posterImage : posterImages){
+                    imageList.add(posterImage.getPosterUrl());
+                }
+            }else{
+                imageList.add(null);
+            }
+
+            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt(),imageList);
             reviewFinishDtoList.add(reviewFinishDto);
         }
         return reviewFinishDtoList;
