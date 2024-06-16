@@ -1,7 +1,8 @@
 package com.poppin.poppinserver.util.push.android;
 
 import com.google.firebase.messaging.*;
-import com.poppin.poppinserver.config.APNsConfig;
+import com.poppin.poppinserver.config.APNsConfiguration;
+import com.poppin.poppinserver.config.AndroidConfiguration;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +20,20 @@ public class FCMTestUtil {
     private static final String TOPIC_TEST = "[FCM Topic Test]";
 
     private final FirebaseMessaging firebaseMessaging;
-    private final APNsConfig apnsConfiguration;
+    private final APNsConfiguration apnsConfiguration;
+    private final AndroidConfiguration androidConfiguration;
 
     /* 안드로이드 토큰 테스트 */
     public void sendNotificationByTokenTest(PushDto pushDto) {
-        ApnsConfig apnsConfig = apnsConfiguration.createApnsConfig(pushDto.title(), pushDto.body());
 
+        log.debug("token : " + pushDto.token());
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(pushDto.title())
                         .setBody(pushDto.body())
                         .build())
-                .setApnsConfig(apnsConfig)
+                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(pushDto.token())
                 .build();
 
@@ -45,7 +48,7 @@ public class FCMTestUtil {
     /* 안드로이드 토픽 구독 & 발송 테스트 */
     public void sendNotificationByTopicTest(PushDto pushDto) throws FirebaseMessagingException {
         List<String> registrationTokens = Collections.singletonList(pushDto.token());
-        ApnsConfig apnsConfig = apnsConfiguration.createApnsConfig(pushDto.title(), pushDto.body());
+
         TopicManagementResponse response = firebaseMessaging.subscribeToTopic(registrationTokens, "Test");
 
         log.info(response.getSuccessCount() + " tokens were subscribed successfully");
@@ -55,7 +58,8 @@ public class FCMTestUtil {
                         .setTitle(pushDto.title())
                         .setBody(pushDto.body())
                         .build())
-                .setApnsConfig(apnsConfig)
+                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(pushDto.token())
                 .setTopic("Test")
                 .build();
