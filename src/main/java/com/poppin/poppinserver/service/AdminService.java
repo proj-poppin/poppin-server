@@ -1,17 +1,17 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.FreqQuestion;
+import com.poppin.poppinserver.domain.ReportReview;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.dto.user.response.UserListDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.FreqQuestionRepository;
-import com.poppin.poppinserver.repository.ReviewRepository;
-import com.poppin.poppinserver.repository.UserRepository;
+import com.poppin.poppinserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,6 +31,8 @@ public class AdminService {
     private final FreqQuestionRepository freqQuestionRepository;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final ReportReviewRepository reportReviewRepository;
+    private final ReportPopupRepository reportPopupRepository;
 
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
@@ -140,5 +142,22 @@ public class AdminService {
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
                 .build();
+    }
+
+    public List<ReportedReviewListResponseDto> readReviewReports(Long page, Long size) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+        Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable);
+
+        List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
+                .map(reportReview -> ReportedReviewListResponseDto.builder()
+                        .reviewId(reportReview.getReviewId().getId())
+                        .reportedReviewId(reportReview.getId())
+                        .reporter(reportReview.getReporterId().getNickname())
+                        .popupName(reportReview.getReviewId().getPopup().getName())
+                        .executed(reportReview.getIsExecuted())
+                        .reportedAt(reportReview.getReportedAt().toString())
+                        .build())
+                .collect(Collectors.toList());
+        return reportedReviewListResponseDtos;
     }
 }

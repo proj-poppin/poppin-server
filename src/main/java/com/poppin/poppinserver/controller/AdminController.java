@@ -61,10 +61,11 @@ public class AdminController {
     }
 
     /* 후기 신고 목록 조회 */
-//    @GetMapping("/reviews")
-//    public ResponseDto<?> readReviewReports() {
-//        return ResponseDto.ok(adminService.readReviewReports());
-//    }
+    @GetMapping("/reports/reviews")
+    public ResponseDto<?> readReviewReports(@RequestParam(required = false, defaultValue = "1") Long page,
+                                            @RequestParam(required = false, defaultValue = "19") Long size) {
+        return ResponseDto.ok(adminService.readReviewReports(page, size));
+    }
 
     /* 후기 신고 상세 조회 */
 

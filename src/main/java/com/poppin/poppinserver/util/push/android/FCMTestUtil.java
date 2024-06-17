@@ -2,7 +2,7 @@ package com.poppin.poppinserver.util.push.android;
 
 import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.config.APNsConfiguration;
-import com.poppin.poppinserver.config.AndroidConfiguration;
+//import com.poppin.poppinserver.config.AndroidConfiguration;
 import com.poppin.poppinserver.dto.notification.request.PushDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class FCMTestUtil {
 
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
-    private final AndroidConfiguration androidConfiguration;
+    //private final AndroidConfiguration androidConfiguration;
 
     /* 안드로이드 토큰 테스트 */
     public void sendNotificationByTokenTest(PushDto pushDto) {
@@ -33,7 +33,7 @@ public class FCMTestUtil {
                         .setBody(pushDto.body())
                         .build())
                 .setApnsConfig(apnsConfiguration.apnsConfig())
-                .setAndroidConfig(androidConfiguration.androidConfig())
+                //.setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(pushDto.token())
                 .build();
 
@@ -59,7 +59,7 @@ public class FCMTestUtil {
                         .setBody(pushDto.body())
                         .build())
                 .setApnsConfig(apnsConfiguration.apnsConfig())
-                .setAndroidConfig(androidConfiguration.androidConfig())
+                //.setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(pushDto.token())
                 .setTopic("Test")
                 .build();
