@@ -70,6 +70,11 @@ public class AdminController {
     /* 후기 신고 상세 조회 */
 
     /* 팝업 신고 목록 조회 */
+    @GetMapping("/reports/popups")
+    public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "1") Long page,
+                                           @RequestParam(required = false, defaultValue = "19") Long size) {
+        return ResponseDto.ok(adminService.readPopupReports(page, size));
+    }
 
     /* 팝업 신고 상세 조회 */
 }

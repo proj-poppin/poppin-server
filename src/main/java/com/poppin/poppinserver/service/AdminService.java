@@ -1,10 +1,12 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.FreqQuestion;
+import com.poppin.poppinserver.domain.ReportPopup;
 import com.poppin.poppinserver.domain.ReportReview;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.dto.report.response.ReportedPopupListResponseDto;
 import com.poppin.poppinserver.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
@@ -150,8 +152,8 @@ public class AdminService {
 
         List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
                 .map(reportReview -> ReportedReviewListResponseDto.builder()
-                        .reviewId(reportReview.getReviewId().getId())
                         .reportedReviewId(reportReview.getId())
+                        .reviewId(reportReview.getReviewId().getId())
                         .reporter(reportReview.getReporterId().getNickname())
                         .popupName(reportReview.getReviewId().getPopup().getName())
                         .executed(reportReview.getIsExecuted())
@@ -159,5 +161,22 @@ public class AdminService {
                         .build())
                 .collect(Collectors.toList());
         return reportedReviewListResponseDtos;
+    }
+
+    public List<ReportedPopupListResponseDto> readPopupReports(Long page, Long size) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+        Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable);
+
+        List<ReportedPopupListResponseDto> reportedPopupListResponseDtos = reportPopups.getContent().stream()
+                .map(reportPopup -> ReportedPopupListResponseDto.builder()
+                        .reportedPopupId(reportPopup.getId())
+                        .popupId(reportPopup.getPopupId().getId())
+                        .reporter(reportPopup.getReporterId().getNickname())
+                        .popupName(reportPopup.getPopupId().getName())
+                        .executed(reportPopup.getIsExecuted())
+                        .reportedAt(reportPopup.getReportedAt().toString())
+                        .build())
+                .collect(Collectors.toList());
+        return reportedPopupListResponseDtos;
     }
 }
