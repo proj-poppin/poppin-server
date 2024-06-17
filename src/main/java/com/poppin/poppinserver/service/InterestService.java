@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.interest.request.AddInterestDto;
 import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -23,16 +22,16 @@ public class InterestService {
 
     private final FCMService fcmService;
     @Transactional // 쿼리 5번 날라감. 최적화 필요
-    public InterestDto userAddInterest(AddInterestDto addInterestDto, Long userId){
+    public InterestDto userAddInterest(Long popupId, Long userId, String token){
         //중복검사
-        interestRepository.findByUserIdAndPopupId(userId, addInterestDto.popupId())
+        interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .ifPresent(interest -> {
                     throw new CommonException(ErrorCode.DUPLICATED_INTEREST);
                 });
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(addInterestDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         Interest interest = Interest.builder()
@@ -45,11 +44,11 @@ public class InterestService {
         popup.addInterestCnt();
 
         /*알림 구독*/
-        String token = addInterestDto.fcmToken();
+        String fcmToken = token;
 
-        fcmService.fcmAddTopic(token, popup, EPopupTopic.MAGAM);
-        fcmService.fcmAddTopic(token, popup, EPopupTopic.OPEN);
-        fcmService.fcmAddTopic(token, popup, EPopupTopic.CHANGE_INFO);
+        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.MAGAM);
+        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.OPEN);
+        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
