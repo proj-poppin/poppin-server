@@ -26,7 +26,7 @@ public class FCMTestUtil {
     /* 안드로이드 토큰 테스트 */
     public void sendNotificationByTokenTest(PushDto pushDto) {
 
-        log.debug("token : " + pushDto.token());
+        log.info("token : " + pushDto.token());
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(pushDto.title())
@@ -39,7 +39,7 @@ public class FCMTestUtil {
 
         try {
             String result = firebaseMessaging.send(message);
-            log.debug(TOKEN_TEST + " Successfully sent message: " + result);
+            log.info(TOKEN_TEST + " Successfully sent message: " + result);
         } catch (FirebaseMessagingException e) {
             log.error(TOKEN_TEST + " Failed to send message: " + e.getMessage());
         }

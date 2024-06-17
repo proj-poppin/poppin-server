@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.type.EPopupTopic;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,25 +45,28 @@ public class InterestService {
         popup.addInterestCnt();
 
         /*알림 구독*/
-//        String token = addInterestDto.fcmToken();
+        String token = addInterestDto.fcmToken();
 
-//        fcmService.fcmAddTopic(token, popup, EPopupTopic.MAGAM);
-//        fcmService.fcmAddTopic(token, popup, EPopupTopic.OPEN);
-//        fcmService.fcmAddTopic(token, popup, EPopupTopic.CHANGE_INFO);
+        fcmService.fcmAddTopic(token, popup, EPopupTopic.MAGAM);
+        fcmService.fcmAddTopic(token, popup, EPopupTopic.OPEN);
+        fcmService.fcmAddTopic(token, popup, EPopupTopic.CHANGE_INFO);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
 
-    public Boolean removeInterest(Long userId, Long popupId){//, String fcmToken) {
+    public Boolean removeInterest(Long userId, Long popupId, String fcmToken){
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
         interestRepository.delete(interest);
 
 //        /*FCM 구독취소*/
-//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.MAGAM);
-//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.OPEN);
-//        fcmService.fcmRemoveTopic(fcmToken, EPopupTopic.CHANGE_INFO);
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.MAGAM);
+        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.OPEN);
+        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
         return true;
     }
 }

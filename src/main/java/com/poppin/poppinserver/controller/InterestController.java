@@ -23,7 +23,7 @@ public class InterestController {
     }
 
     @DeleteMapping("/remove-interest")
-    public ResponseDto<?> removeInterest(@RequestParam("popupId") Long popupId, @UserId Long userId){//, @RequestParam("fcm_token")String token){
-        return ResponseDto.ok(interestService.removeInterest(userId, popupId));//, token));
+    public ResponseDto<?> removeInterest(@RequestParam("popupId") Long popupId, @UserId Long userId, @RequestParam("fcm_token")String token){
+        return ResponseDto.ok(interestService.removeInterest(userId, popupId, token));
     }
 }

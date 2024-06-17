@@ -4,9 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddInterestDto(
         @NotNull
-        Long popupId
+        Long popupId,
 
-//        @NotNull
-//        String fcmToken
+        @NotNull
+        String fcmToken
 ) {
 }
