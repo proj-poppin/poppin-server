@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.domain;
 
-import com.poppin.poppinserver.type.EPopupTopic;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,12 +28,12 @@ public class PopupTopic {
     private Popup popup; // 팝업 id
 
     @Column(name = "topic" , nullable = false)
-    private EPopupTopic topic; // 타입
+    private String topicCode; // 타입
 
     @Builder
-    public PopupTopic(NotificationToken token, Popup popup, EPopupTopic topic){
+    public PopupTopic(NotificationToken token, Popup popup, String topicCode){
         this.tokenId        = token;
         this.popup          = popup;
-        this.topic          = topic;
+        this.topicCode      = topicCode;
     }
 }

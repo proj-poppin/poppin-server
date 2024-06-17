@@ -31,7 +31,7 @@ public class FCMSubscribeUtil {
 
         TopicManagementResponse response = null;
         // 구독
-        PopupTopic popupTopic = new PopupTopic(token, popup, topic);
+        PopupTopic popupTopic = new PopupTopic(token, popup, topic.getCode());
         popupTopicRepository.save(popupTopic);
         response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString());
 
@@ -45,7 +45,7 @@ public class FCMSubscribeUtil {
 
         TopicManagementResponse response = null;
         // 구독 해제
-        PopupTopic popupTopic = popupTopicRepository.findByTokenAndTopic(token.getToken(), topic, popup);
+        PopupTopic popupTopic = popupTopicRepository.findByTokenIdAndTopicCodeAndPopupId(token.getId(), topic.getCode(), popup);
         popupTopicRepository.delete(popupTopic);
         response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic.toString()); // 구독 해제
 
