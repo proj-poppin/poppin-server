@@ -266,6 +266,9 @@ public class UserService {
         userRepository.save(user);
 
         return UserProfileDto.builder()
+                .provider(user.getProvider())
+                .userImageUrl(user.getProfileImageUrl())
+                .email(user.getEmail())
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate())
                 .build();

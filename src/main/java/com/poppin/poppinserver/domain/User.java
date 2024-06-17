@@ -183,8 +183,10 @@ public class User {
     }
 
     public void updateUserNicknameAndBirthDate(String nickname, String birthDate) {
-        this.nickname = nickname;
-        this.birthDate = birthDate;
+        if (nickname != null && !nickname.isEmpty())
+            this.nickname = nickname;
+        if (birthDate != null && !birthDate.isEmpty())
+            this.birthDate = birthDate;
     }
 
     public void updateProfileImage(String profileImageUrl) {
