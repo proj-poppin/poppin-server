@@ -45,7 +45,7 @@ public class FCMSubscribeUtil {
 
         TopicManagementResponse response = null;
         // 구독 해제
-        PopupTopic popupTopic = popupTopicRepository.findByTokenIdAndTopicCodeAndPopupId(token.getId(), topic.getCode(), popup);
+        PopupTopic popupTopic = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
         popupTopicRepository.delete(popupTopic);
         response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic.toString()); // 구독 해제
 
