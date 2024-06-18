@@ -218,6 +218,7 @@ public class UserInformService {
 
         userInform.update(EInformProgress.EXECUTING);
         userInform = userInformRepository.save(userInform);
+        log.info(userInform.getProgress().toString());
 
         return UserInformDto.fromEntity(userInform);
     } // 임시저장

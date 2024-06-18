@@ -235,6 +235,8 @@ public class ManagerInformService {
 
         managerInform.update(EInformProgress.EXECUTING);
         managerInform = managerInformRepository.save(managerInform);
+        log.info(managerInform.getProgress().toString());
+
 
         return ManagerInformDto.fromEntity(managerInform);
     } // 운영자 제보 임시저장
