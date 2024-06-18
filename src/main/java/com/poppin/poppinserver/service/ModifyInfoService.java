@@ -168,6 +168,9 @@ public class ModifyInfoService {
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
+        User user = userRepository.findById(modifyInfo.getUserId().getId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
         List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
 
         List<String> imageList = new ArrayList<>();
