@@ -1,8 +1,11 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.common.PageInfoDto;
+import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.response.ManageListDto;
 import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
@@ -14,6 +17,8 @@ import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -105,7 +110,7 @@ public class UserInformService {
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
-    }
+    } // 제보 생성
 
 
     @Transactional
@@ -332,12 +337,17 @@ public class UserInformService {
         userInform = userInformRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
-    }
+    } // 제보 최종 업로그
 
     @Transactional
-    public List<UserInformSummaryDto> reatUserInformList(){
-        List<UserInform> userInforms = userInformRepository.findAll();
+    public PagingResponseDto reatUserInformList(int page,
+                                                int size,
+                                                EInformProgress progress){
+        Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress.toString());
 
-        return UserInformSummaryDto.fromEntityList(userInforms);
-    }
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);
+        List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(userInforms.getContent());
+
+        return PagingResponseDto.fromEntityAndPageInfo(userInformSummaryDtos, pageInfoDto);
+    } // 제보 리스트 조회
 }

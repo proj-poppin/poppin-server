@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.UserInformService;
+import com.poppin.poppinserver.type.EInformProgress;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +87,9 @@ public class UserInformController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-    public ResponseDto<?> readUserInformList(){
-        return ResponseDto.ok(userInformService.reatUserInformList());
+    public ResponseDto<?> readUserInformList(@RequestParam(value = "page") int page,
+                                             @RequestParam(value = "size") int size,
+                                             @RequestParam(value = "prog") EInformProgress progress){
+        return ResponseDto.ok(userInformService.reatUserInformList(page, size, progress));
     } // 제보 목록 조회
 }

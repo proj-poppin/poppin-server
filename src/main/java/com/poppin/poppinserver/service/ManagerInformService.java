@@ -1,12 +1,15 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.common.PageInfoDto;
+import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
 import com.poppin.poppinserver.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.userInform.response.UserInformSummaryDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -15,6 +18,8 @@ import com.poppin.poppinserver.type.EOperationStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -353,9 +358,12 @@ public class ManagerInformService {
     } // 운영자 제보 업로드 승인
 
     @Transactional
-    public List<ManagerInformSummaryDto> reatManagerInformList(){
-        List<ManagerInform> managerInforms = managerInformRepository.findAll();
+    public PagingResponseDto reatManagerInformList(int page, int size, EInformProgress progress){
+        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page,size), progress.toString());
 
-        return ManagerInformSummaryDto.fromEntityList(managerInforms);
-    }
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(managerInforms);
+        List<ManagerInformSummaryDto> userInformSummaryDtos = ManagerInformSummaryDto.fromEntityList(managerInforms.getContent());
+
+        return PagingResponseDto.fromEntityAndPageInfo(userInformSummaryDtos, pageInfoDto);
+    } // 제보 리스트 조회
 }
