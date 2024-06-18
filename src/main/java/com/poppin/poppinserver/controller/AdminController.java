@@ -42,7 +42,6 @@ public class AdminController {
     }
 
     /* 회원 상세 조회 */
-    /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}")
     public ResponseDto<?> readUserDetail(@PathVariable Long userId) {
         return ResponseDto.ok(adminService.readUserDetail(userId));
@@ -60,15 +59,34 @@ public class AdminController {
         return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
     }
 
+    /* 작성한 전체 후기 조회 */
+    @GetMapping("/users/{userId}/reviews")
+    public ResponseDto<?> readUserReviews(@PathVariable Long userId,
+                                          @RequestParam(required = false, defaultValue = "1") Long page,
+                                          @RequestParam(required = false, defaultValue = "44") Long size,
+                                          @RequestParam(value = "hidden") Boolean hidden) {
+        return ResponseDto.ok(adminService.readUserReviews(userId, page, size, hidden));
+    }
+
     /* 후기 신고 목록 조회 */
-//    @GetMapping("/reviews")
-//    public ResponseDto<?> readReviewReports() {
-//        return ResponseDto.ok(adminService.readReviewReports());
-//    }
+    @GetMapping("/reports/reviews")
+    public ResponseDto<?> readReviewReports(@RequestParam(required = false, defaultValue = "1") Long page,
+                                            @RequestParam(required = false, defaultValue = "19") Long size,
+                                            @RequestParam("isExec") Boolean isExec) {
+        return ResponseDto.ok(adminService.readReviewReports(page, size, isExec));
+    }
 
     /* 후기 신고 상세 조회 */
 
+
     /* 팝업 신고 목록 조회 */
+    @GetMapping("/reports/popups")
+    public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "1") Long page,
+                                           @RequestParam(required = false, defaultValue = "19") Long size,
+                                           @RequestParam("isExec") Boolean isExec) {
+        return ResponseDto.ok(adminService.readPopupReports(page, size, isExec));
+    }
 
     /* 팝업 신고 상세 조회 */
+
 }

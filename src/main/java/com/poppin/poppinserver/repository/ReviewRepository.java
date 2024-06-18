@@ -3,7 +3,9 @@ package com.poppin.poppinserver.repository;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Review;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -36,4 +38,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     void deleteAllByUserId(Long userId);
 
     void deleteAllByPopup(Popup popup);
+
+    @Query("SELECT r FROM Review r WHERE r.user.id = :userId ORDER BY r.createdAt DESC")
+    Page<Review> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
+    @Query("SELECT r FROM Review r WHERE r.user.id = :userId AND r.isVisible = :hidden ORDER BY r.createdAt DESC")
+    Page<Review> findByUserIdAndIsVisibleOrderByCreatedAtDesc(Long userId, Pageable pageable, @Param("hidden") Boolean hidden);
 }
