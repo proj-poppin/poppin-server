@@ -359,7 +359,7 @@ public class ManagerInformService {
 
     @Transactional
     public PagingResponseDto reatManagerInformList(int page, int size, EInformProgress progress){
-        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page,size), progress.toString());
+        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page,size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(managerInforms);
         List<ManagerInformSummaryDto> userInformSummaryDtos = ManagerInformSummaryDto.fromEntityList(managerInforms.getContent());

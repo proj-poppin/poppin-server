@@ -343,7 +343,7 @@ public class UserInformService {
     public PagingResponseDto reatUserInformList(int page,
                                                 int size,
                                                 EInformProgress progress){
-        Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress.toString());
+        Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);
         List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(userInforms.getContent());

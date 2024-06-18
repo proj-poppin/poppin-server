@@ -36,6 +36,7 @@ public class UserInform {
     private String contactLink; // 정보를 접한 사이트 주소
 
     @Column(name = "progress")
+    @Enumerated(EnumType.STRING)
     private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
     @Column(name = "executed_at")

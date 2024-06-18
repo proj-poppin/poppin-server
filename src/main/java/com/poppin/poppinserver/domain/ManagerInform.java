@@ -39,6 +39,7 @@ public class ManagerInform {
     private Popup popupId; // 팝업 정보
 
     @Column(name = "progress")
+    @Enumerated(EnumType.STRING)
     private EInformProgress progress; // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 
     @Column(name = "executed_at")
