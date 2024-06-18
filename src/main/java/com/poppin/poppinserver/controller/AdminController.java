@@ -63,8 +63,9 @@ public class AdminController {
     /* 후기 신고 목록 조회 */
     @GetMapping("/reports/reviews")
     public ResponseDto<?> readReviewReports(@RequestParam(required = false, defaultValue = "1") Long page,
-                                            @RequestParam(required = false, defaultValue = "19") Long size) {
-        return ResponseDto.ok(adminService.readReviewReports(page, size));
+                                            @RequestParam(required = false, defaultValue = "19") Long size,
+                                            @RequestParam("isExec") Boolean isExec) {
+        return ResponseDto.ok(adminService.readReviewReports(page, size, isExec));
     }
 
     /* 후기 신고 상세 조회 */
@@ -72,8 +73,9 @@ public class AdminController {
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
     public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "1") Long page,
-                                           @RequestParam(required = false, defaultValue = "19") Long size) {
-        return ResponseDto.ok(adminService.readPopupReports(page, size));
+                                           @RequestParam(required = false, defaultValue = "19") Long size,
+                                           @RequestParam("isExec") Boolean isExec) {
+        return ResponseDto.ok(adminService.readPopupReports(page, size, isExec));
     }
 
     /* 팝업 신고 상세 조회 */

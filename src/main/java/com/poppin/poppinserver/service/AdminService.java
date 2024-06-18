@@ -146,9 +146,9 @@ public class AdminService {
                 .build();
     }
 
-    public List<ReportedReviewListResponseDto> readReviewReports(Long page, Long size) {
+    public List<ReportedReviewListResponseDto> readReviewReports(Long page, Long size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
-        Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable);
+        Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
                 .map(reportReview -> ReportedReviewListResponseDto.builder()
@@ -163,9 +163,9 @@ public class AdminService {
         return reportedReviewListResponseDtos;
     }
 
-    public List<ReportedPopupListResponseDto> readPopupReports(Long page, Long size) {
+    public List<ReportedPopupListResponseDto> readPopupReports(Long page, Long size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
-        Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable);
+        Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedPopupListResponseDto> reportedPopupListResponseDtos = reportPopups.getContent().stream()
                 .map(reportPopup -> ReportedPopupListResponseDto.builder()
