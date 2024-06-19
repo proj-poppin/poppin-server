@@ -36,8 +36,8 @@ public class AdminController {
 
     /* 회원 관리 목록 조회 */
     @GetMapping("/users")
-    public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "1") Long page,
-                                    @RequestParam(required = false, defaultValue = "44") Long size) {
+    public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "1") int page,
+                                    @RequestParam(required = false, defaultValue = "44") int size) {
         return ResponseDto.ok(adminService.readUsers(page, size));
     }
 
@@ -54,24 +54,24 @@ public class AdminController {
     }
 
     @GetMapping("/users/special-care")
-    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "1") Long page,
-                                               @RequestParam(required = false, defaultValue = "44") Long size) {
+    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "1") int page,
+                                               @RequestParam(required = false, defaultValue = "44") int size) {
         return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
     }
 
     /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}/reviews")
     public ResponseDto<?> readUserReviews(@PathVariable Long userId,
-                                          @RequestParam(required = false, defaultValue = "1") Long page,
-                                          @RequestParam(required = false, defaultValue = "44") Long size,
+                                          @RequestParam(required = false, defaultValue = "1") int page,
+                                          @RequestParam(required = false, defaultValue = "5") int size,
                                           @RequestParam(value = "hidden") Boolean hidden) {
         return ResponseDto.ok(adminService.readUserReviews(userId, page, size, hidden));
     }
 
     /* 후기 신고 목록 조회 */
     @GetMapping("/reports/reviews")
-    public ResponseDto<?> readReviewReports(@RequestParam(required = false, defaultValue = "1") Long page,
-                                            @RequestParam(required = false, defaultValue = "19") Long size,
+    public ResponseDto<?> readReviewReports(@RequestParam(required = false, defaultValue = "1") int page,
+                                            @RequestParam(required = false, defaultValue = "19") int size,
                                             @RequestParam("isExec") Boolean isExec) {
         return ResponseDto.ok(adminService.readReviewReports(page, size, isExec));
     }
@@ -84,8 +84,8 @@ public class AdminController {
 
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
-    public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "1") Long page,
-                                           @RequestParam(required = false, defaultValue = "19") Long size,
+    public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "1") int page,
+                                           @RequestParam(required = false, defaultValue = "19") int size,
                                            @RequestParam("isExec") Boolean isExec) {
         return ResponseDto.ok(adminService.readPopupReports(page, size, isExec));
     }

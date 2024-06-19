@@ -77,8 +77,8 @@ public class AdminService {
         freqQuestionRepository.delete(freqQuestion);
     }
 
-    public UserListDto readUsers(Long page, Long size) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public UserListDto readUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
@@ -112,8 +112,8 @@ public class AdminService {
                 .build();
     }
 
-    public PagingResponseDto readUserReviews(Long userId, Long page, Long size, Boolean hidden) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readUserReviews(Long userId, int page, int size, Boolean hidden) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviewPage;
         if (hidden) {
             reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable, false);    // visible = false인 후기만
@@ -162,8 +162,8 @@ public class AdminService {
                 .build();
     }
 
-    public UserListDto readSpecialCareUsers(Long page, Long size) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public UserListDto readSpecialCareUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
@@ -181,8 +181,8 @@ public class AdminService {
                 .build();
     }
 
-    public PagingResponseDto readReviewReports(Long page, Long size, Boolean isExec) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readReviewReports(int page, int size, Boolean isExec) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
@@ -199,8 +199,8 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedReviewListResponseDtos, pageInfoDto);
     }
 
-    public PagingResponseDto readPopupReports(Long page, Long size, Boolean isExec) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readPopupReports(int page, int size, Boolean isExec) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedPopupListResponseDto> reportedPopupListResponseDtos = reportPopups.getContent().stream()
