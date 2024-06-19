@@ -13,6 +13,7 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.ManagerInformService;
 import com.poppin.poppinserver.service.UserInformService;
 import com.poppin.poppinserver.type.EAvailableAge;
+import com.poppin.poppinserver.type.EInformProgress;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +120,9 @@ public class ManagerInformController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-    public ResponseDto<?> readManagerInformList(){
-        return ResponseDto.ok(managerInformService.reatManagerInformList());
+    public ResponseDto<?> readManagerInformList(@RequestParam(value = "page") int page,
+                                                @RequestParam(value = "size") int size,
+                                                @RequestParam(value = "prog") EInformProgress progress){
+        return ResponseDto.ok(managerInformService.reatManagerInformList(page, size, progress));
     }
 }

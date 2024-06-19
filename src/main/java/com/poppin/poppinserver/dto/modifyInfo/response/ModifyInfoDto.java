@@ -2,6 +2,7 @@ package com.poppin.poppinserver.dto.modifyInfo.response;
 
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.popup.response.PopupDto;
+import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,6 +11,9 @@ import java.util.List;
 public record ModifyInfoDto(
         Long id,
         Long userId, // 작성자 id
+        String userImageUrl, // 작성자 프로필 이미지
+        String email, // 작성자 이메일
+        String nickname, // 작성자 닉네임
         PopupDto popup, // 팝업
         String createdAt, // 작성 일자
         String content, // 수정 요청 텍스트
@@ -26,6 +30,9 @@ public record ModifyInfoDto(
         return ModifyInfoDto.builder()
                 .id(modifyInfo.getId())
                 .userId(modifyInfo.getId())
+                .userImageUrl(modifyInfo.getUserId().getProfileImageUrl())
+                .email(modifyInfo.getUserId().getEmail())
+                .nickname(modifyInfo.getUserId().getNickname())
                 .popup(popupDto)
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
