@@ -5,8 +5,7 @@ import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
-import com.poppin.poppinserver.dto.report.response.ReportedPopupListResponseDto;
-import com.poppin.poppinserver.dto.report.response.ReportedReviewListResponseDto;
+import com.poppin.poppinserver.dto.report.response.*;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.dto.user.response.UserListDto;
@@ -38,6 +37,7 @@ public class AdminService {
     private final ReportPopupRepository reportPopupRepository;
     private final VisitRepository visitRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final PopupRepository popupRepository;
 
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
@@ -77,8 +77,8 @@ public class AdminService {
         freqQuestionRepository.delete(freqQuestion);
     }
 
-    public UserListDto readUsers(Long page, Long size) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public UserListDto readUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
@@ -90,6 +90,7 @@ public class AdminService {
                         .build())
                 .collect(Collectors.toList());
         Long userCnt = userPage.getTotalElements();
+
         return UserListDto.builder()
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
@@ -112,8 +113,8 @@ public class AdminService {
                 .build();
     }
 
-    public PagingResponseDto readUserReviews(Long userId, Long page, Long size, Boolean hidden) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readUserReviews(Long userId, int page, int size, Boolean hidden) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviewPage;
         if (hidden) {
             reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable, false);    // visible = false인 후기만
@@ -162,8 +163,8 @@ public class AdminService {
                 .build();
     }
 
-    public UserListDto readSpecialCareUsers(Long page, Long size) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public UserListDto readSpecialCareUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
@@ -181,8 +182,8 @@ public class AdminService {
                 .build();
     }
 
-    public PagingResponseDto readReviewReports(Long page, Long size, Boolean isExec) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readReviewReports(int page, int size, Boolean isExec) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
@@ -199,8 +200,8 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedReviewListResponseDtos, pageInfoDto);
     }
 
-    public PagingResponseDto readPopupReports(Long page, Long size, Boolean isExec) {
-        Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
+    public PagingResponseDto readPopupReports(int page, int size, Boolean isExec) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
         List<ReportedPopupListResponseDto> reportedPopupListResponseDtos = reportPopups.getContent().stream()
@@ -215,5 +216,75 @@ public class AdminService {
                 .collect(Collectors.toList());
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(reportPopups);
         return PagingResponseDto.fromEntityAndPageInfo(reportedPopupListResponseDtos, pageInfoDto);
+    }
+
+    public ReportedPopupInfoDto readPopupReportDetail(Long popupId) {
+        ReportPopup reportPopup = reportPopupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
+                .popupId(reportPopup.getPopupId().getId())
+                .popupName(reportPopup.getPopupId().getName())
+                .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
+                .address(popup.getAddress())
+                .addressDetail(popup.getAddressDetail())
+                .entranceFee(popup.getEntranceFee())
+                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
+                .parkingAvailable(popup.getParkingAvailable())
+                .resvRequired(popup.getResvRequired())
+                .build();
+        ReportContentDto reportContentDto = ReportContentDto.builder()
+                .reportId(reportPopup.getId())
+                .reporter(reportPopup.getReporterId().getNickname())
+                .reportedAt(reportPopup.getReportedAt().toString())
+                .content(reportPopup.getReportContent())
+                .build();
+        return ReportedPopupInfoDto.builder()
+                .reportedPopupDetailDto(reportedPopupDetailDto)
+                .reportContentDto(reportContentDto)
+                .build();
+    }
+
+    public ReportedReviewInfoDto readReviewReportDetail(Long reviewId) {
+        ReportReview reportReview = reportReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Popup popup = popupRepository.findById(review.getPopup().getId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        ReportedReviewDetailDto reportedReviewDetailDto = ReportedReviewDetailDto.builder()
+                .reviewId(review.getId())
+                .reviewWriter(review.getUser().getNickname())
+                .reviewCnt(review.getUser().getReviewCnt())
+                .reviewContent(review.getText())
+                .reviewCreatedAt(review.getCreatedAt().toString())
+                .isCertificated(review.getIsCertificated())
+                .imageUrl(reviewImageRepository.findUrlAllByReviewId(review.getId()))
+                .build();
+        ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
+                .popupId(reportReview.getReviewId().getPopup().getId())
+                .popupName(reportReview.getReviewId().getPopup().getName())
+                .posterUrl(popup.getPosterUrl())
+                .homepageLink(popup.getHomepageLink())
+                .address(popup.getAddress())
+                .addressDetail(popup.getAddressDetail())
+                .entranceFee(popup.getEntranceFee())
+                .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
+                .parkingAvailable(popup.getParkingAvailable())
+                .resvRequired(popup.getResvRequired())
+                .build();
+        ReportContentDto reportContentDto = ReportContentDto.builder()
+                .reportId(reportReview.getId())
+                .reporter(reportReview.getReporterId().getNickname())
+                .reportedAt(reportReview.getReportedAt().toString())
+                .content(reportReview.getReportContent())
+                .build();
+        return ReportedReviewInfoDto.builder()
+                .reportedPopupDetailDto(reportedPopupDetailDto)
+                .reportedReviewDetailDto(reportedReviewDetailDto)
+                .reportContentDto(reportContentDto)
+                .build();
     }
 }

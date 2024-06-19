@@ -12,11 +12,7 @@ public record ReportedPopupDetailDto(
         String addressDetail,
         String entranceFee,
         String availableAge,
-        Boolean parkingAvailable,
-        Boolean resvRequired,
-        // 위에는 팝업에 관한 정보, 아래는 신고에 관한 정보
-        String reporter,
-        String reportedAt,
-        String content
+        Boolean parkingAvailable,   // 주차 가능 여부 -> String or Boolean?
+        Boolean resvRequired
 ) {
 }
