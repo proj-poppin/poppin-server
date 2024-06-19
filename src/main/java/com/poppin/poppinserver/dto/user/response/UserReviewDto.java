@@ -12,6 +12,6 @@ public record UserReviewDto(
         String createdAt,
         String content,
         List<String> imageUrl, /* 후기 사진 리스트 */
-        Boolean hiddenReview
+        Boolean visible
 ) {
 }
