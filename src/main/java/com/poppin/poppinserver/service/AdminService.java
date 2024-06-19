@@ -297,4 +297,14 @@ public class AdminService {
         reportPopupRepository.save(reportPopup);
         return content;
     }
+
+    public String processReviewReport(Long adminId, Long reviewId, String content) {    // 리뷰 신고 처리
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        ReportReview reportReview = reportReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        reportReview.execute(true, admin, LocalDateTime.now(), content);
+        reportReviewRepository.save(reportReview);
+        return content;
+    }
 }

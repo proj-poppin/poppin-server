@@ -83,7 +83,12 @@ public class AdminController {
     }
 
     /* 후기 신고 처리 생성 */
-
+    @PostMapping("/reports/reviews/{reviewId}")
+    public ResponseDto<?> processReviewReport(@UserId Long adminId,
+                                             @PathVariable Long reviewId,
+                                             @RequestBody String content) {
+        return ResponseDto.created(adminService.processReviewReport(adminId, reviewId, content));
+    }
 
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
