@@ -287,4 +287,24 @@ public class AdminService {
                 .reportContentDto(reportContentDto)
                 .build();
     }
+
+    public String processPopupReport(Long adminId, Long popupId, String content) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        ReportPopup reportPopup = reportPopupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        reportPopup.execute(true, admin, LocalDateTime.now(), content);
+        reportPopupRepository.save(reportPopup);
+        return content;
+    }
+
+    public String processReviewReport(Long adminId, Long reviewId, String content) {    // 리뷰 신고 처리
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        ReportReview reportReview = reportReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        reportReview.execute(true, admin, LocalDateTime.now(), content);
+        reportReviewRepository.save(reportReview);
+        return content;
+    }
 }

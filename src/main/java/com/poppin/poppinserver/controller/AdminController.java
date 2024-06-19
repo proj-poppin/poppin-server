@@ -82,6 +82,14 @@ public class AdminController {
         return ResponseDto.ok(adminService.readReviewReportDetail(reviewId));
     }
 
+    /* 후기 신고 처리 생성 */
+    @PostMapping("/reports/reviews/{reviewId}")
+    public ResponseDto<?> processReviewReport(@UserId Long adminId,
+                                             @PathVariable Long reviewId,
+                                             @RequestBody String content) {
+        return ResponseDto.created(adminService.processReviewReport(adminId, reviewId, content));
+    }
+
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
     public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "0") int page,
@@ -95,5 +103,14 @@ public class AdminController {
     public ResponseDto<?> readPopupReportDetail(@PathVariable Long popupId) {
         return ResponseDto.ok(adminService.readPopupReportDetail(popupId));
     }
+
+    /* 팝업 신고 처리 생성 */
+    @PostMapping("/reports/popups/{popupId}")
+    public ResponseDto<?> processPopupReport(@UserId Long adminId,
+                                             @PathVariable Long popupId,
+                                             @RequestBody String content) {
+        return ResponseDto.created(adminService.processPopupReport(adminId, popupId, content));
+    }
+
 
 }
