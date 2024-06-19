@@ -13,6 +13,7 @@ import com.poppin.poppinserver.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -182,6 +183,7 @@ public class AdminService {
                 .build();
     }
 
+    @Transactional
     public PagingResponseDto readReviewReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
@@ -200,6 +202,7 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedReviewListResponseDtos, pageInfoDto);
     }
 
+    @Transactional
     public PagingResponseDto readPopupReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
@@ -218,6 +221,7 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedPopupListResponseDtos, pageInfoDto);
     }
 
+    @Transactional
     public ReportedPopupInfoDto readPopupReportDetail(Long popupId) {
         ReportPopup reportPopup = reportPopupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -247,6 +251,7 @@ public class AdminService {
                 .build();
     }
 
+    @Transactional
     public ReportedReviewInfoDto readReviewReportDetail(Long reviewId) {
         ReportReview reportReview = reportReviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
