@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.common.PageInfoDto;
+import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
 import com.poppin.poppinserver.dto.report.response.ReportedPopupListResponseDto;
@@ -110,13 +112,13 @@ public class AdminService {
                 .build();
     }
 
-    public List<UserReviewDto> readUserReviews(Long userId, Long page, Long size, Boolean hidden) {
+    public PagingResponseDto readUserReviews(Long userId, Long page, Long size, Boolean hidden) {
         Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
         Page<Review> reviewPage;
         if (hidden) {
-            reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable, true);
+            reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable, false);    // visible = false인 후기만
         } else {
-            reviewPage = reviewRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            reviewPage = reviewRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);   // 모든 후기
         }
 
         List<UserReviewDto> userReviewDtos = reviewPage.getContent().stream()
@@ -129,14 +131,17 @@ public class AdminService {
                             .popupName(userReview.getPopup().getName())
                             .createdAt(userReview.getCreatedAt().toString())
                             .content(userReview.getText())
-                            .hiddenReview(userReview.getIsVisible())
+                            .visible(userReview.getIsVisible())
                             .imageUrl(reviewImageListUrl)
                             .visitedAt(visitDate.isPresent() ? visitDate.get().getCreatedAt().toString() : "")
                             .build();
                     return userReviewDto;
                 })
                 .collect(Collectors.toList());
-        return userReviewDtos;
+
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(reviewPage);
+
+        return PagingResponseDto.fromEntityAndPageInfo(userReviewDtos, pageInfoDto);
     }
 
     public UserListDto searchUsers(String text) {
@@ -176,7 +181,7 @@ public class AdminService {
                 .build();
     }
 
-    public List<ReportedReviewListResponseDto> readReviewReports(Long page, Long size, Boolean isExec) {
+    public PagingResponseDto readReviewReports(Long page, Long size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
@@ -190,10 +195,11 @@ public class AdminService {
                         .reportedAt(reportReview.getReportedAt().toString())
                         .build())
                 .collect(Collectors.toList());
-        return reportedReviewListResponseDtos;
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(reportReviews);
+        return PagingResponseDto.fromEntityAndPageInfo(reportedReviewListResponseDtos, pageInfoDto);
     }
 
-    public List<ReportedPopupListResponseDto> readPopupReports(Long page, Long size, Boolean isExec) {
+    public PagingResponseDto readPopupReports(Long page, Long size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page.intValue() - 1, size.intValue());
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
@@ -207,6 +213,7 @@ public class AdminService {
                         .reportedAt(reportPopup.getReportedAt().toString())
                         .build())
                 .collect(Collectors.toList());
-        return reportedPopupListResponseDtos;
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(reportPopups);
+        return PagingResponseDto.fromEntityAndPageInfo(reportedPopupListResponseDtos, pageInfoDto);
     }
 }

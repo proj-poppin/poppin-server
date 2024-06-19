@@ -77,7 +77,10 @@ public class AdminController {
     }
 
     /* 후기 신고 상세 조회 */
-
+//    @GetMapping("/reports/reviews/{reviewId}")
+//    public ResponseDto<?> readReviewReportDetail(@PathVariable Long reviewId) {
+//        return ResponseDto.ok(adminService.readReviewReportDetail(reviewId));
+//    }
 
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
@@ -87,6 +90,10 @@ public class AdminController {
         return ResponseDto.ok(adminService.readPopupReports(page, size, isExec));
     }
 
-    /* 팝업 신고 상세 조회 */
+//    /* 팝업 신고 상세 조회 */
+//    @GetMapping("/reports/popups/{popupId}")
+//    public ResponseDto<?> readPopupReportDetail(@PathVariable Long popupId) {
+//        return ResponseDto.ok(adminService.readPopupReportDetail(popupId));
+//    }
 
 }
