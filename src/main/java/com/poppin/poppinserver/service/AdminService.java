@@ -287,4 +287,14 @@ public class AdminService {
                 .reportContentDto(reportContentDto)
                 .build();
     }
+
+    public String processPopupReport(Long adminId, Long popupId, String content) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        ReportPopup reportPopup = reportPopupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        reportPopup.execute(true, admin, LocalDateTime.now(), content);
+        reportPopupRepository.save(reportPopup);
+        return content;
+    }
 }
