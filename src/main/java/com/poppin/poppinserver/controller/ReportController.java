@@ -30,7 +30,7 @@ public class ReportController {
                                              @PathVariable Long reviewId,
                                              @RequestBody CreateReviewReportDto createReviewReportDto){
         reportService.createReviewReport(userId, reviewId, createReviewReportDto);
-        return ResponseDto.ok("후기 신고가 접수되었습니다.");
+        return ResponseDto.created("후기 신고가 접수되었습니다.");
     }
 
     /* 유저 팝업 신고 */
@@ -39,7 +39,7 @@ public class ReportController {
                                             @PathVariable Long popupId,
                                             @RequestBody CreatePopupReportDto createPopupReportDto){
         reportService.createPopupReport(userId, popupId, createPopupReportDto);
-        return ResponseDto.ok("팝업 신고가 접수되었습니다.");
+        return ResponseDto.created("팝업 신고가 접수되었습니다.");
     }
 
 }
