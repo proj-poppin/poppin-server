@@ -61,7 +61,9 @@ public class ReviewService {
         String imageStaus = "0";
         log.info("imageStatus : " + imageStaus);
 
-        // 이미지 없을 시 넘어감
+        // 클라이언트 req
+        // 이미지 없을 때 -> "empty"명인 빈 파일 전송
+        // 이미지 있을 때 -> 이미지 파일 전송
         if (!images.get(0).getOriginalFilename().equals("empty")) {
 
             log.info("images 객체 : " + images);
@@ -117,19 +119,19 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        String imageStaus = "0";
-        log.info("imageStatus : " + imageStaus);
+        String imageStatus = "0";
 
-        // 이미지 없을 시 넘어감
+        // 클라이언트 req
+        // 이미지 없을 때 -> "empty"명인 빈 파일 전송
+        // 이미지 있을 때 -> 이미지 파일 전송
         if (!images.get(0).getOriginalFilename().equals("empty")) {
 
-            log.info("images 객체 : " + images);
-            log.info("images 사이즈 : " + images.size());
-            log.info("images 첫번째 요소 파일 명: " + images.get(0).getOriginalFilename());
+            log.info("images Entity : " + images);
+            log.info("images Size : " + images.size());
+            log.info("images first img name: " + images.get(0).getOriginalFilename());
 
-            imageStaus = "1"; // 이미지가 null 이 아닐때
+            imageStatus = "1"; // 이미지가 null 이 아닐때
 
-            log.info("이미지 파일명 : " + images.get(0).getOriginalFilename());
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
 
@@ -144,7 +146,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-        log.info("image Status : " + imageStaus);
+        log.info("image Status : " + imageStatus);
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
                 , popup
