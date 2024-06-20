@@ -1,10 +1,12 @@
 package com.poppin.poppinserver.service;
 
+import com.poppin.poppinserver.domain.AlarmSetting;
 import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
 import com.poppin.poppinserver.dto.notification.response.TokenResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 
 import jakarta.transaction.Transactional;
@@ -22,6 +24,7 @@ import java.time.LocalDateTime;
 public class NotificationService {
 
     private final NotificationTokenRepository notificationTokenRepository;
+    private final AlarmSettingRepository alarmSettingRepository;
 
 
     /* 알림 동의 - 공지사항 , 팝업은 따로 저장 해야 함 */
@@ -33,8 +36,11 @@ public class NotificationService {
             NotificationToken isToken = notificationTokenRepository.findByToken(tokenRequestDto.token());
             if (isToken!=null) throw new CommonException(ErrorCode.DUPLICATED_TOKEN);
             else{
+                // 알림 전부 "1"로 저장
+                AlarmSetting alarmSetting = new AlarmSetting(tokenRequestDto.token(), "1", "1", "1","1","1", "1");
+                alarmSettingRepository.save(alarmSetting);
+
                 // 토큰 저장
-                log.info("디바이스 정보 : " + tokenRequestDto.device());
                 NotificationToken notificationToken = new NotificationToken(
                         tokenRequestDto.token(),
                         LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -138,9 +139,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p " +
             "JOIN Interest i ON p.id = i.popup.id " +
             "WHERE p.openDate = :date " +
-            "AND (p.openTime <= :timeNow AND CONCAT(p.openDate, ' ', p.openTime) >= :timeBefore) " +
+            "AND p.openTime <= :timeNow " +
+            "AND (p.openDate > :date OR (p.openDate = :date AND p.openTime >= :timeBefore)) " +
             "ORDER BY p.createdAt DESC")
-    List<Popup> findOpenPopup(@Param("date") LocalDate date, @Param("timeNow") String timeNow, @Param("timeBefore") String timeBefore);
+    List<Popup> findOpenPopup(@Param("date") LocalDate date,
+                              @Param("timeNow") LocalTime timeNow,
+                              @Param("timeBefore") LocalTime timeBefore);
 
     @Query("SELECT p FROM Popup p " +
             "JOIN Interest i ON p.id = i.popup.id " +

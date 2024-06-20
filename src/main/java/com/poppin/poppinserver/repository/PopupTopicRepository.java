@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 
 
 @Repository
@@ -16,5 +17,6 @@ public interface PopupTopicRepository extends JpaRepository<PopupTopic, Long> {
     @Query("SELECT PT FROM PopupTopic PT WHERE PT.tokenId = :token AND PT.topicCode = :code AND PT.popup = :popupId")
     PopupTopic findByTokenAndTopic(NotificationToken token, @Param("code") String code, @Param("popupId") Popup popupId);
 
-
+    @Query("SELECT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
+    List<String> findTokenIdByTopicAndType(String code, @Param("popupId")Long popupId);
 }
