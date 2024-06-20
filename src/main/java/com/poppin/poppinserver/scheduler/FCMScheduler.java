@@ -33,7 +33,7 @@ public class FCMScheduler {
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */01 * * * *")
     public void reopenPopup(){
 
         /**
@@ -52,7 +52,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */01 * * * *")
     public void magamPopup(){
         /**
          * 마감 팝업 알림
@@ -70,7 +70,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */01 * * * *")
     public void openPopup() {
         /**
          * 오픈 팝업 알림
@@ -82,8 +82,11 @@ public class FCMScheduler {
         LocalTime timeBefore = LocalTime.parse(LocalTime.now().minusMinutes(5).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 
         log.info("- - - - - - - - - - - - - - - - - - - - - 오픈팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("date : " + date);
+        log.info("timeNow : " + timeNow);
+        log.info("timeBefore : " + timeBefore);
 
-        List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
+          List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
 
         if (openPopup.isEmpty())log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
         else {
@@ -117,7 +120,7 @@ public class FCMScheduler {
      * 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
      *
      */
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */01 * * * *")
     public void hoogi() {
         LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
 
@@ -140,6 +143,7 @@ public class FCMScheduler {
     private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
 
         List<FCMRequestDto> fcmRequestDtoList = null;
+
         for (Popup popup : popupList){
             Long popupId = popup.getId();
             List<String> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));

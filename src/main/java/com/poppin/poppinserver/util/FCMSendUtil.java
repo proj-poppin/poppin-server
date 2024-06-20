@@ -67,6 +67,7 @@ public class FCMSendUtil {
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfig)
                     .setApnsConfig(apnsConfig)
+                    .putData("popupId" , fcmRequestDto.popupId().toString())
                     .build();
 
             log.info("TOPIC message sending \n");
