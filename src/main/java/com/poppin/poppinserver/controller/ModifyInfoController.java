@@ -28,12 +28,15 @@ public class ModifyInfoController {
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid CreateModifyInfoDto createModifyInfoDto,
+                                           @RequestParam(value = "popupId") Long popupId,
+                                           @RequestParam(value = "content") String content,
                                            @UserId Long userId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
+
+        CreateModifyInfoDto createModifyInfoDto = new CreateModifyInfoDto(popupId, content);
 
         return ResponseDto.ok(modifyInfoService.createModifyInfo(createModifyInfoDto, images, userId));
     } // 요청 생성
