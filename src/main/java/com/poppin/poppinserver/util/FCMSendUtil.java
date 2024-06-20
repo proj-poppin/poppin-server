@@ -1,0 +1,117 @@
+package com.poppin.poppinserver.util;
+
+import com.google.firebase.messaging.*;
+
+
+import com.poppin.poppinserver.config.APNsConfiguration;
+import com.poppin.poppinserver.config.AndroidConfiguration;
+import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
+
+import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.service.AlarmService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@Slf4j
+@Configuration
+@RequiredArgsConstructor
+public class FCMSendUtil {
+
+    private final NotificationTokenRepository notificationTokenRepository;
+    private final FirebaseMessaging firebaseMessaging;
+    private final APNsConfiguration apnsConfiguration;
+    private final AndroidConfiguration androidConfiguration;
+
+    private final AlarmService alarmService;
+    // aos
+    AndroidConfig androidConfig = androidConfiguration.androidConfig();
+    // ios
+    ApnsConfig apnsConfig = apnsConfiguration.apnsConfig();
+
+
+    /**
+     * 안드로이드 FCM Topic 앱 푸시 알림 메서드
+     * @param fcmRequestDtoList FCM 주제 발송 객체
+     * @throws FirebaseMessagingException FCM 오류
+     */
+    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
+        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
+
+            Message message = null;
+            NotificationToken notificationToken = notificationTokenRepository.findByToken(fcmRequestDto.token());
+
+            message = Message.builder()
+                    .setNotification(Notification.builder()
+                            .setTitle(fcmRequestDto.title())
+                            .setBody(fcmRequestDto.body())
+                            .build())
+                    .setToken(notificationToken.getToken())
+                    .setTopic(String.valueOf(fcmRequestDto.topic()))
+                    .setAndroidConfig(androidConfig)
+                    .setApnsConfig(apnsConfig)
+                    .build();
+
+            log.info("TOPIC message sending \n");
+            try {
+
+                String result = firebaseMessaging.send(message);
+                log.debug( " Successfully sent message: " + result);
+
+                // 알림 키워드 등록
+                String flag = alarmService.insertPopupAlarmKeyword(fcmRequestDto);
+                if (flag.equals("1")){
+                    log.info(fcmRequestDto.token()+" alarm success ");
+                }else{
+                    log.error(fcmRequestDto.token() + " alarm fail");
+                }
+            } catch (FirebaseMessagingException e) {
+                log.error(" Failed to send message: " + e.getMessage());
+            }
+        }
+
+    }
+
+    /**
+     * 여러 기기 동시 전송
+     * @param fcmRequestDtoList 멀티 FCM 발송 객체
+     * @throws FirebaseMessagingException 발송 오류
+     */
+    public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
+        List<String> tokenList = null;
+        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
+            tokenList = IntStream.rangeClosed(1, 1000)
+                    .mapToObj(index -> fcmRequestDto.token())
+                    .collect(Collectors.toList());
+        }
+        MulticastMessage message = MulticastMessage.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(fcmRequestDtoList.get(0).title())
+                        .setBody(fcmRequestDtoList.get(0).body())
+                        .build()
+                )
+                .addAllTokens(tokenList)
+                .build();
+        if (message != null){
+            BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
+
+            if (response.getFailureCount() > 0) {
+                List<SendResponse> responses = response.getResponses();
+                List<String> failedTokens = new ArrayList<>();
+                for (int i = 0; i < responses.size(); i++) {
+                    if (!responses.get(i).isSuccessful()) {
+                        failedTokens.add(tokenList.get(i));
+                    }
+                }
+                log.error(" List of tokens that caused failures: " + failedTokens);
+            }else log.info(" List of tokens send messages SUCCESSFULLY");
+        }
+    }
+
+}

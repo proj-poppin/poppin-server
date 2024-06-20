@@ -7,7 +7,7 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
-import com.poppin.poppinserver.util.push.android.FCMSubscribeUtil;
+import com.poppin.poppinserver.util.FCMSubscribeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
