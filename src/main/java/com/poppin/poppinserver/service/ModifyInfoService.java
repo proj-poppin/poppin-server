@@ -143,9 +143,19 @@ public class ModifyInfoService {
                 .build();
         modifyInformRepository.save(modifyInfo);
 
-        // 정보수정요청 이미지 처리 및 저장
+        // 정보수정요청 이미지 저장
+        String imageStatus = "0";
+
         List<String> fileUrls = new ArrayList<>();
-        if(images.get(0).getOriginalFilename() != ""){ // 이미지가 비었을 시 넘어감
+        if (!images.get(0).getOriginalFilename().equals("empty")) {
+
+            log.info("images Entity : " + images);
+            log.info("images Size : " + images.size());
+            log.info("images first img name: " + images.get(0).getOriginalFilename());
+
+            imageStatus = "1"; // 이미지가 null 이 아닐때
+
+            // 리뷰 이미지 처리 및 저장
             fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
 
             List<ModifyImages> modifyImagesList = new ArrayList<>();
@@ -158,7 +168,6 @@ public class ModifyInfoService {
             }
             modifyImageReposiroty.saveAll(modifyImagesList);
         }
-
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 요청 생성
