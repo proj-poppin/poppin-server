@@ -16,9 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -59,8 +57,11 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        LocalDate now = LocalDate.now();
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
+        LocalDate now = zonedDateTime.toLocalDate();
+        LocalDate tomorrow = zonedDateTime.toLocalDate().plusDays(1);
 
         log.info("- - - - - - - - - - - - - - - - - - - - - 마감팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
         List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow); // null, 1, many
@@ -77,10 +78,14 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈 시간이 현재 시간보다 같거나 클 때 )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        LocalDate date = LocalDate.now();
-        LocalTime timeNow = LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        LocalTime timeBefore = LocalTime.parse(LocalTime.now().minusMinutes(5).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        // 한국 시간대 (KST) 설정
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
+        // 한국 시간 기준 현재 날짜와 시간
+        LocalDate date = zonedDateTime.toLocalDate();
+        LocalTime timeNow = zonedDateTime.toLocalTime();
+        LocalTime timeBefore = timeNow.minusMinutes(5);
         log.info("- - - - - - - - - - - - - - - - - - - - - 오픈팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
         log.info("date : " + date);
         log.info("timeNow : " + timeNow);
