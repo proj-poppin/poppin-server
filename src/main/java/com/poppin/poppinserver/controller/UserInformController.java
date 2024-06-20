@@ -28,7 +28,7 @@ public class UserInformController {
     @PostMapping(value = "/report", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
                                            @RequestParam(value = "name") String name,
-                                           @RequestParam(value = "contactLink") String contactLink,
+                                           @RequestParam(value = "contactLink", required = false) String contactLink,
                                            @RequestParam(value = "fashionBeauty") Boolean fashionBeauty,
                                            @RequestParam(value = "characters") Boolean characters,
                                            @RequestParam(value = "foodBeverage") Boolean foodBeverage,
