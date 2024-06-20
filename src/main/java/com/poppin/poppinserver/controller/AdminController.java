@@ -77,17 +77,17 @@ public class AdminController {
     }
 
     /* 후기 신고 상세 조회 */
-    @GetMapping("/reports/reviews/{reviewId}")
-    public ResponseDto<?> readReviewReportDetail(@PathVariable Long reviewId) {
-        return ResponseDto.ok(adminService.readReviewReportDetail(reviewId));
+    @GetMapping("/reports/reviews/{reportedReviewId}")
+    public ResponseDto<?> readReviewReportDetail(@PathVariable Long reportedReviewId) {
+        return ResponseDto.ok(adminService.readReviewReportDetail(reportedReviewId));
     }
 
     /* 후기 신고 처리 생성 */
-    @PostMapping("/reports/reviews/{reviewId}")
+    @PostMapping("/reports/reviews/{reportedReviewId}")
     public ResponseDto<?> processReviewReport(@UserId Long adminId,
-                                             @PathVariable Long reviewId,
+                                             @PathVariable Long reportedReviewId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processReviewReport(adminId, reviewId, content));
+        return ResponseDto.created(adminService.processReviewReport(adminId, reportedReviewId, content));
     }
 
     /* 팝업 신고 목록 조회 */
@@ -99,17 +99,17 @@ public class AdminController {
     }
 
     /* 팝업 신고 상세 조회 */
-    @GetMapping("/reports/popups/{popupId}")
-    public ResponseDto<?> readPopupReportDetail(@PathVariable Long popupId) {
-        return ResponseDto.ok(adminService.readPopupReportDetail(popupId));
+    @GetMapping("/reports/popups/{reportedPopupId}")
+    public ResponseDto<?> readPopupReportDetail(@PathVariable Long reportedPopupId) {
+        return ResponseDto.ok(adminService.readPopupReportDetail(reportedPopupId));
     }
 
     /* 팝업 신고 처리 생성 */
-    @PostMapping("/reports/popups/{popupId}")
+    @PostMapping("/reports/popups/{reportedPopupId}")
     public ResponseDto<?> processPopupReport(@UserId Long adminId,
-                                             @PathVariable Long popupId,
+                                             @PathVariable Long reportedPopupId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processPopupReport(adminId, popupId, content));
+        return ResponseDto.created(adminService.processPopupReport(adminId, reportedPopupId, content));
     }
 
 
