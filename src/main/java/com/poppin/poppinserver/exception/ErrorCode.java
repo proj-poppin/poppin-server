@@ -66,6 +66,7 @@ public enum ErrorCode {
     NOT_FOUND_VISIT("40413", HttpStatus.NOT_FOUND , "방문한 내역이 없습니다"),
     NOT_FOUND_TOKEN("40414" , HttpStatus.NOT_FOUND , "알림 토큰이 저장된 내역이 없습니다"),
     NOT_FOUND_TOPIC("40415" , HttpStatus.NOT_FOUND , "알림 토픽이 저장된 내역이 없습니다"),
+    NOT_FOUND_ALARM_SETTING("40416" , HttpStatus.NOT_FOUND , "알림 세팅 내역이 없습니다"),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),

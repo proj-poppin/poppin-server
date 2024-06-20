@@ -6,9 +6,13 @@ import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.config.APNsConfiguration;
 import com.poppin.poppinserver.config.AndroidConfiguration;
 import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +29,13 @@ import java.util.stream.IntStream;
 public class FCMSendUtil {
 
     private final NotificationTokenRepository notificationTokenRepository;
+    private final PopupRepository popupRepository;
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
     private final AndroidConfiguration androidConfiguration;
 
     private final AlarmService alarmService;
-    // aos
-    AndroidConfig androidConfig = androidConfiguration.androidConfig();
-    // ios
-    ApnsConfig apnsConfig = apnsConfiguration.apnsConfig();
+
 
 
     /**
@@ -42,15 +44,24 @@ public class FCMSendUtil {
      * @throws FirebaseMessagingException FCM 오류
      */
     public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
+        // aos
+        AndroidConfig androidConfig = androidConfiguration.androidConfig();
+        // ios
+        ApnsConfig apnsConfig = apnsConfiguration.apnsConfig();
+
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
 
             Message message = null;
+
+            Popup popup = popupRepository.findById(fcmRequestDto.popupId())
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
             NotificationToken notificationToken = notificationTokenRepository.findByToken(fcmRequestDto.token());
 
             message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(fcmRequestDto.title())
-                            .setBody(fcmRequestDto.body())
+                            .setBody( popup.getName() + " "  + fcmRequestDto.body())
                             .build())
                     .setToken(notificationToken.getToken())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))

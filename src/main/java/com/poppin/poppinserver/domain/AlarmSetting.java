@@ -18,9 +18,8 @@ public class AlarmSetting {
     @Column(name = "id")
     private Long id; // seq
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private User userId;
+    @Column(name = "token" , nullable = false)
+    private String token;
 
     @Column(name = "push_yn" , nullable = false)
     private String pushYn; // 푸시 알림 on off
@@ -41,8 +40,8 @@ public class AlarmSetting {
     private String changeInfoYn; // 관심 팝업 정보 변경 알림 on off
 
 
-    public AlarmSetting(User userId, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn, String changeInfoYn){
-        this.userId = userId;
+    public AlarmSetting(String token, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn, String changeInfoYn){
+        this.token = token;
         this.pushYn = pushYn;
         this.pushNightYn = pushNightYn;
         this.hoogiYn = hoogiYn;
