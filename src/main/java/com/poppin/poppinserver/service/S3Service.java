@@ -335,6 +335,12 @@ public class S3Service {
         fileValidate.add(".JPG");
         fileValidate.add(".JPEG");
         fileValidate.add(".PNG");
+        fileValidate.add(".tiff");
+        fileValidate.add(".TIFF");
+        fileValidate.add(".svg");
+        fileValidate.add(".SVG");
+        fileValidate.add(".WebP");
+        fileValidate.add(".WEBP");
         String idxFileName = fileName.substring(fileName.lastIndexOf("."));
         if (!fileValidate.contains(idxFileName)) {
             throw new CommonException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
