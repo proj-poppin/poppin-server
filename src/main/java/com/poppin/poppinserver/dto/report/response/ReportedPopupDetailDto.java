@@ -6,8 +6,13 @@ import lombok.Builder;
 public record ReportedPopupDetailDto(
         Long popupId,
         String popupName,
+        String introduce,
         String posterUrl,
         String homepageLink,
+        String openDate,
+        String closeDate,
+        String openTime,
+        String closeTime,
         String address,
         String addressDetail,
         String entranceFee,
