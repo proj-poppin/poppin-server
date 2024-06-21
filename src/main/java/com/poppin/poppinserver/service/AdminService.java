@@ -222,18 +222,23 @@ public class AdminService {
     }
 
     @Transactional
-    public ReportedPopupInfoDto readPopupReportDetail(Long popupId) {
-        ReportPopup reportPopup = reportPopupRepository.findById(popupId)
+    public ReportedPopupInfoDto readPopupReportDetail(Long reportedPopupId) {
+        ReportPopup reportPopup = reportPopupRepository.findById(reportedPopupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupRepository.findById(reportPopup.getPopupId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
-                .popupId(reportPopup.getPopupId().getId())
-                .popupName(reportPopup.getPopupId().getName())
+                .popupId(popup.getId())
+                .popupName(popup.getName())
+                .introduce(popup.getIntroduce())
                 .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
                 .address(popup.getAddress())
                 .addressDetail(popup.getAddressDetail())
+                .openDate(popup.getOpenDate().toString())
+                .closeDate(popup.getCloseDate().toString())
+                .openTime(popup.getOpenTime().toString())
+                .closeTime(popup.getCloseTime().toString())
                 .entranceFee(popup.getEntranceFee())
                 .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
                 .parkingAvailable(popup.getParkingAvailable())
@@ -252,10 +257,10 @@ public class AdminService {
     }
 
     @Transactional
-    public ReportedReviewInfoDto readReviewReportDetail(Long reviewId) {
-        ReportReview reportReview = reportReviewRepository.findById(reviewId)
+    public ReportedReviewInfoDto readReviewReportDetail(Long reportedReviewId) {
+        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        Review review = reviewRepository.findById(reviewId)
+        Review review = reviewRepository.findById(reportReview.getReviewId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         Popup popup = popupRepository.findById(review.getPopup().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -273,8 +278,13 @@ public class AdminService {
                 .popupName(reportReview.getReviewId().getPopup().getName())
                 .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
+                .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
                 .addressDetail(popup.getAddressDetail())
+                .openDate(popup.getOpenDate().toString())
+                .closeDate(popup.getCloseDate().toString())
+                .openTime(popup.getOpenTime().toString())
+                .closeTime(popup.getCloseTime().toString())
                 .entranceFee(popup.getEntranceFee())
                 .availableAge(popup.getAvailableAge().getAvailableAgeProvider())
                 .parkingAvailable(popup.getParkingAvailable())
@@ -293,20 +303,20 @@ public class AdminService {
                 .build();
     }
 
-    public String processPopupReport(Long adminId, Long popupId, String content) {
+    public String processPopupReport(Long adminId, Long reportedPopupId, String content) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        ReportPopup reportPopup = reportPopupRepository.findById(popupId)
+        ReportPopup reportPopup = reportPopupRepository.findById(reportedPopupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportPopup.execute(true, admin, LocalDateTime.now(), content);
         reportPopupRepository.save(reportPopup);
         return content;
     }
 
-    public String processReviewReport(Long adminId, Long reviewId, String content) {    // 리뷰 신고 처리
+    public String processReviewReport(Long adminId, Long reportedReviewId, String content) {    // 리뷰 신고 처리
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        ReportReview reportReview = reportReviewRepository.findById(reviewId)
+        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportReview.execute(true, admin, LocalDateTime.now(), content);
         reportReviewRepository.save(reportReview);

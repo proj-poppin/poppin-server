@@ -140,11 +140,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "JOIN Interest i ON p.id = i.popup.id " +
             "WHERE p.openDate = :date " +
             "AND p.openTime <= :timeNow " +
-            "AND (p.openDate > :date OR (p.openDate = :date AND p.openTime >= :timeBefore)) " +
+            "AND p.openTime >= :timeBefore " +
             "ORDER BY p.createdAt DESC")
     List<Popup> findOpenPopup(@Param("date") LocalDate date,
                               @Param("timeNow") LocalTime timeNow,
                               @Param("timeBefore") LocalTime timeBefore);
+
 
     @Query("SELECT p FROM Popup p " +
             "JOIN Interest i ON p.id = i.popup.id " +
