@@ -11,7 +11,10 @@ public record PushDto(
         String title,
 
         @NotNull
-        String body
+        String body,
+
+        @NotNull
+        Long popupId
 
 ) {
 }
