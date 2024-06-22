@@ -18,5 +18,5 @@ public interface PopupTopicRepository extends JpaRepository<PopupTopic, Long> {
     PopupTopic findByTokenAndTopic(NotificationToken token, @Param("code") String code, @Param("popupId") Popup popupId);
 
     @Query("SELECT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
-    List<String> findTokenIdByTopicAndType(String code, @Param("popupId")Long popupId);
+    List<NotificationToken> findTokenIdByTopicAndType(String code, @Param("popupId")Long popupId);
 }

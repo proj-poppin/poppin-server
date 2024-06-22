@@ -2,6 +2,7 @@ package com.poppin.poppinserver.scheduler;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.AlarmSetting;
+import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
@@ -31,7 +32,7 @@ public class FCMScheduler {
     private final FCMSendUtil fcmSendUtil;
 
     private static ZoneId zoneId = ZoneId.of("Asia/Seoul");
-    private static ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
 
     @Scheduled(cron = "0 */01 * * * *")
     public void reopenPopup(){
@@ -41,6 +42,7 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
          * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
          */
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         LocalDate now = zonedDateTime.toLocalDate();
         log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
 
@@ -59,6 +61,7 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate tomorrow = zonedDateTime.toLocalDate().plusDays(1);
@@ -80,6 +83,8 @@ public class FCMScheduler {
          */
 
         // 한국 시간 기준 현재 날짜와 시간
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
         LocalDate date = zonedDateTime.toLocalDate();
         LocalTime timeNow = zonedDateTime.toLocalTime();
         LocalTime timeBefore = timeNow.minusMinutes(5);
@@ -105,6 +110,8 @@ public class FCMScheduler {
          */
         log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
         // 7일 전 날짜 계산
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate weekAgo = now.minusWeeks(1);
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
@@ -125,6 +132,8 @@ public class FCMScheduler {
      */
     @Scheduled(cron = "0 */01 * * * *")
     public void hoogi() {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
         LocalDateTime now = zonedDateTime.toLocalDateTime();
         LocalDateTime threeHoursAgo = now.minusHours(3);
 
@@ -150,13 +159,13 @@ public class FCMScheduler {
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
-            List<String> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
+            List<NotificationToken> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
             if (tokenList.isEmpty()) log.info(topic + "에 대해 구독한 토큰이 없습니다.");
             else{
-                for (String token : tokenList){
+                for (NotificationToken token : tokenList){
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
-                    AlarmSetting set = alarmSettingRepository.findByToken(token);
+                    AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
                     String setDefVal = set.getPushYn();
                     String setVal;
                     switch (topic){
@@ -167,7 +176,7 @@ public class FCMScheduler {
                         default -> setVal = "1";
                     }
                     if (setDefVal.equals("1") && setVal.equals("1")){
-                        FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token, info.getTitle(), info.getBody() , topic);
+                        FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
                         fcmRequestDtoList.add(fcmRequestDto);
                     }
                 }
