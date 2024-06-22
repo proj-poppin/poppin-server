@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -31,6 +30,9 @@ public class FCMScheduler {
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
+    private static ZoneId zoneId = ZoneId.of("Asia/Seoul");
+    private static ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
     @Scheduled(cron = "0 */01 * * * *")
     public void reopenPopup(){
 
@@ -39,7 +41,7 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
          * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
          */
-        LocalDate now = LocalDate.now();
+        LocalDate now = zonedDateTime.toLocalDate();
         log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
 
         List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
@@ -57,8 +59,6 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate tomorrow = zonedDateTime.toLocalDate().plusDays(1);
@@ -78,9 +78,6 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈 시간이 현재 시간보다 같거나 클 때 )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        // 한국 시간대 (KST) 설정
-        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         // 한국 시간 기준 현재 날짜와 시간
         LocalDate date = zonedDateTime.toLocalDate();
@@ -108,7 +105,8 @@ public class FCMScheduler {
          */
         log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
         // 7일 전 날짜 계산
-        LocalDate weekAgo = LocalDate.now().minusWeeks(1);
+        LocalDate now = zonedDateTime.toLocalDate();
+        LocalDate weekAgo = now.minusWeeks(1);
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
         LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
 
@@ -127,7 +125,8 @@ public class FCMScheduler {
      */
     @Scheduled(cron = "0 */01 * * * *")
     public void hoogi() {
-        LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
+        LocalDateTime now = zonedDateTime.toLocalDateTime();
+        LocalDateTime threeHoursAgo = now.minusHours(3);
 
         log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
         List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAgo);
