@@ -72,8 +72,8 @@ public enum ErrorCode {
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
 
     // Server, File Up/DownLoad Error
-    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
-
+    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    FCM_ERROR("50001" , HttpStatus.INTERNAL_SERVER_ERROR , "공지사항 등록 중 앱 푸시 알림 오류입니다.");
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;

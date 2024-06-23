@@ -5,7 +5,10 @@ import com.google.firebase.messaging.*;
 
 import com.poppin.poppinserver.config.APNsConfiguration;
 import com.poppin.poppinserver.config.AndroidConfiguration;
+import com.poppin.poppinserver.domain.InformAlarm;
+import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 
 import com.poppin.poppinserver.exception.CommonException;
@@ -33,6 +36,38 @@ public class FCMSendUtil {
 
     private final AlarmService alarmService;
 
+
+
+    /* 토큰 메시지 발송 */
+    public String sendFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
+        try {
+            for (NotificationToken token : tokenList) {
+                log.info("token : " + token.getToken());
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle(requestDto.title())
+                                .setBody(requestDto.body())
+                                .build())
+                        .setApnsConfig(apnsConfiguration.apnsConfig())
+                        .setAndroidConfig(androidConfiguration.androidConfig())
+                        .setToken(token.getToken())
+                        .putData("informId", informAlarm.getId().toString())
+                        .build();
+
+                try {
+                    String result = firebaseMessaging.send(message);
+                    log.info(" Successfully sent message: " + result);
+
+                } catch (FirebaseMessagingException e) {
+                    log.error("Failed to send message: " + e.getMessage());
+                }
+            }
+            return "1";
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "0";
+        }
+    }
 
 
     /**

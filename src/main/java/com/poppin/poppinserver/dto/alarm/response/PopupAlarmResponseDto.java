@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.dto.alarm.response;
 
-import com.poppin.poppinserver.domain.Alarm;
+import com.poppin.poppinserver.domain.PopupAlarm;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ public record PopupAlarmResponseDto(
     LocalDate createdAt,
     String iconUrl
 ) {
-    public static PopupAlarmResponseDto fromEntity(Alarm alarm){
+    public static PopupAlarmResponseDto fromEntity(PopupAlarm alarm){
 
         return PopupAlarmResponseDto.builder()
                 .title(alarm.getTitle())

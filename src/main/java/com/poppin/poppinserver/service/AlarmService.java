@@ -1,14 +1,16 @@
 package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.domain.Alarm;
-import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.AlarmRepository;
+import com.poppin.poppinserver.repository.InformAlarmImageRepository;
+import com.poppin.poppinserver.repository.InformAlarmRepository;
+import com.poppin.poppinserver.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +31,11 @@ public class AlarmService {
 
     private final AmazonS3Client s3Client;
 
-    private final AlarmRepository alarmRepository;
+    private final PopupAlarmRepository popupAlarmRepository;
     private final PopupRepository popupRepository;
+    private final InformAlarmRepository informAlarmRepository;
+
+    private final InformAlarmImageRepository informAlarmImageRepository;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
@@ -64,7 +69,7 @@ public class AlarmService {
 
     public String insertPopupAlarmKeyword(FCMRequestDto fcmRequestDto) {
 
-        log.info("ALARM inserting \n");
+        log.info("POPUP ALARM inserting \n");
 
         try {
 
@@ -78,7 +83,7 @@ public class AlarmService {
 
                     String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
 
-                    Alarm alarm = Alarm.builder()
+                    PopupAlarm alarm = PopupAlarm.builder()
                             .popupId(popup)
                             .token(fcmRequestDto.token())
                             .title(fcmRequestDto.title())
@@ -88,7 +93,7 @@ public class AlarmService {
                             .createdAt(LocalDate.now())
                             .build();
 
-                    alarmRepository.save(alarm);
+                    popupAlarmRepository.save(alarm);
                 }
             }
             return "1";
@@ -98,17 +103,56 @@ public class AlarmService {
         }
     }
 
-    // 알림 - 팝업 공지사항
-    public List<PopupAlarmResponseDto> readPopupAlarmList(@UserId Long userId, String token){
+    // 알림 - 일반 공지사항 등록
+    public InformAlarm insertInformAlarmKeyword(InformAlarmRequestDto requestDto) {
+
+        log.info("INFORM ALARM inserting \n");
+
+        try {
+            String keyword = "INFORM";
+            String iconUrl = s3Client.getUrl(alarmBucket, info).toString();
+
+            InformAlarm alarm = new InformAlarm(
+                    requestDto.title(),
+                    requestDto.body(),
+                    keyword,
+                    iconUrl,
+                    LocalDate.now()
+            );
+            informAlarmRepository.save(alarm);
+            InformAlarm informAlarm = informAlarmRepository.findInformAlarmOrderByIdDesc();
+            return informAlarm;
+
+        } catch (CommonException e) {
+            log.error("ERROR during saving alarm : " + e.getMessage());
+            return null;
+        }
+    }
+
+
+
+    // 알림 - 팝업 공지사항 보기
+    public List<PopupAlarmResponseDto> readPopupAlarmList( String token){
 
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
-        List<Alarm> alarmList = alarmRepository.findByKeywordOrderByCreatedAtDesc(token);
+        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(token);
 
-        for (Alarm a : alarmList){
-            PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(a);
+        for (PopupAlarm alarm : alarmList){
+            PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(alarm);
             popupAlarmResponseDtoList.add(popupAlarmResponseDto);
         }
         return popupAlarmResponseDtoList;
+    }
+
+    public List<InformAlarmResponseDto> readInformAlarmList(){
+        List<InformAlarmResponseDto> informAlarmResponseDtoList = new ArrayList<>();
+        List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc();
+
+        for (InformAlarm alarm : alarmList){
+            InformAlarmResponseDto informAlarmResponseDto = InformAlarmResponseDto.fromEntity(alarm);
+            informAlarmResponseDtoList.add(informAlarmResponseDto);
+        }
+        return informAlarmResponseDtoList;
     }
 
 

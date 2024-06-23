@@ -58,8 +58,8 @@ public class ReviewService {
 
         review = reviewRepository.save(review);
 
-        String imageStaus = "0";
-        log.info("imageStatus : " + imageStaus);
+        String imageStatus = "0";
+        log.info("imageStatus : " + imageStatus);
 
         // 클라이언트 req
         // 이미지 없을 때 -> "empty"명인 빈 파일 전송
@@ -84,7 +84,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-        log.info("image Status : " + imageStaus);
+        log.info("image Status : " + imageStatus);
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
