@@ -132,10 +132,10 @@ public class AlarmService {
 
 
     // 알림 - 팝업 공지사항 보기
-    public List<PopupAlarmResponseDto> readPopupAlarmList( String token){
+    public List<PopupAlarmResponseDto> readPopupAlarmList( String fcmToken){
 
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
-        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(token);
+        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(fcmToken);
 
         for (PopupAlarm alarm : alarmList){
             PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(alarm);
