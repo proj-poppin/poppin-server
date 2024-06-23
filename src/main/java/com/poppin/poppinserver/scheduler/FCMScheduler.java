@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,7 +32,7 @@ public class FCMScheduler {
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
-    private static ZoneId zoneId = ZoneId.of("Asia/Seoul");
+
 
 
     @Scheduled(cron = "0 */01 * * * *")
@@ -42,6 +43,7 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
          * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
          */
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         LocalDate now = zonedDateTime.toLocalDate();
         log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
@@ -61,6 +63,7 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         LocalDate now = zonedDateTime.toLocalDate();
@@ -83,6 +86,7 @@ public class FCMScheduler {
          */
 
         // 한국 시간 기준 현재 날짜와 시간
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         LocalDate date = zonedDateTime.toLocalDate();
@@ -109,9 +113,10 @@ public class FCMScheduler {
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
         log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
-        // 7일 전 날짜 계산
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+        // 7일 전 날짜 계산
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate weekAgo = now.minusWeeks(1);
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
@@ -132,6 +137,7 @@ public class FCMScheduler {
      */
     @Scheduled(cron = "0 */01 * * * *")
     public void hoogi() {
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         LocalDateTime now = zonedDateTime.toLocalDateTime();
@@ -155,7 +161,7 @@ public class FCMScheduler {
      */
     private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
 
-        List<FCMRequestDto> fcmRequestDtoList = null;
+        List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
@@ -165,7 +171,9 @@ public class FCMScheduler {
                 for (NotificationToken token : tokenList){
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
+                    log.info("token : " + token.getToken());
                     AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
+                    log.info("setting : " + set);
                     String setDefVal = set.getPushYn();
                     String setVal;
                     switch (topic){
