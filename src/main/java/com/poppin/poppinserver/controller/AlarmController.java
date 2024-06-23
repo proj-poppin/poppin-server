@@ -20,8 +20,8 @@ public class AlarmController {
 
     // 팝업 알림 보여주기
     @GetMapping("/popup")
-    public ResponseDto<?> readPopupAlarm(@RequestParam(name = "token") String token){
-        return ResponseDto.ok(alarmService.readPopupAlarmList(token));
+    public ResponseDto<?> readPopupAlarm(@RequestBody String fcmToken){
+        return ResponseDto.ok(alarmService.readPopupAlarmList(fcmToken));
     }
 
     // 공지사항 알림 보여주기
@@ -30,5 +30,6 @@ public class AlarmController {
         return ResponseDto.ok(alarmService.readInformAlarmList());
     }
 
-
+    // 공지사항 디테일 (1 depth more)
+    //public ResponseDto<?> read
 }

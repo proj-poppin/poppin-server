@@ -366,9 +366,12 @@ public class S3Service {
 
             // seq 반환하기
             Long seq;
-            Optional<InformAlarmImage> alarmImage = informAlarmImageRepository.findAlarmImageOrOrderByIdDesc();
-            if (alarmImage.isEmpty()) seq = Long.valueOf(1);
-            else{seq = alarmImage.get().getId()+1;}
+            Optional<InformAlarmImage> alarmImage = informAlarmImageRepository.findAlarmImageOrderByIdDesc();
+            if (alarmImage.isEmpty()) {
+                seq = 1L;
+            } else {
+                seq = alarmImage.get().getId() + 1;
+            }
 
             String fileName = createFileName(file.getOriginalFilename(), seq);
             ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -384,10 +387,9 @@ public class S3Service {
                 objectMetadata.setContentType(file.getContentType());
 
                 // 조정된 이미지를 S3에 업로드
-                s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata));
                 imgUrlList.add(s3Client.getUrl(bucketInformPoster, fileName).toString());
-            } catch(IOException e) {
+            } catch (IOException e) {
                 log.error("Error processing image for modifyInfoId: " + seq + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
