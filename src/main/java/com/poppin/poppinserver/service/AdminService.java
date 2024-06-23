@@ -371,7 +371,7 @@ public class AdminService {
                 // 푸시 성공
                 if (sendStatus.equals("1")){
 
-                    InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, informAlarmImages);
+                    InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
                     return informApplyResponseDto; // 최종 성공 반환
 
                 }

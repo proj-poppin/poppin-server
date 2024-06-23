@@ -2,16 +2,14 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.InformAlarmImageRepository;
-import com.poppin.poppinserver.repository.InformAlarmRepository;
-import com.poppin.poppinserver.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.repository.PopupRepository;
+import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +33,7 @@ public class AlarmService {
     private final PopupRepository popupRepository;
     private final InformAlarmRepository informAlarmRepository;
 
-    private final InformAlarmImageRepository informAlarmImageRepository;
+    private final UserRepository userRepository;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
@@ -132,15 +130,20 @@ public class AlarmService {
 
 
     // 알림 - 팝업 공지사항 보기
-    public List<PopupAlarmResponseDto> readPopupAlarmList( String fcmToken){
+    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, FcmTokenAlarmRequestDto fcmRequestDto){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        log.info("fcm token : {} " + fcmRequestDto.fcmToken());
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
-        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(fcmToken);
+        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(fcmRequestDto.fcmToken());
 
         for (PopupAlarm alarm : alarmList){
+            log.info("alarmList : " + alarmList);
             PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(alarm);
             popupAlarmResponseDtoList.add(popupAlarmResponseDto);
         }
+        log.info("result : " + popupAlarmResponseDtoList);
         return popupAlarmResponseDtoList;
     }
 
