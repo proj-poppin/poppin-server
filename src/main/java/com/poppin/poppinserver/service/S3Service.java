@@ -358,42 +358,41 @@ public class S3Service {
     }
 
     // 공지사항 이미지 저장
-    public List<String> uploadInformationPoster(List<MultipartFile> multipartFile) {
+    public List<String> uploadInformationPoster(MultipartFile file) {
         List<String> imgUrlList = new ArrayList<>();
         log.info("upload images");
 
-        for (MultipartFile file : multipartFile) {
+        // seq 반환하기
+        Long seq;
+        Optional<InformAlarmImage> alarmImage = informAlarmImageRepository.findAlarmImageOrderByIdDesc();
 
-            // seq 반환하기
-            Long seq;
-            Optional<InformAlarmImage> alarmImage = informAlarmImageRepository.findAlarmImageOrderByIdDesc();
-            if (alarmImage.isEmpty()) {
-                seq = 1L;
-            } else {
-                seq = alarmImage.get().getId() + 1;
-            }
-
-            String fileName = createFileName(file.getOriginalFilename(), seq);
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-
-            try (InputStream originalInputStream = file.getInputStream()) {
-                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
-                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
-                log.info("crop image");
-
-                // 조정된 이미지의 크기를 계산
-                byte[] imageBytes = processedInputStream.readAllBytes();
-                objectMetadata.setContentLength(imageBytes.length);
-                objectMetadata.setContentType(file.getContentType());
-
-                // 조정된 이미지를 S3에 업로드
-                s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata));
-                imgUrlList.add(s3Client.getUrl(bucketInformPoster, fileName).toString());
-            } catch (IOException e) {
-                log.error("Error processing image for modifyInfoId: " + seq + ", fileName: " + fileName, e);
-                throw new CommonException(ErrorCode.SERVER_ERROR);
-            }
+        if (alarmImage.isEmpty()) {
+            seq = 1L;
+        } else {
+            seq = alarmImage.get().getId() + 1;
         }
+
+        String fileName = createFileName(file.getOriginalFilename(), seq);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        try (InputStream originalInputStream = file.getInputStream()) {
+            // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+            InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+            log.info("crop image");
+
+            // 조정된 이미지의 크기를 계산
+            byte[] imageBytes = processedInputStream.readAllBytes();
+            objectMetadata.setContentLength(imageBytes.length);
+            objectMetadata.setContentType(file.getContentType());
+
+            // 조정된 이미지를 S3에 업로드
+            s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata));
+            imgUrlList.add(s3Client.getUrl(bucketInformPoster, fileName).toString());
+        } catch (IOException e) {
+            log.error("Error processing image for modifyInfoId: " + seq + ", fileName: " + fileName, e);
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+
         return imgUrlList;
     }
 

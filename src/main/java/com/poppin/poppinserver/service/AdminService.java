@@ -341,7 +341,7 @@ public class AdminService {
 
 
     public InformApplyResponseDto createInformation(
-            List<MultipartFile> images,
+            MultipartFile images,
             InformAlarmRequestDto requestDto,
             Long adminId
     ){

@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -122,7 +121,7 @@ public class AdminController {
 
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createInformation(
-            @RequestPart(value = "images") List<MultipartFile> images,
+            @RequestPart(value = "images") MultipartFile images,
             @RequestPart(value = "contents") InformAlarmRequestDto requestDto,
             @UserId Long adminId
     ){
