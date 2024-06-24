@@ -46,7 +46,7 @@ public class AdminController {
     public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "0") int page,
                                     @RequestParam(required = false, defaultValue = "44") int size,
                                     @RequestParam(value = "care") Boolean care) {
-        return ResponseDto.ok(adminService.readUsers(page, size));
+        return ResponseDto.ok(adminService.readUsers(page, size, care));
     }
 
     /* 회원 상세 조회 */
@@ -61,11 +61,11 @@ public class AdminController {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
-    @GetMapping("/users/special-care")
-    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "0") int page,
-                                               @RequestParam(required = false, defaultValue = "44") int size) {
-        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
-    }
+//    @GetMapping("/users/special-care")
+//    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "0") int page,
+//                                               @RequestParam(required = false, defaultValue = "44") int size) {
+//        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
+//    }
 
     /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}/reviews")

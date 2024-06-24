@@ -89,9 +89,14 @@ public class AdminService {
         freqQuestionRepository.delete(freqQuestion);
     }
 
-    public UserListDto readUsers(int page, int size) {
+    public UserListDto readUsers(int page, int size, boolean care) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
+        Page<User> userPage;
+        if (care) {
+            userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
+        } else {
+            userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
+        }
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
                 .map(user -> UserAdministrationDto.builder()
@@ -108,6 +113,25 @@ public class AdminService {
                 .userCnt(userCnt)
                 .build();
     }
+
+//    public UserListDto readSpecialCareUsers(int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
+//
+//        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
+//                .map(user -> UserAdministrationDto.builder()
+//                        .id(user.getId())
+//                        .email(user.getEmail())
+//                        .nickname(user.getNickname())
+//                        .requiresSpecialCare(user.getRequiresSpecialCare())
+//                        .build())
+//                .collect(Collectors.toList());
+//        Long userCnt = userPage.getTotalElements();
+//        return UserListDto.builder()
+//                .userList(userAdministrationDtoList)
+//                .userCnt(userCnt)
+//                .build();
+//    }
 
     public UserAdministrationDetailDto readUserDetail(Long userId) {
         User user = userRepository.findById(userId)
@@ -169,25 +193,6 @@ public class AdminService {
                     .build());
         }
         Long userCnt = Long.valueOf(userAdministrationDtoList.size());
-        return UserListDto.builder()
-                .userList(userAdministrationDtoList)
-                .userCnt(userCnt)
-                .build();
-    }
-
-    public UserListDto readSpecialCareUsers(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
-
-        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
-                .map(user -> UserAdministrationDto.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .nickname(user.getNickname())
-                        .requiresSpecialCare(user.getRequiresSpecialCare())
-                        .build())
-                .collect(Collectors.toList());
-        Long userCnt = userPage.getTotalElements();
         return UserListDto.builder()
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
