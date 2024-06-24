@@ -44,7 +44,8 @@ public class AdminController {
     /* 회원 관리 목록 조회 */
     @GetMapping("/users")
     public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "0") int page,
-                                    @RequestParam(required = false, defaultValue = "44") int size) {
+                                    @RequestParam(required = false, defaultValue = "44") int size,
+                                    @RequestParam(value = "care") Boolean care) {
         return ResponseDto.ok(adminService.readUsers(page, size));
     }
 
@@ -119,7 +120,6 @@ public class AdminController {
         return ResponseDto.created(adminService.processPopupReport(adminId, reportedPopupId, content));
     }
 
-
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createInformation(
             @RequestPart(value = "images") List<MultipartFile> images,
@@ -131,6 +131,5 @@ public class AdminController {
         }
         return ResponseDto.ok(adminService.createInformation(images,requestDto,adminId));
     }
-
 
 }

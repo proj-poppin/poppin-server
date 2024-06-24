@@ -64,7 +64,7 @@ public class UserController {
     }
 
     @PutMapping("/image")
-    public ResponseDto<?> updateUserProfileImage(@UserId Long userId, @RequestParam(value = "profileImage") MultipartFile profileImage) {
+    public ResponseDto<?> updateUserProfileImage(@UserId Long userId, @RequestPart(value = "profileImage") MultipartFile profileImage) {
         return ResponseDto.ok(userService.updateProfileImage(userId, profileImage));
     }
 
@@ -166,4 +166,13 @@ public class UserController {
     public ResponseDto<?> generateRandomNickname() {
         return ResponseDto.ok(userService.generateRandomNickname());
     }
+
+//    @PostMapping("/support/question")
+//    public ResponseDto<?> createUserQna(@UserId Long userId,
+//                                        @RequestPart(value = "images") MultipartFile images,
+//                                        @RequestParam("title") String title,
+//                                        @RequestParam("content") String content) {
+//        userService.createUserQna(userId, title, content, images);
+//        return ResponseDto.created("문의가 성공적으로 접수되었습니다.");
+//    }
 }
