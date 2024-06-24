@@ -416,4 +416,12 @@ public class UserService {
         user.addReviewCnt();
         userRepository.save(user);
     }
+
+//    // 1:1 문의 생성 -> 보류 (사유: 카카오톡 페이지 연결)
+//    public void createUserQna(Long userId, String title, String content, MultipartFile images) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+//        s3Service.uploadUserQna(images, userId);
+//
+//    }
 }

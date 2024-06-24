@@ -167,8 +167,12 @@ public class UserController {
         return ResponseDto.ok(userService.generateRandomNickname());
     }
 
-    @PostMapping("/support/question")
-    public ResponseDto<?> createUserQna(@UserId Long userId, @RequestBody) {
-        // return ResponseDto.created(userService.createUserQna(userId, ));
-    }
+//    @PostMapping("/support/question")
+//    public ResponseDto<?> createUserQna(@UserId Long userId,
+//                                        @RequestPart(value = "images") MultipartFile images,
+//                                        @RequestParam("title") String title,
+//                                        @RequestParam("content") String content) {
+//        userService.createUserQna(userId, title, content, images);
+//        return ResponseDto.created("문의가 성공적으로 접수되었습니다.");
+//    }
 }
