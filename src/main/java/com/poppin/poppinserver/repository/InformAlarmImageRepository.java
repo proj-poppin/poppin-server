@@ -3,9 +3,9 @@ package com.poppin.poppinserver.repository;
 import com.poppin.poppinserver.domain.InformAlarmImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,5 +15,6 @@ public interface InformAlarmImageRepository extends JpaRepository<InformAlarmIma
     Optional<InformAlarmImage> findAlarmImageOrderByIdDesc();
 
 
-    List<InformAlarmImage> findAllByInformAlarmId(Long id);
+    @Query("SELECT img FROM InformAlarmImage img WHERE img.informAlarm.id = :id")
+    Optional<InformAlarmImage> findByAlarmId(@Param("id") Long id);
 }

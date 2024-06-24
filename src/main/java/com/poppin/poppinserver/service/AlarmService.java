@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,7 +34,7 @@ public class AlarmService {
     private final PopupAlarmRepository popupAlarmRepository;
     private final PopupRepository popupRepository;
     private final InformAlarmRepository informAlarmRepository;
-
+    private final InformAlarmImageRepository informAlarmImageRepository;
     private final UserRepository userRepository;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
@@ -89,6 +91,7 @@ public class AlarmService {
                             .keyword(keyword)
                             .icon(url)
                             .createdAt(LocalDate.now())
+                            .isRead(false) // 읽음 여부
                             .build();
 
                     popupAlarmRepository.save(alarm);
@@ -110,13 +113,15 @@ public class AlarmService {
             String keyword = "INFORM";
             String iconUrl = s3Client.getUrl(alarmBucket, info).toString();
 
-            InformAlarm alarm = new InformAlarm(
-                    requestDto.title(),
-                    requestDto.body(),
-                    keyword,
-                    iconUrl,
-                    LocalDate.now()
-            );
+            InformAlarm alarm = InformAlarm.builder()
+                    .title(requestDto.title())
+                    .body(requestDto.body())
+                    .keyword(keyword)
+                    .icon(iconUrl)
+                    .createdAt(LocalDate.now())
+                    .isRead(false)
+                    .build();
+
             informAlarmRepository.save(alarm);
             InformAlarm informAlarm = informAlarmRepository.findInformAlarmOrderByIdDesc();
             return informAlarm;
@@ -147,53 +152,83 @@ public class AlarmService {
         return popupAlarmResponseDtoList;
     }
 
-    public List<InformAlarmResponseDto> readInformAlarmList(){
-        List<InformAlarmResponseDto> informAlarmResponseDtoList = new ArrayList<>();
+    // 공지사항 알림 (1 depth)
+    public List<InformAlarmListResponseDto> readInformAlarmList(){
+        List<InformAlarmListResponseDto> informAlarmListResponseDtoList = new ArrayList<>();
         List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc();
 
         for (InformAlarm alarm : alarmList){
-            InformAlarmResponseDto informAlarmResponseDto = InformAlarmResponseDto.fromEntity(alarm);
-            informAlarmResponseDtoList.add(informAlarmResponseDto);
+            InformAlarmListResponseDto informAlarmListResponseDto = InformAlarmListResponseDto.fromEntity(alarm);
+            informAlarmListResponseDtoList.add(informAlarmListResponseDto);
         }
-        return informAlarmResponseDtoList;
+        return informAlarmListResponseDtoList;
+    }
+
+
+    // 공지사항 알림 (2 depth)
+    public InformAlarmResponseDto readDetailInformAlarm(Long informId){
+        // informAlarm 먼저 찾고, isRead true로 저장
+        InformAlarm informAlarm = informAlarmRepository.findById(informId)
+                        .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_INFO_ALARM));
+        informAlarm.markAsRead();
+        informAlarmRepository.save(informAlarm);
+
+        // InfoAlarmImages에서 이미지 url 찾기
+        Optional<InformAlarmImage> img = informAlarmImageRepository.findByAlarmId(informId);
+        if (img.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_INFO_IMG);
+
+
+        // InformAlarmResponseDto 객체 만들기
+        else{
+            InformAlarmResponseDto informAlarmResponseDto = InformAlarmResponseDto.builder()
+                    .id(informAlarm.getId())
+                    .title(informAlarm.getTitle())
+                    .body(informAlarm.getBody())
+                    .posterUrl(img.get().getPosterUrl())
+                    .createdAt(informAlarm.getCreatedAt())
+                    .build();
+            return  informAlarmResponseDto;
+        }
     }
 
 
 
-
     private URL getUrlForTopic(EPopupTopic topic) {
+        URL url = null;
         switch (topic) {
             case MAGAM -> {
-                return s3Client.getUrl(alarmBucket, magam);
+                url = s3Client.getUrl(alarmBucket, magam);
             }
             case CHANGE_INFO -> {
-                return s3Client.getUrl(alarmBucket, info);
+                url =  s3Client.getUrl(alarmBucket, info);
             }
             case JAEBO -> {
-                return s3Client.getUrl(alarmBucket, jaebo);
+                url =  s3Client.getUrl(alarmBucket, jaebo);
             }
             case REOPEN -> {
-                return s3Client.getUrl(alarmBucket, reopen);
+                url =  s3Client.getUrl(alarmBucket, reopen);
             }
             case HOT -> {
-                return s3Client.getUrl(alarmBucket, hot);
+                url =  s3Client.getUrl(alarmBucket, hot);
             }
             case KEYWORD -> {
-                return s3Client.getUrl(alarmBucket, key);
+                url =  s3Client.getUrl(alarmBucket, key);
             }
             case OPEN -> {
-                return s3Client.getUrl(alarmBucket, open);
+                url =  s3Client.getUrl(alarmBucket, open);
             }
             case HOOGI -> {
-                return s3Client.getUrl(alarmBucket, hoogi);
+                url =  s3Client.getUrl(alarmBucket, hoogi);
             }
             case BANGMUN -> {
-                return s3Client.getUrl(alarmBucket, bangmun);
+                url =  s3Client.getUrl(alarmBucket, bangmun);
             }
             default -> {
                 return null;
             }
         }
+        log.info("Generated URL for topic {}: {}", topic, url);
+        return url;
     }
 
 

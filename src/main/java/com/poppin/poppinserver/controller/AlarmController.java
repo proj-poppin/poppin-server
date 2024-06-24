@@ -26,12 +26,15 @@ public class AlarmController {
         return ResponseDto.ok(alarmService.readPopupAlarmList(userId, fcmTokenAlarmRequestDto));
     }
 
-    // 공지사항 알림 보여주기
+    // 공지사항 알림 보여주기(1 depth)
     @GetMapping("/info")
     public ResponseDto<?> readInfoAlarm(){
         return ResponseDto.ok(alarmService.readInformAlarmList());
     }
 
-    // 공지사항 디테일 (1 depth more)
-    //public ResponseDto<?> read
+    // 공지사항 디테일 (2 depth)
+    @GetMapping("info/detail")
+    public ResponseDto<?> readDetailInfoAlarm(@RequestParam("informId")Long informId){
+        return ResponseDto.ok(alarmService.readDetailInformAlarm(informId));
+    }
 }

@@ -42,8 +42,11 @@ public class PopupAlarm {
     @Column(name = "created_at" , nullable = false)
     private LocalDate createdAt;
 
+    @Column(name = "is_read" , nullable = false)
+    private Boolean isRead; // 읽음 여부
+
     @Builder
-    public PopupAlarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt) {
+    public PopupAlarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt , Boolean isRead) {
         this.popupId = popupId;
         this.token = token;
         this.title = title;
@@ -51,5 +54,6 @@ public class PopupAlarm {
         this.keyword = keyword;
         this.icon = icon;
         this.createdAt = createdAt;
+        this.isRead = isRead;
     }
 }

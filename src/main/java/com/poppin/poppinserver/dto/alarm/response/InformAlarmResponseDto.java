@@ -1,26 +1,33 @@
 package com.poppin.poppinserver.dto.alarm.response;
 
-import com.poppin.poppinserver.domain.InformAlarm;
 import lombok.Builder;
 
 import java.time.LocalDate;
 
+// 2 depth
 @Builder
 public record InformAlarmResponseDto(
-
+        Long id,
         String title,
         String body,
-        LocalDate createdAt,
-        String iconUrl
+        String posterUrl, // 알림 포스터
+        LocalDate createdAt
 ) {
 
-    public static InformAlarmResponseDto fromEntity(InformAlarm alarm){
-
-        return InformAlarmResponseDto.builder()
-                .title(alarm.getTitle())
-                .body(alarm.getBody())
-                .createdAt(alarm.getCreatedAt())
-                .iconUrl(alarm.getIcon())
+    public static InformAlarmResponseDto fromEntity(
+            Long id,
+            String title,
+            String body,
+            String posterUrl,
+            LocalDate createdAt
+    ){
+        return InformAlarmResponseDto.builder().
+                id(id)
+                .title(title)
+                .body(body)
+                .posterUrl(posterUrl)
+                .createdAt(createdAt)
                 .build();
     }
+
 }

@@ -67,7 +67,7 @@ public class VisitService {
         visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 일 주일 전 생성된 데이터만 삭제 예정*/
 
         // fcm 구독
-        String token = popupInfoDto.token();
+        String token = popupInfoDto.fcmToken();
         if (token.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
         fcmService.fcmAddTopic(token, popup, EPopupTopic.HOOGI);
 

@@ -22,7 +22,7 @@ public class InformAlarmImage {
     private Long id;
 
 
-    @ManyToOne(fetch  = FetchType.LAZY)
+    @OneToOne(fetch  = FetchType.LAZY)
     @JoinColumn(name="alarm_id" , referencedColumnName = "id",nullable = false)
     private InformAlarm informAlarm;
 

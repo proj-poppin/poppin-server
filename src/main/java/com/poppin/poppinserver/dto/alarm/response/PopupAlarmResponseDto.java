@@ -11,9 +11,9 @@ public record PopupAlarmResponseDto(
 
     String title,
     String body,
-
     LocalDate createdAt,
-    String iconUrl
+    String iconUrl,
+    Boolean isRead
 ) {
     public static PopupAlarmResponseDto fromEntity(PopupAlarm alarm){
 
@@ -22,6 +22,7 @@ public record PopupAlarmResponseDto(
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())
                 .iconUrl(alarm.getIcon())
+                .isRead(alarm.getIsRead())
                 .build();
     }
 }
