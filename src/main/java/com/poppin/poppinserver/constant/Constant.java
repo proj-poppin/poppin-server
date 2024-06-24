@@ -36,7 +36,8 @@ public class Constant {
             "/api/v1/noti/apply/FCMtoken", // fcm 토큰 등록
             "/api/v1/user/support/faqs",
             "/api/v1/user/random-nickname",
-            "/api/v1/alarm/info" // 공지사항 알림
+            "/api/v1/alarm/info", // 공지사항 알림
+            "/api/v1/alarm/info/detail" // 공지사항 알림 2 depth
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";
