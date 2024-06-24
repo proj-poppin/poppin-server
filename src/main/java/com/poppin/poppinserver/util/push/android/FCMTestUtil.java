@@ -35,6 +35,7 @@ public class FCMTestUtil {
                 .setApnsConfig(apnsConfiguration.apnsConfig())
                 .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(pushDto.token())
+                .putData("popupId", pushDto.popupId().toString() )
                 .build();
 
         try {

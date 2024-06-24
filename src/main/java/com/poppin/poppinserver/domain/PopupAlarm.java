@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "alarm")
-public class Alarm {
+@Table(name = "popup_alarm")
+public class PopupAlarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -43,7 +43,7 @@ public class Alarm {
     private LocalDate createdAt;
 
     @Builder
-    public Alarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt) {
+    public PopupAlarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt) {
         this.popupId = popupId;
         this.token = token;
         this.title = title;

@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
@@ -13,6 +15,7 @@ import com.poppin.poppinserver.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.util.FCMSendUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +43,14 @@ public class AdminService {
     private final VisitRepository visitRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PopupRepository popupRepository;
+    private final NotificationTokenRepository notificationTokenRepository;
 
+    private final InformAlarmRepository informAlarmRepository;
+    private final InformAlarmImageRepository informAlarmImageRepository;
+    private final S3Service s3Service;
+    private final AlarmService alarmService;
+
+    private final FCMSendUtil fcmSendUtil;
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
         List<FaqResponseDto> faqDtoList = new ArrayList<>();
@@ -321,5 +332,59 @@ public class AdminService {
         reportReview.execute(true, admin, LocalDateTime.now(), content);
         reportReviewRepository.save(reportReview);
         return content;
+    }
+
+
+    public InformApplyResponseDto createInformation(
+            List<MultipartFile> images,
+            InformAlarmRequestDto requestDto,
+            Long adminId
+    ){
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        try {
+
+            // Alarm 객체 저장
+            log.info("INFORM ALARM Entity Saving");
+            InformAlarm informAlarm = alarmService.insertInformAlarmKeyword(requestDto);
+            informAlarmRepository.save(informAlarm);
+
+            // 이미지 저장
+            List<String> fileUrls = s3Service.uploadInformationPoster(images);
+
+            List<InformAlarmImage> informAlarmImages = new ArrayList<>();
+            for(String url : fileUrls){
+                InformAlarmImage informAlarmImage = InformAlarmImage.builder()
+                        .informAlarm(informAlarm)
+                        .posterUrl(url)
+                        .build();
+                informAlarmImages.add(informAlarmImage);
+            }
+            informAlarmImageRepository.saveAll(informAlarmImages);
+            // 저장 성공
+            if (informAlarm != null){
+                // 앱 푸시 발송
+                List<NotificationToken> tokenList = notificationTokenRepository.findAll();
+                String sendStatus = fcmSendUtil.sendFCMToken(tokenList, requestDto , informAlarm);
+
+                // 푸시 성공
+                if (sendStatus.equals("1")){
+
+                    InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
+                    return informApplyResponseDto; // 최종 성공 반환
+
+                }
+                // 푸시 실패
+                else{
+                    throw new CommonException(ErrorCode.FCM_ERROR);
+                }
+            }
+        // InformAlarm 객체 저장 실패
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("INFORM ALARM ERROR : " + e.getMessage());
+        }
+        return null;
     }
 }

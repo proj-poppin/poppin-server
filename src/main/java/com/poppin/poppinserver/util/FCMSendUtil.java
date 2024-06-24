@@ -5,13 +5,14 @@ import com.google.firebase.messaging.*;
 
 import com.poppin.poppinserver.config.APNsConfiguration;
 import com.poppin.poppinserver.config.AndroidConfiguration;
+import com.poppin.poppinserver.domain.InformAlarm;
 import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class FCMSendUtil {
 
-    private final NotificationTokenRepository notificationTokenRepository;
     private final PopupRepository popupRepository;
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
@@ -36,6 +36,38 @@ public class FCMSendUtil {
 
     private final AlarmService alarmService;
 
+
+
+    /* 토큰 메시지 발송 */
+    public String sendFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
+        try {
+            for (NotificationToken token : tokenList) {
+                log.info("token : " + token.getToken());
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle(requestDto.title())
+                                .setBody(requestDto.body())
+                                .build())
+                        .setApnsConfig(apnsConfiguration.apnsConfig())
+                        .setAndroidConfig(androidConfiguration.androidConfig())
+                        .setToken(token.getToken())
+                        .putData("informId", informAlarm.getId().toString())
+                        .build();
+
+                try {
+                    String result = firebaseMessaging.send(message);
+                    log.info(" Successfully sent message: " + result);
+
+                } catch (FirebaseMessagingException e) {
+                    log.error("Failed to send message: " + e.getMessage());
+                }
+            }
+            return "1";
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "0";
+        }
+    }
 
 
     /**
@@ -56,14 +88,11 @@ public class FCMSendUtil {
             Popup popup = popupRepository.findById(fcmRequestDto.popupId())
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-            NotificationToken notificationToken = notificationTokenRepository.findByToken(fcmRequestDto.token());
-
             message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(fcmRequestDto.title())
                             .setBody( popup.getName() + " "  + fcmRequestDto.body())
                             .build())
-                    .setToken(notificationToken.getToken())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfig)
                     .setApnsConfig(apnsConfig)

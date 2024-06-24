@@ -3,8 +3,10 @@ package com.poppin.poppinserver.service;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.poppin.poppinserver.domain.InformAlarmImage;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.repository.InformAlarmImageRepository;
 import com.poppin.poppinserver.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,16 +19,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
+    private final InformAlarmImageRepository informAlarmImageRepository;
     private final AmazonS3Client s3Client;
     private final ImageUtil imageUtil;
 
     @Value("${cloud.aws.s3.popup-poster}")
     private String bucketPopupPoster;
+
+    @Value("${cloud.aws.s3.inform-poster}")
+    private String bucketInformPoster;
 
     @Value("${cloud.aws.s3.review-image}")
     private String bucketReviewImage;
@@ -350,5 +357,44 @@ public class S3Service {
         return fileName.substring(fileName.lastIndexOf("."));
     }
 
+    // 공지사항 이미지 저장
+    public List<String> uploadInformationPoster(List<MultipartFile> multipartFile) {
+        List<String> imgUrlList = new ArrayList<>();
+        log.info("upload images");
+
+        for (MultipartFile file : multipartFile) {
+
+            // seq 반환하기
+            Long seq;
+            Optional<InformAlarmImage> alarmImage = informAlarmImageRepository.findAlarmImageOrderByIdDesc();
+            if (alarmImage.isEmpty()) {
+                seq = 1L;
+            } else {
+                seq = alarmImage.get().getId() + 1;
+            }
+
+            String fileName = createFileName(file.getOriginalFilename(), seq);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+
+            try (InputStream originalInputStream = file.getInputStream()) {
+                // ImageUtil을 사용하여 이미지를 1:1 비율로 조정
+                InputStream processedInputStream = imageUtil.cropImageToSquare(originalInputStream);
+                log.info("crop image");
+
+                // 조정된 이미지의 크기를 계산
+                byte[] imageBytes = processedInputStream.readAllBytes();
+                objectMetadata.setContentLength(imageBytes.length);
+                objectMetadata.setContentType(file.getContentType());
+
+                // 조정된 이미지를 S3에 업로드
+                s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata));
+                imgUrlList.add(s3Client.getUrl(bucketInformPoster, fileName).toString());
+            } catch (IOException e) {
+                log.error("Error processing image for modifyInfoId: " + seq + ", fileName: " + fileName, e);
+                throw new CommonException(ErrorCode.SERVER_ERROR);
+            }
+        }
+        return imgUrlList;
+    }
 
 }
