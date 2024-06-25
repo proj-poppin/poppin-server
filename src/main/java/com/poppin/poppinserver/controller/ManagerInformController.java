@@ -45,6 +45,7 @@ public class ManagerInformController {
             @RequestParam(value = "introduce", required = false) String introduce,
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "addressDetail", required = false) String addressDetail,
+            @RequestParam(value = "entranceRequired", required = false) Boolean entranceRequired,
             @RequestParam(value = "entranceFee", required = false) String entranceFee,
             @RequestParam(value = "availableAge", required = false) EAvailableAge availableAge,
             @RequestParam(value = "parkingAvailable", required = false) Boolean parkingAvailable,
