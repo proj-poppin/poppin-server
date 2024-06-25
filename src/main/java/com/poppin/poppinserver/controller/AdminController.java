@@ -60,12 +60,6 @@ public class AdminController {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
-//    @GetMapping("/users/special-care")
-//    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "0") int page,
-//                                               @RequestParam(required = false, defaultValue = "44") int size) {
-//        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
-//    }
-
     /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}/reviews")
     public ResponseDto<?> readUserReviews(@PathVariable Long userId,
