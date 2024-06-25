@@ -1,12 +1,18 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
+import com.poppin.poppinserver.exception.CommonException;
+import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @RestController
 @Slf4j
@@ -37,8 +43,9 @@ public class AdminController {
     /* 회원 관리 목록 조회 */
     @GetMapping("/users")
     public ResponseDto<?> readUsers(@RequestParam(required = false, defaultValue = "0") int page,
-                                    @RequestParam(required = false, defaultValue = "44") int size) {
-        return ResponseDto.ok(adminService.readUsers(page, size));
+                                    @RequestParam(required = false, defaultValue = "44") int size,
+                                    @RequestParam(value = "care") Boolean care) {
+        return ResponseDto.ok(adminService.readUsers(page, size, care));
     }
 
     /* 회원 상세 조회 */
@@ -53,11 +60,11 @@ public class AdminController {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
-    @GetMapping("/users/special-care")
-    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "0") int page,
-                                               @RequestParam(required = false, defaultValue = "44") int size) {
-        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
-    }
+//    @GetMapping("/users/special-care")
+//    public ResponseDto<?> readSpecialCareUsers(@RequestParam(required = false, defaultValue = "0") int page,
+//                                               @RequestParam(required = false, defaultValue = "44") int size) {
+//        return ResponseDto.ok(adminService.readSpecialCareUsers(page, size));
+//    }
 
     /* 작성한 전체 후기 조회 */
     @GetMapping("/users/{userId}/reviews")
@@ -112,5 +119,16 @@ public class AdminController {
         return ResponseDto.created(adminService.processPopupReport(adminId, reportedPopupId, content));
     }
 
+    @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> createInformation(
+            @RequestPart(value = "images") MultipartFile images,
+            @RequestPart(value = "contents") InformAlarmRequestDto requestDto,
+            @UserId Long adminId
+    ){
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+        return ResponseDto.ok(adminService.createInformation(images,requestDto,adminId));
+    }
 
 }

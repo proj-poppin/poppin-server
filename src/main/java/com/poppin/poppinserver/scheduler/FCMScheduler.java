@@ -2,6 +2,7 @@ package com.poppin.poppinserver.scheduler;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.AlarmSetting;
+import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
@@ -17,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,7 +32,10 @@ public class FCMScheduler {
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
-    @Scheduled(cron = "0 */01 * * * *")
+
+
+
+    @Scheduled(cron = "0 */05 * * * *")
     public void reopenPopup(){
 
         /**
@@ -39,7 +43,9 @@ public class FCMScheduler {
          * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
          * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
          */
-        LocalDate now = LocalDate.now();
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+        LocalDate now = zonedDateTime.toLocalDate();
         log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
 
         List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
@@ -50,7 +56,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */01 * * * *")
+    @Scheduled(cron = "0 */05 * * * *")
     public void magamPopup(){
         /**
          * 마감 팝업 알림
@@ -71,18 +77,18 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */01 * * * *")
+    @Scheduled(cron = "0 */05 * * * *")
     public void openPopup() {
         /**
          * 오픈 팝업 알림
          * 1. popup 을 추출(조건 : 오픈 시간이 현재 시간보다 같거나 클 때 )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        // 한국 시간대 (KST) 설정
+
+        // 한국 시간 기준 현재 날짜와 시간
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
-        // 한국 시간 기준 현재 날짜와 시간
         LocalDate date = zonedDateTime.toLocalDate();
         LocalTime timeNow = zonedDateTime.toLocalTime();
         LocalTime timeBefore = timeNow.minusMinutes(5);
@@ -107,8 +113,12 @@ public class FCMScheduler {
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
         log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         // 7일 전 날짜 계산
-        LocalDate weekAgo = LocalDate.now().minusWeeks(1);
+        LocalDate now = zonedDateTime.toLocalDate();
+        LocalDate weekAgo = now.minusWeeks(1);
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
         LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
 
@@ -125,17 +135,21 @@ public class FCMScheduler {
      * 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
      *
      */
-    @Scheduled(cron = "0 */01 * * * *")
-    public void hoogi() {
-        LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
-
-        log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
-        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAgo);
-        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
-        else{
-            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
-        }
-    }
+//    @Scheduled(cron = "0 */05 * * * *")
+//    public void hoogi() {
+//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+//
+//        LocalDateTime now = zonedDateTime.toLocalDateTime();
+//        LocalDateTime threeHoursAgo = now.minusHours(3);
+//
+//        log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+//        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAgo);
+//        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
+//        else{
+//            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
+//        }
+//    }
 
 
     /**
@@ -147,17 +161,19 @@ public class FCMScheduler {
      */
     private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
 
-        List<FCMRequestDto> fcmRequestDtoList = null;
+        List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
-            List<String> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
+            List<NotificationToken> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
             if (tokenList.isEmpty()) log.info(topic + "에 대해 구독한 토큰이 없습니다.");
             else{
-                for (String token : tokenList){
+                for (NotificationToken token : tokenList){
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
-                    AlarmSetting set = alarmSettingRepository.findByToken(token);
+                    log.info("token : " + token.getToken());
+                    AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
+                    log.info("setting : " + set);
                     String setDefVal = set.getPushYn();
                     String setVal;
                     switch (topic){
@@ -168,7 +184,7 @@ public class FCMScheduler {
                         default -> setVal = "1";
                     }
                     if (setDefVal.equals("1") && setVal.equals("1")){
-                        FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token, info.getTitle(), info.getBody() , topic);
+                        FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
                         fcmRequestDtoList.add(fcmRequestDto);
                     }
                 }

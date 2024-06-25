@@ -67,13 +67,15 @@ public enum ErrorCode {
     NOT_FOUND_TOKEN("40414" , HttpStatus.NOT_FOUND , "알림 토큰이 저장된 내역이 없습니다"),
     NOT_FOUND_TOPIC("40415" , HttpStatus.NOT_FOUND , "알림 토픽이 저장된 내역이 없습니다"),
     NOT_FOUND_ALARM_SETTING("40416" , HttpStatus.NOT_FOUND , "알림 세팅 내역이 없습니다"),
+    NOT_FOUND_INFO_ALARM("40417" , HttpStatus.NOT_FOUND , "공지사항 상세 내역이 없습니다"),
+    NOT_FOUND_INFO_IMG("40417" , HttpStatus.NOT_FOUND , "공지사항 상세 이미지를 찾을 수 없습니다"),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
 
     // Server, File Up/DownLoad Error
-    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
-
+    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    FCM_ERROR("50001" , HttpStatus.INTERNAL_SERVER_ERROR , "공지사항 등록 중 앱 푸시 알림 오류입니다.");
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;

@@ -9,23 +9,18 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
+// 공지사항 알림 테이블
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "alarm")
-public class Alarm {
+@Table(name = "inform_alarm")
+public class InformAlarm {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "popup_id", nullable = false)
-    private Popup popupId;
-
-    @Column(name = "token" , nullable = false)
-    private String token;
 
     @Column(name = "title" , nullable = false)
     private String title;
@@ -42,14 +37,21 @@ public class Alarm {
     @Column(name = "created_at" , nullable = false)
     private LocalDate createdAt;
 
+    @Column(name = "is_read" , nullable = false)
+    private Boolean isRead;
+
     @Builder
-    public Alarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt) {
-        this.popupId = popupId;
-        this.token = token;
+    public InformAlarm(String title, String body, String keyword, String icon, LocalDate createdAt, Boolean isRead) {
         this.title = title;
         this.body = body;
         this.keyword = keyword;
         this.icon = icon;
         this.createdAt = createdAt;
+        this.isRead = isRead;
+    }
+
+    // isRead를 변경하는 메서드 추가
+    public void markAsRead() {
+        this.isRead = true;
     }
 }

@@ -9,7 +9,7 @@ public record PopupInfoDto(
        Long popupId,
 
         @NotNull
-        String token //fcm
+        String fcmToken //fcm
 ) {
 
 }
