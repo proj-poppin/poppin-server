@@ -2,6 +2,7 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.PopupAlarmRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.AlarmService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,18 @@ public class AlarmController {
 
     private final AlarmService alarmService;
 
-    // 팝업 알림 보여주기
+    // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
     public ResponseDto<?> readPopupAlarm(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto fcmTokenAlarmRequestDto){
         return ResponseDto.ok(alarmService.readPopupAlarmList(userId, fcmTokenAlarmRequestDto));
     }
+
+    // 팝업 알림 보여주기(1 depth)
+    @PostMapping("/popup/detail")
+    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody PopupAlarmRequestDto popupAlarmRequestDto){
+        return ResponseDto.ok(alarmService.readPopupDetail(userId, popupAlarmRequestDto));
+    }
+
 
     // 공지사항 알림 보여주기(1 depth)
     @GetMapping("/info")

@@ -56,4 +56,9 @@ public class PopupAlarm {
         this.createdAt = createdAt;
         this.isRead = isRead;
     }
+
+    // isRead를 변경하는 메서드 추가
+    public void markAsRead() {
+        this.isRead = true;
+    }
 }
