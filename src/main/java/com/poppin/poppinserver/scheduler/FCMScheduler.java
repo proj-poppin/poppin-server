@@ -35,26 +35,25 @@ public class FCMScheduler {
 
 
 
-//    @Scheduled(cron = "0 */05 * * * *")
-//    public void reopenPopup(){
-//
-//        /**
-//         * 재오픈 수요 팝업 재오픈 알림
-//         * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
-//         * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
-//         */
-//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-//        LocalDate now = zonedDateTime.toLocalDate();
-//        log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
-//
-//        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
-//        if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
-//        else{
-//
-//            schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPushInfo.REOPEN);
-//        }
-//    }
+    @Scheduled(cron = "0 */05 * * * *")
+    public void reopenPopup(){
+
+        /**
+         * 재오픈 수요 팝업 재오픈 알림
+         * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
+         * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
+         */
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+        LocalDate now = zonedDateTime.toLocalDate();
+        log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+
+        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
+        if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
+        else{
+            schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPushInfo.REOPEN);
+        }
+    }
 
     @Scheduled(cron = "0 */05 * * * *")
     public void magamPopup(){
@@ -105,30 +104,30 @@ public class FCMScheduler {
         }
     }
 
-//    @Scheduled(cron = "0 0 0 * * MON")
-//    public void hotPopup() {
-//        /**
-//         * 인기 팝업 알림
-//         * 1. popup 을 추출(조건 : 유저 생성 기점으로 7일 마다 인기 팝업 등록된 팝업 )
-//         * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
-//         */
-//        log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
-//
-//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-//        // 7일 전 날짜 계산
-//        LocalDate now = zonedDateTime.toLocalDate();
-//        LocalDate weekAgo = now.minusWeeks(1);
-//        LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
-//        LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
-//
-//        List<Popup> hotPopup = popupRepository.findTopOperatingPopupsByInterestAndViewCountAndUserCreate(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
-//
-//        if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
-//        else {
-//            schedulerFcmPopupTopicByType(hotPopup,EPopupTopic.HOT, EPushInfo.HOTPOPUP);
-//        }
-//    }
+    @Scheduled(cron = "0 0 0 * * MON")
+    public void hotPopup() {
+        /**
+         * 인기 팝업 알림
+         * 1. popup 을 추출(조건 : 유저 생성 기점으로 7일 마다 인기 팝업 등록된 팝업 )
+         * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
+         */
+        log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+        // 7일 전 날짜 계산
+        LocalDate now = zonedDateTime.toLocalDate();
+        LocalDate weekAgo = now.minusWeeks(1);
+        LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
+        LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
+
+        List<Popup> hotPopup = popupRepository.findTopOperatingPopupsByInterestAndViewCountAndUserCreate(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
+
+        if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
+        else {
+            fcmSendUtil.sendByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
+        }
+    }
 
     /**
      * 후기 요청

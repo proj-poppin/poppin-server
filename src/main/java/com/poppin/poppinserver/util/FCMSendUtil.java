@@ -13,8 +13,10 @@ import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.service.AlarmService;
+import com.poppin.poppinserver.type.EPushInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +31,12 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class FCMSendUtil {
 
-    private final PopupRepository popupRepository;
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
     private final AndroidConfiguration androidConfiguration;
+
+    private final PopupRepository popupRepository;
+    private final NotificationTokenRepository notificationTokenRepository;
 
     private final AlarmService alarmService;
 
@@ -68,6 +72,48 @@ public class FCMSendUtil {
             return "0";
         }
     }
+
+
+
+    /* 토큰 메시지 발송 */
+    public String sendByFCMToken(List<Popup> popupList , EPushInfo info) {
+        try {
+            // 인기,
+            List<Long> popupIdList = new ArrayList<>();
+            for (Popup p : popupList){
+                popupIdList.add(p.getId());
+            }
+
+            List<NotificationToken> tokenList = notificationTokenRepository.findAll();
+
+            for (NotificationToken token : tokenList) {
+                log.info("token : " + token.getToken());
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle(info.getTitle())
+                                .setBody(info.getBody())
+                                .build())
+                        .setApnsConfig(apnsConfiguration.apnsConfig())
+                        .setAndroidConfig(androidConfiguration.androidConfig())
+                        .setToken(token.getToken())
+                        .putData("popupList", popupIdList.toString())
+                        .build();
+
+                try {
+                    String result = firebaseMessaging.send(message);
+                    log.info(" Successfully sent message: " + result);
+
+                } catch (FirebaseMessagingException e) {
+                    log.error("Failed to send message: " + e.getMessage());
+                }
+            }
+            return "1";
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "0";
+        }
+    }
+
 
 
     /**
