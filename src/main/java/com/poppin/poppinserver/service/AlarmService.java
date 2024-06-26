@@ -48,6 +48,7 @@ public class AlarmService {
 
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
+    private final PopupService popupService;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
@@ -167,58 +168,14 @@ public class AlarmService {
     // 알림 - 팝업 공지사항(2 depth)
     public PopupDetailDto readPopupDetail(Long userId, Long popupId){
 
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-
         // 팝업 알림 isRead true 반환
         PopupAlarm popupAlarm = popupAlarmRepository.findByPopupId(popupId);
         popupAlarm.markAsRead();
         popupAlarmRepository.save(popupAlarm);
 
+        PopupDetailDto popupDetailDto = popupService.readDetail(popupId, userId);
 
-        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
-
-        // 리뷰 이미지 목록 가져오기
-        List<List<String>> reviewImagesList = new ArrayList<>();
-        List<Long> reviewCntList = new ArrayList<>();
-        for (Review review : reviews){
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
-
-            List<String> imagesList = new ArrayList<>();
-            for(ReviewImage reviewImage : reviewImages){
-                imagesList.add(reviewImage.getImageUrl());
-            }
-            reviewImagesList.add(imagesList);
-
-            reviewCntList.add(review.getUser().getReviewCnt());
-        }
-
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, reviewCntList);
-
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
-
-        Optional<Integer> visitors = visitService.showRealTimeVisitors(popupId); // 실시간 방문자
-
-        popupRepository.save(popup);
-
-        // 이미지 목록 가져오기
-        List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
-
-        List<String> imageList = new ArrayList<>();
-        for(PosterImage posterImage : posterImages){
-            imageList.add(posterImage.getPosterUrl());
-        }
-
-        // 관심 여부 확인
-        Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
-
-        Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
-
-        // 방문 여부 확인
-        if (!visit.isEmpty())return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
-        else return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
-
+        return  popupDetailDto;
     }
 
 
