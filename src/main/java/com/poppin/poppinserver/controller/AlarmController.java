@@ -2,8 +2,10 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.AlarmService;
+import com.poppin.poppinserver.service.AlarmSettingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AlarmController {
 
     private final AlarmService alarmService;
+    private final AlarmSettingService alarmSettingService;
 
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
@@ -43,5 +46,16 @@ public class AlarmController {
     @GetMapping("info/detail")
     public ResponseDto<?> readDetailInfoAlarm(@RequestParam("informId")Long informId){
         return ResponseDto.ok(alarmService.readDetailInformAlarm(informId));
+    }
+
+
+    @PostMapping("set")
+    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
+        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
+    }
+
+    @PostMapping("get")
+    public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto dto){
+        return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
 }

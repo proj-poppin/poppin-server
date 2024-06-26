@@ -55,7 +55,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */05 * * * *")
+    @Scheduled(cron = "0 0 9 * * *")
     public void magamPopup(){
         /**
          * 마감 팝업 알림

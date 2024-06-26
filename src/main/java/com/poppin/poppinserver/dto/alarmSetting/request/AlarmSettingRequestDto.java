@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record AlarmSettingRequestDto(
 
-        String token,
+        String fcmToken,
         String pushYn,
         String pushNightYn,
         String hoogiYn,
@@ -17,7 +17,7 @@ public record AlarmSettingRequestDto(
 
     public static AlarmSettingRequestDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn, String changeInfoYn) {
         return AlarmSettingRequestDto.builder()
-                .token(token)
+                .fcmToken(token)
                 .pushYn(pushYn)
                 .pushNightYn(pushNightYn)
                 .hoogiYn(hoogiYn)

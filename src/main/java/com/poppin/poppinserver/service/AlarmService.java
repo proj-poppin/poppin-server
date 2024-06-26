@@ -9,8 +9,7 @@ import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
-import com.poppin.poppinserver.dto.review.response.ReviewInfoDto;
-import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
+
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -18,7 +17,6 @@ import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
@@ -219,6 +217,7 @@ public class AlarmService {
             return  informAlarmResponseDto;
         }
     }
+
 
 
 
