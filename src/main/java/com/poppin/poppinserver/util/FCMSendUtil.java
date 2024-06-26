@@ -39,7 +39,7 @@ public class FCMSendUtil {
 
 
     /* 토큰 메시지 발송 */
-    public String sendFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
+    public String sendInformationByFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
         try {
             for (NotificationToken token : tokenList) {
                 log.info("token : " + token.getToken());

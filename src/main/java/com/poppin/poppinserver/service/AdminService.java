@@ -371,7 +371,7 @@ public class AdminService {
             if (informAlarm != null){
                 // 앱 푸시 발송
                 List<NotificationToken> tokenList = notificationTokenRepository.findAll();
-                String sendStatus = fcmSendUtil.sendFCMToken(tokenList, requestDto , informAlarm);
+                String sendStatus = fcmSendUtil.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
 
                 // 푸시 성공
                 if (sendStatus.equals("1")){
