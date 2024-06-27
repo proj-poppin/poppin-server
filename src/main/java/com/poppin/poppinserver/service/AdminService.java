@@ -392,4 +392,13 @@ public class AdminService {
         }
         return null;
     }
+
+    public void processReviewReportExec(Long adminId, Long reportedReviewId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        reportReview.execute(true, admin, LocalDateTime.now(), null);
+        reportReviewRepository.save(reportReview);
+    }
 }

@@ -91,6 +91,14 @@ public class AdminController {
         return ResponseDto.created(adminService.processReviewReport(adminId, reportedReviewId, content));
     }
 
+    /* 후기 신고 처리 - 변경 사항 없음 */
+    @PostMapping("/reports/reviews/{reportedReviewId}/exec")
+    public ResponseDto<?> processReviewReportExec(@UserId Long adminId,
+                                                  @PathVariable Long reportedReviewId) {
+        adminService.processReviewReportExec(adminId, reportedReviewId);
+        return ResponseDto.created("변경 사항 없이 처리되었습니다.");
+    }
+
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
     public ResponseDto<?> readPopupReports(@RequestParam(required = false, defaultValue = "0") int page,
