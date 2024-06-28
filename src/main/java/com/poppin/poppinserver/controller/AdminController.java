@@ -88,7 +88,8 @@ public class AdminController {
     public ResponseDto<?> processReviewReport(@UserId Long adminId,
                                              @PathVariable Long reportId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processReviewReport(adminId, reportId, content));
+        adminService.processReviewReport(adminId, reportId, content);
+        return ResponseDto.created("후기 신고 처리가 완료되었습니다.");
     }
 
     /* 후기 신고 처리 - 변경 사항 없음 */
@@ -97,6 +98,12 @@ public class AdminController {
                                                   @PathVariable Long reportId) {
         adminService.processReviewReportExec(adminId, reportId);
         return ResponseDto.created("변경 사항 없이 처리되었습니다.");
+    }
+
+    /* 후기 신고 처리 내용 조회 */
+    @GetMapping("/reports/reviews/{reportId}/exec")
+    public ResponseDto<?> readReviewReportExecContent(@PathVariable Long reportId) {
+        return ResponseDto.ok(adminService.readReviewReportExecContent(reportId));
     }
 
     /* 팝업 신고 목록 조회 */
@@ -113,21 +120,19 @@ public class AdminController {
         return ResponseDto.ok(adminService.readPopupReportDetail(reportId));
     }
 
-//    /* 팝업 신고 처리 내용 조회 */
-//    @GetMapping("/reports/popups/{reportId}/exec")
-//    public ResponseDto<?> readPopupReportExec(@PathVariable Long reportId) {
-//        return ResponseDto.ok(adminService.readPopupReportExec(reportId));
-//    }
-//
-//    /* 후기 신고 처리 내용 조회 */
-//    @GetMapping("/reports/reviews/{reportId}/exec")
+    /* 팝업 신고 처리 내용 조회 */
+    @GetMapping("/reports/popups/{reportId}/exec")
+    public ResponseDto<?> readPopupReportExecContent(@PathVariable Long reportId) {
+        return ResponseDto.ok(adminService.readPopupReportExecContent(reportId));
+    }
 
     /* 팝업 신고 처리 생성 */
     @PostMapping("/reports/popups/{reportId}")
     public ResponseDto<?> processPopupReport(@UserId Long adminId,
                                              @PathVariable Long reportId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processPopupReport(adminId, reportId, content));
+        adminService.processPopupReport(adminId, reportId, content);
+        return ResponseDto.created("팝업 신고 처리가 완료되었습니다.");
     }
 
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
