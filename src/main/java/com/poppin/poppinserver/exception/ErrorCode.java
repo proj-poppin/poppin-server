@@ -69,6 +69,8 @@ public enum ErrorCode {
     NOT_FOUND_ALARM_SETTING("40416" , HttpStatus.NOT_FOUND , "알림 세팅 내역이 없습니다"),
     NOT_FOUND_INFO_ALARM("40417" , HttpStatus.NOT_FOUND , "공지사항 상세 내역이 없습니다"),
     NOT_FOUND_INFO_IMG("40417" , HttpStatus.NOT_FOUND , "공지사항 상세 이미지를 찾을 수 없습니다"),
+    NOT_FOUND_POPUP_REPORT("40418" , HttpStatus.NOT_FOUND , "해당 팝업 신고 내역을 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW_REPORT("40419" , HttpStatus.NOT_FOUND , "해당 리뷰 신고 내역을 찾을 수 없습니다."),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
