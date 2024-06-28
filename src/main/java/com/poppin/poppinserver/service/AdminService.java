@@ -300,24 +300,28 @@ public class AdminService {
                 .build();
     }
 
-    public String processPopupReport(Long adminId, Long reportId, String content) {
+    public ReportExecContentDto processPopupReport(Long adminId, Long reportId, String content) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportPopup.execute(true, admin, LocalDateTime.now(), content);
         reportPopupRepository.save(reportPopup);
-        return content;
+        return ReportExecContentDto.builder()
+                .content(content)
+                .build();
     }
 
-    public String processReviewReport(Long adminId, Long reportId, String content) {    // 리뷰 신고 처리
+    public ReportExecContentDto processReviewReport(Long adminId, Long reportId, String content) {    // 리뷰 신고 처리
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportReview.execute(true, admin, LocalDateTime.now(), content);
         reportReviewRepository.save(reportReview);
-        return content;
+        return ReportExecContentDto.builder()
+                .content(content)
+                .build();
     }
 
 

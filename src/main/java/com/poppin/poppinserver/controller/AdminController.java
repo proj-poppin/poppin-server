@@ -113,6 +113,15 @@ public class AdminController {
         return ResponseDto.ok(adminService.readPopupReportDetail(reportId));
     }
 
+//    /* 팝업 신고 처리 내용 조회 */
+//    @GetMapping("/reports/popups/{reportId}/exec")
+//    public ResponseDto<?> readPopupReportExec(@PathVariable Long reportId) {
+//        return ResponseDto.ok(adminService.readPopupReportExec(reportId));
+//    }
+//
+//    /* 후기 신고 처리 내용 조회 */
+//    @GetMapping("/reports/reviews/{reportId}/exec")
+
     /* 팝업 신고 처리 생성 */
     @PostMapping("/reports/popups/{reportId}")
     public ResponseDto<?> processPopupReport(@UserId Long adminId,
