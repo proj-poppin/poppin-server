@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.repository;
 
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Review;
 import com.poppin.poppinserver.domain.ReviewRecommendUser;
 import com.poppin.poppinserver.domain.User;
@@ -13,4 +14,6 @@ import java.util.Optional;
 public interface ReviewRecommendUserRepository extends JpaRepository<ReviewRecommendUser, Long> {
 
    Optional<ReviewRecommendUser> findByUserAndReview(User user , Review review);
+
+   void deleteAllByReviewPopup(Popup popup);
 }
