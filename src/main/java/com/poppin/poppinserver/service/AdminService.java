@@ -114,25 +114,6 @@ public class AdminService {
                 .build();
     }
 
-//    public UserListDto readSpecialCareUsers(int page, int size) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
-//
-//        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
-//                .map(user -> UserAdministrationDto.builder()
-//                        .id(user.getId())
-//                        .email(user.getEmail())
-//                        .nickname(user.getNickname())
-//                        .requiresSpecialCare(user.getRequiresSpecialCare())
-//                        .build())
-//                .collect(Collectors.toList());
-//        Long userCnt = userPage.getTotalElements();
-//        return UserListDto.builder()
-//                .userList(userAdministrationDtoList)
-//                .userCnt(userCnt)
-//                .build();
-//    }
-
     public UserAdministrationDetailDto readUserDetail(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
