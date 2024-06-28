@@ -4,6 +4,7 @@ import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
+import com.poppin.poppinserver.dto.report.request.CreateReportExecContentDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.AdminService;
@@ -87,8 +88,8 @@ public class AdminController {
     @PostMapping("/reports/reviews/{reportId}")
     public ResponseDto<?> processReviewReport(@UserId Long adminId,
                                              @PathVariable Long reportId,
-                                             @RequestBody String content) {
-        adminService.processReviewReport(adminId, reportId, content);
+                                             @RequestBody CreateReportExecContentDto createReportExecContentDto) {
+        adminService.processReviewReport(adminId, reportId, createReportExecContentDto);
         return ResponseDto.created("후기 신고 처리가 완료되었습니다.");
     }
 
@@ -130,8 +131,8 @@ public class AdminController {
     @PostMapping("/reports/popups/{reportId}")
     public ResponseDto<?> processPopupReport(@UserId Long adminId,
                                              @PathVariable Long reportId,
-                                             @RequestBody String content) {
-        adminService.processPopupReport(adminId, reportId, content);
+                                             @RequestBody CreateReportExecContentDto createReportExecContentDto) {
+        adminService.processPopupReport(adminId, reportId, createReportExecContentDto);
         return ResponseDto.created("팝업 신고 처리가 완료되었습니다.");
     }
 

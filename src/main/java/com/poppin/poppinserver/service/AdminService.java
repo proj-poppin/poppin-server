@@ -7,6 +7,7 @@ import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.dto.report.request.CreateReportExecContentDto;
 import com.poppin.poppinserver.dto.report.response.*;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.dto.user.response.UserAdministrationDto;
@@ -300,21 +301,21 @@ public class AdminService {
                 .build();
     }
 
-    public void processPopupReport(Long adminId, Long reportId, String content) {
+    public void processPopupReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        reportPopup.execute(true, admin, LocalDateTime.now(), content);
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP_REPORT));
+        reportPopup.execute(true, admin, LocalDateTime.now(), createReportExecContentDto.content());
         reportPopupRepository.save(reportPopup);
     }
 
-    public void processReviewReport(Long adminId, Long reportId, String content) {    // 리뷰 신고 처리
+    public void processReviewReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {    // 리뷰 신고 처리
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        reportReview.execute(true, admin, LocalDateTime.now(), content);
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW_REPORT));
+        reportReview.execute(true, admin, LocalDateTime.now(), createReportExecContentDto.content());
         reportReviewRepository.save(reportReview);
     }
 
