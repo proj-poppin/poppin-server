@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ReportedReviewListResponseDto(
-        Long reportedReviewId,
+        Long reportId,
         Long reviewId,
         String reporter,
         String reportedAt,

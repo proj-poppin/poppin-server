@@ -114,25 +114,6 @@ public class AdminService {
                 .build();
     }
 
-//    public UserListDto readSpecialCareUsers(int page, int size) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<User> userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
-//
-//        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
-//                .map(user -> UserAdministrationDto.builder()
-//                        .id(user.getId())
-//                        .email(user.getEmail())
-//                        .nickname(user.getNickname())
-//                        .requiresSpecialCare(user.getRequiresSpecialCare())
-//                        .build())
-//                .collect(Collectors.toList());
-//        Long userCnt = userPage.getTotalElements();
-//        return UserListDto.builder()
-//                .userList(userAdministrationDtoList)
-//                .userCnt(userCnt)
-//                .build();
-//    }
-
     public UserAdministrationDetailDto readUserDetail(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -206,7 +187,7 @@ public class AdminService {
 
         List<ReportedReviewListResponseDto> reportedReviewListResponseDtos = reportReviews.getContent().stream()
                 .map(reportReview -> ReportedReviewListResponseDto.builder()
-                        .reportedReviewId(reportReview.getId())
+                        .reportId(reportReview.getId())
                         .reviewId(reportReview.getReviewId().getId())
                         .reporter(reportReview.getReporterId().getNickname())
                         .popupName(reportReview.getReviewId().getPopup().getName())
@@ -225,7 +206,7 @@ public class AdminService {
 
         List<ReportedPopupListResponseDto> reportedPopupListResponseDtos = reportPopups.getContent().stream()
                 .map(reportPopup -> ReportedPopupListResponseDto.builder()
-                        .reportedPopupId(reportPopup.getId())
+                        .reportId(reportPopup.getId())
                         .popupId(reportPopup.getPopupId().getId())
                         .reporter(reportPopup.getReporterId().getNickname())
                         .popupName(reportPopup.getPopupId().getName())
@@ -238,8 +219,8 @@ public class AdminService {
     }
 
     @Transactional
-    public ReportedPopupInfoDto readPopupReportDetail(Long reportedPopupId) {
-        ReportPopup reportPopup = reportPopupRepository.findById(reportedPopupId)
+    public ReportedPopupInfoDto readPopupReportDetail(Long reportId) {
+        ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         Popup popup = popupRepository.findById(reportPopup.getPopupId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -273,8 +254,8 @@ public class AdminService {
     }
 
     @Transactional
-    public ReportedReviewInfoDto readReviewReportDetail(Long reportedReviewId) {
-        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
+    public ReportedReviewInfoDto readReviewReportDetail(Long reportId) {
+        ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         Review review = reviewRepository.findById(reportReview.getReviewId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -319,24 +300,28 @@ public class AdminService {
                 .build();
     }
 
-    public String processPopupReport(Long adminId, Long reportedPopupId, String content) {
+    public ReportExecContentDto processPopupReport(Long adminId, Long reportId, String content) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        ReportPopup reportPopup = reportPopupRepository.findById(reportedPopupId)
+        ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportPopup.execute(true, admin, LocalDateTime.now(), content);
         reportPopupRepository.save(reportPopup);
-        return content;
+        return ReportExecContentDto.builder()
+                .content(content)
+                .build();
     }
 
-    public String processReviewReport(Long adminId, Long reportedReviewId, String content) {    // 리뷰 신고 처리
+    public ReportExecContentDto processReviewReport(Long adminId, Long reportId, String content) {    // 리뷰 신고 처리
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
+        ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportReview.execute(true, admin, LocalDateTime.now(), content);
         reportReviewRepository.save(reportReview);
-        return content;
+        return ReportExecContentDto.builder()
+                .content(content)
+                .build();
     }
 
 
@@ -393,10 +378,10 @@ public class AdminService {
         return null;
     }
 
-    public void processReviewReportExec(Long adminId, Long reportedReviewId) {
+    public void processReviewReportExec(Long adminId, Long reportId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        ReportReview reportReview = reportReviewRepository.findById(reportedReviewId)
+        ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         reportReview.execute(true, admin, LocalDateTime.now(), null);
         reportReviewRepository.save(reportReview);

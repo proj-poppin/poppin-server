@@ -78,24 +78,24 @@ public class AdminController {
     }
 
     /* 후기 신고 상세 조회 */
-    @GetMapping("/reports/reviews/{reportedReviewId}")
-    public ResponseDto<?> readReviewReportDetail(@PathVariable Long reportedReviewId) {
-        return ResponseDto.ok(adminService.readReviewReportDetail(reportedReviewId));
+    @GetMapping("/reports/reviews/{reportId}")
+    public ResponseDto<?> readReviewReportDetail(@PathVariable Long reportId) {
+        return ResponseDto.ok(adminService.readReviewReportDetail(reportId));
     }
 
     /* 후기 신고 처리 생성 */
-    @PostMapping("/reports/reviews/{reportedReviewId}")
+    @PostMapping("/reports/reviews/{reportId}")
     public ResponseDto<?> processReviewReport(@UserId Long adminId,
-                                             @PathVariable Long reportedReviewId,
+                                             @PathVariable Long reportId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processReviewReport(adminId, reportedReviewId, content));
+        return ResponseDto.created(adminService.processReviewReport(adminId, reportId, content));
     }
 
     /* 후기 신고 처리 - 변경 사항 없음 */
-    @PostMapping("/reports/reviews/{reportedReviewId}/exec")
+    @PostMapping("/reports/reviews/{reportId}/exec")
     public ResponseDto<?> processReviewReportExec(@UserId Long adminId,
-                                                  @PathVariable Long reportedReviewId) {
-        adminService.processReviewReportExec(adminId, reportedReviewId);
+                                                  @PathVariable Long reportId) {
+        adminService.processReviewReportExec(adminId, reportId);
         return ResponseDto.created("변경 사항 없이 처리되었습니다.");
     }
 
@@ -108,17 +108,26 @@ public class AdminController {
     }
 
     /* 팝업 신고 상세 조회 */
-    @GetMapping("/reports/popups/{reportedPopupId}")
-    public ResponseDto<?> readPopupReportDetail(@PathVariable Long reportedPopupId) {
-        return ResponseDto.ok(adminService.readPopupReportDetail(reportedPopupId));
+    @GetMapping("/reports/popups/{reportId}")
+    public ResponseDto<?> readPopupReportDetail(@PathVariable Long reportId) {
+        return ResponseDto.ok(adminService.readPopupReportDetail(reportId));
     }
 
+//    /* 팝업 신고 처리 내용 조회 */
+//    @GetMapping("/reports/popups/{reportId}/exec")
+//    public ResponseDto<?> readPopupReportExec(@PathVariable Long reportId) {
+//        return ResponseDto.ok(adminService.readPopupReportExec(reportId));
+//    }
+//
+//    /* 후기 신고 처리 내용 조회 */
+//    @GetMapping("/reports/reviews/{reportId}/exec")
+
     /* 팝업 신고 처리 생성 */
-    @PostMapping("/reports/popups/{reportedPopupId}")
+    @PostMapping("/reports/popups/{reportId}")
     public ResponseDto<?> processPopupReport(@UserId Long adminId,
-                                             @PathVariable Long reportedPopupId,
+                                             @PathVariable Long reportId,
                                              @RequestBody String content) {
-        return ResponseDto.created(adminService.processPopupReport(adminId, reportedPopupId, content));
+        return ResponseDto.created(adminService.processPopupReport(adminId, reportId, content));
     }
 
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
