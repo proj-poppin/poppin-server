@@ -112,7 +112,7 @@ public class AuthService {
     private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
         Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
-        if (user.isPresent()) {
+        if (user.isPresent() && user.get().getProvider().equals(provider)) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
             return jwtTokenDto;
