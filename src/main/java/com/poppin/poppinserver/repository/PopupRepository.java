@@ -48,7 +48,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND p.operation_status = 'OPERATING' " +
                     "ORDER BY p.open_date DESC, p.id",
             nativeQuery = true)
-    List<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
+    Page<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
 
     //팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
@@ -96,7 +96,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "AND (:experience IS NULL OR pp.experience = :experience)" +
                     "AND (:etc IS NULL OR tp.etc = :etc)",
             nativeQuery = true)
-    List<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
+    Page<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
                                             Boolean market, Boolean display, Boolean experience,
                                             Boolean fashionBeauty, Boolean characters, Boolean foodBeverage,
                                             Boolean webtoonAni, Boolean interiorThings, Boolean movie,

@@ -448,11 +448,26 @@ public class ModifyInfoService {
 
     @Transactional
     public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
+        log.info("delete modify info data");
         List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
 
         for (ModifyInfo modifyInfo : modifyInfoList) {
             // proxy popup 삭제
             Popup proxyPopup = modifyInfo.getProxyPopup();
+
+            // modify info 삭제
+            log.info("delete modify info");
+            // modify info 이미지 삭제
+            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
+            List<String> modifyUrls = modifyImages.stream()
+                    .map(ModifyImages::getImageUrl)
+                    .toList();
+            if(modifyUrls.size() != 0){
+                s3Service.deleteMultipleImages(modifyUrls);
+                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
+            }
+            // modify info 삭제
+            modifyInformRepository.delete(modifyInfo);
 
                 // proxy popup 이미지 삭제
             List<PosterImage> proxyImages = posterImageRepository.findAllByPopupId(proxyPopup);
@@ -468,20 +483,10 @@ public class ModifyInfoService {
             alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
                 // proxy popup 삭제
+            log.info("delete proxy popup");
             popupRepository.delete(proxyPopup);
 
-            // modify info 삭제
-                // modify info 이미지 삭제
-            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
-            List<String> modifyUrls = proxyImages.stream()
-                    .map(PosterImage::getPosterUrl)
-                    .toList();
-            if(modifyUrls.size() != 0){
-                s3Service.deleteMultipleImages(modifyUrls);
-                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
-            }
-                // modify info 삭제
-            modifyInformRepository.delete(modifyInfo);
+
         }
     } // 프록시 팝업 삭제 및 정보수정요청 삭제
 }

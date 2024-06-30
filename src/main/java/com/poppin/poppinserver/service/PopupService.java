@@ -189,6 +189,7 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 후기 관련 데이터
+        log.info("delete reveiw data");
         reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
 
         reviewRepository.deleteAllByPopup(popup);
@@ -196,27 +197,34 @@ public class PopupService {
         // 알람 관련 데이터
 
         // 관심 추가 데이터
+        log.info("delete interest data");
         interestRepository.deleteAllByPopupId(popupId);
 
         // 신고 관련 데이터
+        log.info("delete report data");
         reportPopupRepository.deleteAllByPopupId(popup);
 
         // 실시간 방문자 수 관련 데이터
+        log.info("delete visit data");
         visitRepository.deleteAllByPopup(popup);
 
         // 제보 관련 데이터
+        log.info("delete inform data");
             // 운영자 제보
         managerInformRepository.deleteAllByPopupId(popup);
             // 사용자 제보
         userInformRepository.deleteAllByPopupId(popup);
 
         // 정보수정요청 관련 데이터
+        log.info("delete modify info data");
         modifyInfoService.deleteProxyPopupAndModifyInfoByPopupId(popupId);
 
         // 알람 키워드
+        log.info("delete alarm data");
         alarmKeywordRepository.deleteAllByPopupId(popup);
 
         // 팝업 이미지
+        log.info("delete popup image");
         List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
         List<String> fileUrls = posterImages.stream()
                 .map(PosterImage::getPosterUrl)
@@ -226,6 +234,7 @@ public class PopupService {
             posterImageRepository.deleteAllByPopupId(popup);
         }
 
+        log.info("delete popup");
         popupRepository.delete(popup);
 
         return true;
@@ -543,7 +552,7 @@ public class PopupService {
         }
     } // 취향저격 팝업 조회
 
-    public List<PopupSearchingDto> readSearchingList(String text, String taste, String prepered,
+    public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                      EOperationStatus oper, EPopupSort order, int page, int size,
                                                      Long userId){
         User user = userRepository.findById(userId)
@@ -600,7 +609,7 @@ public class PopupService {
             }
         }
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
                 market, display, experience, // 팝업 형태 3개
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
@@ -609,10 +618,13 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
-        return PopupSearchingDto.fromEntityList(popups, user);
+        List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+
+        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 로그인 팝업 검색
 
-    public List<PopupSearchingDto> readBaseList(String text, int page, int size, Long userId){
+    public PagingResponseDto readBaseList(String text, int page, int size, Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -622,12 +634,15 @@ public class PopupService {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
 
-        return PopupSearchingDto.fromEntityList(popups, user);
+        List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+
+        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 로그인 베이스 팝업 검색
 
-    public List<PopupGuestSearchingDto> readGuestSearchingList(String text, String taste, String prepered,
+    public PagingResponseDto readGuestSearchingList(String text, String taste, String prepered,
                                                                EOperationStatus oper, EPopupSort order, int page, int size){
         // 카테고리 요청 코드 길이 유효성 체크
         if(taste.length() < 3 || prepered.length() < 14){
@@ -680,7 +695,7 @@ public class PopupService {
             }
         }
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
                 market, display, experience, // 팝업 형태 3개
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
@@ -689,18 +704,25 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
-        return PopupGuestSearchingDto.fromEntityList(popups);
+        List<PopupGuestSearchingDto> popupSearchingDtos = PopupGuestSearchingDto.fromEntityList(popups.getContent());
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+
+        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 비로그인 팝업 검색
 
-    public List<PopupGuestSearchingDto> readGuestBaseList(String text, int page, int size){
+    public PagingResponseDto readGuestBaseList(String text, int page, int size){
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
         if (text != null && text.trim() != ""){
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        List<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
-        return PopupGuestSearchingDto.fromEntityList(popups);
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
+
+        List<PopupGuestSearchingDto> popupSearchingDtos = PopupGuestSearchingDto.fromEntityList(popups.getContent());
+        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+
+        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 비로그인 베이스 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
