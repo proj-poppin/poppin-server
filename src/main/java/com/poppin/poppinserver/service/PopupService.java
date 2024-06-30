@@ -53,6 +53,7 @@ public class PopupService {
     private final ManagerInformRepository managerInformRepository;
     private final UserInformRepository userInformRepository;
     private final ReportPopupRepository reportPopupRepository;
+    private final ReviewRecommendUserRepository reviewRecommendUserRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -186,7 +187,10 @@ public class PopupService {
     public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
         // 후기 관련 데이터
+        reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
+
         reviewRepository.deleteAllByPopup(popup);
 
         // 알람 관련 데이터
