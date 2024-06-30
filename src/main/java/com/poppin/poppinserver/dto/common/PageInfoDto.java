@@ -7,7 +7,8 @@ import org.springframework.data.domain.Page;
 public record PageInfoDto(
         Integer page,
         Integer size,
-        Integer totalPages
+        Integer totalPages,
+        Boolean isLast
 ) {
     public static PageInfoDto fromPageInfo(Page<?> result) {
 
@@ -15,6 +16,7 @@ public record PageInfoDto(
                 .page(result.getPageable().getPageNumber())
                 .size(result.getPageable().getPageSize())
                 .totalPages(result.getTotalPages())
+                .isLast(result.isLast())
                 .build();
     }
 }
