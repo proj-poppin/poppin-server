@@ -301,6 +301,7 @@ public class AdminService {
                 .build();
     }
 
+    @Transactional
     public void processPopupReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -310,6 +311,7 @@ public class AdminService {
         reportPopupRepository.save(reportPopup);
     }
 
+    @Transactional
     public void processReviewReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {    // 리뷰 신고 처리
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
