@@ -30,7 +30,7 @@ public class ModifyInfo {
     private Popup originPopup; // 기존 팝업 id
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proxy_popup", nullable = true)
+    @JoinColumn(name = "proxy_popup", nullable = false)
     private Popup proxyPopup; // 임시 팝업 id
 
     @Column(name = "created_at", nullable = false)
