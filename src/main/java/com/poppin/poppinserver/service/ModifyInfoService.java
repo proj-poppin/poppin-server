@@ -468,10 +468,6 @@ public class ModifyInfoService {
                 // proxy popup 알람 키워드 삭제
             alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
-                // proxy popup 삭제
-            log.info("delete proxy popup");
-            popupRepository.delete(proxyPopup);
-
             // modify info 삭제
             log.info("delete modify info");
                 // modify info 이미지 삭제
@@ -483,6 +479,10 @@ public class ModifyInfoService {
                 s3Service.deleteMultipleImages(modifyUrls);
                 modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
             }
+
+            // proxy popup 삭제
+            log.info("delete proxy popup");
+            popupRepository.delete(proxyPopup);
                 // modify info 삭제
             modifyInformRepository.delete(modifyInfo);
         }
