@@ -448,6 +448,7 @@ public class ModifyInfoService {
 
     @Transactional
     public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
+        log.info("delete modify info data");
         List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
 
         for (ModifyInfo modifyInfo : modifyInfoList) {
@@ -468,9 +469,11 @@ public class ModifyInfoService {
             alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
                 // proxy popup 삭제
+            log.info("delete proxy popup");
             popupRepository.delete(proxyPopup);
 
             // modify info 삭제
+            log.info("delete modify info");
                 // modify info 이미지 삭제
             List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
             List<String> modifyUrls = proxyImages.stream()

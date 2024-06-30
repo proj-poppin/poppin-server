@@ -189,6 +189,7 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 후기 관련 데이터
+        log.info("delete reveiw data");
         reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
 
         reviewRepository.deleteAllByPopup(popup);
@@ -196,27 +197,34 @@ public class PopupService {
         // 알람 관련 데이터
 
         // 관심 추가 데이터
+        log.info("delete interest data");
         interestRepository.deleteAllByPopupId(popupId);
 
         // 신고 관련 데이터
+        log.info("delete report data");
         reportPopupRepository.deleteAllByPopupId(popup);
 
         // 실시간 방문자 수 관련 데이터
+        log.info("delete visit data");
         visitRepository.deleteAllByPopup(popup);
 
         // 제보 관련 데이터
+        log.info("delete inform data");
             // 운영자 제보
         managerInformRepository.deleteAllByPopupId(popup);
             // 사용자 제보
         userInformRepository.deleteAllByPopupId(popup);
 
         // 정보수정요청 관련 데이터
+        log.info("delete modify info data");
         modifyInfoService.deleteProxyPopupAndModifyInfoByPopupId(popupId);
 
         // 알람 키워드
+        log.info("delete alarm data");
         alarmKeywordRepository.deleteAllByPopupId(popup);
 
         // 팝업 이미지
+        log.info("delete popup image");
         List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
         List<String> fileUrls = posterImages.stream()
                 .map(PosterImage::getPosterUrl)
@@ -226,6 +234,7 @@ public class PopupService {
             posterImageRepository.deleteAllByPopupId(popup);
         }
 
+        log.info("delete popup");
         popupRepository.delete(popup);
 
         return true;
