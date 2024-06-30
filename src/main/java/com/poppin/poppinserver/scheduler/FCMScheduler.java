@@ -6,8 +6,8 @@ import com.poppin.poppinserver.domain.NotificationToken;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
+import com.poppin.poppinserver.repository.NotificationTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.repository.PopupTopicRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.type.EPushInfo;
 import com.poppin.poppinserver.util.FCMSendUtil;
@@ -28,7 +28,7 @@ import java.util.List;
 public class FCMScheduler {
 
     private final PopupRepository popupRepository;
-    private final PopupTopicRepository popupTopicRepository;
+    private final NotificationTokenRepository notificationTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
@@ -164,7 +164,7 @@ public class FCMScheduler {
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
-            List<NotificationToken> tokenList = (popupTopicRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
+            List<NotificationToken> tokenList = (notificationTokenRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
             if (tokenList.isEmpty()) log.info(topic + "에 대해 구독한 토큰이 없습니다.");
             else{
                 for (NotificationToken token : tokenList){

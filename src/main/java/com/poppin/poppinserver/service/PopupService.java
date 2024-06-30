@@ -54,11 +54,13 @@ public class PopupService {
     private final UserInformRepository userInformRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final ReviewRecommendUserRepository reviewRecommendUserRepository;
+    private final PopupTopicRepository popupTopicRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
     private final ModifyInfoService modifyInfoService;
+    private final FCMService fcmService;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
@@ -194,7 +196,14 @@ public class PopupService {
 
         reviewRepository.deleteAllByPopup(popup);
 
-        // 알람 관련 데이터
+        // 알람 관련 데이터(1. 구독 해제, 2. topic 삭제)
+        List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
+
+        for (PopupTopic topic: topicList) {
+            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.MAGAM );
+            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
+            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
+        }
 
         // 관심 추가 데이터
         log.info("delete interest data");
