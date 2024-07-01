@@ -31,11 +31,12 @@ public class Constant {
             "/api/v1/auth/login/apple",
             "/api/v1/auth/email/verification",
             "/api/v1/auth/email/verification/password",
-            "/api/v1/noti/token/test",
-            "/api/v1/noti/topic/test",
+            "/api/v1/noti/token/test", // fcm 토큰 테스트
+            "/api/v1/noti/topic/test", // fcm 토픽 테스트
             "/api/v1/noti/apply/FCMtoken", // fcm 토큰 등록
             "/api/v1/user/support/faqs",
             "/api/v1/user/random-nickname",
+            "/api/v1/alarm/", // 홈 화면 진입 시 알림 아이콘 빨간 점 여부
             "/api/v1/alarm/info", // 공지사항 알림
             "/api/v1/alarm/info/detail" // 공지사항 알림 2 depth
     );

@@ -23,6 +23,12 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final AlarmSettingService alarmSettingService;
 
+    // 알림 안읽은 것 여부
+    @PostMapping("/")
+    public ResponseDto<?> readAlarm(@RequestBody FcmTokenAlarmRequestDto fcmTokenAlarmRequestDto){
+        return ResponseDto.ok(alarmService.readAlarm(fcmTokenAlarmRequestDto));
+    }
+
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
     public ResponseDto<?> readPopupAlarm(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto fcmTokenAlarmRequestDto){
@@ -58,4 +64,6 @@ public class AlarmController {
     public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto dto){
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
+
+
 }

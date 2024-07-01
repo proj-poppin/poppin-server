@@ -41,8 +41,7 @@ public class FCMSendUtil {
     private final AlarmService alarmService;
 
 
-
-    /* 토큰 메시지 발송 */
+    /* 공지사항 토큰 메시지 발송 */
     public String sendInformationByFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
         try {
             for (NotificationToken token : tokenList) {
@@ -73,9 +72,7 @@ public class FCMSendUtil {
         }
     }
 
-
-
-    /* 토큰 메시지 발송 */
+    /* 스케줄러 후기 발송 */
     public String sendByFCMToken(List<Popup> popupList , EPushInfo info) {
         try {
             // 인기,

@@ -30,6 +30,7 @@ public class AlarmSettingService {
                 .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting alarmSetting = alarmSettingRepository.findByToken(reqDto.fcmToken());
+        if (alarmSetting == null) throw new CommonException(ErrorCode.NOT_FOUND_ALARM_SETTING);
 
         alarmSettingRepository.delete(alarmSetting); // 삭제
 

@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.type.EOperationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -156,8 +155,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p " +
             "JOIN Visit v ON p.id = v.popup.id " +
             "JOIN User u ON v.user.id = u.id " +
-            "WHERE v.createdAt <= :threeHoursAgo")
-    List<Popup> findHoogi(@Param("threeHoursAgo") LocalDateTime threeHoursAgo);
+            "WHERE v.createdAt between :threeHoursAndMin AND :threeHoursAgo")
+    List<Popup> findHoogi(@Param("threeHoursAndMin") LocalDateTime threeHoursAndMin, @Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
             "WHERE p.operationStatus = :oper " +
