@@ -95,24 +95,24 @@ public class UserController {
     }
 
     /*작성완료 인증후기 보기*/
-    @PostMapping("/review/finish/certi")
+    @GetMapping("/review/finish/certi")
     public ResponseDto<?> getCertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getCertifiedReview(userId, reviewId, popupId));
     }
 
     /*작성완료 미인증후기 보기*/
-    @PostMapping("/review/finish/uncerti")
+    @GetMapping("/review/finish/uncerti")
     public ResponseDto<?> getUncertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") Long reviewId, @RequestParam(value = "popupId") Long popupId){
         return ResponseDto.ok(userService.getUncertifiedReview(userId, reviewId, popupId));
     }
 
-    /*마이페이지 - 방문한 팝업 조회*/
+    /*마이페이지 - 후기 작성하기 - 방문한 팝업 조회*/
     @GetMapping("popup/v/certi")
     public ResponseDto<?> getCertifiedPopupList(@UserId Long userId){
         return ResponseDto.ok(userService.getCertifiedPopupList(userId));
     }
 
-    /*마이페이지 - 방문한 팝업 후기 작성*/
+    /*마이페이지 - 후기 작성하기 - 방문한 팝업 후기 작성*/
     @PostMapping(value = "review/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createMPCertiReview(
             @UserId Long userId,
@@ -127,7 +127,7 @@ public class UserController {
         return ResponseDto.ok(reviewService.writeCertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
     }
 
-    /*마이페이지 - 방문한 팝업 일반 후기 작성*/
+    /*마이페이지 - 후기 작성하기 - 일반 후기 작성*/
     @PostMapping(value = "review/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createMPUncertiReview(
             @UserId Long userId,
