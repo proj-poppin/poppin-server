@@ -4,7 +4,6 @@ import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Review;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,7 +17,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.popup.id = :popupId ORDER BY r.recommendCnt DESC")
-    List<Review> findAllByPopupIdOrderByRecommendCntDesc(@Param("popupId") Long popupId, PageRequest pageable);
+    List<Review> findAllByPopupIdOrderByRecommendCntDesc(@Param("popupId") Long popupId);
 
     @Query("SELECT r FROM Review r join Popup p on p.id = r.popup.id WHERE p.id = :popupId AND r.id = :reviewId")
     Review findByReviewIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);

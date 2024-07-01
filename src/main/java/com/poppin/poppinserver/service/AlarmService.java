@@ -2,7 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
@@ -80,7 +80,7 @@ public class AlarmService {
     private String bangmun;
 
 
-    public UnreadAlarmResponseDto readAlarm(FcmTokenAlarmRequestDto fcmRequestDto){
+    public UnreadAlarmResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
         UnreadAlarmResponseDto responseDto;
         List<InformAlarm> informAlarms = informAlarmRepository.findUnreadInformAlarms();
         List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken());
@@ -161,7 +161,7 @@ public class AlarmService {
 
 
     // 알림 - 팝업 공지사항(1 depth)
-    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, FcmTokenAlarmRequestDto fcmRequestDto){
+    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, AlarmTokenRequestDto fcmRequestDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
