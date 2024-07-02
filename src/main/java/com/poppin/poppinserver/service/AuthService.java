@@ -202,6 +202,9 @@ public class AuthService {
         if (email != user.getEmail() && !bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
+        if (user.getIsDeleted()) {
+            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+        }
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         return jwtTokenDto;
