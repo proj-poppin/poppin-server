@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.util.push.ios;
 
-import com.poppin.poppinserver.dto.notification.request.APNsRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.APNsRequestDto;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;

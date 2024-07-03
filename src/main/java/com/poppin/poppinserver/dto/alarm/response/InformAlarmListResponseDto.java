@@ -12,8 +12,7 @@ public record InformAlarmListResponseDto(
         String title,
         String body,
         LocalDate createdAt,
-        String iconUrl,
-        Boolean isRead // 읽음 여부
+        String iconUrl
 ) {
 
     public static InformAlarmListResponseDto fromEntity(InformAlarm alarm){
@@ -24,7 +23,6 @@ public record InformAlarmListResponseDto(
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())
                 .iconUrl(alarm.getIcon())
-                .isRead(alarm.getIsRead())
                 .build();
     }
 }

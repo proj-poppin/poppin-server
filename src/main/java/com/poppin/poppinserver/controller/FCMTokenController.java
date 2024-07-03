@@ -2,9 +2,9 @@ package com.poppin.poppinserver.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.dto.common.ResponseDto;
-import com.poppin.poppinserver.dto.notification.request.PushDto;
-import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
-import com.poppin.poppinserver.service.NotificationService;
+import com.poppin.poppinserver.dto.fcm.request.PushDto;
+import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
+import com.poppin.poppinserver.service.FCMService;
 import com.poppin.poppinserver.util.push.android.FCMTestUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/noti")
-public class NotificationController {
+public class FCMTokenController {
 
-    private final NotificationService notificationService;
+    private final FCMService fcmService;
     private final FCMTestUtil FCMTestUtil;
 
     @PostMapping("/token/test")
@@ -36,6 +36,6 @@ public class NotificationController {
     /*알림 허용 시 데이터 저장*/
     @PostMapping("/apply/FCMtoken")
     public ResponseDto<?> addFCMTokenUsers(@RequestBody TokenRequestDto tokenRequestDto){
-        return ResponseDto.ok(notificationService.fcmApplyToken(tokenRequestDto));
+        return ResponseDto.ok(fcmService.fcmApplyToken(tokenRequestDto));
     }
 }

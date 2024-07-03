@@ -3,12 +3,12 @@ package com.poppin.poppinserver.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.UnreadAlarmResponseDto;
-import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
 
 import com.poppin.poppinserver.exception.CommonException;
@@ -39,14 +39,8 @@ public class AlarmService {
     private final InformAlarmRepository informAlarmRepository;
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final UserRepository userRepository;
-    private final VisitRepository visitRepository;
-    private final InterestRepository interestRepository;
-    private final ReviewRepository reviewRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final InformIsReadRepository informIsReadRepository;
 
-    private final VisitorDataService visitorDataService;
-    private final VisitService visitService;
     private final PopupService popupService;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
@@ -80,10 +74,18 @@ public class AlarmService {
     private String bangmun;
 
 
-    public UnreadAlarmResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
+    /**
+     *  홈 화면 진입 시 읽지 않은 공지 여부 판단
+     * @param userId
+     * @param fcmRequestDto
+     * @return
+     */
+    public UnreadAlarmResponseDto readAlarm(Long userId, AlarmTokenRequestDto fcmRequestDto){
         UnreadAlarmResponseDto responseDto;
-        List<InformAlarm> informAlarms = informAlarmRepository.findUnreadInformAlarms();
-        List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken());
+
+        List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(userId); // 공지
+        List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
+
         if (!informAlarms.isEmpty() && !popupAlarms.isEmpty()){
             responseDto = UnreadAlarmResponseDto.fromEntity(true);
         }
@@ -93,9 +95,9 @@ public class AlarmService {
         return responseDto;
     }
 
-    public String insertPopupAlarmKeyword(FCMRequestDto fcmRequestDto) {
+    public String insertPopupAlarm(FCMRequestDto fcmRequestDto) {
 
-        log.info("POPUP ALARM inserting \n");
+        log.info("POPUP ALARM insert");
 
         try {
 
@@ -131,9 +133,9 @@ public class AlarmService {
     }
 
     // 알림 - 일반 공지사항 등록
-    public InformAlarm insertInformAlarmKeyword(InformAlarmRequestDto requestDto) {
+    public InformAlarm insertInformAlarm(InformAlarmCreateRequestDto requestDto) {
 
-        log.info("INFORM ALARM inserting");
+        log.info("INFORM ALARM insert");
 
         try {
             String keyword = "INFORM";
@@ -145,7 +147,6 @@ public class AlarmService {
                     .keyword(keyword)
                     .icon(iconUrl)
                     .createdAt(LocalDate.now())
-                    .isRead(false)
                     .build();
 
             informAlarmRepository.save(alarm);
@@ -157,7 +158,6 @@ public class AlarmService {
             return null;
         }
     }
-
 
 
     // 알림 - 팝업 공지사항(1 depth)
@@ -192,8 +192,6 @@ public class AlarmService {
     }
 
 
-
-
     // 공지사항 알림 (1 depth)
     public List<InformAlarmListResponseDto> readInformAlarmList(){
         List<InformAlarmListResponseDto> informAlarmListResponseDtoList = new ArrayList<>();
@@ -208,14 +206,18 @@ public class AlarmService {
 
 
     // 공지사항 알림 (2 depth)
-    public InformAlarmResponseDto readDetailInformAlarm(Long informId){
-        // informAlarm 먼저 찾고, isRead true로 저장
+    public InformAlarmResponseDto readDetailInformAlarm(Long userId, Long informId){
+
+        // isRead
+        InformIsRead informIsRead = informIsReadRepository.findByUserIdAndInformId(userId, informId);
+        informIsRead.getIsRead();
+        informIsReadRepository.save(informIsRead);
+
+        // informAlarm
         InformAlarm informAlarm = informAlarmRepository.findById(informId)
                         .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_INFO_ALARM));
-        informAlarm.markAsRead();
-        informAlarmRepository.save(informAlarm);
 
-        // InfoAlarmImages에서 이미지 url 찾기
+        // informAlarm img
         Optional<InformAlarmImage> img = informAlarmImageRepository.findByAlarmId(informId);
         if (img.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_INFO_IMG);
 
@@ -234,6 +236,11 @@ public class AlarmService {
     }
 
 
+    // 공지사항 읽음 여부 테이블에 유저 정보와 함께 저장
+    public void insertInformIsRead(User user, InformAlarm informAlarm){
+        InformIsRead informIsRead = new InformIsRead(informAlarm, user);
+        informIsReadRepository.save(informIsRead);
+    }
 
 
     private URL getUrlForTopic(EPopupTopic topic) {

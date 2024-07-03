@@ -21,7 +21,7 @@ public class PopupTopic {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "token_id", nullable = false)
-    private NotificationToken tokenId; // 토큰 id
+    private FCMToken tokenId; // 토큰 id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id", nullable = false)
@@ -31,7 +31,7 @@ public class PopupTopic {
     private String topicCode; // 타입
 
     @Builder
-    public PopupTopic(NotificationToken token, Popup popup, String topicCode){
+    public PopupTopic(FCMToken token, Popup popup, String topicCode){
         this.tokenId        = token;
         this.popup          = popup;
         this.topicCode      = topicCode;

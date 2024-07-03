@@ -3,7 +3,7 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;
-import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
@@ -45,7 +45,7 @@ public class PopupService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final InterestRepository interestRepository;
-    private final NotificationTokenRepository notificationTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandUserRepository reopenDemandUserRepository;
     private final AlarmKeywordRepository alarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
@@ -743,7 +743,7 @@ public class PopupService {
         Popup popup = popupRepository.findById(pushRequestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        NotificationToken token = notificationTokenRepository.findByToken(pushRequestDto.token());
+        FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());
         if (token==null) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
 
         ReopenDemandUser reopenDemandUser = new ReopenDemandUser(user, popup, pushRequestDto.token(), token.getMod_dtm(),token.getExp_dtm());

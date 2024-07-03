@@ -3,7 +3,7 @@ package com.poppin.poppinserver.util.push.android;
 import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.config.APNsConfiguration;
 import com.poppin.poppinserver.config.AndroidConfiguration;
-import com.poppin.poppinserver.dto.notification.request.PushDto;
+import com.poppin.poppinserver.dto.fcm.request.PushDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

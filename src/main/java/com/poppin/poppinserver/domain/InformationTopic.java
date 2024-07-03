@@ -23,7 +23,7 @@ public class InformationTopic {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "token_id", nullable = false)
-    private NotificationToken tokenId; // 토큰 id
+    private FCMToken tokenId; // 토큰 id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id", nullable = false)
@@ -44,7 +44,7 @@ public class InformationTopic {
 
 
     @Builder
-    public InformationTopic(NotificationToken token, String type, LocalDateTime mod_dtm, EInformationTopic topic) {
+    public InformationTopic(FCMToken token, String type, LocalDateTime mod_dtm, EInformationTopic topic) {
         this.tokenId = token;
         this.topic = topic;
         this.type = type;

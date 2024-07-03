@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Table(name = "notification_token")
-public class NotificationToken {
+public class FCMToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,16 +34,16 @@ public class NotificationToken {
     private String device;         // android or ios
 
     @Builder
-    public NotificationToken( String token, LocalDateTime mod_dtm ,String device ){
+    public FCMToken(String token, LocalDateTime mod_dtm , String device ){
         this.token      = token;
         this.mod_dtm    = mod_dtm;
-        this.exp_dtm    = mod_dtm.plusMonths(2); // 2달 뒤
+        this.exp_dtm    = mod_dtm.plusMonths(1); // 1달
         this.device     = device;
     }
 
     // 토큰 갱신
     public void regenerateToken(){
         this.mod_dtm = LocalDateTime.now();
-        this.exp_dtm = mod_dtm.plusMonths(2);
+        this.exp_dtm = mod_dtm.plusMonths(1);
     }
 }

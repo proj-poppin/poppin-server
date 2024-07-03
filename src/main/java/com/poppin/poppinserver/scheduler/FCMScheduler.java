@@ -2,11 +2,11 @@ package com.poppin.poppinserver.scheduler;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.AlarmSetting;
-import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
-import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.type.EPushInfo;
@@ -28,7 +28,7 @@ import java.util.List;
 public class FCMScheduler {
 
     private final PopupRepository popupRepository;
-    private final NotificationTokenRepository notificationTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSendUtil fcmSendUtil;
 
@@ -36,7 +36,7 @@ public class FCMScheduler {
 
 
     @Scheduled(cron = "0 */05 * * * *")
-    public void reopenPopup(){
+    private void reopenPopup(){
 
         /**
          * 재오픈 수요 팝업 재오픈 알림
@@ -46,7 +46,7 @@ public class FCMScheduler {
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         LocalDate now = zonedDateTime.toLocalDate();
-        log.info("- - - - - - - - - - - - - - - - - - - - - 재오픈알림 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("REOPEN popup scheduler start");
 
         List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
         if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
@@ -56,7 +56,7 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 0 9 * * *")
-    public void magamPopup(){
+    private void magamPopup(){
         /**
          * 마감 팝업 알림
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
@@ -68,7 +68,7 @@ public class FCMScheduler {
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate tomorrow = zonedDateTime.toLocalDate().plusDays(1);
 
-        log.info("- - - - - - - - - - - - - - - - - - - - - 마감팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("MAGAM popup scheduler start");
         List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow); // null, 1, many
         if (magamPopup.isEmpty())log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
         else{
@@ -77,7 +77,7 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 */05 * * * *")
-    public void openPopup() {
+    private void openPopup() {
         /**
          * 오픈 팝업 알림
          * 1. popup 을 추출(조건 : 오픈 시간이 현재 시간보다 같거나 클 때 )
@@ -91,12 +91,12 @@ public class FCMScheduler {
         LocalDate date = zonedDateTime.toLocalDate();
         LocalTime timeNow = zonedDateTime.toLocalTime();
         LocalTime timeBefore = timeNow.minusMinutes(5);
-        log.info("- - - - - - - - - - - - - - - - - - - - - 오픈팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("OPEN popup scheduler start");
         log.info("date : " + date);
         log.info("timeNow : " + timeNow);
         log.info("timeBefore : " + timeBefore);
 
-          List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
+        List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
 
         if (openPopup.isEmpty())log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
         else {
@@ -105,13 +105,13 @@ public class FCMScheduler {
     }
 
     @Scheduled(cron = "0 0 0 * * MON")
-    public void hotPopup() {
+    private void hotPopup() {
         /**
          * 인기 팝업 알림
          * 1. popup 을 추출(조건 : 유저 생성 기점으로 7일 마다 인기 팝업 등록된 팝업 )
          * 2. popup topic 테이블에서 popup id + IP 조건으로 token list 추출
          */
-        log.info("- - - - - - - - - - - - - - - - - - - - - 인기팝업 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("HOT popup scheduler start");
 
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
@@ -135,7 +135,7 @@ public class FCMScheduler {
      *
      */
     @Scheduled(cron = "0 */05 * * * *")
-    public void hoogi() {
+    private void hoogi() {
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
@@ -143,7 +143,7 @@ public class FCMScheduler {
         LocalDateTime threeHoursAndMin = now.minusHours(3).minusMinutes(5);
         LocalDateTime threeHoursAgo = now.minusHours(3);
 
-        log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        log.info("hoogi scheduler start");
         List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAndMin, threeHoursAgo);
         if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
         else{
@@ -165,10 +165,10 @@ public class FCMScheduler {
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
-            List<NotificationToken> tokenList = (notificationTokenRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
-            if (tokenList.isEmpty()) log.info(topic + "에 대해 구독한 토큰이 없습니다.");
+            List<FCMToken> tokenList = (fcmTokenRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
+            if (tokenList.isEmpty()) log.info("nothing subscribed on : " + topic);
             else{
-                for (NotificationToken token : tokenList){
+                for (FCMToken token : tokenList){
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
                     log.info("token : " + token.getToken());
@@ -190,7 +190,7 @@ public class FCMScheduler {
                 }
             }
         }
-        if (fcmRequestDtoList == null) {log.info(topic + "에 대해 메시지 발송할 토큰이 없습니다.");}
+        if (fcmRequestDtoList == null) {log.info("tokens doesn't have existed on : " + topic);}
         else {fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
     }
 }

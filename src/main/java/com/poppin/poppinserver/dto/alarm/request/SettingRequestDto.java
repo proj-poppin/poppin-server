@@ -1,5 +1,8 @@
 package com.poppin.poppinserver.dto.alarm.request;
 
+import lombok.Builder;
+
+@Builder
 public record SettingRequestDto(
 
          String fcmToken,

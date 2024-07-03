@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.dto.report.request.CreateReportExecContentDto;
@@ -139,7 +139,7 @@ public class AdminController {
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createInformation(
             @RequestPart(value = "images") MultipartFile images,
-            @RequestPart(value = "contents") InformAlarmRequestDto requestDto,
+            @RequestPart(value = "contents") InformAlarmCreateRequestDto requestDto,
             @UserId Long adminId
     ){
         if (images.isEmpty()) {

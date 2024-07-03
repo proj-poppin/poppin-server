@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;
@@ -44,7 +44,7 @@ public class AdminService {
     private final VisitRepository visitRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PopupRepository popupRepository;
-    private final NotificationTokenRepository notificationTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     private final InformAlarmRepository informAlarmRepository;
     private final InformAlarmImageRepository informAlarmImageRepository;
@@ -324,7 +324,7 @@ public class AdminService {
 
     public InformApplyResponseDto createInformation(
             MultipartFile images,
-            InformAlarmRequestDto requestDto,
+            InformAlarmCreateRequestDto requestDto,
             Long adminId
     ){
         User admin = userRepository.findById(adminId)
@@ -334,8 +334,18 @@ public class AdminService {
 
             // Alarm 객체 저장
             log.info("INFORM ALARM Entity Saving");
-            InformAlarm informAlarm = alarmService.insertInformAlarmKeyword(requestDto);
-            informAlarmRepository.save(informAlarm);
+
+            InformAlarm informAlarm = alarmService.insertInformAlarm(requestDto);
+            if (informAlarm.equals(null))throw new CommonException(ErrorCode.INFO_ALARM_ERROR);
+            else informAlarmRepository.save(informAlarm);
+
+            // Inform 읽음 여부 테이블에 유저 정보와 함께 저장
+            List<User> userList = userRepository.findAll();
+            for (User user: userList){
+                if (!user.getRole().toString().equals("ADMIN")){ // 관리자가 아닐때만
+                    alarmService.insertInformIsRead(user, informAlarm);
+                }
+            }
 
             // 이미지 저장
             List<String> fileUrls = s3Service.uploadInformationPoster(images);
@@ -349,10 +359,11 @@ public class AdminService {
                 informAlarmImages.add(informAlarmImage);
             }
             informAlarmImageRepository.saveAll(informAlarmImages);
+
             // 저장 성공
             if (informAlarm != null){
                 // 앱 푸시 발송
-                List<NotificationToken> tokenList = notificationTokenRepository.findAll();
+                List<FCMToken> tokenList = fcmTokenRepository.findAll();
                 String sendStatus = fcmSendUtil.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
 
                 // 푸시 성공

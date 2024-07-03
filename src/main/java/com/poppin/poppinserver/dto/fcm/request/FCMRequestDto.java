@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.dto.notification.request;
+package com.poppin.poppinserver.dto.fcm.request;
 
 import com.poppin.poppinserver.type.EPopupTopic;
 import jakarta.validation.constraints.NotNull;
