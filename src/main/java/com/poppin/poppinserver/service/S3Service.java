@@ -346,6 +346,7 @@ public class S3Service {
         fileValidate.add(".TIFF");
         fileValidate.add(".svg");
         fileValidate.add(".SVG");
+        fileValidate.add(".webp");
         fileValidate.add(".WebP");
         fileValidate.add(".WEBP");
         fileValidate.add(".jfif");
