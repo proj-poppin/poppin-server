@@ -24,7 +24,7 @@ public class AlarmController {
     private final AlarmSettingService alarmSettingService;
 
     // 알림 안읽은 것 여부
-    @PostMapping("/")
+    @PostMapping("/read")
     public ResponseDto<?> readAlarm(@UserId Long userId, @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
         return ResponseDto.ok(alarmService.readAlarm(userId, alarmTokenRequestDto));
     }
@@ -55,12 +55,12 @@ public class AlarmController {
     }
 
 
-    @PostMapping("/set")
+    @PostMapping("/update/setting")
     public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
         return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
     }
 
-    @PostMapping("/get")
+    @PostMapping("/read/setting")
     public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody AlarmTokenRequestDto dto){
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
