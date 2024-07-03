@@ -2,6 +2,7 @@ package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.dto.interest.request.InterestRequestDto;
 import com.poppin.poppinserver.service.InterestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +16,13 @@ public class InterestController {
     private final InterestService interestService;
 
     @PostMapping("/add-interest")
-    public ResponseDto<?> addInterest(@RequestParam("popupId") Long popupId, @UserId Long userId, @RequestParam("fcm_token")String token){
+    public ResponseDto<?> addInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto){
         log.info("userId : " + userId.toString());
-        return ResponseDto.ok(interestService.userAddInterest(popupId, userId, token));
+        return ResponseDto.ok(interestService.userAddInterest(userId, interestRequestDto));
     }
 
     @DeleteMapping("/remove-interest")
-    public ResponseDto<?> removeInterest(@RequestParam("popupId") Long popupId, @UserId Long userId, @RequestParam("fcm_token")String token){
-        return ResponseDto.ok(interestService.removeInterest(userId, popupId, token));
+    public ResponseDto<?> removeInterest( @UserId Long userId,  @RequestBody InterestRequestDto interestRequestDto){
+        return ResponseDto.ok(interestService.removeInterest(userId, interestRequestDto));
     }
 }

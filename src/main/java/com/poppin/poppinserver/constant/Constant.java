@@ -36,7 +36,6 @@ public class Constant {
             "/api/v1/noti/apply/FCMtoken", // fcm 토큰 등록
             "/api/v1/user/support/faqs",
             "/api/v1/user/random-nickname",
-            "/api/v1/alarm/", // 홈 화면 진입 시 알림 아이콘 빨간 점 여부
             "/api/v1/alarm/info", // 공지사항 알림
             "/api/v1/alarm/info/detail", // 공지사항 알림 2 depth
             "/api/v1/auth/reset-password/no-auth"
