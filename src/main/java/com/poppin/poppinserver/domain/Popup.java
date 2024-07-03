@@ -46,6 +46,9 @@ public class Popup {
     @Column(name = "entrance_fee")
     private String entranceFee;
 
+    @Column(name = "entrance_required", nullable = false)
+    private Boolean entranceRequired;
+
     @Column(name = "resv_required")
     private Boolean resvRequired;
 
@@ -118,7 +121,7 @@ public class Popup {
 
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,
-                 String address, String addressDetail, String entranceFee,
+                 String address, String addressDetail, String entranceFee, Boolean entranceRequired,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, Double latitude, Double longitude, String operationExcept, String operationStatus,
@@ -129,6 +132,7 @@ public class Popup {
         this.introduce = introduce;
         this.address = address;
         this.addressDetail = addressDetail;
+        this.entranceRequired = entranceRequired;
         this.entranceFee = entranceFee;
         this.resvRequired = resvRequired;
         this.availableAge = availableAge;
@@ -151,7 +155,7 @@ public class Popup {
     }
 
     public void update(String homepageLink, String name, String introduce,
-                 String address, String addressDetail, String entranceFee,
+                 String address, String addressDetail, Boolean entranceRequired, String entranceFee,
                  Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
                  LocalDate openDate, LocalDate closeDate, LocalTime openTime,
                  LocalTime closeTime, Double latitude, Double longitude, String operationExcept, String operationStatus,
@@ -161,6 +165,7 @@ public class Popup {
         this.introduce = introduce;
         this.address = address;
         this.addressDetail = addressDetail;
+        this.entranceRequired = entranceRequired;
         this.entranceFee = entranceFee;
         this.resvRequired = resvRequired;
         this.availableAge = availableAge;

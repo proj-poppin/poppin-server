@@ -19,6 +19,7 @@ public record PopupDto(
         String introduce,
         String address,
         String addressDetail,
+        Boolean entranceRequired,
         String entranceFee,
         String availableAge,
         String availableAgeValue,
@@ -88,6 +89,13 @@ public record PopupDto(
             availableAgeValue = popup.getAvailableAge().toString();
         }
 
+        String entranceFee = null;
+        if (popup.getEntranceRequired() == true) {
+            entranceFee = popup.getEntranceFee();
+        } else {
+            entranceFee = "0";
+        }
+
         return PopupDto.builder()
                 .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
@@ -95,7 +103,9 @@ public record PopupDto(
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
-                .entranceFee(popup.getEntranceFee())
+                .addressDetail(popup.getAddressDetail())
+                .entranceRequired(popup.getEntranceRequired())
+                .entranceFee(entranceFee)
                 .availableAge(availableAge)
                 .availableAgeValue(availableAgeValue)
                 .parkingAvailable(popup.getParkingAvailable())

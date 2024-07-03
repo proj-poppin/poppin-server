@@ -84,6 +84,7 @@ public class ManagerInformService {
                 .availableAge(createManagerInformDto.availableAge())
                 .closeDate(createManagerInformDto.closeDate())
                 .closeTime(createManagerInformDto.closeTime())
+                .entranceRequired(createManagerInformDto.entranceRequired())
                 .entranceFee(createManagerInformDto.entranceFee())
                 .resvRequired(createManagerInformDto.resvRequired())
                 .introduce(createManagerInformDto.introduce())
@@ -216,6 +217,7 @@ public class ManagerInformService {
                 updateManagerInfromDto.introduce(),
                 updateManagerInfromDto.address(),
                 updateManagerInfromDto.addressDetail(),
+                updateManagerInfromDto.entranceRequired(),
                 updateManagerInfromDto.entranceFee(),
                 updateManagerInfromDto.resvRequired(),
                 updateManagerInfromDto.availableAge(),
@@ -338,6 +340,7 @@ public class ManagerInformService {
                 updateManagerInfromDto.introduce(),
                 updateManagerInfromDto.address(),
                 updateManagerInfromDto.addressDetail(),
+                updateManagerInfromDto.entranceRequired(),
                 updateManagerInfromDto.entranceFee(),
                 updateManagerInfromDto.resvRequired(),
                 updateManagerInfromDto.availableAge(),

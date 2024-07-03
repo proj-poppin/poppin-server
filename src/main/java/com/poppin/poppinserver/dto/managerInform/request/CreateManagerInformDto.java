@@ -19,6 +19,7 @@ public record CreateManagerInformDto(
         String introduce,
         String address,
         String addressDetail,
+        Boolean entranceRequired,
         String entranceFee,
         EAvailableAge availableAge,
         Boolean parkingAvailable,
