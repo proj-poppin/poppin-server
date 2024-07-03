@@ -49,18 +49,18 @@ public class AlarmController {
     }
 
     // 공지사항 디테일 (2 depth)
-    @GetMapping("info/detail")
+    @GetMapping("/info/detail")
     public ResponseDto<?> readDetailInfoAlarm(@UserId Long userId, @RequestParam("informId")Long informId){
         return ResponseDto.ok(alarmService.readDetailInformAlarm(userId, informId));
     }
 
 
-    @PostMapping("set")
+    @PostMapping("/set")
     public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
         return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
     }
 
-    @PostMapping("get")
+    @PostMapping("/get")
     public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody AlarmTokenRequestDto dto){
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
