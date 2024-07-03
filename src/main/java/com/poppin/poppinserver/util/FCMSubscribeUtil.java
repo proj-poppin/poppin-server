@@ -30,12 +30,21 @@ public class FCMSubscribeUtil {
         registrationTokens.add(token.getToken());
 
         TopicManagementResponse response = null;
-        // 구독
-        PopupTopic popupTopic = new PopupTopic(token, popup, topic.getCode());
-        popupTopicRepository.save(popupTopic);
-        response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString());
 
-        log.info(response.getSuccessCount() + " token(s) were subscribed successfully : " + token.getToken());
+        log.info("subscribe start");
+
+        // 중복 저장되는 오류 방어 코드 작성
+        PopupTopic topicExist = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
+        if (topicExist != null){
+            popupTopicRepository.delete(topicExist);
+        }
+        else{
+            PopupTopic popupTopic = new PopupTopic(token, popup, topic.getCode());
+            popupTopicRepository.save(popupTopic);
+
+            response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString());
+            log.info(response.getSuccessCount() + " token(s) were subscribed successfully : " + token.getToken());
+        }
     }
 
     public void unsubscribePopupTopic(NotificationToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
