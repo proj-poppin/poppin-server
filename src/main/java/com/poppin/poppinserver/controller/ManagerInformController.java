@@ -80,7 +80,7 @@ public class ManagerInformController {
 
         CreatePreferedDto prefered = new CreatePreferedDto(market, display, experience, null);
         CreateTasteDto taste = new CreateTasteDto(fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings, movie, musical, sports, game, itTech, kpop, alcohol, animalPlant, etc);
-        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail, homepageLink, name, introduce, address, addressDetail, entranceFee, availableAge, parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered, taste);
+        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail, homepageLink, name, introduce, address, addressDetail, entranceRequired, entranceFee, availableAge, parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered, taste);
 
         return ResponseDto.ok(managerInformService.createManagerInform(createManagerInformDto, images, userId));
     }

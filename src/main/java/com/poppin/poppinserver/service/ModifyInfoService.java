@@ -85,6 +85,7 @@ public class ModifyInfoService {
                 .availableAge(popup.getAvailableAge())
                 .closeDate(popup.getCloseDate())
                 .closeTime(popup.getCloseTime())
+                .entranceRequired(popup.getEntranceRequired())
                 .entranceFee(popup.getEntranceFee())
                 .resvRequired(popup.getResvRequired())
                 .introduce(popup.getIntroduce())
@@ -286,6 +287,7 @@ public class ModifyInfoService {
                 updateModifyInfoDto.introduce(),
                 updateModifyInfoDto.address(),
                 updateModifyInfoDto.addressDetail(),
+                updateModifyInfoDto.entranceRequired(),
                 updateModifyInfoDto.entranceFee(),
                 updateModifyInfoDto.resvRequired(),
                 updateModifyInfoDto.availableAge(),
@@ -423,6 +425,7 @@ public class ModifyInfoService {
                 updateModifyInfoDto.introduce(),
                 updateModifyInfoDto.address(),
                 updateModifyInfoDto.addressDetail(),
+                updateModifyInfoDto.entranceRequired(),
                 updateModifyInfoDto.entranceFee(),
                 updateModifyInfoDto.resvRequired(),
                 updateModifyInfoDto.availableAge(),

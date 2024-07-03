@@ -46,7 +46,7 @@ public class FCMSubscribeUtil {
         TopicManagementResponse response = null;
         // 구독 해제
         PopupTopic popupTopic = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
-        popupTopicRepository.delete(popupTopic);
+        if (popupTopic != null ) popupTopicRepository.delete(popupTopic);
         response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic.toString()); // 구독 해제
 
         log.info(response.getSuccessCount() + " token(s) were unsubscribed successfully");

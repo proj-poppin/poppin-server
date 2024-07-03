@@ -18,6 +18,7 @@ public record CreatePopupDto(
         String address,
         String addressDetail,
         @NotNull
+        Boolean entranceRequired,
         String entranceFee,
         @NotNull
         EAvailableAge availableAge,

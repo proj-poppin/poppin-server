@@ -124,6 +124,7 @@ public class PopupService {
                 .availableAge(createPopupDto.availableAge())
                 .closeDate(createPopupDto.closeDate())
                 .closeTime(createPopupDto.closeTime())
+                .entranceRequired(createPopupDto.entranceRequired())
                 .entranceFee(createPopupDto.entranceFee())
                 .resvRequired(createPopupDto.resvRequired())
                 .introduce(createPopupDto.introduce())
@@ -325,6 +326,7 @@ public class PopupService {
                 updatePopupDto.introduce(),
                 updatePopupDto.address(),
                 updatePopupDto.addressDetail(),
+                updatePopupDto.entranceRequired(),
                 updatePopupDto.entranceFee(),
                 updatePopupDto.resvRequired(),
                 updatePopupDto.availableAge(),
