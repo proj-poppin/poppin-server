@@ -111,6 +111,10 @@ public class AuthService {
 
     private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
         Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
+        // 회원 탈퇴 여부 확인
+        if (user.isPresent() && user.get().getIsDeleted()) {
+            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+        }
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (user.isPresent() && user.get().getProvider().equals(provider)) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
@@ -198,8 +202,21 @@ public class AuthService {
         if (email != user.getEmail() && !bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
+        if (user.getIsDeleted()) {
+            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+        }
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         return jwtTokenDto;
+    }
+
+    @Transactional
+    public void resetPasswordNoAuth(PasswordResetDto passwordResetDto) {
+        User user = userRepository.findByEmail(passwordResetDto.email())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!passwordResetDto.password().equals(passwordResetDto.passwordConfirm())) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        user.updatePassword(bCryptPasswordEncoder.encode(passwordResetDto.password()));
     }
 }

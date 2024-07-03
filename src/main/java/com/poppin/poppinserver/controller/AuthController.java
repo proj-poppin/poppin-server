@@ -56,6 +56,12 @@ public class AuthController {
         return ResponseDto.ok("비밀번호 변경 성공");
     }
 
+    @PostMapping("/reset-password/no-auth")
+    public ResponseDto<?> resetPasswordNoAuth(@RequestBody @Valid PasswordResetDto passwordResetDto) {
+        authService.resetPasswordNoAuth(passwordResetDto);
+        return ResponseDto.ok("비밀번호가 재설정되었습니다.");
+    }
+
     @PostMapping("/verification/password")
     public ResponseDto<?> verifyPassword(@UserId Long userId, @RequestBody @Valid PasswordVerificationDto passwordVerificationDto) {
         return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationDto));

@@ -41,41 +41,37 @@ public class FCMSendUtil {
     private final AlarmService alarmService;
 
 
-
-    /* 토큰 메시지 발송 */
+    /* 공지사항 토큰 메시지 발송 */
     public String sendInformationByFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
-        try {
-            for (NotificationToken token : tokenList) {
-                log.info("token : " + token.getToken());
-                Message message = Message.builder()
-                        .setNotification(Notification.builder()
-                                .setTitle(requestDto.title())
-                                .setBody(requestDto.body())
-                                .build())
-                        .setApnsConfig(apnsConfiguration.apnsConfig())
-                        .setAndroidConfig(androidConfiguration.androidConfig())
-                        .setToken(token.getToken())
-                        .putData("informId", informAlarm.getId().toString())
-                        .build();
 
-                try {
-                    String result = firebaseMessaging.send(message);
-                    log.info(" Successfully sent message: " + result);
+        for (NotificationToken token : tokenList) {
+            log.info("token : " + token.getToken());
+            Message message = Message.builder()
+                    .setNotification(Notification.builder()
+                            .setTitle(requestDto.title())
+                            .setBody(requestDto.body())
+                            .build())
+                    .setApnsConfig(apnsConfiguration.apnsConfig())
+                    .setAndroidConfig(androidConfiguration.androidConfig())
+                    .setToken(token.getToken())
+                    .putData("informId", informAlarm.getId().toString())
+                    .build();
 
-                } catch (FirebaseMessagingException e) {
-                    log.error("Failed to send message: " + e.getMessage());
-                }
+            try {
+                String result = firebaseMessaging.send(message);
+                log.info(" Successfully sent message: " + result);
+
+                refreshToken(token); // 토큰일자 갱신
+
+            } catch (FirebaseMessagingException e) {
+                log.error("Failed to send message: " + e.getMessage());
+                return "0"; // fail
             }
-            return "1";
-        }catch (Exception e) {
-            e.printStackTrace();
-            return "0";
         }
+        return "1"; // success
     }
 
-
-
-    /* 토큰 메시지 발송 */
+    /* 스케줄러 후기 발송 */
     public String sendByFCMToken(List<Popup> popupList , EPushInfo info) {
         try {
             // 인기,
@@ -102,6 +98,8 @@ public class FCMSendUtil {
                 try {
                     String result = firebaseMessaging.send(message);
                     log.info(" Successfully sent message: " + result);
+
+                    refreshToken(token);
 
                 } catch (FirebaseMessagingException e) {
                     log.error("Failed to send message: " + e.getMessage());
@@ -145,21 +143,24 @@ public class FCMSendUtil {
                     .putData("popupId" , fcmRequestDto.popupId().toString())
                     .build();
 
-            log.info("TOPIC message sending \n");
+            log.info("TOPIC message sending...");
             try {
 
                 String result = firebaseMessaging.send(message);
-                log.debug( " Successfully sent message: " + result);
+                log.debug( "Successfully sent message: " + result);
+
+                NotificationToken token = notificationTokenRepository.findByToken(fcmRequestDto.token());
+                refreshToken(token); // 토큰 갱신
 
                 // 알림 키워드 등록
                 String flag = alarmService.insertPopupAlarmKeyword(fcmRequestDto);
                 if (flag.equals("1")){
-                    log.info(fcmRequestDto.token()+" alarm success ");
+                    log.info(fcmRequestDto.token() +    " alarm success ");
                 }else{
-                    log.error(fcmRequestDto.token() + " alarm fail");
+                    log.error(fcmRequestDto.token() +   " alarm fail");
                 }
             } catch (FirebaseMessagingException e) {
-                log.error(" Failed to send message: " + e.getMessage());
+                log.error("Failed to send message: " + e.getMessage());
             }
         }
 
@@ -199,6 +200,20 @@ public class FCMSendUtil {
                 log.error(" List of tokens that caused failures: " + failedTokens);
             }else log.info(" List of tokens send messages SUCCESSFULLY");
         }
+    }
+
+
+    /**
+     * FCM 토큰 갱신
+     * @param token
+     */
+    private void refreshToken(NotificationToken token){
+
+        log.info("refresh token : " + token.getToken());
+
+        token.regenerateToken();
+        notificationTokenRepository.save(token);
+
     }
 
 }

@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.AlarmService;
@@ -23,10 +23,16 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final AlarmSettingService alarmSettingService;
 
+    // 알림 안읽은 것 여부
+    @PostMapping("/")
+    public ResponseDto<?> readAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+        return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
+    }
+
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
-    public ResponseDto<?> readPopupAlarm(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto fcmTokenAlarmRequestDto){
-        return ResponseDto.ok(alarmService.readPopupAlarmList(userId, fcmTokenAlarmRequestDto));
+    public ResponseDto<?> readPopupAlarm(@UserId Long userId, @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+        return ResponseDto.ok(alarmService.readPopupAlarmList(userId, alarmTokenRequestDto));
     }
 
     // 팝업 알림 보여주기(2 depth)
@@ -55,7 +61,9 @@ public class AlarmController {
     }
 
     @PostMapping("get")
-    public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody FcmTokenAlarmRequestDto dto){
+    public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody AlarmTokenRequestDto dto){
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
+
+
 }

@@ -2,11 +2,12 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
+import com.poppin.poppinserver.dto.alarm.response.UnreadAlarmResponseDto;
 import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
 
@@ -78,6 +79,20 @@ public class AlarmService {
     @Value("${cloud.aws.s3.alarm.icon.bangmun}")
     private String bangmun;
 
+
+    public UnreadAlarmResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
+        UnreadAlarmResponseDto responseDto;
+        List<InformAlarm> informAlarms = informAlarmRepository.findUnreadInformAlarms();
+        List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken());
+        if (!informAlarms.isEmpty() && !popupAlarms.isEmpty()){
+            responseDto = UnreadAlarmResponseDto.fromEntity(true);
+        }
+        else {
+            responseDto = UnreadAlarmResponseDto.fromEntity(false);
+        }
+        return responseDto;
+    }
+
     public String insertPopupAlarmKeyword(FCMRequestDto fcmRequestDto) {
 
         log.info("POPUP ALARM inserting \n");
@@ -118,7 +133,7 @@ public class AlarmService {
     // 알림 - 일반 공지사항 등록
     public InformAlarm insertInformAlarmKeyword(InformAlarmRequestDto requestDto) {
 
-        log.info("INFORM ALARM inserting \n");
+        log.info("INFORM ALARM inserting");
 
         try {
             String keyword = "INFORM";
@@ -146,7 +161,7 @@ public class AlarmService {
 
 
     // 알림 - 팝업 공지사항(1 depth)
-    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, FcmTokenAlarmRequestDto fcmRequestDto){
+    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, AlarmTokenRequestDto fcmRequestDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -224,36 +239,26 @@ public class AlarmService {
     private URL getUrlForTopic(EPopupTopic topic) {
         URL url = null;
         switch (topic) {
-            case MAGAM -> {
-                url = s3Client.getUrl(alarmBucket, magam);
-            }
-            case CHANGE_INFO -> {
-                url =  s3Client.getUrl(alarmBucket, info);
-            }
-            case JAEBO -> {
-                url =  s3Client.getUrl(alarmBucket, jaebo);
-            }
-            case REOPEN -> {
-                url =  s3Client.getUrl(alarmBucket, reopen);
-            }
-            case HOT -> {
-                url =  s3Client.getUrl(alarmBucket, hot);
-            }
-            case KEYWORD -> {
-                url =  s3Client.getUrl(alarmBucket, key);
-            }
-            case OPEN -> {
-                url =  s3Client.getUrl(alarmBucket, open);
-            }
-            case HOOGI -> {
-                url =  s3Client.getUrl(alarmBucket, hoogi);
-            }
-            case BANGMUN -> {
-                url =  s3Client.getUrl(alarmBucket, bangmun);
-            }
-            default -> {
-                return null;
-            }
+            case MAGAM -> url = s3Client.getUrl(alarmBucket, magam);
+
+            case CHANGE_INFO -> url =  s3Client.getUrl(alarmBucket, info);
+
+            case JAEBO -> url =  s3Client.getUrl(alarmBucket, jaebo);
+
+            case REOPEN -> url =  s3Client.getUrl(alarmBucket, reopen);
+
+            case HOT -> url =  s3Client.getUrl(alarmBucket, hot);
+
+            case KEYWORD -> url =  s3Client.getUrl(alarmBucket, key);
+
+            case OPEN -> url =  s3Client.getUrl(alarmBucket, open);
+
+            case HOOGI -> url =  s3Client.getUrl(alarmBucket, hoogi);
+
+            case BANGMUN -> url =  s3Client.getUrl(alarmBucket, bangmun);
+
+            default -> url =  null;
+
         }
         log.info("Generated URL for topic {}: {}", topic, url);
         return url;

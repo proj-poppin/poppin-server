@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 
 // 공지사항 알림 테이블
+// 테이블 설계 다시 해야함. 모든 token 들어가야 해... -> 테이블 하나 만들기
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,7 +30,7 @@ public class InformAlarm {
     private String body;
 
     @Column(name = "keyword", nullable = false)
-    private String keyword; // popup, notify
+    private String keyword; // popup, inform
 
     @Column(name = "icon" , nullable = false)
     private String icon; // icon

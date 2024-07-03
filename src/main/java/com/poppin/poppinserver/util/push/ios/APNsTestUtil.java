@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class APNsUtil {
+public class APNsTestUtil {
 
     @Value("${apns.name}")
     private String FILE_NAME;

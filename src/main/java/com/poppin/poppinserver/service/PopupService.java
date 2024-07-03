@@ -388,7 +388,7 @@ public class PopupService {
 
         popup.addViewCnt(); // 조회수 + 1
 
-        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
+        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
@@ -431,7 +431,7 @@ public class PopupService {
 
         popup.addViewCnt(); // 조회수 + 1
 
-        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId, PageRequest.of(0,3)); // 후기 추천수 상위 3개
+        List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();

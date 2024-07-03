@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.dto.alarm.request;
 
 
-public record FcmTokenAlarmRequestDto(
+public record AlarmTokenRequestDto(
         String fcmToken
 ) {
 }

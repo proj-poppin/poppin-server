@@ -134,21 +134,22 @@ public class FCMScheduler {
      * 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
      *
      */
-//    @Scheduled(cron = "0 */05 * * * *")
-//    public void hoogi() {
-//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-//
-//        LocalDateTime now = zonedDateTime.toLocalDateTime();
-//        LocalDateTime threeHoursAgo = now.minusHours(3);
-//
-//        log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
-//        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAgo);
-//        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
-//        else{
-//            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
-//        }
-//    }
+    @Scheduled(cron = "0 */05 * * * *")
+    public void hoogi() {
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
+        LocalDateTime now = zonedDateTime.toLocalDateTime();
+        LocalDateTime threeHoursAndMin = now.minusHours(3).minusMinutes(5);
+        LocalDateTime threeHoursAgo = now.minusHours(3);
+
+        log.info("- - - - - - - - - - - - - - - - - - - - - 후기요청 배치 시작 - - - - - - - - - - - - - - - - - - - - -");
+        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAndMin, threeHoursAgo);
+        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
+        else{
+            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
+        }
+    }
 
 
     /**

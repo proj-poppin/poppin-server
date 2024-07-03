@@ -32,6 +32,7 @@ public enum ErrorCode {
     INVALID_OAUTH2_PROVIDER("40021", HttpStatus.BAD_REQUEST, "유효하지 않은 OAuth2 제공자입니다."),
     INVALID_CATEGORY_REQUEST("40022", HttpStatus.BAD_REQUEST, "prepered 코드는 3개, taste 코드는 14개 이상이어야 합니다."),
     DUPLICATED_TOKEN("40023", HttpStatus.BAD_REQUEST, "이미 알림 동의를 하셨습니다."),
+    DELETED_USER_ERROR("40024", HttpStatus.BAD_REQUEST, "탈퇴한 유저는 30일 동안 재가입할 수 없습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),

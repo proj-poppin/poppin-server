@@ -2,7 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.AlarmSetting;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.alarm.request.FcmTokenAlarmRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.SettingResponseDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.alarmSetting.response.AlarmSettingResponseDto;
@@ -30,6 +30,7 @@ public class AlarmSettingService {
                 .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting alarmSetting = alarmSettingRepository.findByToken(reqDto.fcmToken());
+        if (alarmSetting == null) throw new CommonException(ErrorCode.NOT_FOUND_ALARM_SETTING);
 
         alarmSettingRepository.delete(alarmSetting); // 삭제
 
@@ -56,7 +57,7 @@ public class AlarmSettingService {
     }
 
 
-    public SettingResponseDto readAlarmSetting(Long userId, FcmTokenAlarmRequestDto reqDto){
+    public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
 
