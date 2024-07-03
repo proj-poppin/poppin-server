@@ -25,8 +25,8 @@ public class AlarmController {
 
     // 알림 안읽은 것 여부
     @PostMapping("/")
-    public ResponseDto<?> readAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
-        return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
+    public ResponseDto<?> readAlarm(@UserId Long userId, @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+        return ResponseDto.ok(alarmService.readAlarm(userId, alarmTokenRequestDto));
     }
 
     // 팝업 알림 보여주기(1 depth)
@@ -50,8 +50,8 @@ public class AlarmController {
 
     // 공지사항 디테일 (2 depth)
     @GetMapping("info/detail")
-    public ResponseDto<?> readDetailInfoAlarm(@RequestParam("informId")Long informId){
-        return ResponseDto.ok(alarmService.readDetailInformAlarm(informId));
+    public ResponseDto<?> readDetailInfoAlarm(@UserId Long userId, @RequestParam("informId")Long informId){
+        return ResponseDto.ok(alarmService.readDetailInformAlarm(userId, informId));
     }
 
 

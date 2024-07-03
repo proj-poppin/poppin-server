@@ -38,21 +38,15 @@ public class InformAlarm {
     @Column(name = "created_at" , nullable = false)
     private LocalDate createdAt;
 
-    @Column(name = "is_read" , nullable = false)
-    private Boolean isRead;
+
 
     @Builder
-    public InformAlarm(String title, String body, String keyword, String icon, LocalDate createdAt, Boolean isRead) {
+    public InformAlarm(String title, String body, String keyword, String icon, LocalDate createdAt) {
         this.title = title;
         this.body = body;
         this.keyword = keyword;
         this.icon = icon;
         this.createdAt = createdAt;
-        this.isRead = isRead;
     }
 
-    // isRead를 변경하는 메서드 추가
-    public void markAsRead() {
-        this.isRead = true;
-    }
 }

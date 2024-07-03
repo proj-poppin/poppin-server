@@ -33,6 +33,7 @@ public enum ErrorCode {
     INVALID_CATEGORY_REQUEST("40022", HttpStatus.BAD_REQUEST, "prepered 코드는 3개, taste 코드는 14개 이상이어야 합니다."),
     DUPLICATED_TOKEN("40023", HttpStatus.BAD_REQUEST, "이미 알림 동의를 하셨습니다."),
     DELETED_USER_ERROR("40024", HttpStatus.BAD_REQUEST, "탈퇴한 유저는 30일 동안 재가입할 수 없습니다."),
+    REVIEW_RECOMMEND_ERROR("40025", HttpStatus.BAD_REQUEST, "자신의 후기에 추천 할 수 없습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
@@ -78,7 +79,8 @@ public enum ErrorCode {
 
     // Server, File Up/DownLoad Error
     SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    FCM_ERROR("50001" , HttpStatus.INTERNAL_SERVER_ERROR , "공지사항 등록 중 앱 푸시 알림 오류입니다.");
+    FCM_ERROR("50001" , HttpStatus.INTERNAL_SERVER_ERROR , "공지사항 등록 중 앱 푸시 알림 오류입니다."),
+    INFO_ALARM_ERROR("50002" , HttpStatus.INTERNAL_SERVER_ERROR , "공지사항 등록 과정 중 알림 등록 오류 발생하였습니다");
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;

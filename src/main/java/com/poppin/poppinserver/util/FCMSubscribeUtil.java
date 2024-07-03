@@ -3,7 +3,7 @@ package com.poppin.poppinserver.util;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.TopicManagementResponse;
-import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.PopupTopic;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.repository.PopupTopicRepository;
@@ -25,7 +25,7 @@ public class FCMSubscribeUtil {
     private final FirebaseMessaging firebaseMessaging;
 
     /* 안드로이드 토픽 구독 */
-    public void subscribePopupTopic(NotificationToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
+    public void subscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());
 
@@ -47,7 +47,7 @@ public class FCMSubscribeUtil {
         }
     }
 
-    public void unsubscribePopupTopic(NotificationToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
+    public void unsubscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
 
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());

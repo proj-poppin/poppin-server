@@ -169,7 +169,10 @@ public class ReviewService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
+
+        // 예외처리
         if (review == null)throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        if (review.getUser().getId().equals(userId)) throw new CommonException(ErrorCode.REVIEW_RECOMMEND_ERROR);
 
         Optional<ReviewRecommendUser> recommendCnt = reviewRecommendUserRepository.findByUserAndReview(user, review);
         if (recommendCnt.isPresent())throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지

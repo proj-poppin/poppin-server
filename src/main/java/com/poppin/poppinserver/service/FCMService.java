@@ -1,24 +1,63 @@
 package com.poppin.poppinserver.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.domain.AlarmSetting;
+import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
+import com.poppin.poppinserver.dto.fcm.response.TokenResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.repository.AlarmSettingRepository;
+import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.util.FCMSubscribeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FCMService {
 
-    private final NotificationTokenRepository notificationTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
+    private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSubscribeUtil fcmSubscribeUtil ;
+
+
+
+    public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
+
+        try {
+
+            // 토큰 저장 여부 확인
+            FCMToken isToken = fcmTokenRepository.findByToken(tokenRequestDto.token());
+            if (isToken!=null) throw new CommonException(ErrorCode.DUPLICATED_TOKEN);
+            else{
+                // 알림 전부 "1"로 저장
+                AlarmSetting alarmSetting = new AlarmSetting(tokenRequestDto.token(), "1", "1", "1","1","1", "1");
+                alarmSettingRepository.save(alarmSetting);
+
+                // 토큰 저장
+                FCMToken FCMToken = new FCMToken(
+                        tokenRequestDto.token(),
+                        LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
+                        tokenRequestDto.device() // android or ios
+                );
+                FCMToken token = fcmTokenRepository.save(FCMToken); // 토큰 저장
+                return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 성공" , token.getToken());
+            }
+        }catch (Exception e){
+            log.error("토큰 등록 실패: " + e.getMessage());
+            return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 실패" , e.getMessage());
+        }
+    }
+
+
+
     /*
           Method : 관심 팝업 등록 시 주제 테이블에 데이터 삽입 , 구독 시키기
           Author : sakang
@@ -30,7 +69,7 @@ public class FCMService {
             try {
                 log.info("앱푸시 팝업 주제 추가 시작");
 
-                NotificationToken pushToken = notificationTokenRepository.findByToken(token);
+                FCMToken pushToken = fcmTokenRepository.findByToken(token);
                 if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
                 fcmSubscribeUtil.subscribePopupTopic(pushToken, popup , topic); // 관심팝업
             }catch (CommonException | FirebaseMessagingException e){
@@ -51,7 +90,7 @@ public class FCMService {
 
         try {
             log.info("앱푸시 팝업 주제 삭제 시작");
-            NotificationToken pushToken = notificationTokenRepository.findByToken(token);
+            FCMToken pushToken = fcmTokenRepository.findByToken(token);
             if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
             fcmSubscribeUtil.unsubscribePopupTopic(pushToken, popup, topic); // 구독 및 저장
         }catch (CommonException | FirebaseMessagingException e){

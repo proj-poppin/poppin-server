@@ -1,6 +1,6 @@
-package com.poppin.poppinserver.dto.notification.response;
+package com.poppin.poppinserver.dto.fcm.response;
 
-import com.poppin.poppinserver.dto.notification.request.TokenRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 

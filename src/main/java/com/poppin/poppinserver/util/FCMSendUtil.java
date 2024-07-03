@@ -6,14 +6,14 @@ import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.config.APNsConfiguration;
 import com.poppin.poppinserver.config.AndroidConfiguration;
 import com.poppin.poppinserver.domain.InformAlarm;
-import com.poppin.poppinserver.domain.NotificationToken;
+import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmRequestDto;
-import com.poppin.poppinserver.dto.notification.request.FCMRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.NotificationTokenRepository;
+import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.service.AlarmService;
 import com.poppin.poppinserver.type.EPushInfo;
@@ -36,15 +36,21 @@ public class FCMSendUtil {
     private final AndroidConfiguration androidConfiguration;
 
     private final PopupRepository popupRepository;
-    private final NotificationTokenRepository notificationTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     private final AlarmService alarmService;
 
 
-    /* 공지사항 토큰 메시지 발송 */
-    public String sendInformationByFCMToken(List<NotificationToken> tokenList, InformAlarmRequestDto requestDto, InformAlarm informAlarm) {
+    /**
+     * 공지사항 토큰 메시지 발송
+     * @param tokenList
+     * @param requestDto
+     * @param informAlarm
+     * @return
+     */
+    public String sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
 
-        for (NotificationToken token : tokenList) {
+        for (FCMToken token : tokenList) {
             log.info("token : " + token.getToken());
             Message message = Message.builder()
                     .setNotification(Notification.builder()
@@ -71,7 +77,12 @@ public class FCMSendUtil {
         return "1"; // success
     }
 
-    /* 스케줄러 후기 발송 */
+    /**
+     * 스케줄러 토큰 발송
+     * @param popupList
+     * @param info
+     * @return
+     */
     public String sendByFCMToken(List<Popup> popupList , EPushInfo info) {
         try {
             // 인기,
@@ -80,9 +91,9 @@ public class FCMSendUtil {
                 popupIdList.add(p.getId());
             }
 
-            List<NotificationToken> tokenList = notificationTokenRepository.findAll();
+            List<FCMToken> tokenList = fcmTokenRepository.findAll();
 
-            for (NotificationToken token : tokenList) {
+            for (FCMToken token : tokenList) {
                 log.info("token : " + token.getToken());
                 Message message = Message.builder()
                         .setNotification(Notification.builder()
@@ -149,13 +160,13 @@ public class FCMSendUtil {
                 String result = firebaseMessaging.send(message);
                 log.debug( "Successfully sent message: " + result);
 
-                NotificationToken token = notificationTokenRepository.findByToken(fcmRequestDto.token());
+                FCMToken token = fcmTokenRepository.findByToken(fcmRequestDto.token());
                 refreshToken(token); // 토큰 갱신
 
                 // 알림 키워드 등록
-                String flag = alarmService.insertPopupAlarmKeyword(fcmRequestDto);
+                String flag = alarmService.insertPopupAlarm(fcmRequestDto);
                 if (flag.equals("1")){
-                    log.info(fcmRequestDto.token() +    " alarm success ");
+                    log.info(fcmRequestDto.token() +    " alarm success");
                 }else{
                     log.error(fcmRequestDto.token() +   " alarm fail");
                 }
@@ -207,12 +218,12 @@ public class FCMSendUtil {
      * FCM 토큰 갱신
      * @param token
      */
-    private void refreshToken(NotificationToken token){
+    private void refreshToken(FCMToken token){
 
         log.info("refresh token : " + token.getToken());
 
         token.regenerateToken();
-        notificationTokenRepository.save(token);
+        fcmTokenRepository.save(token);
 
     }
 

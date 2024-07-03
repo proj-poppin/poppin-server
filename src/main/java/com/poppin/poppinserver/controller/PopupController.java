@@ -1,22 +1,19 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
-import com.poppin.poppinserver.dto.managerInform.request.UpdateManagerInfromDto;
-import com.poppin.poppinserver.dto.notification.request.PushRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.service.PopupService;
-import com.poppin.poppinserver.service.S3Service;
 import com.poppin.poppinserver.type.EOperationStatus;
 import com.poppin.poppinserver.type.EPopupSort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

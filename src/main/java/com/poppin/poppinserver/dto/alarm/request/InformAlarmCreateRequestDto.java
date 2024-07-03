@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record InformAlarmRequestDto(
+public record InformAlarmCreateRequestDto(
 
         @NotNull
         String title,
