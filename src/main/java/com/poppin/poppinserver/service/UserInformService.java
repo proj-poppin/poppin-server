@@ -112,6 +112,74 @@ public class UserInformService {
         return UserInformDto.fromEntity(userInform);
     } // 제보 생성
 
+    @Transactional
+    public UserInformDto createGuestUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
+                                          Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
+                                          Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
+                                          Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
+                                          List<MultipartFile> images) {
+
+        TastePopup tastePopup = TastePopup.builder()
+                .fasionBeauty(fashionBeauty)
+                .characters(characters)
+                .foodBeverage(foodBeverage)
+                .webtoonAni(webtoonAni)
+                .interiorThings(interiorThings)
+                .movie(movie)
+                .musical(musical)
+                .sports(sports)
+                .game(game)
+                .itTech(itTech)
+                .kpop(kpop)
+                .alchol(alcohol)
+                .animalPlant(animalPlant)
+                .etc(etc)
+                .build();
+        tastePopupRepository.save(tastePopup);
+
+        PreferedPopup preferedPopup = PreferedPopup.builder()
+                .wantFree(false)
+                .market(false)
+                .experience(false)
+                .display(false)
+                .build();
+        preferedPopupRepository.save(preferedPopup);
+
+        Popup popup = Popup.builder()
+                .name(name)
+                .tastePopup(tastePopup)
+                .preferedPopup(preferedPopup)
+                .operationStatus(EOperationStatus.EXECUTING.getStatus())
+                .build();
+        popup = popupRepository.save(popup);
+        log.info(popup.toString());
+
+        // 팝업 이미지 처리 및 저장
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for (String url : fileUrls) {
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        popup = popupRepository.save(popup);
+
+        UserInform userInform = UserInform.builder()
+                .informerId(null)
+                .popupId(popup)
+                .contactLink(contactLink)
+                .progress(EInformProgress.NOTEXECUTED)
+                .build();
+        userInform = userInformRepository.save(userInform);
+
+        return UserInformDto.fromEntity(userInform);
+    } // 제보 생성
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId){

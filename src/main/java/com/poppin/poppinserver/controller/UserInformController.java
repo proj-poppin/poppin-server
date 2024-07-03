@@ -53,6 +53,34 @@ public class UserInformController {
                 musical, sports, game, itTech, kpop, alcohol, animalPlant, etc, images, userId));
     } // 제보 생성
 
+    // 비로그인 사용자 제보 생성
+    @PostMapping(value = "/guest/report", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseDto<?> createGurestUserInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                           @RequestParam(value = "name") String name,
+                                           @RequestParam(value = "contactLink", required = false) String contactLink,
+                                           @RequestParam(value = "fashionBeauty") Boolean fashionBeauty,
+                                           @RequestParam(value = "characters") Boolean characters,
+                                           @RequestParam(value = "foodBeverage") Boolean foodBeverage,
+                                           @RequestParam(value = "webtoonAni") Boolean webtoonAni,
+                                           @RequestParam(value = "interiorThings") Boolean interiorThings,
+                                           @RequestParam(value = "movie") Boolean movie,
+                                           @RequestParam(value = "musical") Boolean musical,
+                                           @RequestParam(value = "sports") Boolean sports,
+                                           @RequestParam(value = "game") Boolean game,
+                                           @RequestParam(value = "itTech") Boolean itTech,
+                                           @RequestParam(value = "kpop") Boolean kpop,
+                                           @RequestParam(value = "alcohol") Boolean alcohol,
+                                           @RequestParam(value = "animalPlant") Boolean animalPlant,
+                                           @RequestParam(value = "etc") Boolean etc) {
+
+        if (images.isEmpty()) {
+            throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
+        }
+
+        return ResponseDto.ok(userInformService.createGuestUserInform(name, contactLink, fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings, movie,
+                musical, sports, game, itTech, kpop, alcohol, animalPlant, etc, images));
+    } // 제보 생성
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
     public ResponseDto<?> readUserInform(@RequestParam("informId") Long userInformId) {
