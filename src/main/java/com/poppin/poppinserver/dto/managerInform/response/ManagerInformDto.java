@@ -21,9 +21,14 @@ public record ManagerInformDto(
     public static ManagerInformDto fromEntity(ManagerInform managerInform){
         PopupDto popupDto = PopupDto.fromEntity(managerInform.getPopupId());
 
+        Long informerId = null;
+        if (managerInform.getInformerId() != null) {
+            informerId = managerInform.getId();
+        }
+
         return ManagerInformDto.builder()
                 .id(managerInform.getId())
-                .informerId(managerInform.getInformerId().getId())
+                .informerId(informerId)
                 .informedAt(managerInform.getInformedAt().toString())
                 .popup(popupDto)
                 .progress(managerInform.getProgress())
