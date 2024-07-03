@@ -38,7 +38,8 @@ public class Constant {
             "/api/v1/user/random-nickname",
             "/api/v1/alarm/", // 홈 화면 진입 시 알림 아이콘 빨간 점 여부
             "/api/v1/alarm/info", // 공지사항 알림
-            "/api/v1/alarm/info/detail" // 공지사항 알림 2 depth
+            "/api/v1/alarm/info/detail", // 공지사항 알림 2 depth
+            "/api/v1/auth/reset-password/no-auth"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

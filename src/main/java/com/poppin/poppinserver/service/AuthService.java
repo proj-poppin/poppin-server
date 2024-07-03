@@ -209,4 +209,14 @@ public class AuthService {
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         return jwtTokenDto;
     }
+
+    @Transactional
+    public void resetPasswordNoAuth(PasswordResetDto passwordResetDto) {
+        User user = userRepository.findByEmail(passwordResetDto.email())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!passwordResetDto.password().equals(passwordResetDto.passwordConfirm())) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        user.updatePassword(bCryptPasswordEncoder.encode(passwordResetDto.password()));
+    }
 }
