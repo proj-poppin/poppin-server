@@ -90,7 +90,7 @@ public record PopupDto(
         }
 
         String entranceFee = null;
-        if (popup.getEntranceRequired() == true) {
+        if (popup.getEntranceRequired() != null && popup.getEntranceRequired()) {
             entranceFee = popup.getEntranceFee();
         } else {
             entranceFee = "0";
