@@ -130,6 +130,88 @@ public class ManagerInformService {
     } //운영자 제보 생성
 
     @Transactional
+    public ManagerInformDto createGuestManagerInform(CreateManagerInformDto createManagerInformDto,
+                                                List<MultipartFile> images){
+        CreateTasteDto createTasteDto = createManagerInformDto.taste();
+        TastePopup tastePopup = TastePopup.builder()
+                .fasionBeauty(createTasteDto.fashionBeauty())
+                .characters(createTasteDto.characters())
+                .foodBeverage(createTasteDto.foodBeverage())
+                .webtoonAni(createTasteDto.webtoonAni())
+                .interiorThings(createTasteDto.interiorThings())
+                .movie(createTasteDto.movie())
+                .musical(createTasteDto.musical())
+                .sports(createTasteDto.sports())
+                .game(createTasteDto.game())
+                .itTech(createTasteDto.itTech())
+                .kpop(createTasteDto.kpop())
+                .alchol(createTasteDto.alcohol())
+                .animalPlant(createTasteDto.animalPlant())
+                .etc(createTasteDto.etc())
+                .build();
+        tastePopupRepository.save(tastePopup);
+
+        CreatePreferedDto createPreferedDto = createManagerInformDto.prefered();
+        PreferedPopup preferedPopup = PreferedPopup.builder()
+                .wantFree(createPreferedDto.wantFree())
+                .market(createPreferedDto.market())
+                .experience(createPreferedDto.experience())
+                .display(createPreferedDto.display())
+                .build();
+        preferedPopupRepository.save(preferedPopup);
+
+        Popup popup = Popup.builder()
+                .homepageLink(createManagerInformDto.homepageLink())
+                .name(createManagerInformDto.name())
+                .availableAge(createManagerInformDto.availableAge())
+                .closeDate(createManagerInformDto.closeDate())
+                .closeTime(createManagerInformDto.closeTime())
+                .entranceRequired(createManagerInformDto.entranceRequired())
+                .entranceFee(createManagerInformDto.entranceFee())
+                .resvRequired(createManagerInformDto.resvRequired())
+                .introduce(createManagerInformDto.introduce())
+                .address(createManagerInformDto.address())
+                .addressDetail(createManagerInformDto.addressDetail())
+                .openDate(createManagerInformDto.openDate())
+                .openTime(createManagerInformDto.openTime())
+                .operationExcept(createManagerInformDto.operationExcept())
+                .operationStatus(EOperationStatus.EXECUTING.getStatus())
+                .parkingAvailable(createManagerInformDto.parkingAvailable())
+                .preferedPopup(preferedPopup)
+                .tastePopup(tastePopup)
+                .build();
+        popup = popupRepository.save(popup);
+        log.info(popup.toString());
+
+        // 팝업 이미지 처리 및 저장
+        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+
+        List<PosterImage> posterImages = new ArrayList<>();
+        for(String url : fileUrls){
+            PosterImage posterImage = PosterImage.builder()
+                    .posterUrl(url)
+                    .popup(popup)
+                    .build();
+            posterImages.add(posterImage);
+        }
+        posterImageRepository.saveAll(posterImages);
+        popup.updatePosterUrl(fileUrls.get(0));
+
+        popup = popupRepository.save(popup);
+
+        ManagerInform managerInform = ManagerInform.builder()
+                .informerId(null)
+                .popupId(popup)
+                .informerEmail(createManagerInformDto.informerEmail())
+                .affiliation(createManagerInformDto.affiliation())
+                .progress(EInformProgress.NOTEXECUTED)
+                .build();
+        managerInform = managerInformRepository.save(managerInform);
+
+        return ManagerInformDto.fromEntity(managerInform);
+    } //운영자 제보 생성
+
+    @Transactional
     public ManagerInformDto readManageInform(Long manageInformId){
         ManagerInform managerInform = managerInformRepository.findById(manageInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));

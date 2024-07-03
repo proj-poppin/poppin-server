@@ -20,9 +20,14 @@ public record UserInformDto(
     public static UserInformDto fromEntity(UserInform userInform){
         PopupDto popupDto = PopupDto.fromEntity(userInform.getPopupId());
 
+        Long informerId = null;
+        if (userInform.getInformerId() != null) {
+            informerId = userInform.getId();
+        }
+
         return UserInformDto.builder()
                 .id(userInform.getId())
-                .informerId(userInform.getInformerId().getId())
+                .informerId(informerId)
                 .informedAt(userInform.getInformedAt().toString())
                 .popup(popupDto)
                 .contactLink(userInform.getContactLink())

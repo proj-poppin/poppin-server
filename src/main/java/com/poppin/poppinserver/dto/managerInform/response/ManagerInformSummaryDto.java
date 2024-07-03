@@ -28,12 +28,17 @@ public record ManagerInformSummaryDto(
                 executedAt = managerInform.getExecutedAt().toString();
             }
 
+            String informerName = null;
+            if (managerInform.getInformerId() != null){
+                informerName = managerInform.getInformerId().getNickname();
+            }
+
             ManagerInformSummaryDto managerInformSummaryDto =
                     ManagerInformSummaryDto.builder()
                             .id(managerInform.getId())
                             .progress(managerInform.getProgress())
                             .popupName(managerInform.getPopupId().getName())
-                            .informerName(managerInform.getInformerId().getNickname())
+                            .informerName(informerName)
                             .informedAt(managerInform.getInformedAt().toString())
                             .executedAt(executedAt)
                             .build();
