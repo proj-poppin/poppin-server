@@ -46,8 +46,8 @@ public class Popup {
     @Column(name = "entrance_fee")
     private String entranceFee;
 
-    @Column(name = "entrance_required", nullable = false)
-    private Boolean entranceRequired;
+    @Column(name = "entrance_required")
+    private Boolean entranceRequired = true;
 
     @Column(name = "resv_required")
     private Boolean resvRequired;
