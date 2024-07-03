@@ -59,7 +59,8 @@ public class PopupController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
-    public ResponseDto<?> removePopup(@RequestParam("id") Long popupId){
+    public ResponseDto<?> removePopup(@RequestParam("id") Long popupId,
+                                      @UserId Long adminId){
         return ResponseDto.ok(popupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
