@@ -10,6 +10,7 @@ public class PrepardSearchUtil {
         String[] words = userInput.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String word : words) {
+            sb.append("*");
             sb.append(word);
             sb.append("* ");
         }
