@@ -9,6 +9,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 public record UpdateManagerInfromDto(
+        String affiliation,
+        String informerEmail,
         Long managerInformId,
         String homepageLink,
         String name,
@@ -24,9 +26,7 @@ public record UpdateManagerInfromDto(
         LocalDate closeDate,
         LocalTime openTime,
         LocalTime closeTime,
-
         Double latitude,
-
         Double longitude,
         String operationExcept,
         CreatePreferedDto prefered,
