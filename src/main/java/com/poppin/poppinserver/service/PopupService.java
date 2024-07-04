@@ -584,6 +584,7 @@ public class PopupService {
         }
 
         List<List<Popup>> popups = new ArrayList<>();
+        List<String> selectedList = new ArrayList<>();
 
         // 사용자가 설정한 카테고리에 해당하는 팝업들을 카테고리 별로 5개씩 리스트에 저장
         TastePopup tastePopup = user.getTastePopup();
@@ -596,6 +597,7 @@ public class PopupService {
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
+                selectedList.add(taste);
                 popups.add(popupList);
             }
 
@@ -611,13 +613,10 @@ public class PopupService {
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
+                selectedList.add(prefered)
                 popups.add(popupList);
             }
         }
-
-        List<String> selectedList = new ArrayList<>();
-        selectedList.addAll(selectedTaste);
-        selectedList.addAll(selectedPrefered);
 
         Random random = new Random();
         Integer randomIndex = random.nextInt(selectedList.size());
