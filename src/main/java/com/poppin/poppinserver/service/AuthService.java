@@ -199,7 +199,7 @@ public class AuthService {
         String password = decoded[1];
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (email != user.getEmail() && !bCryptPasswordEncoder.matches(password, user.getPassword())) {
+        if (email != user.getEmail() || !bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
         if (user.getIsDeleted()) {
