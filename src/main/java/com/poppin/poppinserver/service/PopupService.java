@@ -613,7 +613,7 @@ public class PopupService {
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
-                selectedList.add(prefered)
+                selectedList.add(prefered);
                 popups.add(popupList);
             }
         }
