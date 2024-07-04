@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class PrepardSearchUtil {
     public String prepareSearchText(String userInput) {
-        String[] words = userInput.split(" ");
+        String[] words = userInput.split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String word : words) {
-            sb.append("*");
-            sb.append(word);
-            sb.append("* ");
+            if (!word.isEmpty()) {
+                sb.append(word);
+                sb.append("*");
+            }
         }
         return sb.toString().trim();
     }
