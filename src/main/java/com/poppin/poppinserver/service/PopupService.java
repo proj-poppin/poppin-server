@@ -593,7 +593,12 @@ public class PopupService {
             Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(taste, true))
                     .and(PopupSpecification.isOperating());
 
-            popups.add(popupRepository.findAll(combinedSpec, pageable).getContent());
+            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+
+            if (!popupList.isEmpty()) {
+                popups.add(popupList);
+            }
+
         }
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
@@ -603,7 +608,11 @@ public class PopupService {
             Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(prefered, true))
                     .and(PopupSpecification.isOperating());
 
-            popups.add(popupRepository.findAll(combinedSpec, pageable).getContent());
+            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+
+            if (!popupList.isEmpty()) {
+                popups.add(popupList);
+            }
         }
 
         List<String> selectedList = new ArrayList<>();
