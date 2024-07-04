@@ -317,7 +317,11 @@ public class ManagerInformService {
 
         popup = popupRepository.save(popup);
 
-        managerInform.update(EInformProgress.EXECUTING);
+        managerInform.update(
+                EInformProgress.EXECUTING,
+                updateManagerInfromDto.affiliation(),
+                updateManagerInfromDto.informerEmail()
+                );
         managerInform = managerInformRepository.save(managerInform);
         log.info(managerInform.getProgress().toString());
 
@@ -438,7 +442,11 @@ public class ManagerInformService {
                 admin
         );
 
-        managerInform.update(EInformProgress.EXECUTING);
+        managerInform.update(
+                EInformProgress.EXECUTING,
+                updateManagerInfromDto.affiliation(),
+                updateManagerInfromDto.informerEmail()
+        );
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);

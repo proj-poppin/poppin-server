@@ -56,7 +56,9 @@ public class ManagerInform {
         this.progress = progress;
     }
 
-    public void update(EInformProgress progress) {
+    public void update(EInformProgress progress, String affiliation, String informerEmail) {
+        this.affiliation = affiliation;
+        this.informerEmail = informerEmail;
         this.progress = progress;
         this.executedAt = LocalDateTime.now();
     }
