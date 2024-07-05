@@ -77,7 +77,7 @@ public class UserService {
                 .game(createUserTasteDto.taste().game())
                 .itTech(createUserTasteDto.taste().itTech())
                 .kpop(createUserTasteDto.taste().kpop())
-                .alchol(createUserTasteDto.taste().alcohol())
+                .alcohol(createUserTasteDto.taste().alcohol())
                 .animalPlant(createUserTasteDto.taste().animalPlant())
                 .build();
         tastePopupRepository.save(tastePopup);
@@ -132,7 +132,7 @@ public class UserService {
                     .game(false)
                     .itTech(false)
                     .kpop(false)
-                    .alchol(false)
+                    .alcohol(false)
                     .animalPlant(false)
                     .build();
             tastePopupRepository.save(tastePopup);
