@@ -73,7 +73,7 @@ public class ModifyInfoService {
                 .game(tastePopup.getGame())
                 .itTech(tastePopup.getItTech())
                 .kpop(tastePopup.getKpop())
-                .alchol(tastePopup.getAlcohol())
+                .alcohol(tastePopup.getAlcohol())
                 .animalPlant(tastePopup.getAnimalPlant())
                 .etc(tastePopup.getEtc())
                 .build();

@@ -63,7 +63,7 @@ public class ManagerInformService {
                 .game(createTasteDto.game())
                 .itTech(createTasteDto.itTech())
                 .kpop(createTasteDto.kpop())
-                .alchol(createTasteDto.alcohol())
+                .alcohol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
                 .etc(createTasteDto.etc())
                 .build();
@@ -145,7 +145,7 @@ public class ManagerInformService {
                 .game(createTasteDto.game())
                 .itTech(createTasteDto.itTech())
                 .kpop(createTasteDto.kpop())
-                .alchol(createTasteDto.alcohol())
+                .alcohol(createTasteDto.alcohol())
                 .animalPlant(createTasteDto.animalPlant())
                 .etc(createTasteDto.etc())
                 .build();

@@ -62,7 +62,7 @@ public class UserInformService {
                 .game(game)
                 .itTech(itTech)
                 .kpop(kpop)
-                .alchol(alcohol)
+                .alcohol(alcohol)
                 .animalPlant(animalPlant)
                 .etc(etc)
                 .build();
@@ -131,7 +131,7 @@ public class UserInformService {
                 .game(game)
                 .itTech(itTech)
                 .kpop(kpop)
-                .alchol(alcohol)
+                .alcohol(alcohol)
                 .animalPlant(animalPlant)
                 .etc(etc)
                 .build();
