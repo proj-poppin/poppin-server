@@ -443,7 +443,7 @@ public class ManagerInformService {
         );
 
         managerInform.update(
-                EInformProgress.EXECUTING,
+                EInformProgress.EXECUTED,
                 updateManagerInfromDto.affiliation(),
                 updateManagerInfromDto.informerEmail()
         );
