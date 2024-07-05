@@ -14,7 +14,7 @@ public record UpdateUserInfromDto(
         String introduce,
         String address,
         String addressDetail,
-        Boolean entranceReauired,
+        Boolean entranceRequired,
         String entranceFee,
         EAvailableAge availableAge,
         Boolean parkingAvailable,
