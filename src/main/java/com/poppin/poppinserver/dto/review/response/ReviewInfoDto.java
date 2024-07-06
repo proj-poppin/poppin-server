@@ -23,7 +23,10 @@ public record ReviewInfoDto(
         String text,
 
         @NotNull
-        List<String> imageUrls,
+        List<String> imageUrls, // 후기 첨부 이미지
+
+        @NotNull
+        String profileUrl,
 
         @NotNull
         boolean isCertificated,
@@ -31,7 +34,7 @@ public record ReviewInfoDto(
         @NotNull
         int recommendCnt
 ) {
-    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, List<Long> reviewCnt){
+    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, List<String> profileUrls, List<Long> reviewCnt){
         List<ReviewInfoDto> reviewInfoDtoList = new ArrayList<>();
 
         for (int i = 0; i < reviews.size(); i++) {
@@ -41,6 +44,7 @@ public record ReviewInfoDto(
                     .reviewCnt(reviewCnt.get(i))
                     .text(reviews.get(i).getText())
                     .imageUrls(imageUrls.get(i))
+                    .profileUrl(profileUrls.get(i))
                     .isCertificated(reviews.get(i).getIsCertificated())
                     .recommendCnt(reviews.get(i).getRecommendCnt())
                     .build();

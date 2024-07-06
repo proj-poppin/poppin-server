@@ -392,7 +392,9 @@ public class PopupService {
 
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
+        List<String> profileImagesList = new ArrayList<>();
         List<Long> reviewCntList = new ArrayList<>();
+
         for (Review review : reviews){
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
@@ -400,12 +402,13 @@ public class PopupService {
             for(ReviewImage reviewImage : reviewImages){
                 imagesList.add(reviewImage.getImageUrl());
             }
-            reviewImagesList.add(imagesList);
 
+            reviewImagesList.add(imagesList);
+            profileImagesList.add(review.getUser().getProfileImageUrl());
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, reviewCntList);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList,profileImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -433,9 +436,11 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
-        // 리뷰 이미지 목록 가져오기
+        // 리뷰 이미지 목록, 프로필 이미지 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
+        List<String> profileImagesList = new ArrayList<>();
         List<Long> reviewCntList = new ArrayList<>();
+
         for (Review review : reviews){
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
@@ -443,12 +448,13 @@ public class PopupService {
             for(ReviewImage reviewImage : reviewImages){
                 imagesList.add(reviewImage.getImageUrl());
             }
-            reviewImagesList.add(imagesList);
 
+            reviewImagesList.add(imagesList);
+            profileImagesList.add(review.getUser().getProfileImageUrl());
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, reviewCntList);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
