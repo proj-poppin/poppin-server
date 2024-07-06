@@ -98,11 +98,13 @@ public class User {
     @JoinColumn(name = "who_with_popup_id")
     private WhoWithPopup whoWithPopup;
 
+    @Column(name = "reported_cnt", nullable = false)
+    private Long reportedCnt;
+
     @Builder
     public User(String email, String password, String nickname, String birthDate,
                 ELoginProvider eLoginProvider, EUserRole role,
-                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS,
-                String profileImageUrl
+                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS
     ) {
         this.email = email;
         this.password = password;
@@ -118,10 +120,11 @@ public class User {
         this.refreshToken = null;
         this.deletedAt = null;
         this.isDeleted = false;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageUrl = null;
         this.requiresSpecialCare = false;
         this.reviewCnt = 0L;
         this.certifiedReview = 0L;
+        this.reportedCnt = 0L;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
@@ -212,6 +215,6 @@ public class User {
     }
 
     public void addReviewCnt(){
-        this.reviewCnt ++;
+        this.reviewCnt++;
     }
 }
