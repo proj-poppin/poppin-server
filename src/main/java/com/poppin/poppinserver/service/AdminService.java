@@ -270,6 +270,7 @@ public class AdminService {
                 .reviewCreatedAt(review.getCreatedAt().toString())
                 .isCertificated(review.getIsCertificated())
                 .imageUrl(reviewImageRepository.findUrlAllByReviewId(review.getId()))
+                .userProfileImageUrl(review.getUser().getProfileImageUrl())
                 .build();
         ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
                 .popupId(reportReview.getReviewId().getPopup().getId())
