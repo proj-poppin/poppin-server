@@ -183,6 +183,10 @@ public class FCMScheduler {
                         case HOOGI -> setVal = set.getHoogiYn();
                         default -> setVal = "1";
                     }
+
+                    log.info("pushYn value : " ,  setDefVal);
+                    log.info("topic setting value : ", setVal);
+
                     if (setDefVal.equals("1") && setVal.equals("1")){
                         FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
                         fcmRequestDtoList.add(fcmRequestDto);
