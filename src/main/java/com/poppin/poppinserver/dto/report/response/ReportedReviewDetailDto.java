@@ -12,6 +12,7 @@ public record ReportedReviewDetailDto(
         String reviewContent,
         String reviewCreatedAt,
         boolean isCertificated,
-        List<String> imageUrl /* 후기 사진 리스트 */
+        List<String> imageUrl, /* 후기 사진 리스트 */
+        String userProfileImageUrl /* 후기 작성자 프로필 이미지 */
 ) {
 }
