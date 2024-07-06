@@ -3,14 +3,14 @@ package com.poppin.poppinserver.dto.alarm.response;
 import lombok.Builder;
 
 @Builder
-public record UnreadAlarmResponseDto(
+public record AlarmStatusResponseDto(
 
         Boolean alarmStatus
 
 ) {
-    public static UnreadAlarmResponseDto fromEntity(Boolean alarmStatus){
+    public static AlarmStatusResponseDto fromEntity(Boolean alarmStatus){
 
-        return UnreadAlarmResponseDto.builder()
+        return AlarmStatusResponseDto.builder()
                 .alarmStatus(alarmStatus)
                 .build();
     }

@@ -5,10 +5,7 @@ import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
-import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
-import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
-import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
-import com.poppin.poppinserver.dto.alarm.response.UnreadAlarmResponseDto;
+import com.poppin.poppinserver.dto.alarm.response.*;
 import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
 
@@ -80,17 +77,17 @@ public class AlarmService {
      * @param fcmRequestDto :  FCM Token request dto
      * @return : UnreadAlarmResponseDto
      */
-    public UnreadAlarmResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
-        UnreadAlarmResponseDto responseDto;
+    public AlarmStatusResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
+        AlarmStatusResponseDto responseDto;
 
         List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(fcmRequestDto.fcmToken()); // 공지
         List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
 
         if (!informAlarms.isEmpty() && !popupAlarms.isEmpty()){
-            responseDto = UnreadAlarmResponseDto.fromEntity(true);
+            responseDto = AlarmStatusResponseDto.fromEntity(true);
         }
         else {
-            responseDto = UnreadAlarmResponseDto.fromEntity(false);
+            responseDto = AlarmStatusResponseDto.fromEntity(false);
         }
         return responseDto;
     }
@@ -206,11 +203,11 @@ public class AlarmService {
 
 
     // 공지사항 알림 (2 depth)
-    public InformAlarmResponseDto readDetailInformAlarm(Long userId, InformAlarmDetailRequestDto requestDto){
+    public InformAlarmResponseDto readInformDetail(Long userId, InformAlarmDetailRequestDto requestDto){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
-        
+
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();
         // isRead
@@ -245,6 +242,20 @@ public class AlarmService {
     public void insertInformIsRead(FCMToken token, InformAlarm informAlarm){
         InformIsRead informIsRead = new InformIsRead(informAlarm, token);
         informIsReadRepository.save(informIsRead);
+    }
+
+    public UnreadAlarmsResponseDto countUnreadAlarms(String fcmToken){
+
+        int resultCount;
+
+        int unreadInformAlarms = informIsReadRepository.unreadInforms(fcmToken);
+        int unreadPopupAlarms = popupAlarmRepository.UnreadPopupAlarms(fcmToken);
+
+        resultCount = unreadInformAlarms + unreadPopupAlarms;
+
+        UnreadAlarmsResponseDto responseDto = UnreadAlarmsResponseDto.fromEntity(resultCount);
+
+        return responseDto;
     }
 
 

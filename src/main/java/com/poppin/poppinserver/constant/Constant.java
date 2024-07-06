@@ -42,7 +42,7 @@ public class Constant {
             "/api/v1/user/support/faqs",
             "/api/v1/user/random-nickname",
 
-            "/api/v1/alarm/read",                                           // 공지사항 알림 읽음 여부
+            "/api/v1/alarm/unread",                                         // 공지사항 알림 읽음 여부
             "/api/v1/alarm/info",                                           // 공지사항 알림 1 depth
             "/api/v1/alarm/info/detail"                                     // 공지사항 알림 2 depth
 

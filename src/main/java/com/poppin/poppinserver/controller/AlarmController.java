@@ -25,7 +25,7 @@ public class AlarmController {
     private final AlarmSettingService alarmSettingService;
 
     // 알림 안읽은 것 여부
-    @PostMapping("/read")
+    @PostMapping("/unread")
     public ResponseDto<?> readAlarm( @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
         return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
     }
@@ -42,7 +42,6 @@ public class AlarmController {
         return ResponseDto.ok(alarmService.readPopupDetail(userId, popupId));
     }
 
-
     // 공지사항 알림 보여주기(1 depth)
     @GetMapping("/info")
     public ResponseDto<?> readInfoAlarm(){
@@ -52,13 +51,7 @@ public class AlarmController {
     // 공지사항 디테일 (2 depth)
     @GetMapping("/info/detail")
     public ResponseDto<?> readDetailInfoAlarm(@UserId Long userId, @RequestBody InformAlarmDetailRequestDto requestDto){
-        return ResponseDto.ok(alarmService.readDetailInformAlarm(userId, requestDto));
-    }
-
-
-    @PostMapping("/update/setting")
-    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
-        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
+        return ResponseDto.ok(alarmService.readInformDetail(userId, requestDto));
     }
 
     @PostMapping("/read/setting")
@@ -66,5 +59,9 @@ public class AlarmController {
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
     }
 
+    @PostMapping("/update/setting")
+    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
+        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
+    }
 
 }

@@ -14,7 +14,10 @@ public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long
     @Query("SELECT inform FROM InformIsRead inform WHERE inform.fcmToken.token = :fcmToken AND inform.informAlarm.id = :alarmId")
     InformIsRead findByFcmTokenAndInformAlarm(@Param("fcmToken") String fcmToken, @Param("alarmId") Long alarmId);
 
-    @Query("SELECT a FROM InformIsRead a WHERE a.fcmToken.token = :fcmToken AND a.isRead = false")
+    @Query("SELECT inform FROM InformIsRead inform WHERE inform.fcmToken.token = :fcmToken AND inform.isRead = false")
     List<InformIsRead> findUnreadInformAlarms(@Param("fcmToken") String fcmToken);
+
+    @Query("SELECT COUNT(inform) from InformIsRead inform WHERE inform.fcmToken.token = :fcmToken AND inform.isRead = false")
+    int unreadInforms(@Param("fcmToken") String fcmToken);
 
 }

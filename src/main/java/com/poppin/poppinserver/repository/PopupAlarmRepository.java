@@ -12,12 +12,15 @@ import java.util.List;
 public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
 
 
-    @Query("SELECT a FROM PopupAlarm a WHERE a.keyword = 'POPUP' AND a.token = :token ORDER BY a.createdAt desc ")
+    @Query("SELECT popup FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.token = :token ORDER BY popup.createdAt desc ")
     List<PopupAlarm> findByKeywordOrderByCreatedAtDesc(String token);
 
-    @Query("SELECT a FROM PopupAlarm a WHERE a.keyword = 'POPUP' AND a.isRead = false AND a.token = :token ORDER BY a.createdAt desc ")
-    List<PopupAlarm> findUnreadPopupAlarms(String token);
+    @Query("SELECT popup FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.isRead = false AND popup.token = :fcmToken ORDER BY popup.createdAt desc ")
+    List<PopupAlarm> findUnreadPopupAlarms(@Param("fcmToken") String fcmToken);
 
-    @Query("SELECT a FROM PopupAlarm a WHERE a.popupId.id = :popupId")
+    @Query("SELECT popup FROM PopupAlarm popup WHERE popup.popupId.id = :popupId")
     PopupAlarm findByPopupId(@Param("popupId") Long popupId);
+
+    @Query("SELECT COUNT(popup) FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.isRead = false AND popup.token = :fcmToken")
+    int UnreadPopupAlarms(@Param("fcmToken") String fcmToken);
 }
