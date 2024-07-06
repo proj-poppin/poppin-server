@@ -17,30 +17,35 @@ public class Constant {
     public static final Long MEMBER_INFO_RETENTION_PERIOD = 30L;
     public static final List<String> NO_NEED_AUTH_URLS = List.of(
 
-            "/api/v1/auth/sign-up", // 회원가입
-            "/api/v1/auth/sign-in", // 로그인
-            "/api/v1/popup/hot-list",   // 인기 팝업 목록 조회
-            "/api/v1/popup/new-list",   // 새로 오픈 팝업 목록 조회
-            "/api/v1/popup/closing-list",    // 종료 임박 팝업 목록 조회
-            "/api/v1/popup/guest/detail",     // 팝업 비로그인 상세 조회
-            "/api/v1/popup/guest/search", // 비로그인 팝업 검색
-            "/api/v1/popup/guest/search/base", // 비로그인 팝업 베이스 검색
-            "/api/v1/manager-inform/guest", // 비로그인 운영자 팝업 제보
-            "/api/v1/user-inform/guest/report", // 비로그인 이용자 팝업 제보
+            "/api/v1/auth/sign-up",                                // 회원가입
+            "/api/v1/auth/sign-in",                                         // 로그인
+            "/api/v1/popup/hot-list",                                       // 인기 팝업 목록 조회
+            "/api/v1/popup/new-list",                                       // 새로 오픈 팝업 목록 조회
+            "/api/v1/popup/closing-list",                                   // 종료 임박 팝업 목록 조회
+            "/api/v1/popup/guest/detail",                                   // 팝업 비로그인 상세 조회
+            "/api/v1/popup/guest/search",                                   // 비로그인 팝업 검색
+            "/api/v1/popup/guest/search/base",                              // 비로그인 팝업 베이스 검색
+            "/api/v1/manager-inform/guest",                                 // 비로그인 운영자 팝업 제보
+            "/api/v1/user-inform/guest/report",                             // 비로그인 이용자 팝업 제보
             "/api/v1/auth/login/kakao",
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
             "/api/v1/auth/email/verification",
             "/api/v1/auth/email/verification/password",
-            "/api/v1/noti/token/test", // fcm 토큰 테스트
-            "/api/v1/noti/topic/test", // fcm 토픽 테스트
-            "/api/v1/noti/apply/FCMtoken", // fcm 토큰 등록
+            "/api/v1/auth/reset-password/no-auth",
+
+            "/api/v1/noti/token/test",                                      // fcm 토큰 테스트
+            "/api/v1/noti/topic/test",                                      // fcm 토픽 테스트
+            "/api/v1/noti/apply/FCMtoken",                                  // fcm 토큰 등록
+
             "/api/v1/user/support/faqs",
             "/api/v1/user/random-nickname",
-            "/api/v1/alarm/info", // 공지사항 알림
-            "/api/v1/alarm/info/detail", // 공지사항 알림 2 depth
-            "/api/v1/auth/reset-password/no-auth"
+
+            "/api/v1/alarm/read",                                           // 공지사항 알림 읽음 여부
+            "/api/v1/alarm/info",                                           // 공지사항 알림 1 depth
+            "/api/v1/alarm/info/detail"                                     // 공지사항 알림 2 depth
+
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

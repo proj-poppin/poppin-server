@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.dto.alarm.response.PopupAlarmResponseDto;
@@ -76,14 +77,13 @@ public class AlarmService {
 
     /**
      *  홈 화면 진입 시 읽지 않은 공지 여부 판단
-     * @param userId
-     * @param fcmRequestDto
-     * @return
+     * @param fcmRequestDto :  FCM Token request dto
+     * @return : UnreadAlarmResponseDto
      */
-    public UnreadAlarmResponseDto readAlarm(Long userId, AlarmTokenRequestDto fcmRequestDto){
+    public UnreadAlarmResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
         UnreadAlarmResponseDto responseDto;
 
-        List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(userId); // 공지
+        List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(fcmRequestDto.fcmToken()); // 공지
         List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
 
         if (!informAlarms.isEmpty() && !popupAlarms.isEmpty()){
@@ -206,10 +206,15 @@ public class AlarmService {
 
 
     // 공지사항 알림 (2 depth)
-    public InformAlarmResponseDto readDetailInformAlarm(Long userId, Long informId){
+    public InformAlarmResponseDto readDetailInformAlarm(Long userId, InformAlarmDetailRequestDto requestDto){
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
+        
+        String fcmToken = requestDto.fcmToken();
+        Long informId = requestDto.informId();
         // isRead
-        InformIsRead informIsRead = informIsReadRepository.findByUserIdAndInformId(userId, informId);
+        InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(fcmToken,informId);
         informIsRead.getIsRead();
         informIsReadRepository.save(informIsRead);
 

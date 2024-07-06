@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long> {
 
-    @Query("SELECT inform FROM InformIsRead inform WHERE inform.user.id = :userId AND inform.informAlarm.id = :alarmId")
-    InformIsRead findByUserIdAndInformId(@Param("userId") Long userId, @Param("alarmId") Long alarmId);
+    @Query("SELECT inform FROM InformIsRead inform WHERE inform.fcmToken.token = :fcmToken AND inform.informAlarm.id = :alarmId")
+    InformIsRead findByFcmTokenAndInformAlarm(@Param("fcmToken") String fcmToken, @Param("alarmId") Long alarmId);
 
-    @Query("SELECT a FROM InformIsRead a WHERE a.user.id = :userId AND a.isRead = false")
-    List<InformIsRead> findUnreadInformAlarms(@Param("userId") Long userId);
+    @Query("SELECT a FROM InformIsRead a WHERE a.fcmToken.token = :fcmToken AND a.isRead = false")
+    List<InformIsRead> findUnreadInformAlarms(@Param("fcmToken") String fcmToken);
 
 }
