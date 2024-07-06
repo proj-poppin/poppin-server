@@ -23,16 +23,16 @@ public class InformIsRead {
     private InformAlarm informAlarm;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    @JoinColumn(name = "fcm_token", referencedColumnName = "id", nullable = false)
+    private FCMToken fcmToken;
 
     @Column(name = "is_read", nullable = false)
     private Boolean isRead;
 
     @Builder
-    public InformIsRead(InformAlarm informAlarm, User user) {
+    public InformIsRead(InformAlarm informAlarm, FCMToken token) {
         this.informAlarm = informAlarm;
-        this.user = user;
+        this.fcmToken = token;
         this.isRead = false;
     }
 

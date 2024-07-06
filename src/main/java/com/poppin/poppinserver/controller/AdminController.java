@@ -138,14 +138,14 @@ public class AdminController {
 
     @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createInformation(
-            @RequestPart(value = "images") MultipartFile images,
+            @UserId Long adminId,
             @RequestPart(value = "contents") InformAlarmCreateRequestDto requestDto,
-            @UserId Long adminId
+            @RequestPart(value = "images") MultipartFile images
     ){
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
-        return ResponseDto.ok(adminService.createInformation(images,requestDto,adminId));
+        return ResponseDto.ok(adminService.createInformation(adminId,requestDto,images));
     }
 
 }

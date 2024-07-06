@@ -323,10 +323,11 @@ public class AdminService {
 
 
     public InformApplyResponseDto createInformation(
-            MultipartFile images,
+            Long adminId,
             InformAlarmCreateRequestDto requestDto,
-            Long adminId
+            MultipartFile images
     ){
+        // 관리자 여부 확인
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -339,12 +340,10 @@ public class AdminService {
             if (informAlarm.equals(null))throw new CommonException(ErrorCode.INFO_ALARM_ERROR);
             else informAlarmRepository.save(informAlarm);
 
-            // Inform 읽음 여부 테이블에 유저 정보와 함께 저장
-            List<User> userList = userRepository.findAll();
-            for (User user: userList){
-                if (!user.getRole().toString().equals("ADMIN")){ // 관리자가 아닐때만
-                    alarmService.insertInformIsRead(user, informAlarm);
-                }
+            // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
+            List<FCMToken> tokenList = fcmTokenRepository.findAll();
+            for (FCMToken token: tokenList){
+                alarmService.insertInformIsRead(token, informAlarm);
             }
 
             // 이미지 저장
@@ -363,7 +362,6 @@ public class AdminService {
             // 저장 성공
             if (informAlarm != null){
                 // 앱 푸시 발송
-                List<FCMToken> tokenList = fcmTokenRepository.findAll();
                 String sendStatus = fcmSendUtil.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
 
                 // 푸시 성공
