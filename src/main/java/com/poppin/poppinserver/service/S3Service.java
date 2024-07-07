@@ -353,6 +353,8 @@ public class S3Service {
         fileValidate.add(".JFIF");
         fileValidate.add(".HEIF");
         fileValidate.add(".heif");
+        fileValidate.add(".HEIC");
+        fileValidate.add(".heic");
         log.info("image validate : " + fileName);
         String idxFileName = fileName.substring(fileName.lastIndexOf("."));
         log.info("idx file name : " + idxFileName);
