@@ -9,6 +9,7 @@ import com.poppin.poppinserver.dto.alarm.response.*;
 import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
 
+import com.poppin.poppinserver.dto.popup.response.PopupGuestDetailDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -158,9 +159,8 @@ public class AlarmService {
 
 
     // 알림 - 팝업 공지사항(1 depth)
-    public List<PopupAlarmResponseDto> readPopupAlarmList( Long userId, AlarmTokenRequestDto fcmRequestDto){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+    public List<PopupAlarmResponseDto> readPopupAlarmList( AlarmTokenRequestDto fcmRequestDto){
+
 
         log.info("fcm token : {} " + fcmRequestDto.fcmToken());
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
@@ -188,6 +188,18 @@ public class AlarmService {
         return  popupDetailDto;
     }
 
+    public PopupGuestDetailDto readPopupDetailGuest(Long popupId){
+
+        // 팝업 알림 isRead true 반환
+        PopupAlarm popupAlarm = popupAlarmRepository.findByPopupId(popupId);
+        popupAlarm.markAsRead();
+        popupAlarmRepository.save(popupAlarm);
+
+        PopupGuestDetailDto popupDetailDto = popupService.readGuestDetail(popupId);
+
+        return  popupDetailDto;
+    }
+
 
     // 공지사항 알림 (1 depth)
     public List<InformAlarmListResponseDto> readInformAlarmList(){
@@ -203,10 +215,7 @@ public class AlarmService {
 
 
     // 공지사항 알림 (2 depth)
-    public InformAlarmResponseDto readInformDetail(Long userId, InformAlarmDetailRequestDto requestDto){
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
+    public InformAlarmResponseDto readInformDetail(InformAlarmDetailRequestDto requestDto){
 
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();

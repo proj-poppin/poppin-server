@@ -32,14 +32,20 @@ public class AlarmController {
 
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
-    public ResponseDto<?> readPopupAlarm(@UserId Long userId, @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
-        return ResponseDto.ok(alarmService.readPopupAlarmList(userId, alarmTokenRequestDto));
+    public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+        return ResponseDto.ok(alarmService.readPopupAlarmList(alarmTokenRequestDto));
     }
 
-    // 팝업 알림 보여주기(2 depth)
+    // 팝업 알림 보여주기 - 로그인 (2 depth)
     @GetMapping("/popup/detail")
     public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestParam("popupId") Long popupId){
         return ResponseDto.ok(alarmService.readPopupDetail(userId, popupId));
+    }
+
+    // 팝업 알림 보여주기 - 비로그인 (2 depth)
+    @GetMapping("/popup/guest/detail")
+    public ResponseDto<?> readPopupDetailGuest(@RequestParam("popupId") Long popupId){
+        return ResponseDto.ok(alarmService.readPopupDetailGuest(popupId));
     }
 
     // 공지사항 알림 보여주기(1 depth)
@@ -50,8 +56,8 @@ public class AlarmController {
 
     // 공지사항 디테일 (2 depth)
     @GetMapping("/info/detail")
-    public ResponseDto<?> readDetailInfoAlarm(@UserId Long userId, @RequestBody InformAlarmDetailRequestDto requestDto){
-        return ResponseDto.ok(alarmService.readInformDetail(userId, requestDto));
+    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformAlarmDetailRequestDto requestDto){
+        return ResponseDto.ok(alarmService.readInformDetail(requestDto));
     }
 
     @PostMapping("/read/setting")
