@@ -351,8 +351,11 @@ public class S3Service {
         fileValidate.add(".WEBP");
         fileValidate.add(".jfif");
         fileValidate.add(".JFIF");
+        fileValidate.add(".HEIF");
+        fileValidate.add(".heif");
         String idxFileName = fileName.substring(fileName.lastIndexOf("."));
         if (!fileValidate.contains(idxFileName)) {
+            log.info("image validate : " + idxFileName);
             throw new CommonException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
         }
         return fileName.substring(fileName.lastIndexOf("."));

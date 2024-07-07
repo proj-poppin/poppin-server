@@ -15,6 +15,7 @@ public record ModifyInfoDto(
         String email, // 작성자 이메일
         String nickname, // 작성자 닉네임
         PopupDto popup, // 팝업
+        String popupName,
         String createdAt, // 작성 일자
         String content, // 수정 요청 텍스트
         Boolean isExecuted, // 처리 여부
@@ -34,6 +35,7 @@ public record ModifyInfoDto(
                 .email(modifyInfo.getUserId().getEmail())
                 .nickname(modifyInfo.getUserId().getNickname())
                 .popup(popupDto)
+                .popupName(popupDto.name())
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
                 .isExecuted(modifyInfo.getIsExecuted())

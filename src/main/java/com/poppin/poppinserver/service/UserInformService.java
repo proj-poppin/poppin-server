@@ -80,6 +80,7 @@ public class UserInformService {
                 .name(name)
                 .tastePopup(tastePopup)
                 .preferedPopup(preferedPopup)
+                .entranceRequired(true)
                 .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .build();
         popup = popupRepository.save(popup);
