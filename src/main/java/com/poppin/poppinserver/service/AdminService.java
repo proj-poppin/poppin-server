@@ -312,12 +312,27 @@ public class AdminService {
         reportPopupRepository.save(reportPopup);
     }
 
+    // 후기 신고 처리 생성 -> 후기 가리기
     @Transactional
-    public void processReviewReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {    // 리뷰 신고 처리
+    public void processReviewReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW_REPORT));
+        Review review = reviewRepository.findById(reportReview.getReviewId().getId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
+
+        review.updateReviewInvisible();
+        reviewRepository.save(review);
+
+        User reviewAuthor = review.getUser();
+        reviewAuthor.addReportCnt();
+
+        if (reviewAuthor.getReportedCnt() >= 3){
+            reviewAuthor.requiresSpecialCare();
+        }
+        userRepository.save(reviewAuthor);
+
         reportReview.execute(true, admin, LocalDateTime.now(), createReportExecContentDto.content());
         reportReviewRepository.save(reportReview);
     }

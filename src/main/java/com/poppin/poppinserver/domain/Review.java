@@ -66,5 +66,9 @@ public class Review {
 
     public void addRecommendCnt(){this.recommendCnt += 1;} // 추천 버튼 클릭시
     public void updateReviewUrl(String imageUrl){this.imageUrl = imageUrl;}
-    public void updateReviewVisible(){if (this.getIsVisible()) this.isVisible = false;}
+    public void updateReviewInvisible() {
+        if (this.getIsVisible()) {
+            this.isVisible = false;
+        }
+    }
 }
