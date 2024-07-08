@@ -7,6 +7,7 @@ import com.poppin.poppinserver.dto.review.request.ReviewInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class ReportService {
 
     }
 
+    @Transactional
     public void createReviewReport(Long userId, Long reviewId, CreateReviewReportDto createReviewReportDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -51,6 +53,15 @@ public class ReportService {
                 .reportContent(createReviewReportDto.content())
                 .isExecuted(false)
                 .build();
+
+        User reviewAuthor = review.getUser();
+        reviewAuthor.addReportCnt();
+
+        if (reviewAuthor.getReportedCnt() >= 3){
+            reviewAuthor.requiresSpecialCare();
+        }
+
+        userRepository.save(reviewAuthor);
         reportReviewRepository.save(reportReview);
     }
 
