@@ -18,11 +18,11 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    // 관리자 페이지 - 후기 신고 - 후기 숨기기
-    @PostMapping("/hide-review")
-    public ResponseDto<?> hideReview(@UserId Long userId, @RequestBody ReviewInfoDto reviewInfoDto){
-        return ResponseDto.ok(reportService.hideReview(userId, reviewInfoDto));
-    }
+//    // 관리자 페이지 - 후기 신고 - 후기 숨기기
+//    @PostMapping("/hide-review")
+//    public ResponseDto<?> hideReview(@UserId Long userId, @RequestBody ReviewInfoDto reviewInfoDto){
+//        return ResponseDto.ok(reportService.hideReview(userId, reviewInfoDto));
+//    }
 
     /* 유저 후기 신고 */
     @PostMapping("/review/{reviewId}")
