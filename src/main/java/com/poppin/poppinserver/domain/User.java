@@ -214,6 +214,10 @@ public class User {
         this.deletedAt = null;
     }
 
+    public void addReportCnt(){
+        this.reportedCnt++;
+    }
+
     public void addReviewCnt(){
         this.reviewCnt++;
     }
