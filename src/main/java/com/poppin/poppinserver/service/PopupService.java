@@ -209,8 +209,23 @@ public class PopupService {
         visitRepository.deleteAllByPopup(popup);
 
         // 후기 관련 데이터
+        // 후기 이미지
+        log.info("delete review image");
+        List<Review> reviews = reviewRepository.findByPopupId(popupId);
+
+        for (Review review : reviews) {
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            List<String> reviewUrls = reviewImages.stream()
+                    .map(ReviewImage::getImageUrl)
+                    .toList();
+            if(reviewUrls.size() != 0){
+                s3Service.deleteMultipleImages(reviewUrls);
+                reviewImageRepository.deleteAllByReviewId(review.getId());
+            }
+        }
+
+
         log.info("delete reveiw data");
-        reviewImageRepository.deleteAllByPosterId(popupId);
 
         reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
 

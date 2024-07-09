@@ -43,4 +43,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.user.id = :userId AND r.isVisible = :hidden ORDER BY r.createdAt DESC")
     Page<Review> findByUserIdAndIsVisibleOrderByCreatedAtDesc(Long userId, Pageable pageable, @Param("hidden") Boolean hidden);
+
+    List<Review> findByPopupId(Long popupId);
 }
