@@ -117,7 +117,8 @@ public class UserInformController {
     @GetMapping("/list")
     public ResponseDto<?> readUserInformList(@RequestParam(value = "page") int page,
                                              @RequestParam(value = "size") int size,
-                                             @RequestParam(value = "prog") EInformProgress progress){
+                                             @RequestParam(value = "prog") EInformProgress progress,
+                                             @UserId Long adminId){
         return ResponseDto.ok(userInformService.reatUserInformList(page, size, progress));
     } // 제보 목록 조회
 }
