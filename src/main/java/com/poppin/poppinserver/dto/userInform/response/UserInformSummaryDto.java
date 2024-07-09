@@ -32,6 +32,11 @@ public record UserInformSummaryDto(
                 informerName = userInform.getInformerId().getNickname();
             }
 
+            String adminName = null;
+            if (userInform.getPopupId().getAgent() != null) {
+                adminName = userInform.getPopupId().getAgent().getNickname();
+            }
+
             UserInformSummaryDto userInformSummaryDto =
                     UserInformSummaryDto.builder()
                             .id(userInform.getId())
@@ -40,7 +45,7 @@ public record UserInformSummaryDto(
                             .informerName(informerName)
                             .informedAt(userInform.getInformedAt().toString())
                             .executedAt(executedAt)
-                            .adminName(userInform.getPopupId().getAgent().getNickname())
+                            .adminName(adminName)
                             .build();
 
             dtoList.add(userInformSummaryDto);
