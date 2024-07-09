@@ -211,14 +211,19 @@ public class PopupService {
         // 후기 관련 데이터
         // 후기 이미지
         log.info("delete review image");
-        List<ReviewImage> reviewImages = reviewImageRepository.findAllByPopup(popup);
-        List<String> fileUrls = reviewImages.stream()
-                .map(ReviewImage::getImageUrl)
-                .toList();
-        if(fileUrls.size() != 0){
-            s3Service.deleteMultipleImages(fileUrls);
-            reviewImageRepository.deleteAllByPopup(popup);
+        List<Review> reviews = reviewRepository.findByPopupId(popupId);
+
+        for (Review review : reviews) {
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            List<String> reviewUrls = reviewImages.stream()
+                    .map(ReviewImage::getImageUrl)
+                    .toList();
+            if(reviewUrls.size() != 0){
+                s3Service.deleteMultipleImages(reviewUrls);
+                reviewImageRepository.deleteAllByReviewId(review.getId());
+            }
         }
+
 
         log.info("delete reveiw data");
 
