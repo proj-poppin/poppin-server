@@ -115,6 +115,10 @@ public class AuthService {
         if (user.isPresent() && user.get().getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
+        // 이미 가입된 계정이 있는지 확인
+        if (user.isPresent() && !user.get().getProvider().equals(provider)) {
+            throw new CommonException(ErrorCode.DUPLICATED_SOCIAL_ID);
+        }
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (user.isPresent() && user.get().getProvider().equals(provider)) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
