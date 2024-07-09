@@ -3,7 +3,7 @@ package com.poppin.poppinserver.service;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Visit;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.popup.request.PopupInfoDto;
+import com.poppin.poppinserver.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.dto.visit.response.RealTimeVisitorsDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -46,11 +46,11 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, PopupInfoDto popupInfoDto){
+    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, VisitorsInfoDto visitorsInfoDto){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(popupInfoDto.popupId())
+        Popup popup = popupRepository.findById(visitorsInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         /*30분 전 시간*/
@@ -67,7 +67,7 @@ public class VisitService {
         visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 일 주일 전 생성된 데이터만 삭제 예정*/
 
         // fcm 구독
-        String token = popupInfoDto.fcmToken();
+        String token = visitorsInfoDto.fcmToken();
         if (token.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
         fcmService.fcmAddTopic(token, popup, EPopupTopic.HOOGI);
 

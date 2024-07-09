@@ -2,6 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
+import com.poppin.poppinserver.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.poppin.poppinserver.util.FCMTokenUtil.refreshToken;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class AlarmService {
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final UserRepository userRepository;
     private final InformIsReadRepository informIsReadRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     private final PopupService popupService;
 
@@ -175,36 +179,78 @@ public class AlarmService {
         return popupAlarmResponseDtoList;
     }
 
-    // 알림 - 팝업 공지사항(2 depth)
-    public PopupDetailDto readPopupDetail(Long userId, Long popupId){
+    // 알림 - 로그인 팝업 공지사항(2 depth)
+    public PopupDetailDto readPopupDetail(Long userId, AlarmPopupRequestDto requestDto){
+
+        log.info("alarm popup login detail ...");
+
+        Long alarmId = requestDto.alarmId();
+        Long popupId = requestDto.popupId();
+        String fcmToken = requestDto.fcmToken();
+
+        log.info("alarm id : {}" + alarmId);
+        log.info("popup id : {}" + popupId);
+        log.info("fcm token : {}" + fcmToken);
 
         // 팝업 알림 isRead true 반환
-        PopupAlarm popupAlarm = popupAlarmRepository.findByPopupId(popupId);
+        PopupAlarm popupAlarm = popupAlarmRepository.findById(alarmId)
+                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_POPUP_ALARM));
         popupAlarm.markAsRead();
         popupAlarmRepository.save(popupAlarm);
 
-        PopupDetailDto popupDetailDto = popupService.readDetail(popupId, userId);
+        // fcm token refresh
+        FCMToken token = fcmTokenRepository.findByToken(fcmToken);
+        refreshToken(token);
+
+        // 팝업 상세 load
+        PopupDetailDto popupDetailDto = popupService.readDetail(requestDto.popupId(), userId);
 
         return  popupDetailDto;
+
     }
 
-    public PopupGuestDetailDto readPopupDetailGuest(Long popupId){
+    // 알림 - 비 로그인 팝업 공지사항(2 depth)
+    public PopupGuestDetailDto readPopupDetailGuest(AlarmPopupRequestDto requestDto){
+
+        log.info("alarm popup un-login detail ...");
+
+        Long alarmId = requestDto.alarmId();
+        Long popupId = requestDto.popupId();
+        String fcmToken = requestDto.fcmToken();
+
+        log.info("alarm id : {}" + alarmId);
+        log.info("popup id : {}" + popupId);
+        log.info("fcm token : {}" + fcmToken);
+
 
         // 팝업 알림 isRead true 반환
-        PopupAlarm popupAlarm = popupAlarmRepository.findByPopupId(popupId);
+        PopupAlarm popupAlarm = popupAlarmRepository.findById(alarmId)
+                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_POPUP_ALARM));
         popupAlarm.markAsRead();
         popupAlarmRepository.save(popupAlarm);
 
-        PopupGuestDetailDto popupDetailDto = popupService.readGuestDetail(popupId);
+        // fcm token refresh
+        FCMToken token = fcmTokenRepository.findByToken(fcmToken);
+        refreshToken(token);
+
+        // 팝업 상세 정보
+        PopupGuestDetailDto popupDetailDto = popupService.readGuestDetail(requestDto.popupId());
 
         return  popupDetailDto;
     }
 
 
     // 공지사항 알림 (1 depth)
-    public List<InformAlarmListResponseDto> readInformAlarmList(){
+    public List<InformAlarmListResponseDto> readInformAlarmList(AlarmTokenRequestDto requestDto){
+
+        log.info("read inform alarm ...");
+
+        log.info("fcm token : {} " + requestDto.fcmToken());
+
         List<InformAlarmListResponseDto> informAlarmListResponseDtoList = new ArrayList<>();
-        List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc();
+        List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc(requestDto.fcmToken());
+
+        log.info("alarm list : {}" + alarmList);
 
         for (InformAlarm alarm : alarmList){
             InformAlarmListResponseDto informAlarmListResponseDto = InformAlarmListResponseDto.fromEntity(alarm);
@@ -219,6 +265,9 @@ public class AlarmService {
 
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();
+
+        log.info("fcmToken : ", fcmToken );
+        log.info("inform ID : ", informId);
         // isRead
         InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(fcmToken,informId);
         informIsRead.getIsRead();
