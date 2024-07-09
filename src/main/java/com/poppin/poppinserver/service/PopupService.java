@@ -203,6 +203,11 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
+
+        // 실시간 방문자 수 관련 데이터
+        log.info("delete visit data");
+        visitRepository.deleteAllByPopup(popup);
+
         // 후기 관련 데이터
         log.info("delete reveiw data");
         reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
@@ -225,10 +230,6 @@ public class PopupService {
         // 신고 관련 데이터
         log.info("delete report data");
         reportPopupRepository.deleteAllByPopupId(popup);
-
-        // 실시간 방문자 수 관련 데이터
-        log.info("delete visit data");
-        visitRepository.deleteAllByPopup(popup);
 
         // 제보 관련 데이터
         log.info("delete inform data");
