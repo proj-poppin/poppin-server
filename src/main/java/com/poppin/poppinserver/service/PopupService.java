@@ -178,7 +178,19 @@ public class PopupService {
     public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size){
         Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper.getStatus());
 
-        Long num = popupRepository.count();
+        // 각 운영상태별로 팝업 개수 반환
+        Long num = 0L;
+        switch (oper){
+            case NOTYET:
+                num = popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
+                break;
+            case TERMINATED:
+                num = popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
+                break;
+            case OPERATING:
+                num = popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
+                break;
+        }
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
