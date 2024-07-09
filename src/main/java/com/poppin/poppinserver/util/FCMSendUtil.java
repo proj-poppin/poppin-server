@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.poppin.poppinserver.util.FCMTokenUtil.refreshToken;
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -211,20 +213,6 @@ public class FCMSendUtil {
                 log.error(" List of tokens that caused failures: " + failedTokens);
             }else log.info(" List of tokens send messages SUCCESSFULLY");
         }
-    }
-
-
-    /**
-     * FCM 토큰 갱신
-     * @param token
-     */
-    private void refreshToken(FCMToken token){
-
-        log.info("refresh token : " + token.getToken());
-
-        token.regenerateToken();
-        fcmTokenRepository.save(token);
-
     }
 
 }

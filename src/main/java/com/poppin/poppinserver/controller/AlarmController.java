@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
@@ -37,25 +38,25 @@ public class AlarmController {
     }
 
     // 팝업 알림 보여주기 - 로그인 (2 depth)
-    @GetMapping("/popup/detail")
-    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestParam("popupId") Long popupId){
-        return ResponseDto.ok(alarmService.readPopupDetail(userId, popupId));
+    @PostMapping("/popup/detail")
+    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto){
+        return ResponseDto.ok(alarmService.readPopupDetail(userId, requestDto));
     }
 
     // 팝업 알림 보여주기 - 비로그인 (2 depth)
-    @GetMapping("/popup/guest/detail")
-    public ResponseDto<?> readPopupDetailGuest(@RequestParam("popupId") Long popupId){
-        return ResponseDto.ok(alarmService.readPopupDetailGuest(popupId));
+    @PostMapping("/popup/guest/detail")
+    public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto){
+        return ResponseDto.ok(alarmService.readPopupDetailGuest(requestDto));
     }
 
     // 공지사항 알림 보여주기(1 depth)
-    @GetMapping("/info")
-    public ResponseDto<?> readInfoAlarm(){
-        return ResponseDto.ok(alarmService.readInformAlarmList());
+    @PostMapping("/info")
+    public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto){
+        return ResponseDto.ok(alarmService.readInformAlarmList(requestDto));
     }
 
     // 공지사항 디테일 (2 depth)
-    @GetMapping("/info/detail")
+    @PostMapping("/info/detail")
     public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformAlarmDetailRequestDto requestDto){
         return ResponseDto.ok(alarmService.readInformDetail(requestDto));
     }
