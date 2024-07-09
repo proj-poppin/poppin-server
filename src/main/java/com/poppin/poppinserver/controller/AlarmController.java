@@ -38,7 +38,7 @@ public class AlarmController {
     }
 
     // 팝업 알림 보여주기 - 로그인 (2 depth)
-    @PostMapping("/popup/detail")
+    @PostMapping("/detail/popup")
     public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto){
         return ResponseDto.ok(alarmService.readPopupDetail(userId, requestDto));
     }

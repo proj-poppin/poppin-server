@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Builder
 public record PopupAlarmResponseDto(
     Long alarmId,
-    Long popupId,
+    Long id, // popup id
     String title,
     String body,
     LocalDate createdAt,
@@ -20,7 +20,7 @@ public record PopupAlarmResponseDto(
 
         return PopupAlarmResponseDto.builder()
                 .alarmId(alarm.getId())
-                .popupId(alarm.getPopupId().getId())
+                .id(alarm.getPopupId().getId())
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())

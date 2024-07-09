@@ -62,7 +62,8 @@ public class FCMSendUtil {
                     .setApnsConfig(apnsConfiguration.apnsConfig())
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setToken(token.getToken())
-                    .putData("informId", informAlarm.getId().toString())
+                    .putData("id", informAlarm.getId().toString())
+                    .putData("type", "inform")
                     .build();
 
             try {
@@ -153,7 +154,8 @@ public class FCMSendUtil {
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfig)
                     .setApnsConfig(apnsConfig)
-                    .putData("popupId" , fcmRequestDto.popupId().toString())
+                    .putData("id" , fcmRequestDto.popupId().toString())
+                    .putData("type", "popup")
                     .build();
 
             log.info("TOPIC message sending...");
