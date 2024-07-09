@@ -34,6 +34,7 @@ public enum ErrorCode {
     DUPLICATED_TOKEN("40023", HttpStatus.BAD_REQUEST, "이미 알림 동의를 하셨습니다."),
     DELETED_USER_ERROR("40024", HttpStatus.BAD_REQUEST, "탈퇴한 유저는 30일 동안 재가입할 수 없습니다."),
     REVIEW_RECOMMEND_ERROR("40025", HttpStatus.BAD_REQUEST, "자신의 후기에 추천 할 수 없습니다."),
+    DUPLICATED_SOCIAL_ID("40026", HttpStatus.BAD_REQUEST, "해당 이메일로 가입된 계정이 존재합니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
