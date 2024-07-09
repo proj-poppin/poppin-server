@@ -210,6 +210,8 @@ public class PopupService {
 
         // 후기 관련 데이터
         log.info("delete reveiw data");
+        reviewImageRepository.deleteAllByPosterId(popupId);
+
         reviewRecommendUserRepository.deleteAllByReviewPopup(popup);
 
         reviewRepository.deleteAllByPopup(popup);
