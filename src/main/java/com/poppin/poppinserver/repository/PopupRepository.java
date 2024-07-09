@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.repository;
 
+import com.amazonaws.services.cloudformation.model.OperationStatus;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.type.EOperationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -117,6 +119,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     @Query("SELECT p FROM Popup p WHERE p.id = :vdPopupId")
     Popup findTopByPopupId(Long vdPopupId);
+
+    Long countByOperationStatus(String operationStatus);
 
 
     /**

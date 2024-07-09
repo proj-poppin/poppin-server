@@ -41,6 +41,7 @@ public record ManagerInformSummaryDto(
                             .informerName(informerName)
                             .informedAt(managerInform.getInformedAt().toString())
                             .executedAt(executedAt)
+                            .adminName(managerInform.getPopupId().getAgent().getNickname())
                             .build();
 
             dtoList.add(managerInformSummaryDto);

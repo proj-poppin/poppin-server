@@ -40,6 +40,7 @@ public record UserInformSummaryDto(
                             .informerName(informerName)
                             .informedAt(userInform.getInformedAt().toString())
                             .executedAt(executedAt)
+                            .adminName(userInform.getPopupId().getAgent().getNickname())
                             .build();
 
             dtoList.add(userInformSummaryDto);

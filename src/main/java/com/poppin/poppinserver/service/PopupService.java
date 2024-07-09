@@ -178,7 +178,19 @@ public class PopupService {
     public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size){
         Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper.getStatus());
 
-        Long num = popupRepository.count();
+        // 각 운영상태별로 팝업 개수 반환
+        Long num = 0L;
+        switch (oper){
+            case NOTYET:
+                num = popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
+                break;
+            case TERMINATED:
+                num = popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
+                break;
+            case OPERATING:
+                num = popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
+                break;
+        }
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
@@ -190,6 +202,11 @@ public class PopupService {
     public Boolean removePopup(Long popupId) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+
+        // 실시간 방문자 수 관련 데이터
+        log.info("delete visit data");
+        visitRepository.deleteAllByPopup(popup);
 
         // 후기 관련 데이터
         log.info("delete reveiw data");
@@ -213,10 +230,6 @@ public class PopupService {
         // 신고 관련 데이터
         log.info("delete report data");
         reportPopupRepository.deleteAllByPopupId(popup);
-
-        // 실시간 방문자 수 관련 데이터
-        log.info("delete visit data");
-        visitRepository.deleteAllByPopup(popup);
 
         // 제보 관련 데이터
         log.info("delete inform data");

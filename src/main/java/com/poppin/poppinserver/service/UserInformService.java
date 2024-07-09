@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.service;
 
+import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.common.PageInfoDto;
 import com.poppin.poppinserver.dto.common.PagingResponseDto;

@@ -15,6 +15,7 @@ public record ModifyInfoDto(
         String email, // 작성자 이메일
         String nickname, // 작성자 닉네임
         PopupDto popup, // 팝업
+        PopupDto originPopup, // 변경 전 팝업
         String popupName,
         String createdAt, // 작성 일자
         String content, // 수정 요청 텍스트
@@ -28,6 +29,8 @@ public record ModifyInfoDto(
             popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
         }
 
+        PopupDto originPopupDto = PopupDto.fromEntity(modifyInfo.getOriginPopup());
+
         return ModifyInfoDto.builder()
                 .id(modifyInfo.getId())
                 .userId(modifyInfo.getId())
@@ -35,6 +38,7 @@ public record ModifyInfoDto(
                 .email(modifyInfo.getUserId().getEmail())
                 .nickname(modifyInfo.getUserId().getNickname())
                 .popup(popupDto)
+                .originPopup(originPopupDto)
                 .popupName(popupDto.name())
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
