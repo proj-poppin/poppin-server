@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    @Query("SELECT r FROM Review r WHERE r.popup.id = :popupId ORDER BY r.recommendCnt DESC")
+    @Query("SELECT r FROM Review r WHERE r.popup.id = :popupId AND r.isVisible = true ORDER BY r.recommendCnt DESC")
     List<Review> findAllByPopupIdOrderByRecommendCntDesc(@Param("popupId") Long popupId);
 
     @Query("SELECT r FROM Review r join Popup p on p.id = r.popup.id WHERE p.id = :popupId AND r.id = :reviewId")
