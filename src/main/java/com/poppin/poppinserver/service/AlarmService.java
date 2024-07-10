@@ -215,9 +215,9 @@ public class AlarmService {
         Long popupId = requestDto.popupId();
         String fcmToken = requestDto.fcmToken();
 
-        log.info("alarm id : {}" + alarmId);
-        log.info("popup id : {}" + popupId);
-        log.info("fcm token : {}" + fcmToken);
+        log.info("alarm id : {} " , alarmId);
+        log.info("popup id : {} " , popupId);
+        log.info("fcm token : {} " , fcmToken);
 
 
         // 팝업 알림 isRead true 반환
@@ -242,12 +242,12 @@ public class AlarmService {
 
         log.info("read inform alarm ...");
 
-        log.info("fcm token : {} " + requestDto.fcmToken());
+        log.info("fcm token : {} ", requestDto.fcmToken());
 
         List<InformAlarmListResponseDto> informAlarmListResponseDtoList = new ArrayList<>();
         List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc(requestDto.fcmToken());
 
-        log.info("alarm list : {}" + alarmList);
+        log.info("alarm list : {}", alarmList);
 
         for (InformAlarm alarm : alarmList){
             InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(requestDto.fcmToken(), alarm.getId());
