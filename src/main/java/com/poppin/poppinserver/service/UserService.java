@@ -434,25 +434,42 @@ public class UserService {
     private boolean updatePreferenceSettings(User user) {
         boolean hasPreferences = true;
 
-        if (user.getPreferedPopup() == null) {
-            PreferedPopup preferedPopup = createDefaultPreferedPopup();
+        PreferedPopup preferedPopup = user.getPreferedPopup();
+        TastePopup tastePopup = user.getTastePopup();
+        WhoWithPopup whoWithPopup = user.getWhoWithPopup();
+
+        if (preferedPopup == null) {
+            preferedPopup = createDefaultPreferedPopup();
             preferedPopupRepository.save(preferedPopup);
             user.updatePopupTaste(preferedPopup);
         }
 
-        if (user.getTastePopup() == null) {
-            TastePopup tastePopup = createDefaultTastePopup();
+        if (tastePopup == null) {
+            tastePopup = createDefaultTastePopup();
             tastePopupRepository.save(tastePopup);
             user.updatePopupTaste(tastePopup);
         }
 
-        if (user.getWhoWithPopup() == null) {
-            WhoWithPopup whoWithPopup = createDefaultWhoWithPopup();
+        if (whoWithPopup == null) {
+            whoWithPopup = createDefaultWhoWithPopup();
             whoWithPopupRepository.save(whoWithPopup);
             user.updatePopupTaste(whoWithPopup);
         }
 
-        if (isAllFalse(user.getPreferedPopup()) && isAllFalse(user.getTastePopup()) && isAllFalse(user.getWhoWithPopup())) {
+        userRepository.save(user);
+
+        if (preferedPopup.getDisplay() == false && preferedPopup.getExperience() == false &&
+                preferedPopup.getMarket() == false && preferedPopup.getWantFree() == false &&
+            tastePopup.getAlcohol() == false && tastePopup.getAnimalPlant() == false &&
+                tastePopup.getCharacters() == false && tastePopup.getFashionBeauty() == false &&
+                tastePopup.getFoodBeverage() == false && tastePopup.getGame() == false &&
+                tastePopup.getInteriorThings() == false && tastePopup.getItTech() == false &&
+                tastePopup.getKpop() == false && tastePopup.getMovie() == false &&
+                tastePopup.getMusical() == false && tastePopup.getSports() == false &&
+                tastePopup.getWebtoonAni() == false &&
+            whoWithPopup.getSolo() == false && whoWithPopup.getWithFamily() == false &&
+                whoWithPopup.getWithFriend() == false && whoWithPopup.getWithLover() == false
+            ) {
             hasPreferences = false;
         }
 
@@ -493,21 +510,5 @@ public class UserService {
                 .withFamily(false)
                 .withLover(false)
                 .build();
-    }
-
-    private boolean isAllFalse(Object popup) {
-        Field[] fields = popup.getClass().getDeclaredFields(); // 객체의 모든 필드 가져오기
-        try {
-            for (Field field : fields) {
-                field.setAccessible(true); // private 필드 접근 허용
-                Object value = field.get(popup); // 필드 값 가져오기
-                if (value instanceof Boolean && (Boolean) value) { // 필드가 Boolean 타입이고 true인 경우
-                    return false;
-                }
-            }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        return true; // 모든 Boolean 필드가 false인 경우
     }
 }
