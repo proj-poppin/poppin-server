@@ -2,10 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.dto.alarm.request.AlarmPopupRequestDto;
-import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.*;
 import com.poppin.poppinserver.dto.alarm.response.*;
 import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.dto.popup.response.PopupDetailDto;
@@ -261,11 +258,12 @@ public class AlarmService {
 
 
     // 공지사항 알림 (2 depth)
-    public InformAlarmResponseDto readInformDetail(InformAlarmDetailRequestDto requestDto){
+    public InformAlarmResponseDto readInformDetail(InformDetailDto requestDto){
 
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();
 
+        log.info("dto : " , requestDto);
         log.info("fcmToken : ", fcmToken );
         log.info("inform ID : ", informId);
         // isRead

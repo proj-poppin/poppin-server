@@ -3,7 +3,7 @@ package com.poppin.poppinserver.controller;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.dto.alarm.request.InformAlarmDetailRequestDto;
+import com.poppin.poppinserver.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.service.AlarmService;
@@ -57,7 +57,7 @@ public class AlarmController {
 
     // 공지사항 디테일 (2 depth)
     @PostMapping("/info/detail")
-    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformAlarmDetailRequestDto requestDto){
+    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto){
         return ResponseDto.ok(alarmService.readInformDetail(requestDto));
     }
 
