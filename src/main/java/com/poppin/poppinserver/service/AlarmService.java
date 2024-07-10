@@ -263,12 +263,17 @@ public class AlarmService {
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();
 
-        log.info("dto : " , requestDto);
-        log.info("fcmToken : ", fcmToken );
-        log.info("inform ID : ", informId);
+        FCMToken token = fcmTokenRepository.findByToken(fcmToken);
+
+        log.info("dto : {}" , requestDto);
+        log.info("fcmToken : {}", fcmToken );
+        log.info("inform ID : {}", informId);
+
         // isRead
-        InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(fcmToken,informId);
-        informIsRead.getIsRead();
+        InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(token.getId(),informId);
+        log.info("inform : {}", informIsRead);
+
+        informIsRead.markAsRead();
         informIsReadRepository.save(informIsRead);
 
         // informAlarm
