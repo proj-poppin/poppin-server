@@ -85,7 +85,7 @@ public class AlarmService {
         List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(fcmRequestDto.fcmToken()); // 공지
         List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
 
-        if (!informAlarms.isEmpty() && !popupAlarms.isEmpty()){
+        if (!informAlarms.isEmpty() || !popupAlarms.isEmpty()){
             responseDto = AlarmStatusResponseDto.fromEntity(true);
         }
         else {
@@ -163,16 +163,16 @@ public class AlarmService {
     public List<PopupAlarmResponseDto> readPopupAlarmList( AlarmTokenRequestDto fcmRequestDto){
 
 
-        log.info("fcm token : {} " + fcmRequestDto.fcmToken());
+        log.info("fcm token : {} " , fcmRequestDto.fcmToken());
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
         List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(fcmRequestDto.fcmToken());
 
         for (PopupAlarm alarm : alarmList){
-            log.info("alarmList : " + alarmList);
+            log.info("alarmList : {} " , alarmList);
             PopupAlarmResponseDto popupAlarmResponseDto = PopupAlarmResponseDto.fromEntity(alarm);
             popupAlarmResponseDtoList.add(popupAlarmResponseDto);
         }
-        log.info("result : " + popupAlarmResponseDtoList);
+        log.info("result : {} " , popupAlarmResponseDtoList);
         return popupAlarmResponseDtoList;
     }
 
