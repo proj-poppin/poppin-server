@@ -10,6 +10,7 @@ import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.NicknameDto;
 import com.poppin.poppinserver.dto.user.response.UserMypageDto;
+import com.poppin.poppinserver.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -417,11 +419,95 @@ public class UserService {
         userRepository.save(user);
     }
 
-//    // 1:1 문의 생성 -> 보류 (사유: 카카오톡 페이지 연결)
-//    public void createUserQna(Long userId, String title, String content, MultipartFile images) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//        s3Service.uploadUserQna(images, userId);
-//
-//    }
+    @Transactional
+    public UserPreferenceSettingDto readUserPreferenceSettingCreated(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        boolean isPreferenceSettingCreated = updatePreferenceSettings(user);
+
+        return UserPreferenceSettingDto.builder()
+                .isPreferenceSettingCreated(isPreferenceSettingCreated)
+                .build();
+    }
+
+    private boolean updatePreferenceSettings(User user) {
+        boolean hasPreferences = true;
+
+        if (user.getPreferedPopup() == null) {
+            PreferedPopup preferedPopup = createDefaultPreferedPopup();
+            preferedPopupRepository.save(preferedPopup);
+            user.updatePopupTaste(preferedPopup);
+        }
+
+        if (user.getTastePopup() == null) {
+            TastePopup tastePopup = createDefaultTastePopup();
+            tastePopupRepository.save(tastePopup);
+            user.updatePopupTaste(tastePopup);
+        }
+
+        if (user.getWhoWithPopup() == null) {
+            WhoWithPopup whoWithPopup = createDefaultWhoWithPopup();
+            whoWithPopupRepository.save(whoWithPopup);
+            user.updatePopupTaste(whoWithPopup);
+        }
+
+        if (isAllFalse(user.getPreferedPopup()) && isAllFalse(user.getTastePopup()) && isAllFalse(user.getWhoWithPopup())) {
+            hasPreferences = false;
+        }
+
+        return hasPreferences;
+    }
+
+    private PreferedPopup createDefaultPreferedPopup() {
+        return PreferedPopup.builder()
+                .market(false)
+                .display(false)
+                .experience(false)
+                .wantFree(false)
+                .build();
+    }
+
+    private TastePopup createDefaultTastePopup() {
+        return TastePopup.builder()
+                .fasionBeauty(false)
+                .characters(false)
+                .foodBeverage(false)
+                .webtoonAni(false)
+                .interiorThings(false)
+                .movie(false)
+                .musical(false)
+                .sports(false)
+                .game(false)
+                .itTech(false)
+                .kpop(false)
+                .alcohol(false)
+                .animalPlant(false)
+                .build();
+    }
+
+    private WhoWithPopup createDefaultWhoWithPopup() {
+        return WhoWithPopup.builder()
+                .solo(false)
+                .withFriend(false)
+                .withFamily(false)
+                .withLover(false)
+                .build();
+    }
+
+    private boolean isAllFalse(Object popup) {
+        Field[] fields = popup.getClass().getDeclaredFields(); // 객체의 모든 필드 가져오기
+        try {
+            for (Field field : fields) {
+                field.setAccessible(true); // private 필드 접근 허용
+                Object value = field.get(popup); // 필드 값 가져오기
+                if (value instanceof Boolean && (Boolean) value) { // 필드가 Boolean 타입이고 true인 경우
+                    return false;
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return true; // 모든 Boolean 필드가 false인 경우
+    }
 }
