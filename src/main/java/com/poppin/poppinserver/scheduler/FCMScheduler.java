@@ -165,15 +165,17 @@ public class FCMScheduler {
 
         for (Popup popup : popupList){
             Long popupId = popup.getId();
+            log.info("topic code : {}" , topic.getCode());
+            log.info("popupId : {}" , popupId);
             List<FCMToken> tokenList = (fcmTokenRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
             if (tokenList.isEmpty()) log.info("nothing subscribed on : " + topic);
             else{
                 for (FCMToken token : tokenList){
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
-                    log.info("token : " + token.getToken());
+                    log.info("token : {}" ,token.getToken());
                     AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
-                    log.info("setting : " + set);
+                    log.info("setting : {}", set);
                     String setDefVal = set.getPushYn();
                     String setVal;
                     switch (topic){
