@@ -250,7 +250,8 @@ public class AlarmService {
         log.info("alarm list : {}" + alarmList);
 
         for (InformAlarm alarm : alarmList){
-            InformAlarmListResponseDto informAlarmListResponseDto = InformAlarmListResponseDto.fromEntity(alarm);
+            InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(requestDto.fcmToken(), alarm.getId());
+            InformAlarmListResponseDto informAlarmListResponseDto = InformAlarmListResponseDto.fromEntity(alarm, informIsRead.getIsRead());
             informAlarmListResponseDtoList.add(informAlarmListResponseDto);
         }
         return informAlarmListResponseDtoList;
@@ -263,14 +264,12 @@ public class AlarmService {
         String fcmToken = requestDto.fcmToken();
         Long informId = requestDto.informId();
 
-        FCMToken token = fcmTokenRepository.findByToken(fcmToken);
-
         log.info("dto : {}" , requestDto);
         log.info("fcmToken : {}", fcmToken );
         log.info("inform ID : {}", informId);
 
         // isRead
-        InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(token.getId(),informId);
+        InformIsRead informIsRead = informIsReadRepository.findByFcmTokenAndInformAlarm(fcmToken,informId);
         log.info("inform : {}", informIsRead);
 
         informIsRead.markAsRead();
