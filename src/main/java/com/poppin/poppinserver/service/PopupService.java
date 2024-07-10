@@ -350,6 +350,22 @@ public class PopupService {
         }
         alarmKeywordRepository.saveAll(alarmKeywords);
 
+        //날짜 요청 유효성 검증
+        if (updatePopupDto.openDate().isAfter(updatePopupDto.closeDate())) {
+            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
+        }
+
+        //현재 운영상태 정의
+        String operationStatus;
+        if (updatePopupDto.openDate().isAfter(LocalDate.now())){
+            operationStatus = EOperationStatus.NOTYET.getStatus();
+        } else if (updatePopupDto.closeDate().isBefore(LocalDate.now())) {
+            operationStatus = EOperationStatus.TERMINATED.getStatus();
+        }
+        else{
+            operationStatus = EOperationStatus.OPERATING.getStatus();
+        }
+
         popup.update(
                 updatePopupDto.homepageLink(),
                 updatePopupDto.name(),
@@ -368,7 +384,7 @@ public class PopupService {
                 updatePopupDto.latitude(),
                 updatePopupDto.longitude(),
                 updatePopupDto.operationExcept(),
-                popup.getOperationStatus(),
+                operationStatus,
                 admin
         );
 
