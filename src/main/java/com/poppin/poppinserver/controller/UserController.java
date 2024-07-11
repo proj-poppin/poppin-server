@@ -171,4 +171,10 @@ public class UserController {
     public ResponseDto<?> readUserPreferenceSettingCreated(@UserId Long userId) {
         return ResponseDto.ok(userService.readUserPreferenceSettingCreated(userId));
     }
+
+    @PostMapping("/block/{blockUserId}")
+    public ResponseDto<?> blockUser(@UserId Long userId, @PathVariable Long blockUserId) {
+        userService.blockUser(userId, blockUserId);
+        return ResponseDto.ok("차단 완료되었습니다.");
+    }
 }
