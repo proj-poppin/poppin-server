@@ -10,6 +10,7 @@ import com.poppin.poppinserver.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.dto.user.response.NicknameDto;
 import com.poppin.poppinserver.dto.user.response.UserMypageDto;
+import com.poppin.poppinserver.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -42,6 +44,7 @@ public class UserService {
     private final S3Service s3Service;
     private final FreqQuestionRepository freqQuestionRepository;
     private final PosterImageRepository posterImageRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -417,11 +420,120 @@ public class UserService {
         userRepository.save(user);
     }
 
-//    // 1:1 문의 생성 -> 보류 (사유: 카카오톡 페이지 연결)
-//    public void createUserQna(Long userId, String title, String content, MultipartFile images) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//        s3Service.uploadUserQna(images, userId);
-//
-//    }
+    @Transactional
+    public UserPreferenceSettingDto readUserPreferenceSettingCreated(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        boolean isPreferenceSettingCreated = updatePreferenceSettings(user);
+
+        return UserPreferenceSettingDto.builder()
+                .isPreferenceSettingCreated(isPreferenceSettingCreated)
+                .build();
+    }
+
+    private boolean updatePreferenceSettings(User user) {
+        boolean hasPreferences = true;
+
+        PreferedPopup preferedPopup = user.getPreferedPopup();
+        TastePopup tastePopup = user.getTastePopup();
+        WhoWithPopup whoWithPopup = user.getWhoWithPopup();
+
+        if (preferedPopup == null) {
+            preferedPopup = createDefaultPreferedPopup();
+            preferedPopupRepository.save(preferedPopup);
+            user.updatePopupTaste(preferedPopup);
+        }
+
+        if (tastePopup == null) {
+            tastePopup = createDefaultTastePopup();
+            tastePopupRepository.save(tastePopup);
+            user.updatePopupTaste(tastePopup);
+        }
+
+        if (whoWithPopup == null) {
+            whoWithPopup = createDefaultWhoWithPopup();
+            whoWithPopupRepository.save(whoWithPopup);
+            user.updatePopupTaste(whoWithPopup);
+        }
+
+        userRepository.save(user);
+
+        if (preferedPopup.getDisplay() == false && preferedPopup.getExperience() == false &&
+                preferedPopup.getMarket() == false && preferedPopup.getWantFree() == false &&
+            tastePopup.getAlcohol() == false && tastePopup.getAnimalPlant() == false &&
+                tastePopup.getCharacters() == false && tastePopup.getFashionBeauty() == false &&
+                tastePopup.getFoodBeverage() == false && tastePopup.getGame() == false &&
+                tastePopup.getInteriorThings() == false && tastePopup.getItTech() == false &&
+                tastePopup.getKpop() == false && tastePopup.getMovie() == false &&
+                tastePopup.getMusical() == false && tastePopup.getSports() == false &&
+                tastePopup.getWebtoonAni() == false &&
+            whoWithPopup.getSolo() == false && whoWithPopup.getWithFamily() == false &&
+                whoWithPopup.getWithFriend() == false && whoWithPopup.getWithLover() == false
+            ) {
+            hasPreferences = false;
+        }
+
+        return hasPreferences;
+    }
+
+    private PreferedPopup createDefaultPreferedPopup() {
+        return PreferedPopup.builder()
+                .market(false)
+                .display(false)
+                .experience(false)
+                .wantFree(false)
+                .build();
+    }
+
+    private TastePopup createDefaultTastePopup() {
+        return TastePopup.builder()
+                .fasionBeauty(false)
+                .characters(false)
+                .foodBeverage(false)
+                .webtoonAni(false)
+                .interiorThings(false)
+                .movie(false)
+                .musical(false)
+                .sports(false)
+                .game(false)
+                .itTech(false)
+                .kpop(false)
+                .alcohol(false)
+                .animalPlant(false)
+                .build();
+    }
+
+    private WhoWithPopup createDefaultWhoWithPopup() {
+        return WhoWithPopup.builder()
+                .solo(false)
+                .withFriend(false)
+                .withFamily(false)
+                .withLover(false)
+                .build();
+    }
+
+    @Transactional
+    public void createblockedUser(Long userId, Long blockUserId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        User blockedUser = userRepository.findById(blockUserId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        if (userId.equals(blockUserId)) {
+            throw new CommonException(ErrorCode.CANNOT_BLOCK_MYSELF);
+        }
+
+        Optional<BlockedUser> checkBlockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId, blockUserId);
+        if (checkBlockedUser.isPresent()) {
+            throw new CommonException(ErrorCode.ALREADY_BLOCKED_USER);
+        }
+
+        BlockedUser createBlockedUser = BlockedUser.builder()
+                .userId(user)
+                .blockedUserId(blockedUser)
+                .build();
+        blockedUserRepository.save(createBlockedUser);
+    }
 }

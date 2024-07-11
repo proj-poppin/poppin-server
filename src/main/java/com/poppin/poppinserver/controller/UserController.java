@@ -166,4 +166,15 @@ public class UserController {
     public ResponseDto<?> generateRandomNickname() {
         return ResponseDto.ok(userService.generateRandomNickname());
     }
+
+    @GetMapping("/preference-setting")
+    public ResponseDto<?> readUserPreferenceSettingCreated(@UserId Long userId) {
+        return ResponseDto.ok(userService.readUserPreferenceSettingCreated(userId));
+    }
+
+    @PostMapping("/block/{blockUserId}")
+    public ResponseDto<?> createblockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
+        userService.createblockedUser(userId, blockUserId);
+        return ResponseDto.ok("차단 완료되었습니다.");
+    }
 }

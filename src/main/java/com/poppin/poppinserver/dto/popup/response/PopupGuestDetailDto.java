@@ -73,7 +73,7 @@ public record PopupGuestDetailDto(
                 .review(reviewInfoList)
                 .visitorData(visitorDataDto)
                 .realTimeVisit(realTimeVisit)
-                .isVisited(true)
+                .isVisited(false)
                 .build();
     }
 }

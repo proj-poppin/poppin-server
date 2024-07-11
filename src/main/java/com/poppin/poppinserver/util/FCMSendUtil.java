@@ -149,7 +149,7 @@ public class FCMSendUtil {
             message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(fcmRequestDto.title())
-                            .setBody( popup.getName() + " "  + fcmRequestDto.body())
+                            .setBody( "[" + popup.getName() + "] "  + fcmRequestDto.body())
                             .build())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfig)
