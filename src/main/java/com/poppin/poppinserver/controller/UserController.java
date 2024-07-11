@@ -173,8 +173,8 @@ public class UserController {
     }
 
     @PostMapping("/block/{blockUserId}")
-    public ResponseDto<?> blockUser(@UserId Long userId, @PathVariable Long blockUserId) {
-        userService.blockUser(userId, blockUserId);
+    public ResponseDto<?> createblockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
+        userService.createblockedUser(userId, blockUserId);
         return ResponseDto.ok("차단 완료되었습니다.");
     }
 }
