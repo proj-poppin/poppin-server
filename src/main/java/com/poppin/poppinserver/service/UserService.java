@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -512,7 +513,8 @@ public class UserService {
                 .build();
     }
 
-    public void blockUser(Long userId, Long blockUserId) {
+    @Transactional
+    public void createblockedUser(Long userId, Long blockUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -521,6 +523,11 @@ public class UserService {
 
         if (userId.equals(blockUserId)) {
             throw new CommonException(ErrorCode.CANNOT_BLOCK_MYSELF);
+        }
+
+        Optional<BlockedUser> checkBlockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId, blockUserId);
+        if (checkBlockedUser.isPresent()) {
+            throw new CommonException(ErrorCode.ALREADY_BLOCKED_USER);
         }
 
         BlockedUser createBlockedUser = BlockedUser.builder()

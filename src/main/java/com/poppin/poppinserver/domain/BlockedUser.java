@@ -19,11 +19,11 @@ public class BlockedUser {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User userId;
 
     @ManyToOne
-    @JoinColumn(name = "blocked_user_id", nullable = false)
+    @JoinColumn(name = "blocked_user_id", referencedColumnName = "id", nullable = false)
     private User blockedUserId;
 
     @Builder

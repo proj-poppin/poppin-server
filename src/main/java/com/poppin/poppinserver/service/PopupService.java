@@ -485,17 +485,22 @@ public class PopupService {
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
         List<Long> blockedUserIds = blockedUserRepository.findBlockedUserIdsByUserId(userId);
-        log.info(blockedUserIds.toString());
+        log.info("Blocked User IDs: " + blockedUserIds.toString());
 
+        // 차단된 사용자의 리뷰를 제외한 리스트
+        List<Review> filteredReviews = new ArrayList<>();
         // 리뷰 이미지 목록, 프로필 이미지 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
         List<Long> reviewCntList = new ArrayList<>();
-        List<ReviewInfoDto> reviewInfoList;
 
         for (Review review : reviews) {
-            if (blockedUserIds.contains(review.getUser().getId()))
+            if (blockedUserIds.contains(review.getUser().getId())) {
+                log.info("Filtered Review by User ID: " + review.getUser().getId());
                 continue;
+            }
+
+            filteredReviews.add(review);
 
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
@@ -509,7 +514,7 @@ public class PopupService {
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList, reviewCntList);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(filteredReviews, reviewImagesList, profileImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -531,10 +536,10 @@ public class PopupService {
         Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
 
         // 방문 여부 확인
-        if (!visit.isEmpty())return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
-        else return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
-
-
+        if (!visit.isEmpty())
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
+        else
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
