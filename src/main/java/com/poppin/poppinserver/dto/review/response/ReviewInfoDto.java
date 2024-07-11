@@ -32,7 +32,10 @@ public record ReviewInfoDto(
         boolean isCertificated,
 
         @NotNull
-        int recommendCnt
+        int recommendCnt,
+
+        @NotNull
+        Long userId
 ) {
     public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, List<String> profileUrls, List<Long> reviewCnt){
         List<ReviewInfoDto> reviewInfoDtoList = new ArrayList<>();
@@ -40,6 +43,7 @@ public record ReviewInfoDto(
         for (int i = 0; i < reviews.size(); i++) {
             ReviewInfoDto reviewInfoDto = ReviewInfoDto.builder()
                     .reviewId(reviews.get(i).getId())
+                    .userId(reviews.get(i).getUser().getId())
                     .nickname(reviews.get(i).getNickname())
                     .reviewCnt(reviewCnt.get(i))
                     .text(reviews.get(i).getText())

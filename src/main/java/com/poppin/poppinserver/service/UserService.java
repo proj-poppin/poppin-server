@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +43,7 @@ public class UserService {
     private final S3Service s3Service;
     private final FreqQuestionRepository freqQuestionRepository;
     private final PosterImageRepository posterImageRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -510,5 +510,23 @@ public class UserService {
                 .withFamily(false)
                 .withLover(false)
                 .build();
+    }
+
+    public void blockUser(Long userId, Long blockUserId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        User blockedUser = userRepository.findById(blockUserId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        if (userId.equals(blockUserId)) {
+            throw new CommonException(ErrorCode.CANNOT_BLOCK_MYSELF);
+        }
+
+        BlockedUser createBlockedUser = BlockedUser.builder()
+                .userId(user)
+                .blockedUserId(blockedUser)
+                .build();
+        blockedUserRepository.save(createBlockedUser);
     }
 }

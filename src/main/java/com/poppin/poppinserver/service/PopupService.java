@@ -64,6 +64,7 @@ public class PopupService {
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
+    private final BlockedUserRepository blockedUserRepository;
 
     @Transactional
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
@@ -473,6 +474,7 @@ public class PopupService {
         return PopupGuestDetailDto.fromEntity(popup, imageList, reviewInfoList, visitorDataDto, visitors);
     } // 비로그인 상세조회
 
+    @Transactional
     public PopupDetailDto readDetail(Long popupId, Long userId){
 
         Popup popup = popupRepository.findById(popupId)
@@ -482,12 +484,19 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
+        List<Long> blockedUserIds = blockedUserRepository.findBlockedUserIdsByUserId(userId);
+        log.info(blockedUserIds.toString());
+
         // 리뷰 이미지 목록, 프로필 이미지 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
         List<Long> reviewCntList = new ArrayList<>();
+        List<ReviewInfoDto> reviewInfoList;
 
-        for (Review review : reviews){
+        for (Review review : reviews) {
+            if (blockedUserIds.contains(review.getUser().getId()))
+                continue;
+
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
             List<String> imagesList = new ArrayList<>();
@@ -500,7 +509,7 @@ public class PopupService {
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList, reviewCntList);
+        reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 

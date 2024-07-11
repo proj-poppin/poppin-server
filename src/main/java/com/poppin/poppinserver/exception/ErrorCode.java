@@ -35,6 +35,7 @@ public enum ErrorCode {
     DELETED_USER_ERROR("40024", HttpStatus.BAD_REQUEST, "탈퇴한 유저는 30일 동안 재가입할 수 없습니다."),
     REVIEW_RECOMMEND_ERROR("40025", HttpStatus.BAD_REQUEST, "자신의 후기에 추천 할 수 없습니다."),
     DUPLICATED_SOCIAL_ID("40026", HttpStatus.BAD_REQUEST, "해당 이메일로 가입된 소셜 계정이 존재합니다."),
+    CANNOT_BLOCK_MYSELF("40027", HttpStatus.BAD_REQUEST, "자신을 차단할 수 없습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
