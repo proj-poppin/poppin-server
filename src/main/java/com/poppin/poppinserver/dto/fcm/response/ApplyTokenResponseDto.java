@@ -22,7 +22,7 @@ public record ApplyTokenResponseDto(
 ) {
     public static ApplyTokenResponseDto fromEntity(ApplyTokenRequestDto applyTokenRequestDto, String response, String description){
         return ApplyTokenResponseDto.builder()
-                .token(applyTokenRequestDto.token())
+                .token(applyTokenRequestDto.fcmToken())
                 .device(applyTokenRequestDto.device())
                 .response(response)
                 .description(description)
