@@ -394,17 +394,7 @@ public class PopupService {
         // 팝업 정보 변경 시 앱푸시 보내기 (수정 필요)
         // popup topic repository -> interest 와 join해서 popup id 같고, popup topic 이 change_info인 애들 의 NT
         // for문으로 FCMRequestDto -> 리스트에 담아 전송
-//        Optional<Interest> interest = interestRepository.findByUserIdAndPopupId(adminId, popup.getId());
-//        if (interest.isPresent()){
-//            List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
-//            NotificationToken notificationToken = notificationTokenRepository.findByToken(updatePopupDto.token());
-//            if (notificationToken.equals(null))throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-//            else {
-//                FCMRequestDto fcmRequestDto = FCMRequestDto.fromEntity(popup.getId(), updatePopupDto.token(), EPushInfo.CHANGE_INFO.getTitle(), EPushInfo.CHANGE_INFO.getBody(), EPopupTopic.CHANGE_INFO);
-//                fcmRequestDtoList.add(fcmRequestDto);
-//                fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);
-//            }
-//        }
+
 
 
         return PopupDto.fromEntity(popup);

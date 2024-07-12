@@ -37,6 +37,7 @@ public class Constant {
 
             "/api/v1/noti/token/test",                                      // fcm 토큰 테스트
             "/api/v1/noti/topic/test",                                      // fcm 토픽 테스트
+            "/api/v1/noti/duplicate/FCMtoken",                              // fcm 토큰 중복검사
             "/api/v1/noti/apply/FCMtoken",                                  // fcm 토큰 등록
 
             "/api/v1/user/support/faqs",
