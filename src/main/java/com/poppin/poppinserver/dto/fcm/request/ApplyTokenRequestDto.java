@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ApplyTokenRequestDto(
         @NotNull
-        String token,
+        String fcmToken,
 
         @NotNull
         String device

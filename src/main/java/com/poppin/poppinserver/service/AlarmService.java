@@ -185,9 +185,9 @@ public class AlarmService {
         Long popupId = requestDto.popupId();
         String fcmToken = requestDto.fcmToken();
 
-        log.info("alarm id : {}" + alarmId);
-        log.info("popup id : {}" + popupId);
-        log.info("fcm token : {}" + fcmToken);
+        log.info("alarm id : {}" , alarmId);
+        log.info("popup id : {}" , popupId);
+        log.info("fcm token : {}" , fcmToken);
 
         // 팝업 알림 isRead true 반환
         PopupAlarm popupAlarm = popupAlarmRepository.findById(alarmId)

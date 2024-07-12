@@ -14,10 +14,10 @@ import java.util.Optional;
 @Repository
 public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
-    @Query("SELECT nt FROM FCMToken nt WHERE nt.token = :token")
+    @Query("SELECT token FROM FCMToken token WHERE token.token = :token")
     FCMToken findByToken(@Param("token") String token);
 
-    @Query("SELECT nt FROM FCMToken nt WHERE nt.token = :token")
+    @Query("SELECT token FROM FCMToken token WHERE token.token = :token")
     Optional<FCMToken> findByTokenOpt(@Param("token") String token);
 
     @Query("SELECT DISTINCT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
@@ -25,4 +25,7 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     @Query("SELECT token FROM FCMToken token WHERE token.exp_dtm <= :now")
     List<FCMToken> findExpiredTokenList(LocalDateTime now);
+
+    @Query("DELETE FROM FCMToken token WHERE token.token = :fcmTokenOptional")
+    void delete(Optional<FCMToken> fcmTokenOptional);
 }
