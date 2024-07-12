@@ -38,26 +38,27 @@ public class FCMService {
 
             // 존재하면 true, 존재하지 않으면 false
             Boolean isDuplicate = fcmTokenOptional.isPresent();
+
             if (isDuplicate){
-                fcmTokenRepository.delete(fcmTokenOptional); // 삭제
+                return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated fcm token" , requestDto.fcmToken());
             }
+            else{
+                // 알림 전부 "1"로 저장
+                AlarmSetting alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1","1","1", "1");
+                alarmSettingRepository.save(alarmSetting);
 
-            // 알림 전부 "1"로 저장
-            AlarmSetting alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1","1","1", "1");
-            alarmSettingRepository.save(alarmSetting);
-
-            // 토큰 저장
-            FCMToken FCMToken = new FCMToken(
-                    requestDto.fcmToken(),
-                    LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
-                    requestDto.device() // android or ios
-            );
-            FCMToken token = fcmTokenRepository.save(FCMToken); // 토큰 저장
-            return ApplyTokenResponseDto.fromEntity(requestDto, "token 저장 성공" , token.getToken());
-
+                // 토큰 저장
+                FCMToken FCMToken = new FCMToken(
+                        requestDto.fcmToken(),
+                        LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
+                        requestDto.device() // android or ios
+                );
+                FCMToken token = fcmTokenRepository.save(FCMToken); // 토큰 저장
+                return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save succeed" , token.getToken());
+            }
         }catch (Exception e){
             log.error("토큰 등록 실패: " + e.getMessage());
-            return ApplyTokenResponseDto.fromEntity(requestDto, "token 저장 실패" , e.getMessage());
+            return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail" , e.getMessage());
         }
     }
 
