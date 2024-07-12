@@ -2,8 +2,9 @@ package com.poppin.poppinserver.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.dto.fcm.request.DuplicateTokenReqDto;
 import com.poppin.poppinserver.dto.fcm.request.PushDto;
-import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
 import com.poppin.poppinserver.service.FCMService;
 import com.poppin.poppinserver.util.push.android.FCMTestUtil;
 import jakarta.validation.Valid;
@@ -33,9 +34,15 @@ public class FCMTokenController {
         FCMTestUtil.sendNotificationByTopicTest(pushDto);
     }
 
-    /*알림 허용 시 데이터 저장*/
+
+    /* token 중복 검사 */
+    @PostMapping("/duplicate/FCMtoken")
+    public ResponseDto<?> isDuplicatedFCMToken(@RequestBody DuplicateTokenReqDto requestDto){
+        return ResponseDto.ok(fcmService.isDuplicateFCMToken(requestDto));
+    }
+    /* 알림 허용 시 데이터 저장 */
     @PostMapping("/apply/FCMtoken")
-    public ResponseDto<?> addFCMTokenUsers(@RequestBody TokenRequestDto tokenRequestDto){
-        return ResponseDto.ok(fcmService.fcmApplyToken(tokenRequestDto));
+    public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto){
+        return ResponseDto.ok(fcmService.FCMApplyToken(applyTokenRequestDto));
     }
 }

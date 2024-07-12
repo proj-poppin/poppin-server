@@ -4,8 +4,10 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.AlarmSetting;
 import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
-import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
-import com.poppin.poppinserver.dto.fcm.response.TokenResponseDto;
+import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.DuplicateTokenReqDto;
+import com.poppin.poppinserver.dto.fcm.response.ApplyTokenResponseDto;
+import com.poppin.poppinserver.dto.fcm.response.DuplicateTokenResDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,32 +30,41 @@ public class FCMService {
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSubscribeUtil fcmSubscribeUtil ;
 
+    /* FCM TOKEN 중복 검사 */
+    public DuplicateTokenResDto isDuplicateFCMToken(DuplicateTokenReqDto reqDto){
+        Optional<FCMToken> token = fcmTokenRepository.findByTokenOpt(reqDto.fcmToken());
 
+        // 존재하면 true, 존재하지 않으면 false
+        Boolean isDuplicate = token.isPresent();
 
-    public TokenResponseDto fcmApplyToken(TokenRequestDto tokenRequestDto){
+        return DuplicateTokenResDto.fromEntity(isDuplicate);
+    }
+
+    /* FCM TOKEN 등록 */
+    public ApplyTokenResponseDto FCMApplyToken(ApplyTokenRequestDto applyTokenRequestDto){
 
         try {
 
             // 토큰 저장 여부 확인
-            FCMToken isToken = fcmTokenRepository.findByToken(tokenRequestDto.token());
+            FCMToken isToken = fcmTokenRepository.findByToken(applyTokenRequestDto.token());
             if (isToken!=null) throw new CommonException(ErrorCode.DUPLICATED_TOKEN);
             else{
                 // 알림 전부 "1"로 저장
-                AlarmSetting alarmSetting = new AlarmSetting(tokenRequestDto.token(), "1", "1", "1","1","1", "1");
+                AlarmSetting alarmSetting = new AlarmSetting(applyTokenRequestDto.token(), "1", "1", "1","1","1", "1");
                 alarmSettingRepository.save(alarmSetting);
 
                 // 토큰 저장
                 FCMToken FCMToken = new FCMToken(
-                        tokenRequestDto.token(),
+                        applyTokenRequestDto.token(),
                         LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
-                        tokenRequestDto.device() // android or ios
+                        applyTokenRequestDto.device() // android or ios
                 );
                 FCMToken token = fcmTokenRepository.save(FCMToken); // 토큰 저장
-                return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 성공" , token.getToken());
+                return ApplyTokenResponseDto.fromEntity(applyTokenRequestDto, "token 저장 성공" , token.getToken());
             }
         }catch (Exception e){
             log.error("토큰 등록 실패: " + e.getMessage());
-            return TokenResponseDto.fromEntity(tokenRequestDto, "token 저장 실패" , e.getMessage());
+            return ApplyTokenResponseDto.fromEntity(applyTokenRequestDto, "token 저장 실패" , e.getMessage());
         }
     }
 

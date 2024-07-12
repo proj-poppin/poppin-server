@@ -43,7 +43,7 @@ public class FCMSubscribeUtil {
             popupTopicRepository.save(popupTopic);
 
             response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString());
-            log.info(response.getSuccessCount() + " token(s) were subscribed successfully : " + token.getToken());
+            log.info(response.getSuccessCount() + " token(s) were subscribed successfully : {}" , token.getToken());
         }
     }
 

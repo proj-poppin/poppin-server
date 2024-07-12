@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -15,6 +16,9 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     @Query("SELECT nt FROM FCMToken nt WHERE nt.token = :token")
     FCMToken findByToken(@Param("token") String token);
+
+    @Query("SELECT nt FROM FCMToken nt WHERE nt.token = :token")
+    Optional<FCMToken> findByTokenOpt(@Param("token") String token);
 
     @Query("SELECT DISTINCT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
     List<FCMToken> findTokenIdByTopicAndType(String code, @Param("popupId")Long popupId);

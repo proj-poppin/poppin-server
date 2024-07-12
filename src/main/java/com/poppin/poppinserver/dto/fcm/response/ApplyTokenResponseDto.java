@@ -1,11 +1,11 @@
 package com.poppin.poppinserver.dto.fcm.response;
 
-import com.poppin.poppinserver.dto.fcm.request.TokenRequestDto;
+import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record TokenResponseDto(
+public record ApplyTokenResponseDto(
 
         @NotNull
         String token,
@@ -20,10 +20,10 @@ public record TokenResponseDto(
         String description
 
 ) {
-    public static TokenResponseDto fromEntity(TokenRequestDto tokenRequestDto, String response, String description){
-        return TokenResponseDto.builder()
-                .token(tokenRequestDto.token())
-                .device(tokenRequestDto.device())
+    public static ApplyTokenResponseDto fromEntity(ApplyTokenRequestDto applyTokenRequestDto, String response, String description){
+        return ApplyTokenResponseDto.builder()
+                .token(applyTokenRequestDto.token())
+                .device(applyTokenRequestDto.device())
                 .response(response)
                 .description(description)
                 .build();
