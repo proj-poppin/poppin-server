@@ -40,7 +40,7 @@ public class FCMService {
             Boolean isDuplicate = fcmTokenOptional.isPresent();
 
             if (isDuplicate){
-                return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated fcm token" , requestDto.fcmToken());
+                return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated fcm token" , "토큰이 중복되어 저장하지 않습니다.");
             }
             else{
                 // 알림 전부 "1"로 저장
@@ -53,8 +53,9 @@ public class FCMService {
                         LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+2달)
                         requestDto.device() // android or ios
                 );
-                FCMToken token = fcmTokenRepository.save(FCMToken); // 토큰 저장
-                return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save succeed" , token.getToken());
+
+                fcmTokenRepository.save(FCMToken); // 토큰 저장
+                return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save succeed" , "토큰이 저장되었습니다.");
             }
         }catch (Exception e){
             log.error("토큰 등록 실패: " + e.getMessage());
@@ -62,13 +63,11 @@ public class FCMService {
         }
     }
 
-
-
     /*
           Method : 관심 팝업 등록 시 주제 테이블에 데이터 삽입 , 구독 시키기
           Author : sakang
           Date   : 2024-04-27
-        */
+    */
     public void fcmAddTopic(String token, Popup popup, EPopupTopic topic){
         if(token != null){
             // 팝업 관련
@@ -91,7 +90,7 @@ public class FCMService {
           Method : 관심 팝업 삭제 시 주제 테이블에 구독 해제
           Author : sakang
           Date   : 2024-04-27
-        */
+    */
     public void fcmRemoveTopic(String token, Popup popup, EPopupTopic topic){
 
         try {
