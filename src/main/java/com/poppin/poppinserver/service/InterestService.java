@@ -21,7 +21,7 @@ public class InterestService {
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
 
-    private final FCMService fcmService;
+    private final FCMTokenService fcmTokenService;
     @Transactional // 쿼리 5번 날라감. 최적화 필요
     public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto){
         //중복검사
@@ -47,9 +47,9 @@ public class InterestService {
         /*알림 구독*/
         String fcmToken = requestDto.fcmToken();
 
-        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmService.fcmAddTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.MAGAM);
+        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.OPEN);
+        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
         return InterestDto.fromEntity(interest,user,popup);
     }
@@ -66,9 +66,9 @@ public class InterestService {
 
         String fcmToken = requestDto.fcmToken();
 
-        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.MAGAM);
-        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.OPEN);
-        fcmService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
+        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.MAGAM);
+        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.OPEN);
+        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
         return true;
     }
 }

@@ -10,7 +10,7 @@ import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import com.poppin.poppinserver.type.EPushInfo;
-import com.poppin.poppinserver.util.FCMSendUtil;
+import com.poppin.poppinserver.service.FCMSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ public class FCMScheduler {
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
-    private final FCMSendUtil fcmSendUtil;
+    private final FCMSendService fcmSendService;
 
 
 
@@ -125,7 +125,7 @@ public class FCMScheduler {
 
         if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
         else {
-            fcmSendUtil.sendByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
+            fcmSendService.sendByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
         }
     }
 
@@ -159,7 +159,7 @@ public class FCMScheduler {
      * @param info : 푸시 알림 제목, 메시지
      * @throws FirebaseMessagingException
      */
-    private void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
+    public void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
 
         List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
 
@@ -197,6 +197,7 @@ public class FCMScheduler {
             }
         }
         if (fcmRequestDtoList == null) {log.info("tokens doesn't have existed on : " + topic);}
-        else {fcmSendUtil.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
+        else {
+            fcmSendService.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
     }
 }

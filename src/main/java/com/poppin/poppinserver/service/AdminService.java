@@ -16,7 +16,6 @@ import com.poppin.poppinserver.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
-import com.poppin.poppinserver.util.FCMSendUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +49,9 @@ public class AdminService {
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final S3Service s3Service;
     private final AlarmService alarmService;
+    private final AlarmListService alarmListService;
 
-    private final FCMSendUtil fcmSendUtil;
+    private final FCMSendService fcmSendService;
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
         List<FaqResponseDto> faqDtoList = new ArrayList<>();
@@ -359,7 +359,7 @@ public class AdminService {
             // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
             List<FCMToken> tokenList = fcmTokenRepository.findAll();
             for (FCMToken token: tokenList){
-                alarmService.insertInformIsRead(token, informAlarm);
+                alarmListService.insertInformIsRead(token, informAlarm);
             }
 
             // 이미지 저장
@@ -378,7 +378,7 @@ public class AdminService {
             // 저장 성공
             if (informAlarm != null){
                 // 앱 푸시 발송
-                String sendStatus = fcmSendUtil.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
+                String sendStatus = fcmSendService.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
 
                 // 푸시 성공
                 if (sendStatus.equals("1")){

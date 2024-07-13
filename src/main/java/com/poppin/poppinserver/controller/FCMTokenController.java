@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.fcm.request.PushDto;
 import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
-import com.poppin.poppinserver.service.FCMService;
+import com.poppin.poppinserver.service.FCMTokenService;
 import com.poppin.poppinserver.util.push.android.FCMTestUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/noti")
 public class FCMTokenController {
 
-    private final FCMService fcmService;
+    private final FCMTokenService fcmTokenService;
     private final FCMTestUtil FCMTestUtil;
 
     @PostMapping("/token/test")
@@ -36,6 +36,6 @@ public class FCMTokenController {
     /* 알림 허용 시 데이터 저장 */
     @PostMapping("/apply/FCMtoken")
     public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto){
-        return ResponseDto.ok(fcmService.FCMApplyToken(applyTokenRequestDto));
+        return ResponseDto.ok(fcmTokenService.FCMApplyToken(applyTokenRequestDto));
     }
 }

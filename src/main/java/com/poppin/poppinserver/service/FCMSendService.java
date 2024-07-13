@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.util;
+package com.poppin.poppinserver.service;
 
 import com.google.firebase.messaging.*;
 
@@ -15,23 +15,22 @@ import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.repository.PopupRepository;
-import com.poppin.poppinserver.service.AlarmService;
 import com.poppin.poppinserver.type.EPushInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.poppin.poppinserver.util.FCMTokenUtil.refreshToken;
+import static com.poppin.poppinserver.util.FCMRefreshUtil.refreshToken;
 
 @Slf4j
-@Configuration
 @RequiredArgsConstructor
-public class FCMSendUtil {
+@Service
+public class FCMSendService {
 
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
@@ -39,7 +38,6 @@ public class FCMSendUtil {
 
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
-
     private final AlarmService alarmService;
 
 

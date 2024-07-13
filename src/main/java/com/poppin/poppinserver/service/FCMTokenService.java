@@ -11,7 +11,6 @@ import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.repository.FCMTokenRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
-import com.poppin.poppinserver.util.FCMSubscribeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,14 +18,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class FCMService {
+public class FCMTokenService {
 
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
-    private final FCMSubscribeUtil fcmSubscribeUtil ;
+    private final FCMSubscribeService fcmSubscribeService;
 
     /* FCM TOKEN 등록 */
     public ApplyTokenResponseDto FCMApplyToken(ApplyTokenRequestDto requestDto){
@@ -76,7 +75,7 @@ public class FCMService {
 
                 FCMToken pushToken = fcmTokenRepository.findByToken(token);
                 if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                fcmSubscribeUtil.subscribePopupTopic(pushToken, popup , topic); // 관심팝업
+                fcmSubscribeService.subscribePopupTopic(pushToken, popup , topic); // 관심팝업
             }catch (CommonException | FirebaseMessagingException e){
                 log.error("앱푸시 팝업 주제 추가 실패");
                 e.printStackTrace();
@@ -97,7 +96,7 @@ public class FCMService {
             log.info("앱푸시 팝업 주제 삭제 시작");
             FCMToken pushToken = fcmTokenRepository.findByToken(token);
             if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-            fcmSubscribeUtil.unsubscribePopupTopic(pushToken, popup, topic); // 구독 및 저장
+            fcmSubscribeService.unsubscribePopupTopic(pushToken, popup, topic); // 구독 및 저장
         }catch (CommonException | FirebaseMessagingException e){
             log.error("앱푸시 팝업 주제 삭제 실패");
             e.printStackTrace();

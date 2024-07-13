@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.util;
+package com.poppin.poppinserver.service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class FCMSubscribeUtil {
+public class FCMSubscribeService {
 
     private final PopupTopicRepository popupTopicRepository;
 

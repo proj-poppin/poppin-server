@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.service.AlarmListService;
 import com.poppin.poppinserver.service.AlarmService;
 import com.poppin.poppinserver.service.AlarmSettingService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AlarmController {
 
     private final AlarmService alarmService;
+    private final AlarmListService alarmListService;
     private final AlarmSettingService alarmSettingService;
 
     // 알림 안읽은 것 여부
@@ -34,31 +36,31 @@ public class AlarmController {
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
     public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
-        return ResponseDto.ok(alarmService.readPopupAlarmList(alarmTokenRequestDto));
+        return ResponseDto.ok(alarmListService.readPopupAlarmList(alarmTokenRequestDto));
     }
 
     // 팝업 알림 보여주기 - 로그인 (2 depth)
     @PostMapping("/detail/popup")
     public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto){
-        return ResponseDto.ok(alarmService.readPopupDetail(userId, requestDto));
+        return ResponseDto.ok(alarmListService.readPopupDetail(userId, requestDto));
     }
 
     // 팝업 알림 보여주기 - 비로그인 (2 depth)
     @PostMapping("/popup/guest/detail")
     public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto){
-        return ResponseDto.ok(alarmService.readPopupDetailGuest(requestDto));
+        return ResponseDto.ok(alarmListService.readPopupDetailGuest(requestDto));
     }
 
     // 공지사항 알림 보여주기(1 depth)
     @PostMapping("/info")
     public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto){
-        return ResponseDto.ok(alarmService.readInformAlarmList(requestDto));
+        return ResponseDto.ok(alarmListService.readInformAlarmList(requestDto));
     }
 
     // 공지사항 디테일 (2 depth)
     @PostMapping("/info/detail")
     public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto){
-        return ResponseDto.ok(alarmService.readInformDetail(requestDto));
+        return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
     }
 
     @PostMapping("/read/setting")

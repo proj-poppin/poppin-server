@@ -14,6 +14,7 @@ import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
+import com.poppin.poppinserver.scheduler.FCMScheduler;
 import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
@@ -55,16 +56,19 @@ public class PopupService {
     private final ReportPopupRepository reportPopupRepository;
     private final ReviewRecommendUserRepository reviewRecommendUserRepository;
     private final PopupTopicRepository popupTopicRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
     private final ModifyInfoService modifyInfoService;
-    private final FCMService fcmService;
+    private final FCMTokenService fcmTokenService;
 
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
-    private final BlockedUserRepository blockedUserRepository;
+
+    private final FCMScheduler fcmScheduler;
+
 
     @Transactional
     public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
@@ -236,9 +240,9 @@ public class PopupService {
         List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
 
         for (PopupTopic topic: topicList) {
-            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.MAGAM );
-            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
-            fcmService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
+            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.MAGAM );
+            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
+            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
         }
 
         // 관심 추가 데이터
@@ -391,11 +395,10 @@ public class PopupService {
 
         popupRepository.save(popup);
 
-        // 팝업 정보 변경 시 앱푸시 보내기 (수정 필요)
-        // popup topic repository -> interest 와 join해서 popup id 같고, popup topic 이 change_info인 애들 의 NT
-        // for문으로 FCMRequestDto -> 리스트에 담아 전송
-
-
+        // 팝업 정보 변경 시 앱푸시 보내기
+        List<Popup> popupList = new ArrayList<>();
+        popupList.add(popup);
+        fcmScheduler.schedulerFcmPopupTopicByType(popupList,EPopupTopic.CHANGE_INFO,EPushInfo.CHANGE_INFO);
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정

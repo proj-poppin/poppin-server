@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class FCMTokenUtil implements ApplicationContextAware {
+public class FCMRefreshUtil implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
