@@ -74,12 +74,12 @@ public class UserController {
         return ResponseDto.ok("프로필 이미지가 삭제되었습니다.");
     }
 
-    @PatchMapping("/settings")
-    public ResponseDto<?> updateUserNicknameAndBirthDate(
+    @PutMapping("/settings")
+    public ResponseDto<?> updateUserNickname(
             @UserId Long userId,
             @RequestBody UserInfoDto userInfoDto
     ) {
-        return ResponseDto.ok(userService.updateUserNicknameAndBirthDate(userId, userInfoDto));
+        return ResponseDto.ok(userService.updateUserNickname(userId, userInfoDto));
     }
 
     @DeleteMapping("/withdrawal")

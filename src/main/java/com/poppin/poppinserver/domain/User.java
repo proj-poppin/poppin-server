@@ -36,9 +36,6 @@ public class User {
     @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "birth_date")
-    private String birthDate;
-
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
@@ -102,14 +99,13 @@ public class User {
     private Long reportedCnt;
 
     @Builder
-    public User(String email, String password, String nickname, String birthDate,
+    public User(String email, String password, String nickname,
                 ELoginProvider eLoginProvider, EUserRole role,
                 Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS
     ) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.birthDate = birthDate;
         this.provider = eLoginProvider;
         this.role = role;
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
@@ -132,7 +128,6 @@ public class User {
                 .email(authSignUpDto.email())
                 .password(encodedPassword)
                 .nickname(authSignUpDto.nickname())
-                .birthDate(authSignUpDto.birthDate())
                 .eLoginProvider(eLoginProvider)
                 .role(EUserRole.USER)
                 .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
@@ -153,9 +148,8 @@ public class User {
                 .build();
     }
 
-    public void register(String nickname, String birthDate) {
+    public void register(String nickname) {
         this.nickname = nickname;
-        this.birthDate = birthDate;
         this.role = EUserRole.USER;
     }
 
@@ -185,11 +179,9 @@ public class User {
         this.whoWithPopup = whoWithPopup;
     }
 
-    public void updateUserNicknameAndBirthDate(String nickname, String birthDate) {
+    public void updateUserNickname(String nickname) {
         if (nickname != null && !nickname.isEmpty())
             this.nickname = nickname;
-        if (birthDate != null && !birthDate.isEmpty())
-            this.birthDate = birthDate;
     }
 
     public void updateProfileImage(String profileImageUrl) {
