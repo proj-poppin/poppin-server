@@ -8,7 +8,6 @@ public record UserProfileDto(
         String userImageUrl,
         String email,
         String nickname,
-        String birthDate,
         ELoginProvider provider
 ) {
 }

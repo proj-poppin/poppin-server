@@ -125,7 +125,6 @@ public class AdminService {
                 .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
                 .provider(user.getProvider())
-                .birthDate(user.getBirthDate())
                 .requiresSpecialCare(user.getRequiresSpecialCare())
                 .hiddenReviewCount(hiddenReviewCount)
                 .build();

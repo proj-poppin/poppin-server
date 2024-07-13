@@ -226,7 +226,6 @@ public class UserService {
                 .email(user.getEmail())
                 .userImageUrl(user.getProfileImageUrl())
                 .nickname(user.getNickname())
-                .birthDate(user.getBirthDate())
                 .provider(user.getProvider())
                 .build();
     }
@@ -259,13 +258,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserProfileDto updateUserNicknameAndBirthDate(Long userId, UserInfoDto userInfoDto) {
+    public UserProfileDto updateUserNickname(Long userId, UserInfoDto userInfoDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (userId != user.getId())) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
-        user.updateUserNicknameAndBirthDate(userInfoDto.nickname(), userInfoDto.birthDate());
+        user.updateUserNickname(userInfoDto.nickname());
         userRepository.save(user);
 
         return UserProfileDto.builder()
@@ -273,7 +272,7 @@ public class UserService {
                 .userImageUrl(user.getProfileImageUrl())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .birthDate(user.getBirthDate())
+                //.birthDate(user.getBirthDate())
                 .build();
     }
 

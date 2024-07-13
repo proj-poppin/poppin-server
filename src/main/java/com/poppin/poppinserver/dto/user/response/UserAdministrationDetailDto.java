@@ -9,7 +9,6 @@ public record UserAdministrationDetailDto(
         String userImageUrl,
         String email,
         String nickname,
-        String birthDate,
         ELoginProvider provider,
         boolean requiresSpecialCare,
         Long hiddenReviewCount
