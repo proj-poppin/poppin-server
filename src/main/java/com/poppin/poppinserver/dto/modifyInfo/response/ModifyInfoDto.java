@@ -20,6 +20,7 @@ public record ModifyInfoDto(
         String createdAt, // 작성 일자
         String content, // 수정 요청 텍스트
         Boolean isExecuted, // 처리 여부
+        String info, // 정보 처리 내용
         List<String> images
 ) {
     public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images){
@@ -42,6 +43,7 @@ public record ModifyInfoDto(
                 .popupName(popupDto.name())
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
+                .info(modifyInfo.getInfo())
                 .isExecuted(modifyInfo.getIsExecuted())
                 .images(images)
                 .build();
