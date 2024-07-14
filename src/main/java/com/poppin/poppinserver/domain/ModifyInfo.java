@@ -42,6 +42,9 @@ public class ModifyInfo {
     @Column(name = "is_executed", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isExecuted; // 처리 여부
 
+    @Column(name = "info", nullable = true)
+    private String info;
+
     @Builder
     public ModifyInfo(User userId, Popup proxyPopup, Popup originPopup, String content) {
         this.userId = userId;
@@ -50,10 +53,16 @@ public class ModifyInfo {
         this.createdAt = LocalDateTime.now();
         this.content = content;
         this.isExecuted = false;
+        this.info = null;
     }
 
-    public void update(Boolean isExecuted) {
+    public void update(String info) {
+        this.info = info;
+    }
+
+    public void update(String info, Boolean isExecuted) {
         this.isExecuted = isExecuted;
         this.proxyPopup = this.originPopup;
+        this.info = info;
     }
 }

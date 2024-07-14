@@ -301,8 +301,9 @@ public class ModifyInfoService {
                 updateModifyInfoDto.operationExcept(),
                 EOperationStatus.EXECUTING.getStatus(),
                 admin
-
         );
+
+        modifyInfo.update(updateModifyInfoDto.info());
 
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
@@ -441,7 +442,7 @@ public class ModifyInfoService {
                 admin
         );
 
-        modifyInfo.update(true);
+        modifyInfo.update(updateModifyInfoDto.info(), true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
         popupRepository.delete(proxyPopup);
