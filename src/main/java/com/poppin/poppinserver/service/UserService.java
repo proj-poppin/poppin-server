@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -410,9 +411,46 @@ public class UserService {
     public void deleteAllRelatedInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
+
+
+
         s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
-        reviewRepository.deleteAllByUserId(userId);     // 유저가 남긴 모든 후기 삭제
+        userRepository.delete(user);     // 유저 삭제
     }
+
+    /*
+        유저가 작성한 모든 후기 삭제
+     */
+    private void deleteUserReviews(Long userId) {
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+
+        // 후기 이미지 삭제
+        for (Review review : reviews) {
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            // S3에서 삭제
+            for (ReviewImage reviewImage : reviewImages) {
+                s3Service.deleteImage(reviewImage.getImageUrl());
+            }
+            // DB에서 삭제
+            reviewImageRepository.deleteAllByReviewId(review.getId());
+        }
+        // 모든 후기 삭제
+        reviewRepository.deleteAllByUserId(userId);
+    }
+
+    /*
+        유저가 작성한 모든 제보 삭제
+     */
+
+    /*
+        유저가 작성한 모든 정보수정요청 삭제
+     */
+
+    /*
+        유저가 작성한 모든 신고 삭제
+     */
 
     public void addReviewCnt(User user){
         user.addReviewCnt();
