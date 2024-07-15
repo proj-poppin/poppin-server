@@ -175,7 +175,7 @@ public class ModifyInfoService {
     } // 요청 생성
 
     @Transactional
-    public ModifyInfoDto readModifyInfo(Boolean isExec, Long modifyInfoId, Long adminId){
+    public ModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId){
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -195,7 +195,7 @@ public class ModifyInfoService {
         }
 
         String agentName = null;
-        if (isExec) {
+        if (modifyInfo.getIsExecuted()) {
             agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
         } else {
             User admin = userRepository.findById(adminId)
