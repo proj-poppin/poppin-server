@@ -20,6 +20,7 @@ public record ModifyInfoDto(
         String content, // 수정 요청 텍스트
         Boolean isExecuted, // 처리 여부
         String info, // 정보 처리 내용
+        String agentName, // 담당 관리자
         List<String> images
 ) {
     public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images){
@@ -27,6 +28,11 @@ public record ModifyInfoDto(
         PopupDto popupDto = null;
         if(modifyInfo != null){
             popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
+        }
+
+        String agentName = null;
+        if(modifyInfo.getOriginPopup().getAgent() != null){
+            agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
         }
 
         return ModifyInfoDto.builder()
@@ -40,6 +46,7 @@ public record ModifyInfoDto(
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
                 .info(modifyInfo.getInfo())
+                .agentName(agentName)
                 .isExecuted(modifyInfo.getIsExecuted())
                 .images(images)
                 .build();
