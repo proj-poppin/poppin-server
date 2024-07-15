@@ -43,8 +43,10 @@ public class ModifyInfoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
-    public ResponseDto<?> readModifyInfo(@RequestParam("infoId") Long modifyInfoId){
-        return ResponseDto.ok(modifyInfoService.readModifyInfo(modifyInfoId));
+    public ResponseDto<?> readModifyInfo(@RequestParam("isExec") Boolean isExec,
+                                         @RequestParam("infoId") Long modifyInfoId,
+                                         @UserId Long adminId){
+        return ResponseDto.ok(modifyInfoService.readModifyInfo(isExec, modifyInfoId, adminId));
     } // 요청 조회
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -9,6 +9,7 @@ import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoDto;
 import com.poppin.poppinserver.dto.modifyInfo.response.ModifyInfoSummaryDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.dto.popup.request.CreateTasteDto;
+import com.poppin.poppinserver.dto.popup.response.PopupDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.*;
@@ -174,7 +175,7 @@ public class ModifyInfoService {
     } // 요청 생성
 
     @Transactional
-    public ModifyInfoDto readModifyInfo(Long modifyInfoId){
+    public ModifyInfoDto readModifyInfo(Boolean isExec, Long modifyInfoId, Long adminId){
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -188,7 +189,35 @@ public class ModifyInfoService {
             imageList.add(modifyImages.getImageUrl());
         }
 
-        return ModifyInfoDto.fromEntity(modifyInfo, imageList);
+        PopupDto popupDto = null;
+        if(modifyInfo != null){
+            popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
+        }
+
+        String agentName = null;
+        if (isExec) {
+            agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
+        } else {
+            User admin = userRepository.findById(adminId)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+            agentName = admin.getNickname();
+        }
+
+        return ModifyInfoDto.builder()
+                .id(modifyInfo.getId())
+                .userId(modifyInfo.getId())
+                .userImageUrl(modifyInfo.getUserId().getProfileImageUrl())
+                .email(modifyInfo.getUserId().getEmail())
+                .nickname(modifyInfo.getUserId().getNickname())
+                .popup(popupDto)
+                .popupName(popupDto.name())
+                .createdAt(modifyInfo.getCreatedAt().toString())
+                .content(modifyInfo.getContent())
+                .info(modifyInfo.getInfo())
+                .agentName(agentName)
+                .isExecuted(modifyInfo.getIsExecuted())
+                .images(imageList)
+                .build();
     } // 조회
 
     @Transactional
