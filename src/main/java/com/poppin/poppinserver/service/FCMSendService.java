@@ -8,6 +8,7 @@ import com.poppin.poppinserver.config.AndroidConfiguration;
 import com.poppin.poppinserver.domain.InformAlarm;
 import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.Review;
 import com.poppin.poppinserver.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
 
@@ -72,6 +73,13 @@ public class FCMSendService {
 
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
+
+                if ("Requested entity was not found.".equals(e.getMessage())) {
+                    log.error("Invalid FCM token: " + token.getToken());
+                    // 토큰 제거
+                    fcmTokenRepository.delete(token);
+                }
+
                 return "0"; // fail
             }
         }
@@ -79,12 +87,12 @@ public class FCMSendService {
     }
 
     /**
-     * 스케줄러 토큰 발송
-     * @param popupList
-     * @param info
+     * 인기팝업
+     * @param popupList 주간 인기 팝업 리스트
+     * @param info 인기 팝업 앱푸시 메시지 enum
      * @return
      */
-    public String sendByFCMToken(List<Popup> popupList , EPushInfo info) {
+    public String sendHotByFCMToken(List<Popup> popupList , EPushInfo info) {
         try {
             // 인기,
             List<Long> popupIdList = new ArrayList<>();
@@ -124,7 +132,35 @@ public class FCMSendService {
         }
     }
 
+    /**
+     * 후기 추천 앱푸시 메서드
+     * @param review 해당 후기
+     * @param info 후기 추천 앱 푸시 메시지 enum
+     */
+    public void sendChoochunByFCMToken(Review review, EPushInfo info){
 
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(info.getTitle())
+                        .setBody( "[" + review.getPopup().getName() + "] " + info.getBody())
+                        .build())
+                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setAndroidConfig(androidConfiguration.androidConfig())
+                .setToken(review.getToken())
+                .putData("id", review.getPopup().getId().toString())
+                .build();
+
+        try {
+            String result = firebaseMessaging.send(message);
+            log.info("Successfully sent message: " + result);
+
+            FCMToken token = fcmTokenRepository.findByToken(review.getToken());
+            refreshToken(token);
+
+        } catch (FirebaseMessagingException e) {
+            log.error("Failed to send message: " + e.getMessage());
+        }
+    }
 
     /**
      * 안드로이드 FCM Topic 앱 푸시 알림 메서드
@@ -132,10 +168,6 @@ public class FCMSendService {
      * @throws FirebaseMessagingException FCM 오류
      */
     public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
-        // aos
-        AndroidConfig androidConfig = androidConfiguration.androidConfig();
-        // ios
-        ApnsConfig apnsConfig = apnsConfiguration.apnsConfig();
 
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
 
@@ -150,8 +182,8 @@ public class FCMSendService {
                             .setBody( "[" + popup.getName() + "] "  + fcmRequestDto.body())
                             .build())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
-                    .setAndroidConfig(androidConfig)
-                    .setApnsConfig(apnsConfig)
+                    .setAndroidConfig(androidConfiguration.androidConfig())
+                    .setApnsConfig(apnsConfiguration.apnsConfig())
                     .putData("id" , fcmRequestDto.popupId().toString())
                     .putData("type", "popup")
                     .build();

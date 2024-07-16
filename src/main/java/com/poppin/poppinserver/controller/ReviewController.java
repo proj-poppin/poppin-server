@@ -46,6 +46,7 @@ public class ReviewController {
     @PostMapping(value = "/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE}) // 후기 생성
     public ResponseDto<?> createCertifiedReview(
             @UserId Long userId,
+            @RequestParam("fcmToken") String token,
             @RequestParam("popupId") Long popupId,
             @RequestParam("text") String text,
             @RequestParam("visitDate") String visitDate,
@@ -55,13 +56,14 @@ public class ReviewController {
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
 
-        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
+        return ResponseDto.ok(reviewService.writeCertifiedReview(userId, token, popupId, text, visitDate, satisfaction, congestion, nickname, images));
     }
 
     /*일반 후기 작성*/
     @PostMapping(value = "/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUncertiReview(
             @UserId Long userId,
+            @RequestParam("fcmToken") String token,
             @RequestParam("popupId") Long popupId,
             @RequestParam("text") String text,
             @RequestParam("visitDate") String visitDate,
@@ -70,7 +72,7 @@ public class ReviewController {
             @RequestParam("nickname") String nickname,
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, popupId,text,visitDate,satisfaction,congestion,nickname, images));
+        return ResponseDto.ok(reviewService.writeUncertifiedReview(userId, token, popupId, text, visitDate, satisfaction, congestion, nickname, images));
     }
 
     @PostMapping("/add-recommend") // 후기 추천

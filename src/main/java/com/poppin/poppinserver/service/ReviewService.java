@@ -2,6 +2,7 @@ package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.type.ECongestion;
+import com.poppin.poppinserver.type.EPushInfo;
 import com.poppin.poppinserver.type.ESatisfaction;
 import com.poppin.poppinserver.type.EVisitDate;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
@@ -33,12 +34,13 @@ public class ReviewService {
     private final VisitRepository visitRepository;
     private final S3Service s3Service;
     private final UserService userService;
+    private final FCMSendService fcmSendService;
 
 
 
     /*방문(인증)후기 생성*/
     @Transactional
-    public ReviewDto writeCertifiedReview(Long userId, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
+    public ReviewDto writeCertifiedReview(Long userId, String token, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -51,6 +53,7 @@ public class ReviewService {
 
         Review review = Review.builder()
                 .user(user)
+                .token(token)
                 .popup(popup)
                 .text(text)
                 .isCertificated(true)
@@ -66,9 +69,9 @@ public class ReviewService {
         // 이미지 있을 때 -> 이미지 파일 전송
         if (!images.get(0).getOriginalFilename().equals("empty")) {
 
-            log.info("images 객체 : " + images);
-            log.info("images 사이즈 : " + images.size());
-            log.info("images 첫번째 요소 파일 명: " + images.get(0).getOriginalFilename());
+            log.info("images 객체 : {}", images);
+            log.info("images 사이즈 : {}", images.size());
+            log.info("images 첫번째 요소 파일 명: {}", images.get(0).getOriginalFilename());
 
             // 리뷰 이미지 처리 및 저장
             List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
@@ -84,7 +87,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-        log.info("image Status : " + imageStatus);
+        log.info("image Status : {}",imageStatus);
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
@@ -102,7 +105,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto writeUncertifiedReview(Long userId, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
+    public ReviewDto writeUncertifiedReview(Long userId, String token, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -112,6 +115,7 @@ public class ReviewService {
 
         Review review = Review.builder()
                 .user(user)
+                .token(token)
                 .popup(popup)
                 .text(text)
                 .isCertificated(false)
@@ -126,9 +130,9 @@ public class ReviewService {
         // 이미지 있을 때 -> 이미지 파일 전송
         if (!images.get(0).getOriginalFilename().equals("empty")) {
 
-            log.info("images Entity : " + images);
-            log.info("images Size : " + images.size());
-            log.info("images first img name: " + images.get(0).getOriginalFilename());
+            log.info("images Entity : {}", images);
+            log.info("images Size : {}", images.size());
+            log.info("images first img name: {}",  images.get(0).getOriginalFilename());
 
             imageStatus = "1"; // 이미지가 null 이 아닐때
 
@@ -146,7 +150,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-        log.info("image Status : " + imageStatus);
+        log.info("image Status : {} ", imageStatus);
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
                 , popup
@@ -186,6 +190,8 @@ public class ReviewService {
                 .build();
         reviewRecommendUserRepository.save(reviewRecommendUser);
 
+        // FCM 알림
+        fcmSendService.sendChoochunByFCMToken(review, EPushInfo.CHOOCHUN);
         return "정상적으로 반환되었습니다";
     }
 

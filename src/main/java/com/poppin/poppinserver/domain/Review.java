@@ -26,6 +26,9 @@ public class Review {
     @JoinColumn(name = "user_id", referencedColumnName = "id",nullable = false)
     private User user;
 
+    @Column(name = "token" , nullable = false)
+    private String token;
+
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
@@ -52,8 +55,9 @@ public class Review {
     private int recommendCnt;
 
     @Builder
-    public Review(User user, Popup popup, String imageUrl, String text, boolean isCertificated) {
+    public Review(User user, String token, Popup popup, String imageUrl, String text, boolean isCertificated) {
         this.user = user;
+        this.token = token;
         this.nickname = user.getNickname();
         this.popup = popup;
         this.imageUrl = imageUrl;

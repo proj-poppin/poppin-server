@@ -121,11 +121,11 @@ public class FCMScheduler {
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
         LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
 
-        List<Popup> hotPopup = popupRepository.findTopOperatingPopupsByInterestAndViewCountAndUserCreate(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
+        List<Popup> hotPopup = popupRepository.findHotPopup(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
 
         if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
         else {
-            fcmSendService.sendByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
+            fcmSendService.sendHotByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
         }
     }
 
