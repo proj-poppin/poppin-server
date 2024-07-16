@@ -412,9 +412,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        deleteUserPopupInterests(userId);  // 유저 팝업 관심 등록 전부 삭제
         deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
-
-
 
         s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
         userRepository.delete(user);     // 유저 삭제
@@ -441,16 +440,41 @@ public class UserService {
     }
 
     /*
+        유저 방문자 데이터 삭제
+    */
+    private void deleteUserVisitData(Long userId) {
+
+    }
+
+    /*
+        유저 팝업 관심 등록 전부 삭제
+    */
+    private void deleteUserPopupInterests(Long userId) {
+
+
+    }
+
+    /*
         유저가 작성한 모든 제보 삭제
      */
+    private void deleteUserInformRequests(Long userId) {
+
+    }
 
     /*
         유저가 작성한 모든 정보수정요청 삭제
      */
+    private void deleteUserModifyInfoRequests(Long userId) {
+
+    }
 
     /*
         유저가 작성한 모든 신고 삭제
      */
+    private void deleteUserReports(Long userId) {
+
+    }
+
 
     public void addReviewCnt(User user){
         user.addReviewCnt();
