@@ -30,6 +30,7 @@ public class FCMTokenService {
     /* FCM TOKEN 등록 */
     public ApplyTokenResponseDto FCMApplyToken(ApplyTokenRequestDto requestDto){
 
+        log.info("apply token : {}" , requestDto.fcmToken());
         try {
 
             // 토큰 저장 여부 확인
