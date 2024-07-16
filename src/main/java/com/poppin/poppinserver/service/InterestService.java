@@ -47,9 +47,9 @@ public class InterestService {
         /*알림 구독*/
         String fcmToken = requestDto.fcmToken();
 
-        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmAddTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
         return InterestDto.fromEntity(interest,user,popup);
     }

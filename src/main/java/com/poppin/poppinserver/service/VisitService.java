@@ -69,7 +69,7 @@ public class VisitService {
         // fcm 구독
         String token = visitorsInfoDto.fcmToken();
         if (token.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-        fcmTokenService.fcmAddTopic(token, popup, EPopupTopic.HOOGI);
+        fcmTokenService.fcmAddPopupTopic(token, popup, EPopupTopic.HOOGI);
 
         Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo); /*실시간 방문자 수*/
 

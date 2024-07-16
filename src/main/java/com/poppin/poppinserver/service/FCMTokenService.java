@@ -68,7 +68,7 @@ public class FCMTokenService {
           Author : sakang
           Date   : 2024-04-27
     */
-    public void fcmAddTopic(String token, Popup popup, EPopupTopic topic){
+    public void fcmAddPopupTopic(String token, Popup popup, EPopupTopic topic){
         if(token != null){
             // 팝업 관련
             try {
