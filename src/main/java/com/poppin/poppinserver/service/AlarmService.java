@@ -34,37 +34,8 @@ public class AlarmService {
     private final InformAlarmRepository informAlarmRepository;
     private final InformIsReadRepository informIsReadRepository;
 
-
     @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
-
-    @Value("${cloud.aws.s3.alarm.icon.magam}")
-    private String magam;
-
-    @Value("${cloud.aws.s3.alarm.icon.info}")
-    private String info;
-
-    @Value("${cloud.aws.s3.alarm.icon.jaebo}")
-    private String jaebo;
-
-    @Value("${cloud.aws.s3.alarm.icon.reopen}")
-    private String reopen;
-
-    @Value("${cloud.aws.s3.alarm.icon.hot}")
-    private String hot;
-
-    @Value("${cloud.aws.s3.alarm.icon.keyword}")
-    private String key;
-
-    @Value("${cloud.aws.s3.alarm.icon.open}")
-    private String open;
-
-    @Value("${cloud.aws.s3.alarm.icon.hoogi}")
-    private String hoogi;
-
-    @Value("${cloud.aws.s3.alarm.icon.bangmun}")
-    private String bangmun;
-
 
     /**
      *  홈 화면 진입 시 읽지 않은 공지 여부 판단
@@ -86,36 +57,32 @@ public class AlarmService {
         return responseDto;
     }
 
+    // 알림 - 팝업 공지사항 등록
     public String insertPopupAlarm(FCMRequestDto fcmRequestDto) {
 
         log.info("POPUP ALARM insert");
 
         try {
+            Popup popup = popupRepository.findById(fcmRequestDto.popupId())
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-            for (EPopupTopic topicType : EPopupTopic.values()) {
+            String keyword = "POPUP"; // 팝업 알림
 
-                if (topicType.equals(fcmRequestDto.topic())) {
-                    Popup popup = popupRepository.findById(fcmRequestDto.popupId())
-                            .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+            String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
 
-                    String keyword = "POPUP"; // 팝업 알림
+            PopupAlarm alarm = PopupAlarm.builder()
+                    .popupId(popup)
+                    .token(fcmRequestDto.token())
+                    .title(fcmRequestDto.title())
+                    .body(fcmRequestDto.body())
+                    .keyword(keyword)
+                    .icon(url)
+                    .createdAt(LocalDate.now())
+                    .isRead(false) // 읽음 여부
+                    .build();
 
-                    String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
+            popupAlarmRepository.save(alarm);
 
-                    PopupAlarm alarm = PopupAlarm.builder()
-                            .popupId(popup)
-                            .token(fcmRequestDto.token())
-                            .title(fcmRequestDto.title())
-                            .body(fcmRequestDto.body())
-                            .keyword(keyword)
-                            .icon(url)
-                            .createdAt(LocalDate.now())
-                            .isRead(false) // 읽음 여부
-                            .build();
-
-                    popupAlarmRepository.save(alarm);
-                }
-            }
             return "1";
         } catch (CommonException e) {
             log.error("ERROR during saving alarm : " + e.getMessage());
@@ -130,7 +97,7 @@ public class AlarmService {
 
         try {
             String keyword = "INFORM";
-            String iconUrl = s3Client.getUrl(alarmBucket, info).toString();
+            String iconUrl = s3Client.getUrl(alarmBucket, EPopupTopic.CHANGE_INFO.getImgName()).toString();
 
             InformAlarm alarm = InformAlarm.builder()
                     .title(requestDto.title())
@@ -151,29 +118,7 @@ public class AlarmService {
     }
 
     private URL getUrlForTopic(EPopupTopic topic) {
-        URL url = null;
-        switch (topic) {
-            case MAGAM -> url = s3Client.getUrl(alarmBucket, magam);
-
-            case CHANGE_INFO -> url =  s3Client.getUrl(alarmBucket, info);
-
-            case JAEBO -> url =  s3Client.getUrl(alarmBucket, jaebo);
-
-            case REOPEN -> url =  s3Client.getUrl(alarmBucket, reopen);
-
-            case HOT -> url =  s3Client.getUrl(alarmBucket, hot);
-
-            case KEYWORD -> url =  s3Client.getUrl(alarmBucket, key);
-
-            case OPEN -> url =  s3Client.getUrl(alarmBucket, open);
-
-            case HOOGI -> url =  s3Client.getUrl(alarmBucket, hoogi);
-
-            case BANGMUN -> url =  s3Client.getUrl(alarmBucket, bangmun);
-
-            default -> url =  null;
-
-        }
+        URL url = s3Client.getUrl(alarmBucket, topic.getImgName());
         log.info("Generated URL for topic {}: {}", topic, url);
         return url;
     }
