@@ -148,6 +148,7 @@ public class FCMSendService {
                 .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(review.getToken())
                 .putData("id", review.getPopup().getId().toString())
+                .putData("type", "popup")
                 .build();
 
         try {

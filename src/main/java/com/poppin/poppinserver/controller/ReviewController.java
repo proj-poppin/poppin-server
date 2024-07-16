@@ -3,6 +3,7 @@ package com.poppin.poppinserver.controller;
 import com.poppin.poppinserver.annotation.UserId;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.review.request.CreateReviewDto;
+import com.poppin.poppinserver.dto.review.request.RecommendDto;
 import com.poppin.poppinserver.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,10 +78,10 @@ public class ReviewController {
 
     @PostMapping("/add-recommend") // 후기 추천
     public ResponseDto<?> addRecommendReview(@UserId Long userId,
-                                             @RequestParam(value = "reviewId") Long reviewId,
-                                             @RequestParam(value = "popupId")Long popupId)
+                                             @RequestBody RecommendDto recommendDto
+                                             )
     {
-        return ResponseDto.ok(reviewService.addRecommendReview(userId, reviewId, popupId));
+        return ResponseDto.ok(reviewService.addRecommendReview(userId, recommendDto));
     }
 
 }

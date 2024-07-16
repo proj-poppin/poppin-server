@@ -1,10 +1,9 @@
 package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
-import com.poppin.poppinserver.type.ECongestion;
-import com.poppin.poppinserver.type.EPushInfo;
-import com.poppin.poppinserver.type.ESatisfaction;
-import com.poppin.poppinserver.type.EVisitDate;
+import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
+import com.poppin.poppinserver.dto.review.request.RecommendDto;
+import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
@@ -35,6 +34,7 @@ public class ReviewService {
     private final S3Service s3Service;
     private final UserService userService;
     private final FCMSendService fcmSendService;
+    private final AlarmService alarmService;
 
 
 
@@ -168,7 +168,11 @@ public class ReviewService {
 
 
     /*후기 추천 증가*/
-    public String addRecommendReview(Long userId ,Long reviewId, Long popupId) {
+    public String addRecommendReview(Long userId , RecommendDto recommendDto) {
+        String token = recommendDto.fcmToken();
+        Long reviewId = recommendDto.reviewId();
+        Long popupId = recommendDto.popupId();
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -191,7 +195,18 @@ public class ReviewService {
         reviewRecommendUserRepository.save(reviewRecommendUser);
 
         // FCM 알림
-        fcmSendService.sendChoochunByFCMToken(review, EPushInfo.CHOOCHUN);
+
+        FCMRequestDto requestDto = FCMRequestDto.fromEntity(
+                popupId,
+                token,
+                EPushInfo.CHOOCHUN.getTitle(),
+                EPushInfo.CHOOCHUN.getBody(),
+                EPopupTopic.CHOOCHUN
+        );
+
+        alarmService.insertPopupAlarm(requestDto); // 저장
+
+        fcmSendService.sendChoochunByFCMToken(review, EPushInfo.CHOOCHUN); // 알림
         return "정상적으로 반환되었습니다";
     }
 
