@@ -2,7 +2,6 @@ package com.poppin.poppinserver.service;
 
 import com.poppin.poppinserver.domain.*;
 import com.poppin.poppinserver.dto.fcm.request.FCMRequestDto;
-import com.poppin.poppinserver.dto.review.request.RecommendDto;
 import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.dto.review.response.ReviewDto;
 import com.poppin.poppinserver.exception.CommonException;
@@ -168,10 +167,7 @@ public class ReviewService {
 
 
     /*후기 추천 증가*/
-    public String addRecommendReview(Long userId , RecommendDto recommendDto) {
-        String token = recommendDto.fcmToken();
-        Long reviewId = recommendDto.reviewId();
-        Long popupId = recommendDto.popupId();
+    public String addRecommendReview(Long userId, Long reviewId, Long popupId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -198,14 +194,13 @@ public class ReviewService {
 
         FCMRequestDto requestDto = FCMRequestDto.fromEntity(
                 popupId,
-                token,
+                review.getToken(),
                 EPushInfo.CHOOCHUN.getTitle(),
                 EPushInfo.CHOOCHUN.getBody(),
                 EPopupTopic.CHOOCHUN
         );
 
         alarmService.insertPopupAlarm(requestDto); // 저장
-
         fcmSendService.sendChoochunByFCMToken(review, EPushInfo.CHOOCHUN); // 알림
         return "정상적으로 반환되었습니다";
     }
