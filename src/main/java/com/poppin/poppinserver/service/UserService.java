@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,47 +112,24 @@ public class UserService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (user.getPreferedPopup() == null) {
-            PreferedPopup preferedPopup = PreferedPopup.builder()
-                    .market(false)
-                    .display(false)
-                    .experience(false)
-                    .wantFree(false)
-                    .build();
+            PreferedPopup preferedPopup = createDefaultPreferedPopup();
             preferedPopupRepository.save(preferedPopup);
             user.updatePopupTaste(preferedPopup);
         }
 
         if (user.getTastePopup() == null) {
-            TastePopup tastePopup = TastePopup.builder()
-                    .fasionBeauty(false)
-                    .characters(false)
-                    .foodBeverage(false)
-                    .webtoonAni(false)
-                    .interiorThings(false)
-                    .movie(false)
-                    .musical(false)
-                    .sports(false)
-                    .game(false)
-                    .itTech(false)
-                    .kpop(false)
-                    .alcohol(false)
-                    .animalPlant(false)
-                    .build();
+            TastePopup tastePopup = createDefaultTastePopup();
             tastePopupRepository.save(tastePopup);
             user.updatePopupTaste(tastePopup);
         }
 
         if (user.getWhoWithPopup() == null) {
-            WhoWithPopup whoWithPopup = WhoWithPopup.builder()
-                    .solo(false)
-                    .withFriend(false)
-                    .withFamily(false)
-                    .withLover(false)
-                    .build();
+            WhoWithPopup whoWithPopup = createDefaultWhoWithPopup();
             whoWithPopupRepository.save(whoWithPopup);
             user.updatePopupTaste(whoWithPopup);
         }
 
+        userRepository.save(user);
         return UserTasteDto.builder()
                 .preference(PreferedDto.fromEntity(user.getPreferedPopup()))
                 .taste(TasteDto.fromEntity(user.getTastePopup()))
@@ -273,7 +249,6 @@ public class UserService {
                 .userImageUrl(user.getProfileImageUrl())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                //.birthDate(user.getBirthDate())
                 .build();
     }
 
