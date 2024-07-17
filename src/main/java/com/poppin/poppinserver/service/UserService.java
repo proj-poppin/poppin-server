@@ -455,8 +455,8 @@ public class UserService {
         유저가 작성한 모든 제보 삭제
      */
     private void deleteInformRequests(Long userId) {
-        userInformRepository.deleteAllByUserId(userId);
-        managerInformRepository.deleteAllByUserId(userId);
+        userInformRepository.deleteAllByInformerIdAndProgress(userId);
+        managerInformRepository.deleteAllByInformerIdAndProgress(userId);
     }
 
     /*
