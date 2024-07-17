@@ -1,8 +1,9 @@
-version: 0.0
-os: linux
+version: latest
+os: ubuntu
 files:
   - source: /
-    destination: /home/ubuntu/apps/deploy
+    destination: /service/tomcat
+    overwrite: yes
 
 permissions:
   - object: /
