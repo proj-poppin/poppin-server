@@ -14,4 +14,10 @@ public interface ModifyInformRepository extends JpaRepository<ModifyInfo, Long> 
     Page<ModifyInfo> findAllByIsExecuted(Pageable pageable, @Param("isExecuted") Boolean isExecuted);
 
     List<ModifyInfo> findAllByOriginPopupId(Long originPopupId);
+    
+    @Query("DELETE FROM ModifyInfo mi WHERE mi.userId = :userId")
+    void deleteAllByUserId(Long userId);
+
+    @Query("select m from ModifyInfo m where m.userId = :userId")
+    List<ModifyInfo> findAllByUserId(Long userId);
 }

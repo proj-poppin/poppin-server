@@ -13,4 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface ReportReviewRepository extends JpaRepository<ReportReview, Long> {
     @Query("SELECT r FROM ReportReview r WHERE r.isExecuted = :isExec ORDER BY r.reportedAt DESC")
     Page<ReportReview> findAllByOrderByReportedAtDesc(Pageable pageable, @Param("isExec") Boolean isExec);
+
+    @Query("DELETE FROM ReportReview r WHERE r.reporterId = :userId")
+    void deleteAllByUserId(Long userId);
 }

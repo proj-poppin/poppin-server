@@ -37,4 +37,7 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     void deleteAllByCreatedAtBefore(LocalDateTime dateTime);
 
     void deleteAllByPopup(Popup popup);
+
+    @Query("DELETE FROM Visit v WHERE v.user.id = :userId")
+    void deleteAllByUserId(Long userId);
 }

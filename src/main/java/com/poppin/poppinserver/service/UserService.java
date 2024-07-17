@@ -45,6 +45,16 @@ public class UserService {
     private final FreqQuestionRepository freqQuestionRepository;
     private final PosterImageRepository posterImageRepository;
     private final BlockedUserRepository blockedUserRepository;
+    private final InterestRepository interestRepository;
+    private final ReviewRecommendUserRepository reviewRecommendUserRepository;
+    private final UserInformRepository userInformRepository;
+    private final ManagerInformRepository managerInformRepository;
+    private final ModifyInformRepository modifyInfoRepository;
+    private final ModifyImageReposiroty modifyImageReposiroty;
+    private final ReportReviewRepository reportReviewRepository;
+    private final ReportPopupRepository reportPopupRepository;
+    private final NotificationRepository notificationRepository;
+
 
     @Transactional
     public UserTasteDto createUserTaste(
@@ -387,10 +397,17 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        deleteUserPopupInterests(userId);  // 유저 팝업 관심 등록 전부 삭제
+        deleteUserVisitData(userId);    // 유저 방문자 데이터 삭제
+        visitRepository.deleteAllByUserId(userId);  // 유저 팝업 방문 삭제
+        interestRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
+        reviewRecommendUserRepository.deleteAllByUserId(userId);    // 유저가 누른 모든 추천 삭제
         deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
-
+        deleteInformRequests(userId);   // 유저가 남긴 모든 제보 삭제
+        deleteUserModifyInfoRequests(userId);    // 유저가 남긴 모든 정보수정요청 삭제
+        deleteUserReports(userId);   // 유저가 남긴 모든 신고 삭제
         s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
+        deleteUserNotificationAlarmInfo(userId);
+        deleteBlockedUsers(userId);    // 유저 차단 목록 삭제
         userRepository.delete(user);     // 유저 삭제
     }
 
@@ -402,14 +419,20 @@ public class UserService {
 
         // 후기 이미지 삭제
         for (Review review : reviews) {
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            Long reviewId = review.getId();
+            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(reviewId);
             // S3에서 삭제
             for (ReviewImage reviewImage : reviewImages) {
                 s3Service.deleteImage(reviewImage.getImageUrl());
             }
             // DB에서 삭제
-            reviewImageRepository.deleteAllByReviewId(review.getId());
+            reviewImageRepository.deleteAllByReviewId(reviewId);
+            // 방문자 데이터 삭제
+            deleteUserVisitData(reviewId);
+            // 후기 추천 삭제
+            deleteReviewRecommend(reviewId);
         }
+
         // 모든 후기 삭제
         reviewRepository.deleteAllByUserId(userId);
     }
@@ -417,39 +440,59 @@ public class UserService {
     /*
         유저 방문자 데이터 삭제
     */
-    private void deleteUserVisitData(Long userId) {
-
+    private void deleteUserVisitData(Long reviewId) {
+        visitorDataRepository.deleteAllByReviewId(reviewId);
     }
 
     /*
-        유저 팝업 관심 등록 전부 삭제
-    */
-    private void deleteUserPopupInterests(Long userId) {
-
-
+        유저 후기 추천 삭제
+     */
+    private void deleteReviewRecommend(Long reviewId) {
+        reviewRecommendUserRepository.deleteAllByReviewId(reviewId);
     }
 
     /*
         유저가 작성한 모든 제보 삭제
      */
-    private void deleteUserInformRequests(Long userId) {
-
+    private void deleteInformRequests(Long userId) {
+        userInformRepository.deleteAllByUserId(userId);
+        managerInformRepository.deleteAllByUserId(userId);
     }
 
     /*
         유저가 작성한 모든 정보수정요청 삭제
      */
     private void deleteUserModifyInfoRequests(Long userId) {
-
+        List<ModifyInfo> modifyInfos = modifyInfoRepository.findAllByUserId(userId);
+        for (ModifyInfo modifyInfo : modifyInfos) {
+            Long modifyId = modifyInfo.getId();
+            modifyImageReposiroty.deleteAllByModifyId(modifyId);
+        }
+        modifyInfoRepository.deleteAllByUserId(userId);
     }
 
     /*
         유저가 작성한 모든 신고 삭제
      */
     private void deleteUserReports(Long userId) {
-
+        reportReviewRepository.deleteAllByUserId(userId);
+        reportPopupRepository.deleteAllByUserId(userId);
     }
 
+    /*
+        유저 차단 목록 삭제
+     */
+    private void deleteBlockedUsers(Long userId) {
+        blockedUserRepository.deleteAllByUserId(userId);
+        blockedUserRepository.deleteAllByBlockedId(userId);
+    }
+
+    /*
+        유저 공지 사항 알람 정보 삭제
+     */
+    private void deleteUserNotificationAlarmInfo(Long userId) {
+        notificationRepository.deleteAllByUserId(userId);
+    }
 
     public void addReviewCnt(User user){
         user.addReviewCnt();
