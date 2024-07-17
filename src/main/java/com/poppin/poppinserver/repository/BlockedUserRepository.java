@@ -15,4 +15,10 @@ public interface BlockedUserRepository extends JpaRepository<BlockedUser, Long> 
 
     @Query("SELECT bu.id FROM BlockedUser bu WHERE bu.userId.id = :userId AND bu.blockedUserId.id = :blockedUserId")
     Optional<BlockedUser> findByUserIdAndBlockedUserId(Long userId, Long blockedUserId);
+
+    @Query("DELETE FROM BlockedUser bu WHERE bu.userId.id = :userId")
+    void deleteAllByUserId(Long userId);
+
+    @Query("DELETE FROM BlockedUser bu WHERE bu.blockedUserId.id = :userId")
+    void deleteAllByBlockedId(Long userId);
 }
