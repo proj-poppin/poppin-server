@@ -172,6 +172,9 @@ public class ReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
         Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
 
         // 예외처리
@@ -196,7 +199,7 @@ public class ReviewService {
                 popupId,
                 review.getToken(),
                 EPushInfo.CHOOCHUN.getTitle(),
-                EPushInfo.CHOOCHUN.getBody(),
+                "[" + popup.getName() + "] " + EPushInfo.CHOOCHUN.getBody(),
                 EPopupTopic.CHOOCHUN
         );
 

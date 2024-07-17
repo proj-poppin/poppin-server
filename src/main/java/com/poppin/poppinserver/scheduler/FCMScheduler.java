@@ -190,8 +190,21 @@ public class FCMScheduler {
                     log.info("topic setting value : ", setVal);
 
                     if (setDefVal.equals("1") && setVal.equals("1")){
-                        FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
-                        fcmRequestDtoList.add(fcmRequestDto);
+                        if (
+                                info.equals(EPushInfo.HOTPOPUP) ||
+                                info.equals(EPushInfo.MAGAM) ||
+                                info.equals(EPushInfo.REOPEN) ||
+                                info.equals(EPushInfo.KEYWORD)
+                        ){
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), "[" + popup.getName() + "] " + info.getBody() , topic);
+                            fcmRequestDtoList.add(fcmRequestDto);
+                        }
+                        else if (
+                                info.equals(EPushInfo.OPEN)
+                        ) {
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), "[" + popup.getName() + "] " + info.getTitle(), info.getBody() , topic);
+                            fcmRequestDtoList.add(fcmRequestDto);
+                        }
                     }
                 }
             }
