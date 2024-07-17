@@ -41,48 +41,40 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # create application.yml
       - name: make application-aws.yml
         if: contains(github.ref, 'release-test')
         run: |
-        # spring의 resources 경로로 이동
+          
           cd ./src/main/resources
 
           ls -al
           touch ./application-aws.yml
           
-        # GitHub-Actions에서 설정한 값을 application-aws.yml 파일에 쓰기
           echo "copy properties"
           echo "${{ secrets.AWS_PROPERTIES }}" > ./application-aws.yml
         shell: bash
 
-      # create firebase_key file
       - name: make fcm firebase_key file
         if: contains(github.ref, 'release-test')
         run: |
-        # spring의 resources 경로로 이동
           mkdir ./src/main/resources/firebase
           cd ./src/main/resources/firebase
           
           ls -al
           touch ./firebase_key.json
           
-          # GitHub-Actions에서 설정한 값 파일에 쓰기
           echo "copy FIREBASE_SECRET_KEY"
           echo "${{ secrets.FIREBASE_KEY }}" > ./firebase_key.json
         shell: bash
 
-      # gradlew 파일 실행권한 설정
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
 
-      # Gradle build (Test 제외)
       - name: Build with Gradle
         run: ./gradlew clean --stacktrace --info build
         shell: bash
 
-      # AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -90,7 +82,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 빌드 결과물을 S3 버킷에 업로드
       - name: Upload to AWS S3
         run: |
           aws deploy push \
@@ -99,7 +90,6 @@ jobs:
             --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
             --source .
 
-      # S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy to AWS EC2 from S3
         run: |
           aws deploy create-deployment \
