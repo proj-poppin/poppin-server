@@ -50,8 +50,8 @@ public class AdminService {
     private final S3Service s3Service;
     private final AlarmService alarmService;
     private final AlarmListService alarmListService;
-
     private final FCMSendService fcmSendService;
+
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
         List<FaqResponseDto> faqDtoList = new ArrayList<>();
@@ -381,14 +381,8 @@ public class AdminService {
 
                 // 푸시 성공
                 if (sendStatus.equals("1")){
-
                     InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
                     return informApplyResponseDto; // 최종 성공 반환
-
-                }
-                // 푸시 실패
-                else{
-                    throw new CommonException(ErrorCode.FCM_ERROR);
                 }
             }
         // InformAlarm 객체 저장 실패
