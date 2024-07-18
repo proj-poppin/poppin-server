@@ -19,7 +19,7 @@ public class PopupScheduler {
     // 자정마다 팝업 상태 변경
     @Scheduled(cron = "0 0 0 * * *")
     public void changePopupOperatingStatus(){
-        List<Popup> popups = popupRepository.findAllByOpStatusNotTerminated();
+        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
 
         for(Popup popup : popups){
             //현재 운영상태 수정

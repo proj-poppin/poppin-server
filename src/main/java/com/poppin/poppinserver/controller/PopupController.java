@@ -1,12 +1,14 @@
 package com.poppin.poppinserver.controller;
 
 import com.poppin.poppinserver.annotation.UserId;
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
 import com.poppin.poppinserver.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
+import com.poppin.poppinserver.repository.PopupRepository;
 import com.poppin.poppinserver.service.PopupService;
 import com.poppin.poppinserver.type.EOperationStatus;
 import com.poppin.poppinserver.type.EPopupSort;
@@ -18,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,7 +30,6 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
-
 
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
@@ -44,7 +47,7 @@ public class PopupController {
     @GetMapping("/admin")
     public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
                                     @UserId Long adminId) {
-
+        log.info(LocalDateTime.now().toString());
         return ResponseDto.ok(popupService.readPopup(adminId, popupId));
     } // 전체팝업관리 - 팝업조회
 
