@@ -15,4 +15,7 @@ public interface ReportPopupRepository extends JpaRepository<ReportPopup, Long> 
 
     @Query("SELECT r FROM ReportPopup r WHERE r.isExecuted = :isExec ORDER BY r.reportedAt DESC")
     Page<ReportPopup> findAllByOrderByReportedAtDesc(Pageable pageable, @Param("isExec") Boolean isExec);
+
+    @Query("DELETE FROM ReportPopup r WHERE r.reporterId.id = :userId")
+    void deleteAllByUserId(Long userId);
 }
