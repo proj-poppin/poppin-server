@@ -40,6 +40,7 @@ public class FCMSendService {
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmService alarmService;
+    private final FCMSubscribeService fcmSubscribeService;
 
 
     /**
@@ -68,18 +69,9 @@ public class FCMSendService {
             try {
                 String result = firebaseMessaging.send(message);
                 log.info(" Successfully sent message: " + result);
-
                 refreshToken(token); // 토큰일자 갱신
-
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
-
-                if ("Requested entity was not found.".equals(e.getMessage())) {
-                    log.error("Invalid FCM token: " + token.getToken());
-                    // 토큰 제거
-                    fcmTokenRepository.delete(token);
-                }
-
                 return "0"; // fail
             }
         }
