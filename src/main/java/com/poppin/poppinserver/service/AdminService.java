@@ -377,13 +377,10 @@ public class AdminService {
             // 저장 성공
             if (informAlarm != null){
                 // 앱 푸시 발송
-                String sendStatus = fcmSendService.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
-
+                fcmSendService.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
                 // 푸시 성공
-                if (sendStatus.equals("1")){
-                    InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
-                    return informApplyResponseDto; // 최종 성공 반환
-                }
+                InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
+                return informApplyResponseDto; // 최종 성공 반환
             }
         // InformAlarm 객체 저장 실패
         }catch (Exception e){

@@ -45,12 +45,8 @@ public class FCMSendService {
 
     /**
      * 공지사항 토큰 메시지 발송
-     * @param tokenList
-     * @param requestDto
-     * @param informAlarm
-     * @return
      */
-    public String sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
+    public void sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
 
         for (FCMToken token : tokenList) {
             log.info("token : " + token.getToken());
@@ -65,17 +61,14 @@ public class FCMSendService {
                     .putData("id", informAlarm.getId().toString())
                     .putData("type", "inform")
                     .build();
-
             try {
                 String result = firebaseMessaging.send(message);
-                log.info(" Successfully sent message: " + result);
+                log.info("Successfully sent message: " + result);
                 refreshToken(token); // 토큰일자 갱신
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
-                return "0"; // fail
             }
         }
-        return "1"; // success
     }
 
     /**
