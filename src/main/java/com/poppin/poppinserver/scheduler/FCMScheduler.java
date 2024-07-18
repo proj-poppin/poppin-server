@@ -186,8 +186,8 @@ public class FCMScheduler {
                         default -> setVal = "1";
                     }
 
-                    log.info("pushYn value : " ,  setDefVal);
-                    log.info("topic setting value : ", setVal);
+                    log.info("pushYn value : {}" ,  setDefVal);
+                    log.info("topic setting value : {}", setVal);
 
                     if (setDefVal.equals("1") && setVal.equals("1")){
                         if (
@@ -203,6 +203,9 @@ public class FCMScheduler {
                                 info.equals(EPushInfo.OPEN)
                         ) {
                             FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), "[" + popup.getName() + "] " + info.getTitle(), info.getBody() , topic);
+                            fcmRequestDtoList.add(fcmRequestDto);
+                        }else{
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         }
                     }

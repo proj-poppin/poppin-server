@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
 
 
-    @Query("SELECT popup FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.token = :token ORDER BY popup.createdAt desc ")
-    List<PopupAlarm> findByKeywordOrderByCreatedAtDesc(String token);
+    @Query("SELECT popup FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.token = :token ORDER BY popup.id DESC ")
+    List<PopupAlarm> findByKeywordOrderByIdDesc(String token);
 
     @Query("SELECT popup FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.isRead = false AND popup.token = :fcmToken ORDER BY popup.createdAt desc ")
     List<PopupAlarm> findUnreadPopupAlarms(@Param("fcmToken") String fcmToken);

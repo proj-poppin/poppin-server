@@ -44,7 +44,7 @@ public class AlarmListService {
 
         log.info("fcm token : {} " , fcmRequestDto.fcmToken());
         List<PopupAlarmResponseDto> popupAlarmResponseDtoList = new ArrayList<>();
-        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByCreatedAtDesc(fcmRequestDto.fcmToken());
+        List<PopupAlarm> alarmList = popupAlarmRepository.findByKeywordOrderByIdDesc(fcmRequestDto.fcmToken());
 
         for (PopupAlarm alarm : alarmList){
             log.info("alarmList : {} " , alarmList);
@@ -124,7 +124,7 @@ public class AlarmListService {
         log.info("fcm token : {} ", requestDto.fcmToken());
 
         List<InformAlarmListResponseDto> informAlarmListResponseDtoList = new ArrayList<>();
-        List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByCreatedAtDesc(requestDto.fcmToken());
+        List<InformAlarm> alarmList = informAlarmRepository.findByKeywordOrderByIdDesc(requestDto.fcmToken());
 
         log.info("alarm list : {}", alarmList);
 

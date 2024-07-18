@@ -4,18 +4,21 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.domain.AlarmSetting;
 import com.poppin.poppinserver.domain.FCMToken;
 import com.poppin.poppinserver.domain.Popup;
+import com.poppin.poppinserver.domain.PopupTopic;
 import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
 import com.poppin.poppinserver.dto.fcm.response.ApplyTokenResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
 import com.poppin.poppinserver.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.repository.FCMTokenRepository;
+import com.poppin.poppinserver.repository.PopupTopicRepository;
 import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,11 +27,13 @@ import java.util.Optional;
 public class FCMTokenService {
 
     private final FCMTokenRepository fcmTokenRepository;
+
+    private final PopupTopicRepository popupTopicRepository;
     private final AlarmSettingRepository alarmSettingRepository;
     private final FCMSubscribeService fcmSubscribeService;
 
     /* FCM TOKEN 등록 */
-    public ApplyTokenResponseDto FCMApplyToken(ApplyTokenRequestDto requestDto){
+    public ApplyTokenResponseDto fcmApplyToken(ApplyTokenRequestDto requestDto){
 
         log.info("apply token : {}" , requestDto.fcmToken());
         try {
@@ -61,6 +66,25 @@ public class FCMTokenService {
             log.error("토큰 등록 실패: " + e.getMessage());
             return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail" , e.getMessage());
         }
+    }
+
+    public void fcmRemoveToken(FCMToken token) throws FirebaseMessagingException {
+
+        // 구독내역 존재 시 전부 삭제
+        Optional<List<PopupTopic>> topicsNeedToDelete = popupTopicRepository.findByToken(token);
+        if (topicsNeedToDelete.isPresent()){
+            for (PopupTopic topic : topicsNeedToDelete.get()) {
+                popupTopicRepository.delete(topic);
+                fcmSubscribeService.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.MAGAM);
+                fcmSubscribeService.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.OPEN);
+                fcmSubscribeService.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.CHANGE_INFO);
+            }
+        }
+
+        // 후기쪽 토큰 refresh
+        // 토큰 삭제
+        fcmTokenRepository.delete(token);
+
     }
 
     /*

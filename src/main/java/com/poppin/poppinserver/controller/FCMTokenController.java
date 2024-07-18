@@ -36,6 +36,6 @@ public class FCMTokenController {
     /* 알림 허용 시 데이터 저장 */
     @PostMapping("/apply/FCMtoken")
     public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto){
-        return ResponseDto.ok(fcmTokenService.FCMApplyToken(applyTokenRequestDto));
+        return ResponseDto.ok(fcmTokenService.fcmApplyToken(applyTokenRequestDto));
     }
 }
