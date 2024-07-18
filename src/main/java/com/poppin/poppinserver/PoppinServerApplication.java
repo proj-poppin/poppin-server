@@ -16,10 +16,4 @@ public class PoppinServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PoppinServerApplication.class, args);
 	}
-
-//	@PostConstruct
-//	public void init() {
-//		// timezone 설정
-//		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-//	}
 }

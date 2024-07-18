@@ -30,34 +30,6 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
-    private final PopupRepository popupRepository;
-
-    @GetMapping("/test")
-    public void test() {
-        log.info(LocalDateTime.now().toString());
-        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
-
-        for(Popup popup : popups){
-            log.info("name : " + popup.getName());
-            log.info("openDate : " + popup.getOpenDate().toString());
-            log.info("closeDate : " + popup.getCloseDate().toString());
-
-            log.info("st : ");
-            //현재 운영상태 수정
-            if (popup.getOpenDate().isAfter(LocalDate.now())){
-                log.info("NOTYET");
-                popup.updateOpStatus(EOperationStatus.NOTYET.getStatus());
-            } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
-                log.info("TERMINATED");
-                popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());
-            } else {
-                log.info("OPER");
-                popup.updateOpStatus(EOperationStatus.OPERATING.getStatus());
-            }
-        }
-
-    }
-
 
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
