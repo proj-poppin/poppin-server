@@ -22,10 +22,10 @@ public class JwtUtil implements InitializingBean {
     private String secretKey;
 
     @Value("${jwt.access-token-validity-in-milli-seconds}")
-    private Integer accessTokenExpirationPeriod;
+    private Long accessTokenExpirationPeriod;
 
     @Value("${jwt.refresh-token-validity-in-milli-seconds}")
-    private Integer refreshTokenExpirationPeriod;
+    private Long refreshTokenExpirationPeriod;
 
     private Key key;
 
@@ -35,7 +35,7 @@ public class JwtUtil implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(String email, EUserRole role, Integer expirationPeriod) {
+    public String createToken(String email, EUserRole role, Long expirationPeriod) {
         Claims claims = Jwts.claims();
         claims.put(Constant.USER_EMAIL_CLAIM_NAME, email);
         claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
@@ -51,7 +51,7 @@ public class JwtUtil implements InitializingBean {
                 .compact();
     }
 
-    public String createToken(Long id, EUserRole role, Integer expirationPeriod) {
+    public String createToken(Long id, EUserRole role, Long expirationPeriod) {
         Claims claims = Jwts.claims();
         claims.put(Constant.USER_ID_CLAIM_NAME, id);
         claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
