@@ -14,5 +14,5 @@ public interface ManagerInformRepository extends JpaRepository<ManagerInform, Lo
     Page<ManagerInform> findAllByProgress(Pageable pageable, EInformProgress progress);
 
     @Query("DELETE FROM ManagerInform mi WHERE mi.informerId.id = :informerId AND mi.progress = 'NOTEXECUTED'")
-    void deleteAllByInformerIdAndProgress(Long userId);
+    void deleteAllByInformerIdAndProgress(Long informerId);
 }
