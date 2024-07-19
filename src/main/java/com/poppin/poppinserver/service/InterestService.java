@@ -66,9 +66,9 @@ public class InterestService {
 
         String fcmToken = requestDto.fcmToken();
 
-        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmRemoveTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.MAGAM);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.OPEN);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
         return true;
     }
 }

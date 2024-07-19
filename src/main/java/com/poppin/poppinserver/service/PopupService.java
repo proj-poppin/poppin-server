@@ -240,9 +240,9 @@ public class PopupService {
         List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
 
         for (PopupTopic topic: topicList) {
-            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.MAGAM );
-            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
-            fcmTokenService.fcmRemoveTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup,EPopupTopic.MAGAM );
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
         }
 
         // 관심 추가 데이터

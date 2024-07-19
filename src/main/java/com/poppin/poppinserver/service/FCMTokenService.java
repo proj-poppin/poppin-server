@@ -115,7 +115,7 @@ public class FCMTokenService {
           Author : sakang
           Date   : 2024-04-27
     */
-    public void fcmRemoveTopic(String token, Popup popup, EPopupTopic topic){
+    public void fcmRemovePopupTopic(String token, Popup popup, EPopupTopic topic){
 
         try {
             log.info("앱푸시 팝업 주제 삭제 시작");
@@ -127,5 +127,6 @@ public class FCMTokenService {
             e.printStackTrace();
         }
     }
+
 
 }
