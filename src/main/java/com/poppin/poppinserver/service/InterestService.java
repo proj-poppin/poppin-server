@@ -22,7 +22,8 @@ public class InterestService {
     private final InterestRepository interestRepository;
 
     private final FCMTokenService fcmTokenService;
-    @Transactional // 쿼리 5번 날라감. 최적화 필요
+
+    @Transactional
     public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto){
         //중복검사
         interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
