@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -32,10 +34,9 @@ public class BlockedPopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 관심 저장 해제
-        Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Optional<Interest> interest = interestRepository.findByUserIdAndPopupId(userId, popupId);
 
-        interestRepository.delete(interest);
+        interest.ifPresent(interestRepository::delete);
 
         // 팝업 차단 생성 및 저장
         BlockedPopup blockedPopup = BlockedPopup.builder()
