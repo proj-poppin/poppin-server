@@ -57,6 +57,7 @@ public class PopupService {
     private final ReviewRecommendUserRepository reviewRecommendUserRepository;
     private final PopupTopicRepository popupTopicRepository;
     private final BlockedUserRepository blockedUserRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -528,11 +529,16 @@ public class PopupService {
 
         Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
 
+        // 차단 여부 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
+
         // 방문 여부 확인
         if (!visit.isEmpty())
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true, isBlocked); // 이미 방문함
         else
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false, isBlocked); // 방문 한적 없음
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
@@ -742,14 +748,14 @@ public class PopupService {
             }
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText, PageRequest.of(page, size, sort),
                 market, display, experience, // 팝업 형태 3개
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper.getStatus()); // 운영 상태
+                oper.getStatus(),userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
@@ -767,7 +773,7 @@ public class PopupService {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText, PageRequest.of(page, size), userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
