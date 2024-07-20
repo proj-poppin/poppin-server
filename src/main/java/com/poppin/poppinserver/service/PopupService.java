@@ -742,14 +742,14 @@ public class PopupService {
             }
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText, PageRequest.of(page, size, sort),
                 market, display, experience, // 팝업 형태 3개
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper.getStatus()); // 운영 상태
+                oper.getStatus(),userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
@@ -767,7 +767,7 @@ public class PopupService {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size)); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText, PageRequest.of(page, size), userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
