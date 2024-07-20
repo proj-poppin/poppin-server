@@ -392,7 +392,6 @@ public class UserService {
         return new NicknameDto(randomNickname);
     }
 
-    @Transactional
     public void deleteAllRelatedInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -408,7 +407,6 @@ public class UserService {
         s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
         deleteUserNotificationAlarmInfo(userId);
         deleteBlockedUsers(userId);    // 유저 차단 목록 삭제
-        userRepository.delete(user);     // 유저 삭제
     }
 
     /*
