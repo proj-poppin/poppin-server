@@ -57,6 +57,7 @@ public class PopupService {
     private final ReviewRecommendUserRepository reviewRecommendUserRepository;
     private final PopupTopicRepository popupTopicRepository;
     private final BlockedUserRepository blockedUserRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
 
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
@@ -528,11 +529,16 @@ public class PopupService {
 
         Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
 
+        // 차단 여부 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
+
         // 방문 여부 확인
         if (!visit.isEmpty())
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true); // 이미 방문함
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true, isBlocked); // 이미 방문함
         else
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false); // 방문 한적 없음
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false, isBlocked); // 방문 한적 없음
     } // 로그인 상세조회
 
     public List<PopupSummaryDto> readHotList(){
