@@ -19,6 +19,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     //인기 팝업스토어
     @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
             "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
+            "WHERE p.operationStatus = 'OPERATING' " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
     List<Popup> findTopOperatingPopupsByInterestAndViewCount(@Param("startOfDay") LocalDateTime startOfDay,
