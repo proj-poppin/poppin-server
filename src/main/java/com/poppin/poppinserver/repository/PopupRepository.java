@@ -91,7 +91,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "OR (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
             "OR (:etc IS NULL OR tp.etc = :etc)) " +
             "AND ( " +
-            "OR (:market IS NULL OR pp.market = :market) " +
+            "(:market IS NULL OR pp.market = :market) " +
             "OR (:display IS NULL OR pp.display = :display) " +
             "OR (:experience IS NULL OR pp.experience = :experience))",
             countQuery = "SELECT COUNT(*) FROM popups p " +
@@ -117,7 +117,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "OR (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
                     "OR (:etc IS NULL OR tp.etc = :etc)) " +
                     "AND ( " +
-                    "OR (:market IS NULL OR pp.market = :market) " +
+                    "(:market IS NULL OR pp.market = :market) " +
                     "OR (:display IS NULL OR pp.display = :display) " +
                     "OR (:experience IS NULL OR pp.experience = :experience))",
             nativeQuery = true)
@@ -152,7 +152,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "OR (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
             "OR (:etc IS NULL OR tp.etc = :etc)) " +
             "AND ( " +
-            "OR (:market IS NULL OR pp.market = :market) " +
+            "(:market IS NULL OR pp.market = :market) " +
             "OR (:display IS NULL OR pp.display = :display) " +
             "OR (:experience IS NULL OR pp.experience = :experience))",
             countQuery = "SELECT COUNT(*) FROM popups p " +
@@ -176,7 +176,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "OR (:animalPlant IS NULL OR tp.animal_plant = :animalPlant) " +
                     "OR (:etc IS NULL OR tp.etc = :etc)) " +
                     "AND ( " +
-                    "OR (:market IS NULL OR pp.market = :market) " +
+                    "(:market IS NULL OR pp.market = :market) " +
                     "OR (:display IS NULL OR pp.display = :display) " +
                     "OR (:experience IS NULL OR pp.experience = :experience))",
             nativeQuery = true)
