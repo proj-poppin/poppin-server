@@ -16,6 +16,6 @@ public interface UserInformRepository extends JpaRepository<UserInform, Long> {
     Page<UserInform> findAllByProgress(Pageable pageable, EInformProgress pregress);
 
     @Modifying
-    @Query("DELETE FROM UserInform ui WHERE ui.informerId.id = :informerId AND ui.progress = 'NOTEXECUTED'")
-    void deleteAllByInformerIdAndProgress(@Param("informerId") Long informerId);
+    @Query("DELETE FROM UserInform ui WHERE ui.informerId.id = :informerId")
+    void deleteAllByInformerId(@Param("informerId") Long informerId);
 }

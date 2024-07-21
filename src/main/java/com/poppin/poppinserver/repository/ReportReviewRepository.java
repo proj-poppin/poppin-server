@@ -16,6 +16,6 @@ public interface ReportReviewRepository extends JpaRepository<ReportReview, Long
     Page<ReportReview> findAllByOrderByReportedAtDesc(Pageable pageable, @Param("isExec") Boolean isExec);
 
     @Modifying
-    @Query("DELETE FROM ReportReview r WHERE r.reporterId = :userId")
+    @Query("DELETE FROM ReportReview r WHERE r.reporterId.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
 }
