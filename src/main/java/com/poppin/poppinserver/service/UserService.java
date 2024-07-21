@@ -395,8 +395,6 @@ public class UserService {
 
     public void deleteAllRelatedInfo(User user) {
         Long userId = user.getId();
-        deleteUserVisitData(userId);    // 유저 방문자 데이터 삭제
-        log.info("팝업 방문자 데이터 삭제 완료");
         visitRepository.deleteAllByUserId(userId);  // 유저 팝업 방문 삭제
         log.info("유저 팝업 방문 삭제 완료");
         interestRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
