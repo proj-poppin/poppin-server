@@ -4,6 +4,7 @@ import com.poppin.poppinserver.domain.ModifyInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,9 +15,10 @@ public interface ModifyInformRepository extends JpaRepository<ModifyInfo, Long> 
     Page<ModifyInfo> findAllByIsExecuted(Pageable pageable, @Param("isExecuted") Boolean isExecuted);
 
     List<ModifyInfo> findAllByOriginPopupId(Long originPopupId);
-    
+
+    @Modifying
     @Query("DELETE FROM ModifyInfo mi WHERE mi.userId = :userId")
-    void deleteAllByUserId(Long userId);
+    void deleteAllByUserId(@Param("userId") Long userId);
 
     @Query("select m from ModifyInfo m where m.userId = :userId")
     List<ModifyInfo> findAllByUserId(Long userId);

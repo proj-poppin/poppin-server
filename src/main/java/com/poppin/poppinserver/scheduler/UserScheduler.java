@@ -21,7 +21,8 @@ public class UserScheduler {
     private final UserService userService;
 
     // 자정마다 soft delete 한 지 30일이 지난 유저 삭제
-    @Scheduled(cron = "0 0 0 * * *")
+    // @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     @Transactional
     public void hardDeleteUser(){
         List<User> users = userRepository.findAllByDeletedAtIsNotNullAndIsDeleted();

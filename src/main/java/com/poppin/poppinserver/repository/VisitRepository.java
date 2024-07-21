@@ -5,6 +5,7 @@ import com.poppin.poppinserver.domain.Visit;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,7 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     void deleteAllByPopup(Popup popup);
 
+    @Modifying
     @Query("DELETE FROM Visit v WHERE v.user.id = :userId")
-    void deleteAllByUserId(Long userId);
+    void deleteAllByUserId(@Param("userId") Long userId);
 }

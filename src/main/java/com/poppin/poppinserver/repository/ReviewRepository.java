@@ -32,7 +32,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Long countByUserIdAndIsVisibleFalse(Long userId);
 
     @Modifying
-    @Transactional
     @Query("DELETE FROM Review r WHERE r.user.id = :userId")
     void deleteAllByUserId(Long userId);
 
