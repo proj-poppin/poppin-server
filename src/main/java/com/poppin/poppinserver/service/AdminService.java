@@ -44,7 +44,6 @@ public class AdminService {
     private final ReviewImageRepository reviewImageRepository;
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
-
     private final InformAlarmRepository informAlarmRepository;
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final S3Service s3Service;
@@ -116,9 +115,21 @@ public class AdminService {
     }
 
     public UserAdministrationDetailDto readUserDetail(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Long hiddenReviewCount = reviewRepository.countByUserIdAndIsVisibleFalse(userId);
+        UserAdministrationDetailDto userAdministrationDetailDto;
+
+        if (user.getIsDeleted() && user.getDeletedAt() != null) {
+            userAdministrationDetailDto = createDeletedUserDetailDto(user);
+        } else {
+            Long hiddenReviewCount = reviewRepository.countByUserIdAndIsVisibleFalse(userId);
+            userAdministrationDetailDto = createActiveUserDetailDto(user, hiddenReviewCount);
+        }
+
+        return userAdministrationDetailDto;
+    }
+
+    private UserAdministrationDetailDto createActiveUserDetailDto(User user, Long hiddenReviewCount) {
         return UserAdministrationDetailDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -127,6 +138,18 @@ public class AdminService {
                 .provider(user.getProvider())
                 .requiresSpecialCare(user.getRequiresSpecialCare())
                 .hiddenReviewCount(hiddenReviewCount)
+                .build();
+    }
+
+    private UserAdministrationDetailDto createDeletedUserDetailDto(User user) {
+        return UserAdministrationDetailDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .userImageUrl(null)
+                .nickname("탈퇴한 유저입니다.")
+                .provider(null)
+                .requiresSpecialCare(false)
+                .hiddenReviewCount(0L)
                 .build();
     }
 
