@@ -42,7 +42,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.isLogin = :isLogin AND u.refreshToken IS NOT NULL")
     Optional<User> findByIdAndIsLoginAndRefreshTokenNotNull(Long id, boolean isLogin);
 
-    List<User> findAllByDeletedAtIsNotNull();
+    @Query("SELECT u FROM User u WHERE u.deletedAt IS NOT NULL AND u.isDeleted = true")
+    List<User> findAllByDeletedAtIsNotNullAndIsDeleted();
 
     @Query("SELECT u FROM User u WHERE u.nickname LIKE %:nickname% OR u.email LIKE %:email% ORDER BY u.nickname ASC")
     List<User> findByNicknameContainingOrEmailContainingOrderByNickname(String nickname, String email);
