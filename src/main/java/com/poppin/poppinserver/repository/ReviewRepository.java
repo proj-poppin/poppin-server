@@ -2,7 +2,6 @@ package com.poppin.poppinserver.repository;
 
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.Review;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,4 +43,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByUserIdAndIsVisibleOrderByCreatedAtDesc(Long userId, Pageable pageable, @Param("hidden") Boolean hidden);
 
     List<Review> findByPopupId(Long popupId);
+
+    List<Review> findByToken(String token);
 }

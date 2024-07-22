@@ -28,4 +28,7 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     @Query("DELETE FROM FCMToken token WHERE token.token = :fcmTokenOptional")
     void delete(Optional<FCMToken> fcmTokenOptional);
+
+    @Query("SELECT token FROM FCMToken token WHERE token.deviceId = :deviceId")
+    Optional<FCMToken> findByDeviceId(String deviceId);
 }

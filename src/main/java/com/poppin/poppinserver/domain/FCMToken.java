@@ -2,16 +2,14 @@ package com.poppin.poppinserver.domain;
 
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Table(name = "notification_token")
@@ -33,12 +31,16 @@ public class FCMToken {
     @Column(name = "device" , nullable = false)
     private String device;         // android or ios
 
+    @Column(name = "device_id", nullable = false)
+    private String deviceId;
+
     @Builder
-    public FCMToken(String token, LocalDateTime mod_dtm , String device ){
+    public FCMToken(String token, LocalDateTime mod_dtm , String device, String deviceId ){
         this.token      = token;
         this.mod_dtm    = mod_dtm;
-        this.exp_dtm    = mod_dtm.plusMonths(1); // 1달
+        this.exp_dtm    = mod_dtm.plusMonths(1);
         this.device     = device;
+        this.deviceId   = deviceId;
     }
 
     // 토큰 갱신

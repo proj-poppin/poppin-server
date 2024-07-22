@@ -1,10 +1,7 @@
 package com.poppin.poppinserver.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Table(name = "review")
@@ -27,7 +25,7 @@ public class Review {
     private User user;
 
     @Column(name = "token" , nullable = false)
-    private String token;
+    private String token; // 후기 추천용 토큰
 
     @Column(name = "nickname", nullable = false)
     private String nickname;
