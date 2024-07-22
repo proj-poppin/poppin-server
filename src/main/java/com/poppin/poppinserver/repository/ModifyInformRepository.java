@@ -17,9 +17,9 @@ public interface ModifyInformRepository extends JpaRepository<ModifyInfo, Long> 
     List<ModifyInfo> findAllByOriginPopupId(Long originPopupId);
 
     @Modifying
-    @Query("DELETE FROM ModifyInfo mi WHERE mi.userId = :userId")
+    @Query("DELETE FROM ModifyInfo mi WHERE mi.userId.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
 
-    @Query("select m from ModifyInfo m where m.userId = :userId")
+    @Query("select m from ModifyInfo m where m.userId.id = :userId")
     List<ModifyInfo> findAllByUserId(Long userId);
 }

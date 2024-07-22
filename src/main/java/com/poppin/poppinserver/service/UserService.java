@@ -56,7 +56,6 @@ public class UserService {
     private final NotificationRepository notificationRepository;
     private final BlockedPopupRepository blockedPopupRepository;
 
-
     @Transactional
     public UserTasteDto createUserTaste(
             Long userId,
@@ -396,27 +395,18 @@ public class UserService {
     public void deleteAllRelatedInfo(User user) {
         Long userId = user.getId();
         visitRepository.deleteAllByUserId(userId);  // 유저 팝업 방문 삭제
-        log.info("유저 팝업 방문 삭제 완료");
         interestRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
-        log.info("유저 팝업 관심 등록 삭제 완료");
         reviewRecommendUserRepository.deleteAllByUserId(userId);    // 유저가 누른 모든 추천 삭제
-        log.info("유저가 누른 모든 후기 추천 삭제 완료");
-        deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
-        log.info("유저가 남긴 모든 후기 삭제 완료");
-        deleteInformRequests(userId);   // 유저가 남긴 모든 제보 삭제
-        log.info("유저가 남긴 모든 제보 삭제 완료");
-        deleteUserModifyInfoRequests(userId);    // 유저가 남긴 모든 정보수정요청 삭제
-        log.info("유저가 남긴 모든 정보수정요청 삭제 완료");
         deleteUserReports(userId);   // 유저가 남긴 모든 신고 삭제
-        log.info("유저가 남긴 모든 신고 삭제 완료");
-        s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
-        log.info("유저 프로필 이미지 삭제 완료");
+        deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
+        deleteInformRequests(userId);   // 유저가 남긴 모든 제보 삭제
+        deleteUserModifyInfoRequests(userId);    // 유저가 남긴 모든 정보수정요청 삭제
+        if (user.getProfileImageUrl() != null) {
+            s3Service.deleteImage(user.getProfileImageUrl());   // 유저 프로필 이미지 S3에서도 삭제
+        }
         deleteUserNotificationAlarmInfo(userId);    // 유저 공지사항 알람 삭제
-        log.info("유저 공지사항 알람 삭제 완료");
         deleteBlockedPopups(userId);    // 팝업 차단 목록 삭제
-        log.info("유저의 팝업 차단 목록 삭제 완료");
         deleteBlockedUsers(userId);    // 유저 차단 목록 삭제
-        log.info("유저 차단 목록 삭제 완료");
     }
 
     /*
@@ -463,8 +453,8 @@ public class UserService {
         유저가 작성한 모든 제보 삭제
      */
     private void deleteInformRequests(Long userId) {
-        userInformRepository.deleteAllByInformerIdAndProgress(userId);
-        managerInformRepository.deleteAllByInformerIdAndProgress(userId);
+        userInformRepository.deleteAllByInformerId(userId);
+        managerInformRepository.deleteAllByInformerId(userId);
     }
 
     /*

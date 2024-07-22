@@ -21,8 +21,8 @@ public class UserScheduler {
     private final UserService userService;
 
     // 자정마다 soft delete 한 지 30일이 지난 유저 삭제
-    // @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "0 */5 * * * *")
+    // @Scheduled(cron = "0 */3 * * * *") // test 3분마다
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void hardDeleteUser(){
         List<User> users = userRepository.findAllByDeletedAtIsNotNullAndIsDeleted();
@@ -30,9 +30,7 @@ public class UserScheduler {
         List<User> usersToDelete = users.stream()
                 .filter(user -> user.getDeletedAt().toLocalDate().isBefore(LocalDate.now().plusDays(1)))
                 .collect(Collectors.toList());
-        log.info("usersToDelete 진입");
         usersToDelete.forEach(user -> userService.deleteAllRelatedInfo(user));
-        log.info("deleteAllInBatch 유저 최종 삭제 진입");
         userRepository.deleteAllInBatch(usersToDelete);
         log.info("deleteAllInBatch 유저 최종 삭제 완료");
     }
