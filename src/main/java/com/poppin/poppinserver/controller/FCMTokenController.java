@@ -38,4 +38,10 @@ public class FCMTokenController {
     public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto){
         return ResponseDto.ok(fcmTokenService.fcmApplyToken(applyTokenRequestDto));
     }
+
+    // 데이터베이스 초기화 시 토큰 팝업 구독 해제
+    @PostMapping("/reset/topic")
+    public ResponseDto<?> resetPopupTopic(){
+        return ResponseDto.ok(fcmTokenService.resetPopupTopic());
+    }
 }

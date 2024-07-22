@@ -6,10 +6,7 @@ import com.poppin.poppinserver.dto.fcm.request.ApplyTokenRequestDto;
 import com.poppin.poppinserver.dto.fcm.response.ApplyTokenResponseDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
-import com.poppin.poppinserver.repository.AlarmSettingRepository;
-import com.poppin.poppinserver.repository.FCMTokenRepository;
-import com.poppin.poppinserver.repository.PopupTopicRepository;
-import com.poppin.poppinserver.repository.ReviewRepository;
+import com.poppin.poppinserver.repository.*;
 import com.poppin.poppinserver.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +27,7 @@ public class FCMTokenService {
     private final AlarmSettingRepository alarmSettingRepository;
     private final ReviewRepository reviewRepository;
     private final FCMSubscribeService fcmSubscribeService;
+    private final PopupRepository popupRepository;
 
     /* FCM TOKEN 등록 */
     public ApplyTokenResponseDto fcmApplyToken(ApplyTokenRequestDto requestDto){
@@ -134,6 +132,23 @@ public class FCMTokenService {
             log.error("failed to unsubscribe popup topic");
             e.printStackTrace();
         }
+    }
+
+
+    public String resetPopupTopic(){
+
+        List<FCMToken> fcmTokenList = fcmTokenRepository.findAll();
+        for (FCMToken token : fcmTokenList){
+            Optional<List<PopupTopic>> topics = popupTopicRepository.findByToken(token);
+            if (topics.isPresent()){
+                for (PopupTopic topic : topics.get()){
+                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.MAGAM);
+                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.OPEN);
+                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.CHANGE_INFO);
+                }
+            }
+        }
+        return "finish";
     }
 
 }
