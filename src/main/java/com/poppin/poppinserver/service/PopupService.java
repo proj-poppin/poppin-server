@@ -283,6 +283,9 @@ public class PopupService {
         log.info("delete popup topic");
         popupTopicRepository.deleteAllByPopup(popup);
 
+        log.info("delete blocked popup");
+        blockedPopupRepository.deleteAllByPopupId(popup);
+
         log.info("delete popup");
         popupRepository.delete(popup);
 
