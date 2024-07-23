@@ -58,17 +58,15 @@ public class PopupService {
     private final PopupTopicRepository popupTopicRepository;
     private final BlockedUserRepository blockedUserRepository;
     private final BlockedPopupRepository blockedPopupRepository;
-
     private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
     private final ModifyInfoService modifyInfoService;
     private final FCMTokenService fcmTokenService;
-
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
-
     private final FCMScheduler fcmScheduler;
+    private final PopupAlarmRepository popupAlarmRepository;
 
 
     @Transactional
@@ -279,6 +277,11 @@ public class PopupService {
             s3Service.deleteMultipleImages(fileUrls);
             posterImageRepository.deleteAllByPopupId(popup);
         }
+        log.info("delete popup alarm");
+        popupAlarmRepository.deleteAllByPopupId(popup);
+
+        log.info("delete popup topic");
+        popupTopicRepository.deleteAllByPopup(popup);
 
         log.info("delete popup");
         popupRepository.delete(popup);

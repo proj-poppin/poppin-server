@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.repository;
 
+import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.PopupAlarm;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,6 @@ public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
 
     @Query("SELECT COUNT(popup) FROM PopupAlarm popup WHERE popup.keyword = 'POPUP' AND popup.isRead = false AND popup.token = :fcmToken")
     int UnreadPopupAlarms(@Param("fcmToken") String fcmToken);
+
+    void deleteAllByPopupId(Popup popup);
 }
