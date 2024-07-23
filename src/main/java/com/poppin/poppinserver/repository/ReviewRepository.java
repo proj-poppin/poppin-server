@@ -44,5 +44,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findByPopupId(Long popupId);
 
-    List<Review> findByToken(String token);
+    List<Review> findAllByToken(String token);
 }

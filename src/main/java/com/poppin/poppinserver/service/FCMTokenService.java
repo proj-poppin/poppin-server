@@ -41,15 +41,14 @@ public class FCMTokenService {
             Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByDeviceId(requestDto.deviceId());
             Boolean isDuplicate = fcmTokenOptional.isPresent();
 
-            if (isDuplicate && !requestDto.fcmToken().equals(fcmTokenOptional)){
-
+            if (isDuplicate && !requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
                 // fcm token refreshing
                 fcmTokenOptional.get().setToken(requestDto.fcmToken());
                 fcmTokenOptional.get().regenerateToken();
                 fcmTokenRepository.save(fcmTokenOptional.get());
 
                 // review token refreshing
-                List<Review> reviews = reviewRepository.findByToken(requestDto.fcmToken());
+                List<Review> reviews = reviewRepository.findAllByToken(fcmTokenOptional.get().getToken());
                 for (Review review : reviews){
                     review.setToken(requestDto.fcmToken());
                     reviewRepository.save(review);
@@ -152,3 +151,4 @@ public class FCMTokenService {
     }
 
 }
+
