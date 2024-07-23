@@ -31,7 +31,7 @@ public class FCMToken {
     @Column(name = "device" , nullable = false)
     private String device;         // android or ios
 
-    @Column(name = "device_id", nullable = false)
+    @Column(name = "device_id", nullable = false, unique = true)
     private String deviceId;
 
     @Builder
