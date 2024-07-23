@@ -24,4 +24,5 @@ public interface PopupTopicRepository extends JpaRepository<PopupTopic, Long> {
     @Query("SELECT PT FROM PopupTopic PT WHERE PT.popup = :popup")
     List<PopupTopic> findByPopup(Popup popup);
 
+    void deleteAllByPopup(Popup popup);
 }
