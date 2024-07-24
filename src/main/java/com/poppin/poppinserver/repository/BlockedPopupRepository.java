@@ -18,4 +18,6 @@ public interface BlockedPopupRepository extends JpaRepository<BlockedPopup, Long
     @Modifying
     @Query("DELETE FROM BlockedPopup bp WHERE bp.userId.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
+
+    void deleteAllByPopupId(Popup popup);
 }

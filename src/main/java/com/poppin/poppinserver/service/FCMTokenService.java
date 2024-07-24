@@ -36,32 +36,37 @@ public class FCMTokenService {
         log.info("apply token : {}" , requestDto.fcmToken());
 
         try {
-
             // 토큰 저장 여부 확인
             Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByDeviceId(requestDto.deviceId());
             Boolean isDuplicate = fcmTokenOptional.isPresent();
 
-            if (isDuplicate && !requestDto.fcmToken().equals(fcmTokenOptional)){
-
+            // 디바이스 ID와 토큰이 모두 동일한 경우
+            if (isDuplicate && requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
+                AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
+                if (alarmSetting == null) {
+                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
+                    alarmSettingRepository.save(alarmSetting);
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "create alarm setting." , "알람 세팅이 생성되었습니다.");
+                }
+                else {
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting." , "기존 알람 세팅이 존재합니다.");
+                }
+            }
+            else if (isDuplicate && !requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) { // 디바이스 ID는 동일하지만 토큰이 다른 경우
                 // fcm token refreshing
                 fcmTokenOptional.get().setToken(requestDto.fcmToken());
                 fcmTokenOptional.get().regenerateToken();
                 fcmTokenRepository.save(fcmTokenOptional.get());
 
                 // review token refreshing
-                List<Review> reviews = reviewRepository.findByToken(requestDto.fcmToken());
+                List<Review> reviews = reviewRepository.findAllByToken(fcmTokenOptional.get().getToken());
                 for (Review review : reviews){
                     review.setToken(requestDto.fcmToken());
                     reviewRepository.save(review);
                 }
 
                 return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated device id. update token." , "토큰 업데이트.");
-            }
-            else{
-                // 알림 전부 "1"로 저장
-                AlarmSetting alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1","1","1", "1");
-                alarmSettingRepository.save(alarmSetting);
-
+            } else {
                 // 토큰 저장
                 FCMToken FCMToken = new FCMToken(
                         requestDto.fcmToken(),
@@ -73,7 +78,7 @@ public class FCMTokenService {
                 fcmTokenRepository.save(FCMToken); // 토큰 저장
                 return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save succeed" , "토큰이 저장되었습니다.");
             }
-        }catch (Exception e){
+        } catch (Exception e){
             log.error("applying token failed {}", e.getMessage());
             return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail" , e.getMessage());
         }
@@ -152,3 +157,4 @@ public class FCMTokenService {
     }
 
 }
+
