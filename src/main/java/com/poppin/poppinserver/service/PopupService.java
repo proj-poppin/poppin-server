@@ -805,6 +805,16 @@ public class PopupService {
             throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
         }
 
+        // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
+        log.info("taste: " + taste);
+        if (taste.equals("0000000000000")) {
+            taste = "111";
+        }
+        log.info("prepered: " + prepered);
+        if (prepered.equals("00000000000000")) {
+            prepered = "11111111111111";
+        }
+
         // 팝업 형태 3개
         Boolean market = (taste.charAt(0) == '1') ? true : null;
         Boolean display = (taste.charAt(1) == '1') ? true : null;
