@@ -52,4 +52,6 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
     @Modifying
     @Query("DELETE FROM VisitorData vd WHERE vd.review.id = :reviewId")
     void deleteAllByReviewId(@Param("reviewId") Long reviewId);
+
+    void deleteAllByPopupId(Long popupId);
 }

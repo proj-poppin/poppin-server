@@ -67,6 +67,7 @@ public class PopupService {
     private final PrepardSearchUtil prepardSearchUtil;
     private final FCMScheduler fcmScheduler;
     private final PopupAlarmRepository popupAlarmRepository;
+    private final VisitorDataRepository visitorDataRepository;
 
 
     @Transactional
@@ -207,7 +208,6 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-
         // 실시간 방문자 수 관련 데이터
         log.info("delete visit data");
         visitRepository.deleteAllByPopup(popup);
@@ -218,6 +218,7 @@ public class PopupService {
         List<Review> reviews = reviewRepository.findByPopupId(popupId);
 
         for (Review review : reviews) {
+            visitorDataRepository.deleteAllByReviewId(review.getId());
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
             List<String> reviewUrls = reviewImages.stream()
                     .map(ReviewImage::getImageUrl)
