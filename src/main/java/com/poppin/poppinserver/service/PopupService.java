@@ -67,6 +67,7 @@ public class PopupService {
     private final PrepardSearchUtil prepardSearchUtil;
     private final FCMScheduler fcmScheduler;
     private final PopupAlarmRepository popupAlarmRepository;
+    private final VisitorDataRepository visitorDataRepository;
 
 
     @Transactional
@@ -207,10 +208,12 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-
         // 실시간 방문자 수 관련 데이터
         log.info("delete visit data");
         visitRepository.deleteAllByPopup(popup);
+
+        // 실시간 방문자수 데이터
+        visitorDataRepository.deleteAllByReviewId(popupId);
 
         // 후기 관련 데이터
         // 후기 이미지
