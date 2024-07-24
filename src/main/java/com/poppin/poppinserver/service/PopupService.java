@@ -212,15 +212,13 @@ public class PopupService {
         log.info("delete visit data");
         visitRepository.deleteAllByPopup(popup);
 
-        // 실시간 방문자수 데이터
-        visitorDataRepository.deleteAllByReviewId(popupId);
-
         // 후기 관련 데이터
         // 후기 이미지
         log.info("delete review image");
         List<Review> reviews = reviewRepository.findByPopupId(popupId);
 
         for (Review review : reviews) {
+            visitorDataRepository.deleteAllByReviewId(review.getId());
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
             List<String> reviewUrls = reviewImages.stream()
                     .map(ReviewImage::getImageUrl)
