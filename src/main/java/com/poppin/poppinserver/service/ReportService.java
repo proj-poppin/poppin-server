@@ -25,21 +25,6 @@ public class ReportService {
     private final ReportPopupRepository reportPopupRepository;
     private final PopupRepository popupRepository;
 
-//    public Review hideReview(Long userId, ReviewInfoDto reviewInfoDto){
-//
-//
-//        /*관리자 여부 체크 메서드도 필요*/
-//        /**/
-//
-//        Review review = reviewRepository.findById(reviewInfoDto.reviewId())
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
-//
-//        review.updateReviewInvisible();
-//
-//        return reviewRepository.save(review);
-//
-//    }
-
     public void createReviewReport(Long userId, Long reviewId, CreateReviewReportDto createReviewReportDto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -52,15 +37,6 @@ public class ReportService {
                 .reportContent(createReviewReportDto.content())
                 .isExecuted(false)
                 .build();
-
-//        User reviewAuthor = review.getUser();
-//        reviewAuthor.addReportCnt();
-//
-//        if (reviewAuthor.getReportedCnt() >= 3){
-//            reviewAuthor.requiresSpecialCare();
-//        }
-//
-//         userRepository.save(reviewAuthor);
         reportReviewRepository.save(reportReview);
     }
 

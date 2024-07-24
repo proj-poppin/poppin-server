@@ -344,13 +344,15 @@ public class AdminService {
         Review review = reviewRepository.findById(reportReview.getReviewId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
 
-        review.updateReviewInvisible();
+        User reviewAuthor = review.getUser();
+        if (review.getIsVisible() == true){ // 가려진 후기가 아닌 경우에만(즉 최초 신고 시에만) 신고 횟수 증가
+            reviewAuthor.addReportCnt();
+        }
+
+        review.updateReviewInvisible(); // 후기 가리고
         reviewRepository.save(review);
 
-        User reviewAuthor = review.getUser();
-        reviewAuthor.addReportCnt();
-
-        if (reviewAuthor.getReportedCnt() >= 3){
+        if (reviewAuthor.getReportedCnt() >= 3){    // 신고 횟수 3회 이상 시 특별 관리 대상으로 변경
             reviewAuthor.requiresSpecialCare();
         }
         userRepository.save(reviewAuthor);
