@@ -22,11 +22,11 @@ public class ReviewImage {
     private Long id;
 
     @ManyToOne(fetch  = FetchType.LAZY)
-    @JoinColumn(name="review_id" , referencedColumnName = "id",nullable = false)
+    @JoinColumn(name="review_id", referencedColumnName = "id", nullable = false)
     private Review review;
 
     @Column(name = "image_url")
-    private  String imageUrl;
+    private String imageUrl;
 
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt;

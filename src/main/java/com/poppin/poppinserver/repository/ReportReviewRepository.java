@@ -18,4 +18,8 @@ public interface ReportReviewRepository extends JpaRepository<ReportReview, Long
     @Modifying
     @Query("DELETE FROM ReportReview r WHERE r.reporterId.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query("DELETE FROM ReportReview r WHERE r.reviewId.id = :reviewId")
+    void deleteAllByReviewId(Long reviewId);
 }
