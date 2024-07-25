@@ -422,17 +422,22 @@ public class UserService {
             // S3에서 삭제
             for (ReviewImage reviewImage : reviewImages) {
                 s3Service.deleteImage(reviewImage.getImageUrl());
+                log.info("Deleting image from S3: {}", reviewImage.getImageUrl());
             }
             // DB에서 삭제
             reviewImageRepository.deleteAllByReviewId(reviewId);
+            log.info("Deleting review images from DB for reviewId: {}", reviewId);
             // 방문자 데이터 삭제
             deleteUserVisitData(reviewId);
             // 후기 추천 삭제
             deleteReviewRecommend(reviewId);
+            // 후기 신고 삭제
+            reportReviewRepository.deleteAllByReviewId(reviewId);
         }
 
         // 모든 후기 삭제
         reviewRepository.deleteAllByUserId(userId);
+        log.info("Finished deleting reviews for userId: {}", userId);
     }
 
     /*
