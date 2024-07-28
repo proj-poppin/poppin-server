@@ -7,6 +7,6 @@ public record UserMypageDto(
         String nickname,
         String userImageUrl,
         Long writtenReview,
-        Long reviewCnt
+        Long visitedPopupCnt
 ) {
 }
