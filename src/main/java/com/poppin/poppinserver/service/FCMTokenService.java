@@ -39,7 +39,6 @@ public class FCMTokenService {
             // 토큰 저장 여부 확인
             Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByDeviceId(requestDto.deviceId());
             Boolean isDuplicate = fcmTokenOptional.isPresent();
-
             // 디바이스 ID와 토큰이 모두 동일한 경우
             if (isDuplicate && requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
                 AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
@@ -89,6 +88,7 @@ public class FCMTokenService {
                 }
 
             } else {    // device id가 다를 때
+                log.info("----------new device id----------");
                 // 새로운 토큰 저장
                 FCMToken FCMToken = new FCMToken(
                         requestDto.fcmToken(),
