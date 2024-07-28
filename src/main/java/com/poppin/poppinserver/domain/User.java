@@ -74,8 +74,8 @@ public class User {
     @Column(name = "review_cnt", nullable = false)
     private Long reviewCnt;
 
-    @Column(name = "certified_review")
-    private Long certifiedReview;
+    @Column(name = "visited_popup_cnt", nullable = false)
+    private Long visitedPopupCnt;
 
     @Column(name = "require_special_care", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean requiresSpecialCare;
@@ -119,7 +119,7 @@ public class User {
         this.profileImageUrl = null;
         this.requiresSpecialCare = false;
         this.reviewCnt = 0L;
-        this.certifiedReview = 0L;
+        this.visitedPopupCnt = 0L;
         this.reportedCnt = 0L;
     }
 
@@ -212,5 +212,9 @@ public class User {
 
     public void addReviewCnt(){
         this.reviewCnt++;
+    }
+
+    public void addVisitedPopupCnt(){
+        this.visitedPopupCnt++;
     }
 }

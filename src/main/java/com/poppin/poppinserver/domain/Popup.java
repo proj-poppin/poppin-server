@@ -34,7 +34,7 @@ public class Popup {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "introduce")
+    @Column(name = "introduce", length = 3000)
     private String introduce;
 
     @Column(name = "address")
