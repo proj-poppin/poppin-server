@@ -448,6 +448,12 @@ public class ModifyInfoService {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
+        // 입장료 유무 false일 경우, 입장료 무료
+        String entranceFee = updateModifyInfoDto.entranceFee();
+        if (!updateModifyInfoDto.entranceRequired()) {
+            entranceFee = "무료";
+        }
+
         // 기존 팝업 업데이트
         originPopup.update(
                 updateModifyInfoDto.homepageLink(),
@@ -456,7 +462,7 @@ public class ModifyInfoService {
                 updateModifyInfoDto.address(),
                 updateModifyInfoDto.addressDetail(),
                 updateModifyInfoDto.entranceRequired(),
-                updateModifyInfoDto.entranceFee(),
+                entranceFee,
                 updateModifyInfoDto.resvRequired(),
                 updateModifyInfoDto.availableAge(),
                 updateModifyInfoDto.parkingAvailable(),
