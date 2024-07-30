@@ -420,6 +420,12 @@ public class ManagerInformService {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
+        // 입장료 유무 false일 경우, 입장료 무료
+        String entranceFee = updateManagerInfromDto.entranceFee();
+        if (!updateManagerInfromDto.entranceRequired()) {
+            entranceFee = "무료";
+        }
+
         popup.update(
                 updateManagerInfromDto.homepageLink(),
                 updateManagerInfromDto.name(),
@@ -427,7 +433,7 @@ public class ManagerInformService {
                 updateManagerInfromDto.address(),
                 updateManagerInfromDto.addressDetail(),
                 updateManagerInfromDto.entranceRequired(),
-                updateManagerInfromDto.entranceFee(),
+                entranceFee,
                 updateManagerInfromDto.resvRequired(),
                 updateManagerInfromDto.availableAge(),
                 updateManagerInfromDto.parkingAvailable(),

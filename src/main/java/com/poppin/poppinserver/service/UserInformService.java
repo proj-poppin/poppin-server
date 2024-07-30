@@ -384,6 +384,12 @@ public class UserInformService {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
+        // 입장료 유무 false일 경우, 입장료 무료
+        String entranceFee = updateUserInfromDto.entranceFee();
+        if (!updateUserInfromDto.entranceRequired()) {
+            entranceFee = "무료";
+        }
+
         popup.update(
                 updateUserInfromDto.homepageLink(),
                 updateUserInfromDto.name(),
@@ -391,7 +397,7 @@ public class UserInformService {
                 updateUserInfromDto.address(),
                 updateUserInfromDto.addressDetail(),
                 updateUserInfromDto.entranceRequired(),
-                updateUserInfromDto.entranceFee(),
+                entranceFee,
                 updateUserInfromDto.resvRequired(),
                 updateUserInfromDto.availableAge(),
                 updateUserInfromDto.parkingAvailable(),

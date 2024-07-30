@@ -122,6 +122,12 @@ public class PopupService {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
+        // 입장료 유무 false일 경우, 입장료 무료
+        String entranceFee = createPopupDto.entranceFee();
+        if (!createPopupDto.entranceRequired()) {
+            entranceFee = "무료";
+        }
+
         // 팝업 스토어 정보 저장
         Popup popup = Popup.builder()
                 .homepageLink(createPopupDto.homepageLink())
@@ -130,7 +136,7 @@ public class PopupService {
                 .closeDate(createPopupDto.closeDate())
                 .closeTime(createPopupDto.closeTime())
                 .entranceRequired(createPopupDto.entranceRequired())
-                .entranceFee(createPopupDto.entranceFee())
+                .entranceFee(entranceFee)
                 .resvRequired(createPopupDto.resvRequired())
                 .introduce(createPopupDto.introduce())
                 .address(createPopupDto.address())
@@ -379,6 +385,12 @@ public class PopupService {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
+        // 입장료 유무 false일 경우, 입장료 무료
+        String entranceFee = updatePopupDto.entranceFee();
+        if (!updatePopupDto.entranceRequired()) {
+            entranceFee = "무료";
+        }
+
         popup.update(
                 updatePopupDto.homepageLink(),
                 updatePopupDto.name(),
@@ -386,7 +398,7 @@ public class PopupService {
                 updatePopupDto.address(),
                 updatePopupDto.addressDetail(),
                 updatePopupDto.entranceRequired(),
-                updatePopupDto.entranceFee(),
+                entranceFee,
                 updatePopupDto.resvRequired(),
                 updatePopupDto.availableAge(),
                 updatePopupDto.parkingAvailable(),
