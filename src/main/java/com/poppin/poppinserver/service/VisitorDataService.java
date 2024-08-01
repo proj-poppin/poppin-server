@@ -4,7 +4,7 @@ import com.poppin.poppinserver.type.ESatisfaction;
 import com.poppin.poppinserver.type.EVisitDate;
 import com.poppin.poppinserver.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.repository.VisitorDataRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

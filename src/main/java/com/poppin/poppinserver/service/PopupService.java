@@ -19,7 +19,7 @@ import com.poppin.poppinserver.specification.PopupSpecification;
 import com.poppin.poppinserver.type.*;
 import com.poppin.poppinserver.util.PrepardSearchUtil;
 import com.poppin.poppinserver.util.SelectRandomUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
