@@ -3,7 +3,7 @@ package com.poppin.poppinserver.scheduler;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.repository.UserRepository;
 import com.poppin.poppinserver.service.UserService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

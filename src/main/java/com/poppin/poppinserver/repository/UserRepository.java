@@ -3,7 +3,7 @@ package com.poppin.poppinserver.repository;
 import com.poppin.poppinserver.domain.User;
 import com.poppin.poppinserver.type.ELoginProvider;
 import com.poppin.poppinserver.type.EUserRole;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

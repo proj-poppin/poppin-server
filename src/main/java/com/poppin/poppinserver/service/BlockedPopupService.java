@@ -4,7 +4,6 @@ import com.poppin.poppinserver.domain.BlockedPopup;
 import com.poppin.poppinserver.domain.Interest;
 import com.poppin.poppinserver.domain.Popup;
 import com.poppin.poppinserver.domain.User;
-import com.poppin.poppinserver.dto.blockedPopup.request.CreateBlockedPopup;
 import com.poppin.poppinserver.dto.blockedPopup.response.BlockedPopupDto;
 import com.poppin.poppinserver.exception.CommonException;
 import com.poppin.poppinserver.exception.ErrorCode;
