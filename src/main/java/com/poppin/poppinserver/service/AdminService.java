@@ -203,7 +203,7 @@ public class AdminService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponseDto readReviewReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
@@ -222,7 +222,7 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedReviewListResponseDtos, pageInfoDto);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponseDto readPopupReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
@@ -241,7 +241,7 @@ public class AdminService {
         return PagingResponseDto.fromEntityAndPageInfo(reportedPopupListResponseDtos, pageInfoDto);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReportedPopupInfoDto readPopupReportDetail(Long reportId) {
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -276,7 +276,7 @@ public class AdminService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReportedReviewInfoDto readReviewReportDetail(Long reportId) {
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -424,7 +424,7 @@ public class AdminService {
         reportReviewRepository.save(reportReview);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReportExecContentResponseDto readPopupReportExecContent(Long reportId) {
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP_REPORT));
@@ -436,7 +436,7 @@ public class AdminService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReportExecContentResponseDto readReviewReportExecContent(Long reportId) {
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW_REPORT));
