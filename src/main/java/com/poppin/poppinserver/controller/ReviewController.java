@@ -27,7 +27,7 @@ public class ReviewController {
     public ResponseDto<?> imageTest(
             @RequestPart(value = "images" ) List<MultipartFile> images)
     {
-        if (!images.isEmpty()){return ResponseDto.ok("이미지 전달 완료");}
+        if (!images.isEmpty()){return ResponseDto.ok("이미지 전달 성공");}
         else return ResponseDto.ok("이미지 전달 실패");
     }
 
