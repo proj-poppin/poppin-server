@@ -1,0 +1,58 @@
+language: java
+jdk:
+  - openjdk17
+
+brances:
+  only:
+    - dev
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script:
+  - "./gradlew clean build"
+  - travis_wait 30
+
+before_deploy:
+  - mkdir -p before-deploy # zip에 포함시킬 파일들을 담을 디렉토리 생성
+  - cp scripts/*.sh before-deploy/     # *.sh 파일 디렉토리 안으로 복사
+  - cp appspec.yml before-deploy/      # appsepc.yml 파일 디렉토리 안으로 복사
+  - cp build/libs/*.jar before-deploy/ # jar 파일 디렉토리 안으로 복사
+  - cd before-deploy && zip -r before-deploy * # before-deploy로 이동후 디렉토리 내부에 있는 파일들 전체 압축
+  - cd ../ && mkdir -p deploy # 상위 디렉토리로 이동후 deploy 디렉토리 생성
+  - mv before-deploy/before-deploy.zip deploy/Poppin_CI-CD.zip  # before-deploy 내부 파일들을 압축한 zip을 deploy 내부에 SpringBoot_CI-CD.zip 이라는 이름으로 옮기기
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY                  # Travis CI 에서 IAM 사용자 엑세스 키
+
+    secret_access_key: $AWS_SECRET_KEY              # Travis CI 에서 IAM 사용자 비밀 엑세스 키
+
+    bucket: poppin-deploy-bucket                    # S3 Bucket 이름
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private                                    # 다른 사람이 다운 받지 못하도록 private
+    local_dir: deploy                               # S3로 올리고자 하는 디렉토리
+    wait-until-deployed: true
+
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY                  # Travis CI 에서 IAM 사용자 엑세스 키
+
+    secret_access_key: $AWS_SECRET_KEY              # Travis CI 에서 IAM 사용자 비밀 엑세스 키
+
+    bucket: poppin-deploy-bucket                    # S3 Bucket 이름
+    key: Poppin_CI-CD.zip                           # Bucket 내부에 존재하는 zip 이름
+    bundle_type: zip
+    application: poppin-prod-bgdeploy-cd            # CodeDeploy 애플리케이션 이름
+
+    deployment_group: poppin-prod-bgdeploy-dg       # CodeDeploy 배포 그룹 이름
+
+    region: ap-northeast-2
+    wait-until-deployed: true
+
+notification:
+  email:
+    recipients:
+      - dev.gsandoo@gmail.com
