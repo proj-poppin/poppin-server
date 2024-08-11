@@ -40,12 +40,12 @@ jobs:
       - name: Start SSH Tunnel(dev)
         if: github.ref == 'refs/heads/dev'
         run: |
-          ssh -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_DEV_PORT }}:${{ secrets.RDS_DEV_HOST }}:${{ secrets.RDS_DEV_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
+          ssh -v -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_DEV_PORT }}:${{ secrets.RDS_DEV_HOST }}:${{ secrets.RDS_DEV_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
 
       - name: Start SSH Tunnel(prd)
         if: github.ref == 'refs/heads/prd'
         run: |
-          ssh -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_PORT }}:${{ secrets.RDS_HOST }}:${{ secrets.RDS_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
+          ssh -v -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_PORT }}:${{ secrets.RDS_HOST }}:${{ secrets.RDS_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
