@@ -1,18 +1,21 @@
 version: 0.0
 os: linux
+
 files:
-  - source: /    # 프로젝트 전체를 의미
-    destination: /service/tomcat/deploy   # Ubuntu 사용자 디렉토리에 파일을 옮기겠다는 뜻
-    overwrite: yes
+  - source: /
+    destination: /service/tomcat
+    overwrite: true
 
 permissions:
-  - object: /
-    pattern: "**"
+  - object: /service/tomcat
+    pattern: '**'
     owner: ubuntu
     group: ubuntu
 
 hooks:
-  ApplicationStart:
-    - location: deploy.sh  # ApplicationStart 에서 deploy.sh를 실행합니다.
-      timeout: 60
-      runas: root
+  BeforeInstall:
+    - location: scripts/before-deploy.sh
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/after-deploy.sh
+      runas: ubuntu

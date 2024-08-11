@@ -1,0 +1,124 @@
+name: CI/CD (Blue-Green Deployment)
+
+on:
+  push:
+    branches:
+      - dev
+      - prd
+  pull_request:
+    branches:
+      - dev
+      - prd
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEV_PROPERTIES: ${{ secrets.AWS_DEV_PROPERTIES }}
+  AWS_PRD_PROPERTIES: ${{ secrets.AWS_PRD_PROPERTIES }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  FIREBASE_KEY_JSON: ${{ secrets.FIREBASE_KEY }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BASTION_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} "exit"
+
+      - name: Start SSH Tunnel
+        run: |
+          ssh -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_PORT }}:${{ secrets.RDS_HOST }}:${{ secrets.RDS_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Create firebase directory
+        run: mkdir -p src/main/resources/firebase
+
+      - name: Add firebase_key.json
+        run: echo "$FIREBASE_KEY_JSON" > src/main/resources/firebase/firebase_key.json
+
+      - name: Add application-dev.yml
+        if: github.ref == 'refs/heads/dev'
+        run: echo "$AWS_DEV_PROPERTIES" > src/main/resources/application.yml
+
+      - name: Add application-prd.yml
+        if: github.ref == 'refs/heads/prd'
+        run: echo "$AWS_PRD_PROPERTIES" > src/main/resources/application.yml
+
+      - name: Clean Gradle cache
+        run: rm -rf ~/.gradle/caches/
+
+      - name: Clean build directory
+        run: ./gradlew clean
+
+      - name: Build with Gradle
+        run: ./gradlew build --warning-mode all
+
+      - name: List files in build directory
+        run: |
+          echo "Root directory:"
+          ls -al
+          echo "Build directory:"
+          ls -al build
+          echo "Libs directory:"
+          ls -al build/libs
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload JAR to S3 (dev)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          ZIP_FILE="deploy-${{ github.sha }}.zip"
+          zip -r $ZIP_FILE build/libs/poppin-server-0.0.1-SNAPSHOT.jar appspec.yml scripts/
+          aws s3 cp $ZIP_FILE s3://${{ secrets.AWS_S3_DEV_BUCKET_NAME }}/$ZIP_FILE
+
+      - name: Upload JAR to S3 (prd)
+        if: github.ref == 'refs/heads/prd'
+        run: |
+          ZIP_FILE="deploy-${{ github.sha }}.zip"
+          zip -r $ZIP_FILE build/libs/poppin-server-0.0.1-SNAPSHOT.jar appspec.yml scripts/
+          aws s3 cp $ZIP_FILE s3://${{ secrets.AWS_S3_BUCKET_NAME }}/$ZIP_FILE
+
+      - name: Verify ZIP contents
+        run: |
+          ZIP_FILE="deploy-${{ github.sha }}.zip"
+          unzip -l $ZIP_FILE
+
+      - name: Trigger CodeDeploy (dev)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          aws deploy create-deployment \
+          --application-name ${{ secrets.AWS_CODEDEPLOY_DEV_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_DEV_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=${{ secrets.AWS_S3_DEV_BUCKET_NAME }},bundleType=zip,key=deploy-${{ github.sha }}.zip
+
+      - name: Trigger CodeDeploy (prd)
+        if: github.ref == 'refs/heads/prd'
+        run: |
+          aws deploy create-deployment \
+          --application-name ${{ secrets.AWS_CODEDEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=${{ secrets.AWS_S3_BUCKET_NAME }},bundleType=zip,key=deploy-${{ github.sha }}.zip
