@@ -37,7 +37,13 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} "exit"
 
-      - name: Start SSH Tunnel
+      - name: Start SSH Tunnel(dev)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          ssh -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_DEV_PORT }}:${{ secrets.RDS_DEV_HOST }}:${{ secrets.RDS_DEV_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
+
+      - name: Start SSH Tunnel(prd)
+        if: github.ref == 'refs/heads/prd'
         run: |
           ssh -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_PORT }}:${{ secrets.RDS_HOST }}:${{ secrets.RDS_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
 
