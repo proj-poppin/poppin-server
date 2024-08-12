@@ -1,4 +1,4 @@
-name: CI/CD (Blue-Green Deployment)
+name: CI/CD Script
 
 on:
   push:
