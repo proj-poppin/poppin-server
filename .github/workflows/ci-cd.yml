@@ -1,4 +1,4 @@
-name: CI/CD Script
+name: Poppin proj. CI/CD Script
 
 on:
   push:
