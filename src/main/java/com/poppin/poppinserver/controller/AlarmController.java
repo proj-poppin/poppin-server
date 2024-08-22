@@ -6,6 +6,7 @@ import com.poppin.poppinserver.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.dto.common.ResponseDto;
+import com.poppin.poppinserver.service.AlarmKeywordService;
 import com.poppin.poppinserver.service.AlarmListService;
 import com.poppin.poppinserver.service.AlarmService;
 import com.poppin.poppinserver.service.AlarmSettingService;
@@ -26,6 +27,7 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final AlarmListService alarmListService;
     private final AlarmSettingService alarmSettingService;
+    private final AlarmKeywordService alarmKeywordService;
 
     // 알림 안읽은 것 여부
     @PostMapping("/unread")
@@ -72,5 +74,14 @@ public class AlarmController {
     public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
         return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
     }
+
+    // 마이페이지 > 키워드 알람 > 키워드 조회
+    @GetMapping("/keyword")
+    public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {
+        return ResponseDto.ok(alarmKeywordService.readAlarmKeywords(userId));
+    }
+
+
+
 
 }
