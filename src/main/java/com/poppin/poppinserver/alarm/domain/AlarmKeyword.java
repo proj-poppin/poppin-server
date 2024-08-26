@@ -34,4 +34,12 @@ public class AlarmKeyword {
         this.keyword = keyword;
         this.isOn = true;
     }
+
+    public void setAlarmStatus(Boolean isOn) {
+        if (isOn) {
+            this.isOn = true;
+        } else {
+            this.isOn = false;
+        }
+    }
 }
