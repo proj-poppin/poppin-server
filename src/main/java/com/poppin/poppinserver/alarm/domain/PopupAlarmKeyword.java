@@ -12,8 +12,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "alarm_keyword")
-public class AlarmKeyword {
+@Table(name = "popup_alarm_keyword")
+public class PopupAlarmKeyword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,7 +27,7 @@ public class AlarmKeyword {
     private String keyword; // 재오픈 알람 키워드
 
     @Builder
-    public AlarmKeyword(Popup popupId, String keyword) {
+    public PopupAlarmKeyword(Popup popupId, String keyword) {
         this.popupId = popupId;
         this.keyword = keyword;
     }

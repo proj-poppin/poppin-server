@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.popup.dto.popup.response;
 
-import com.poppin.poppinserver.alarm.domain.AlarmKeyword;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import lombok.Builder;
@@ -76,8 +76,8 @@ public record PopupDto(
         }
 
         List<String> keywordList = new ArrayList<>();
-        for(AlarmKeyword alarmKeyword : popup.getAlarmKeywords()){
-            keywordList.add(alarmKeyword.getKeyword());
+        for(PopupAlarmKeyword popupAlarmKeyword : popup.getPopupAlarmKeywords()){
+            keywordList.add(popupAlarmKeyword.getKeyword());
         }
 
         String availableAge = null;

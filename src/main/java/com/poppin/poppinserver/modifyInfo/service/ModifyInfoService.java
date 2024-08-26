@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.modifyInfo.service;
 
-import com.poppin.poppinserver.alarm.domain.AlarmKeyword;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
@@ -140,13 +140,13 @@ public class ModifyInfoService {
 
 
         // 프록시 알람키워드 생성
-        List<AlarmKeyword> alarmKeywords = alarmKeywordRepository.findByPopupId(popup);
+        List<PopupAlarmKeyword> popupAlarmKeywords = alarmKeywordRepository.findByPopupId(popup);
 
-        List<AlarmKeyword> proxyKeywords = new ArrayList<>();
-        for (AlarmKeyword alarmKeyword : alarmKeywords) {
-            AlarmKeyword proxyKeyword = AlarmKeyword.builder()
+        List<PopupAlarmKeyword> proxyKeywords = new ArrayList<>();
+        for (PopupAlarmKeyword popupAlarmKeyword : popupAlarmKeywords) {
+            PopupAlarmKeyword proxyKeyword = PopupAlarmKeyword.builder()
                     .popupId(proxyPopup)
-                    .keyword(alarmKeyword.getKeyword())
+                    .keyword(popupAlarmKeyword.getKeyword())
                     .build();
         }
         alarmKeywordRepository.saveAll(proxyKeywords);
@@ -314,16 +314,16 @@ public class ModifyInfoService {
         }
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
-        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateModifyInfoDto.keywords()){
-            alarmKeywords.add(AlarmKeyword.builder()
+            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(alarmKeywords);
+        alarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         popup.update(
                 updateModifyInfoDto.homepageLink(),
@@ -433,16 +433,16 @@ public class ModifyInfoService {
         }
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(originPopup.getAlarmKeywords());
+        alarmKeywordRepository.deleteAll(originPopup.getPopupAlarmKeywords());
 
-        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateModifyInfoDto.keywords()){
-            alarmKeywords.add(AlarmKeyword.builder()
+            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(originPopup)
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(alarmKeywords);
+        alarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         // 프록시 키워드 삭제
         alarmKeywordRepository.deleteAllByPopupId(proxyPopup);

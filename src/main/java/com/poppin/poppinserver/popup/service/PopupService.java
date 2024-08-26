@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.alarm.domain.AlarmKeyword;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
@@ -388,16 +388,16 @@ public class PopupService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
-        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updatePopupDto.keywords()){
-            alarmKeywords.add(AlarmKeyword.builder()
+            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(alarmKeywords);
+        alarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         //날짜 요청 유효성 검증
         if (updatePopupDto.openDate().isAfter(updatePopupDto.closeDate())) {
