@@ -3,6 +3,7 @@ package com.poppin.poppinserver.alarm.domain;
 import com.poppin.poppinserver.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -29,6 +30,7 @@ public class UserAlarmKeyword {
     @Column(name = "keyword", nullable = false)
     private List<AlarmKeyword> keywords = new ArrayList<>(); // 재오픈 알람 키워드
 
+    @Builder
     public UserAlarmKeyword(User userId, List<String> keywordList) {
         this.userId = userId;
         for (String keyword : keywordList) {

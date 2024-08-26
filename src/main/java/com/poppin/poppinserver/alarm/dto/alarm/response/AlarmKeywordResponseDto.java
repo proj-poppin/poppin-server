@@ -4,6 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record AlarmKeywordResponseDto(
-        String keyword
+        Long keywordId,
+        String keyword,
+        boolean isOn
 ) {
 }

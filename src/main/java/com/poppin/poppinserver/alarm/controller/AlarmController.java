@@ -15,9 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
 
-
-
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -76,12 +73,9 @@ public class AlarmController {
     }
 
     // 마이페이지 > 키워드 알람 > 키워드 조회
-//    @GetMapping("/keyword")
-//    public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {
-//        return ResponseDto.ok(alarmKeywordService.readAlarmKeywords(userId));
-//    }
-
-
-
+    @GetMapping("/keywords")
+    public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {
+        return ResponseDto.ok(alarmKeywordService.readAlarmKeywords(userId));
+    }
 
 }
