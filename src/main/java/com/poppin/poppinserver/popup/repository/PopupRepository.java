@@ -213,7 +213,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
      */
     // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
     @Query("SELECT p FROM Popup p " +
-            "JOIN AlarmKeyword al ON p.id = al.popupId.id " +
+            "JOIN PopupAlarmKeyword al ON p.id = al.popupId.id " +
             "WHERE p.openDate >= :nowDate " +
             "AND EXISTS (SELECT 1 FROM ReopenDemand rod WHERE p.id = rod.popup.id)")
     List<Popup> findReopenPopupWithDemand(LocalDate nowDate);

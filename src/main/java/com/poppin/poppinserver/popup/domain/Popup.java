@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.popup.domain;
 
-import com.poppin.poppinserver.alarm.domain.AlarmKeyword;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.core.type.EAvailableAge;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.user.domain.User;
@@ -119,7 +119,7 @@ public class Popup {
     private Set<PosterImage> posterImages = new HashSet<>();
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
-    private Set<AlarmKeyword> alarmKeywords = new HashSet<>();
+    private Set<PopupAlarmKeyword> popupAlarmKeywords = new HashSet<>();
 
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,

@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.inform.service;
 
-import com.poppin.poppinserver.alarm.domain.AlarmKeyword;
-import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
@@ -50,7 +50,7 @@ public class ManagerInformService {
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
-    private final AlarmKeywordRepository alarmKeywordRepository;
+    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
@@ -294,16 +294,16 @@ public class ManagerInformService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
-        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateManagerInfromDto.keywords()){
-            alarmKeywords.add(AlarmKeyword.builder()
+            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(alarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         popup.update(
                 updateManagerInfromDto.homepageLink(),
@@ -404,16 +404,16 @@ public class ManagerInformService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
-        List<AlarmKeyword> alarmKeywords = new ArrayList<>();
+        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateManagerInfromDto.keywords()){
-            alarmKeywords.add(AlarmKeyword.builder()
+            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(alarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         //날짜 요청 유효성 검증
         if (updateManagerInfromDto.openDate().isAfter(updateManagerInfromDto.closeDate())) {

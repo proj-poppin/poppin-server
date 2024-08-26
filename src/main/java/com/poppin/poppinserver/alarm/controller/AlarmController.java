@@ -1,22 +1,19 @@
 package com.poppin.poppinserver.alarm.controller;
 
-import com.poppin.poppinserver.core.annotation.UserId;
+import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
-import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.alarm.service.AlarmKeywordService;
 import com.poppin.poppinserver.alarm.service.AlarmListService;
 import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.alarm.service.AlarmSettingService;
+import com.poppin.poppinserver.core.annotation.UserId;
+import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.web.bind.annotation.*;
-
-
-
 
 @RestController
 @Slf4j
@@ -76,12 +73,22 @@ public class AlarmController {
     }
 
     // 마이페이지 > 키워드 알람 > 키워드 조회
-//    @GetMapping("/keyword")
-//    public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {
-//        return ResponseDto.ok(alarmKeywordService.readAlarmKeywords(userId));
-//    }
+    @GetMapping("/keywords")
+    public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {
+        return ResponseDto.ok(alarmKeywordService.readAlarmKeywords(userId));
+    }
 
+    // 마이페이지 > 키워드 알람 > 키워드 등록
+    @PostMapping("/keywords")
+    public ResponseDto<?> createAlarmKeyword(@UserId Long userId, @RequestBody AlarmKeywordRequestDto alarmKeywordRequestDto) {
+        return ResponseDto.ok(alarmKeywordService.createAlarmKeyword(userId, alarmKeywordRequestDto));
+    }
 
-
+    // 마이페이지 > 키워드 알람 > 키워드 삭제
+    @PostMapping("/keywords/{keywordId}")
+    public ResponseDto<?> createAlarmKeyword(@UserId Long userId, @PathVariable(name = "keywordId") Long keywordId) {
+        alarmKeywordService.deleteAlarmKeyword(userId, keywordId);
+        return ResponseDto.ok("알람 키워드가 삭제되었습니다.");
+    }
 
 }
