@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.inform.service;
 
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
-import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
@@ -48,7 +48,7 @@ public class UserInformService {
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
-    private final AlarmKeywordRepository alarmKeywordRepository;
+    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
@@ -265,7 +265,7 @@ public class UserInformService {
         popup.updatePosterUrl(newUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateUserInfromDto.keywords()){
@@ -274,7 +274,7 @@ public class UserInformService {
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(popupAlarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         popup.update(
                 updateUserInfromDto.homepageLink(),
@@ -368,7 +368,7 @@ public class UserInformService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateUserInfromDto.keywords()){
@@ -377,7 +377,7 @@ public class UserInformService {
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(popupAlarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         //날짜 요청 유효성 검증
         if (updateUserInfromDto.openDate().isAfter(updateUserInfromDto.closeDate())) {

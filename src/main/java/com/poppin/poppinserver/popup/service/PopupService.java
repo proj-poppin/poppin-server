@@ -3,7 +3,7 @@ package com.poppin.poppinserver.popup.service;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
-import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
@@ -78,7 +78,7 @@ public class PopupService {
     private final InterestRepository interestRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
-    private final AlarmKeywordRepository alarmKeywordRepository;
+    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitRepository visitRepository;
     private final ManagerInformRepository managerInformRepository;
@@ -302,7 +302,7 @@ public class PopupService {
 
         // 알람 키워드
         log.info("delete alarm data");
-        alarmKeywordRepository.deleteAllByPopupId(popup);
+        popupAlarmKeywordRepository.deleteAllByPopupId(popup);
 
         // 팝업 이미지
         log.info("delete popup image");
@@ -388,7 +388,7 @@ public class PopupService {
         popup.updatePosterUrl(fileUrls.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updatePopupDto.keywords()){
@@ -397,7 +397,7 @@ public class PopupService {
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(popupAlarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         //날짜 요청 유효성 검증
         if (updatePopupDto.openDate().isAfter(updatePopupDto.closeDate())) {

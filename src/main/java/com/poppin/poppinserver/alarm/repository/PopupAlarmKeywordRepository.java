@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface AlarmKeywordRepository extends JpaRepository<PopupAlarmKeyword, Long> {
+public interface PopupAlarmKeywordRepository extends JpaRepository<PopupAlarmKeyword, Long> {
     List<PopupAlarmKeyword> findByPopupId(Popup popupId);
 
     void deleteAllByPopupId(Popup popupId);

@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.modifyInfo.service;
 
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
-import com.poppin.poppinserver.alarm.repository.AlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
@@ -53,7 +53,7 @@ public class ModifyInfoService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
-    private final AlarmKeywordRepository alarmKeywordRepository;
+    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
 
@@ -140,7 +140,7 @@ public class ModifyInfoService {
 
 
         // 프록시 알람키워드 생성
-        List<PopupAlarmKeyword> popupAlarmKeywords = alarmKeywordRepository.findByPopupId(popup);
+        List<PopupAlarmKeyword> popupAlarmKeywords = popupAlarmKeywordRepository.findByPopupId(popup);
 
         List<PopupAlarmKeyword> proxyKeywords = new ArrayList<>();
         for (PopupAlarmKeyword popupAlarmKeyword : popupAlarmKeywords) {
@@ -149,7 +149,7 @@ public class ModifyInfoService {
                     .keyword(popupAlarmKeyword.getKeyword())
                     .build();
         }
-        alarmKeywordRepository.saveAll(proxyKeywords);
+        popupAlarmKeywordRepository.saveAll(proxyKeywords);
 
         // 정보수정요청 객체 저장
         ModifyInfo modifyInfo = ModifyInfo.builder()
@@ -314,7 +314,7 @@ public class ModifyInfoService {
         }
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateModifyInfoDto.keywords()){
@@ -323,7 +323,7 @@ public class ModifyInfoService {
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(popupAlarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         popup.update(
                 updateModifyInfoDto.homepageLink(),
@@ -433,7 +433,7 @@ public class ModifyInfoService {
         }
 
         // 기존 키워드 삭제 및 다시 저장
-        alarmKeywordRepository.deleteAll(originPopup.getPopupAlarmKeywords());
+        popupAlarmKeywordRepository.deleteAll(originPopup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
         for(String keyword : updateModifyInfoDto.keywords()){
@@ -442,10 +442,10 @@ public class ModifyInfoService {
                     .keyword(keyword)
                     .build());
         }
-        alarmKeywordRepository.saveAll(popupAlarmKeywords);
+        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         // 프록시 키워드 삭제
-        alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
+        popupAlarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
         //날짜 요청 유효성 검증
         if (updateModifyInfoDto.openDate().isAfter(updateModifyInfoDto.closeDate())) {
@@ -534,7 +534,7 @@ public class ModifyInfoService {
             }
 
                 // proxy popup 알람 키워드 삭제
-            alarmKeywordRepository.deleteAllByPopupId(proxyPopup);
+            popupAlarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
                 // proxy popup 삭제
             log.info("delete proxy popup");
