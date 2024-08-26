@@ -84,4 +84,11 @@ public class AlarmController {
         return ResponseDto.ok(alarmKeywordService.createAlarmKeyword(userId, alarmKeywordRequestDto));
     }
 
+    // 마이페이지 > 키워드 알람 > 키워드 삭제
+    @PostMapping("/keywords/{keywordId}")
+    public ResponseDto<?> createAlarmKeyword(@UserId Long userId, @PathVariable(name = "keywordId") Long keywordId) {
+        alarmKeywordService.deleteAlarmKeyword(userId, keywordId);
+        return ResponseDto.ok("알람 키워드가 삭제되었습니다.");
+    }
+
 }

@@ -38,6 +38,7 @@ public enum ErrorCode {
     CANNOT_BLOCK_MYSELF("40027", HttpStatus.BAD_REQUEST, "자신을 차단할 수 없습니다."),
     ALREADY_BLOCKED_USER("40028", HttpStatus.BAD_REQUEST, "이미 차단된 사용자입니다."),
     DUPLICATED_ALARM_KEYWORD("40029", HttpStatus.BAD_REQUEST, "이미 등록된 알람 키워드입니다."),
+    NOT_FOUND_ALARM_KEYWORD("40030", HttpStatus.BAD_REQUEST, "존재하지 않는 알람 키워드입니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
