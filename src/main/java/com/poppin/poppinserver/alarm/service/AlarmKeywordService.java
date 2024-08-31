@@ -28,7 +28,7 @@ public class AlarmKeywordService {
 
     @Transactional(readOnly = true)
     public List<AlarmKeywordResponseDto> readAlarmKeywords(Long userId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         List<AlarmKeyword> alarmKeywordList = userAlarmKeywordRepository.findByUserId(user)
                 .orElseGet(() -> {
@@ -45,7 +45,7 @@ public class AlarmKeywordService {
 
     @Transactional
     public List<AlarmKeywordResponseDto> createAlarmKeyword(Long userId, AlarmKeywordRequestDto alarmKeywordRequestDto) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findByUserId(user)
@@ -81,7 +81,7 @@ public class AlarmKeywordService {
 
     @Transactional
     public void deleteAlarmKeyword(Long userId, Long keywordId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findByUserId(user)
@@ -103,5 +103,19 @@ public class AlarmKeywordService {
 
         // 응답 새로 내려줄지 말지 클라와 논의 후 작성
         // 현재까지는 그냥 삭제완료 String만 json으로 반환
+    }
+
+    @Transactional
+    public void setAlarmKeywordStatus(Long userId, Long keywordId, Boolean isOn) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findByUserId(user)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+
+        AlarmKeyword alarmKeyword = alarmKeywordRepository.findById(keywordId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ALARM_KEYWORD));
+
+        alarmKeyword.setAlarmStatus(isOn);
     }
 }

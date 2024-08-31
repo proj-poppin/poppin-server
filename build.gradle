@@ -4,6 +4,10 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
+ext {
+	springCloudVersion = "2023.0.3"
+}
+
 group = 'com.poppin'
 version = '0.0.1-SNAPSHOT'
 
@@ -22,12 +26,20 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// Default
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// MYSQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// TEST
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// security
@@ -55,6 +67,13 @@ dependencies {
 
 	// APNs
 	implementation 'com.github.fernandospr:javapns-jdk16:2.4.0' // IOS >= 10
+
+	// OpenFeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// ETC
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 }
 
 tasks.named('test') {
@@ -67,4 +86,10 @@ tasks.withType(JavaCompile) {
 
 jar {
 	archiveFileName.set('poppin-server-0.0.1-SNAPSHOT.jar')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+	}
 }

@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,9 +21,8 @@ public class AlarmKeyword {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_alarm_keyword_id", nullable = false)
-    private UserAlarmKeyword userAlarmKeyword;
+    @OneToMany(mappedBy = "keywordId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<UserAlarmKeyword> userAlarmKeyword = new ArrayList<>();
 
     @Column(name = "keyword", nullable = false)
     private String keyword;
@@ -29,9 +31,17 @@ public class AlarmKeyword {
     private Boolean isOn;
 
     @Builder
-    public AlarmKeyword(UserAlarmKeyword userAlarmKeyword, String keyword) {
+    public AlarmKeyword(List<UserAlarmKeyword> userAlarmKeyword, String keyword) {
         this.userAlarmKeyword = userAlarmKeyword;
         this.keyword = keyword;
         this.isOn = true;
+    }
+
+    public void setAlarmStatus(Boolean isOn) {
+        if (isOn) {
+            this.isOn = true;
+        } else {
+            this.isOn = false;
+        }
     }
 }
