@@ -1,14 +1,15 @@
 package com.poppin.poppinserver.user.domain;
 
+import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.type.ELoginProvider;
+import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
-import com.poppin.poppinserver.core.type.ELoginProvider;
-import com.poppin.poppinserver.core.type.EUserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -86,6 +87,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Interest> interestes = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<UserAlarmKeyword> userAlarmKeywords = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "prefered_popup_id")

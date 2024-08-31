@@ -8,9 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,15 +23,13 @@ public class UserAlarmKeyword {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User userId;
 
-    @OneToMany(mappedBy = "userAlarmKeyword", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "keyword", nullable = false)
-    private List<AlarmKeyword> keywords = new ArrayList<>(); // 재오픈 알람 키워드
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "keyword_id", nullable = false)
+    private AlarmKeyword keywordId;
 
     @Builder
-    public UserAlarmKeyword(User userId, List<String> keywordList) {
+    public UserAlarmKeyword(User userId, AlarmKeyword keywordId) {
         this.userId = userId;
-        for (String keyword : keywordList) {
-            this.keywords.add(new AlarmKeyword(this, keyword));
-        }
+        this.keywordId = keywordId;
     }
 }
