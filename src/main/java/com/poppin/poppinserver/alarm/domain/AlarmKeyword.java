@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,7 +22,7 @@ public class AlarmKeyword {
     private Long id;
 
     @OneToMany(mappedBy = "keywordId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<UserAlarmKeyword> userAlarmKeyword = new ArrayList<>();
+    private Set<UserAlarmKeyword> userAlarmKeyword = new HashSet<>();
 
     @Column(name = "keyword", nullable = false)
     private String keyword;
@@ -31,7 +31,7 @@ public class AlarmKeyword {
     private Boolean isOn;
 
     @Builder
-    public AlarmKeyword(List<UserAlarmKeyword> userAlarmKeyword, String keyword) {
+    public AlarmKeyword(Set<UserAlarmKeyword> userAlarmKeyword, String keyword) {
         this.userAlarmKeyword = userAlarmKeyword;
         this.keyword = keyword;
         this.isOn = true;

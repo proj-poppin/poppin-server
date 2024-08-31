@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecificationExecutor<Popup> {
     //인기 팝업스토어
-    @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
+    @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
             "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
             "WHERE p.operationStatus = 'OPERATING' " +
             "GROUP BY p.id " +
@@ -251,7 +251,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     Page<Popup> findByOperationStatusAndOrderByName(Pageable pageable, String oper);
 
 
-    @Query("SELECT p FROM Popup p LEFT JOIN p.interestes i " +
+    @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
             "ON i.createdAt >= :startOfWeek AND i.createdAt < :endOfWeek " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(i) DESC, p.viewCnt DESC")

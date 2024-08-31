@@ -113,7 +113,7 @@ public class Popup {
     private User agent;
 
     @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
-    private Set<Interest> interestes = new HashSet<>();
+    private Set<Interest> interest = new HashSet<>();
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
     private Set<PosterImage> posterImages = new HashSet<>();

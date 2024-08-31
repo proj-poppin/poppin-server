@@ -86,7 +86,7 @@ public class User {
     private Boolean requiresSpecialCare;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Interest> interestes = new HashSet<>();
+    private Set<Interest> interest = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<UserAlarmKeyword> userAlarmKeywords = new HashSet<>();
