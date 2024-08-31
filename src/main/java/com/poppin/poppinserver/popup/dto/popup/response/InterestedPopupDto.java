@@ -17,10 +17,10 @@ public record InterestedPopupDto(
         String open_date,
         String close_date
 ) {
-    public static List<InterestedPopupDto> fromEntityList(Set<Interest> interesteSet){
+    public static List<InterestedPopupDto> fromEntityList(Set<Interest> interestSet){
         List<InterestedPopupDto> dtoList = new ArrayList<>();
 
-        for(Interest intereste : interesteSet){
+        for(Interest intereste : interestSet){
             Popup popup = intereste.getPopup();
             InterestedPopupDto interestedPopupDto =
                     InterestedPopupDto.builder()

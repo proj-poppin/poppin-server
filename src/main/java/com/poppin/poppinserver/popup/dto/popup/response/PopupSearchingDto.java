@@ -30,11 +30,11 @@ public record PopupSearchingDto(
     public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user){
         List<PopupSearchingDto> dtoList = new ArrayList<>();
 
-        Set<Interest> interestes = user.getInterestes();
+        Set<Interest> interest = user.getInterest();
 
         List<Long> interestedPopups = new ArrayList<>();
-        for(Interest intereste : interestes){
-            interestedPopups.add(intereste.getPopup().getId());
+        for(Interest i : interest){
+            interestedPopups.add(i.getPopup().getId());
         }
 
         for(Popup popup : popups){

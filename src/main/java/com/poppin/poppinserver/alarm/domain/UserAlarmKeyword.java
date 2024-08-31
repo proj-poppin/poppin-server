@@ -19,17 +19,24 @@ public class UserAlarmKeyword {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "keyword", nullable = false)
+    private String keyword;
+
+    @Column(name = "is_on", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean isOn;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User userId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword_id", nullable = false)
-    private AlarmKeyword keywordId;
+    private User user;
 
     @Builder
-    public UserAlarmKeyword(User userId, AlarmKeyword keywordId) {
-        this.userId = userId;
-        this.keywordId = keywordId;
+    public UserAlarmKeyword(User user, String keyword) {
+        this.user = user;
+        this.keyword = keyword;
+        this.isOn = true;
+    }
+
+    public void setAlarmStatus(Boolean isOn) {
+        this.isOn = isOn ? true : false;
     }
 }
