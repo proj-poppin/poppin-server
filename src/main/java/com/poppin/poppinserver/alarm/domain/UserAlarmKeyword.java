@@ -29,11 +29,15 @@ public class UserAlarmKeyword {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
+    @Column(name = "fcm_token", nullable = false)
+    private String fcmToken;
+
     @Builder
-    public UserAlarmKeyword(User user, String keyword) {
+    public UserAlarmKeyword(User user, String keyword, String fcmToken) {
         this.user = user;
         this.keyword = keyword;
         this.isOn = true;
+        this.fcmToken = fcmToken;
     }
 
     public void setAlarmStatus(Boolean isOn) {

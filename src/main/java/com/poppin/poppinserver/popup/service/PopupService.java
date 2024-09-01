@@ -1,55 +1,54 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
+import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
+import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
+import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
+import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
+import com.poppin.poppinserver.alarm.repository.*;
+import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.core.dto.PageInfoDto;
+import com.poppin.poppinserver.core.dto.PagingResponseDto;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.scheduler.FCMScheduler;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
-import com.poppin.poppinserver.core.dto.PageInfoDto;
-import com.poppin.poppinserver.core.dto.PagingResponseDto;
-import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
+import com.poppin.poppinserver.core.util.PrepardSearchUtil;
+import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
+import com.poppin.poppinserver.popup.domain.*;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
+import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.review.response.ReviewInfoDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
-import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
+import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.popup.domain.*;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.core.scheduler.FCMScheduler;
-import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
-import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.core.util.SelectRandomUtil;
-import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.poppin.poppinserver.visit.service.VisitService;
+import com.poppin.poppinserver.visit.service.VisitorDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,6 +57,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -98,6 +98,8 @@ public class PopupService {
     private final FCMScheduler fcmScheduler;
     private final PopupAlarmRepository popupAlarmRepository;
     private final VisitorDataRepository visitorDataRepository;
+    private final UserAlarmKeywordRepository userAlarmKeywordRepository;
+    private final FCMSendService fcmSendService;
 
 
     @Transactional
@@ -204,6 +206,23 @@ public class PopupService {
         popup = popupRepository.save(popup);
 
         log.info(popup.getName() + " 팝업생성");
+
+        // 유저 알람 키워드와 매칭하여 알림 발송
+        List<UserAlarmKeyword> allKeywords = userAlarmKeywordRepository.findAll();
+        for (UserAlarmKeyword userAlarmKeyword : allKeywords) {
+            if (userAlarmKeyword.getIsOn() && (popup.getName().contains(userAlarmKeyword.getKeyword()) ||
+                    popup.getAddress().contains(userAlarmKeyword.getKeyword()) ||
+                    popup.getAddressDetail().contains(userAlarmKeyword.getKeyword()))) {
+                AlarmKeywordCreateRequestDto alarmKeywordCreateRequestDto = AlarmKeywordCreateRequestDto.builder()
+                        .title(EPushInfo.KEYWORD_ALARM.getTitle())
+                        .body(EPushInfo.KEYWORD_ALARM.getBody())
+                        .build();
+
+                // 유저에게 FCM 토큰 메시지 발송
+                FCMToken token = fcmTokenRepository.findByToken(userAlarmKeyword.getFcmToken());
+                fcmSendService.sendKeywordAlarmByFCMToken(token, alarmKeywordCreateRequestDto, userAlarmKeyword);
+            }
+        }
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성

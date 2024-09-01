@@ -3,9 +3,11 @@ package com.poppin.poppinserver.alarm.service;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmKeywordResponseDto;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,9 @@ import java.util.Set;
 public class AlarmKeywordService {
     private final UserRepository userRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
+    private final PopupRepository popupRepository;
+    private final FCMSendService fcmSendService;
+    private final FCMTokenRepository fcmTokenRepository;
 
     @Transactional(readOnly = true)
     public List<AlarmKeywordResponseDto> readAlarmKeywords(Long userId) {

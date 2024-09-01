@@ -5,9 +5,13 @@ import com.poppin.poppinserver.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Set;
 
 public interface UserAlarmKeywordRepository extends JpaRepository<UserAlarmKeyword, Long> {
     @Query("SELECT uak FROM UserAlarmKeyword uak WHERE uak.user = :user")
     Set<UserAlarmKeyword> findAllByUser(User user);
+
+    @Query("SELECT uak FROM UserAlarmKeyword uak WHERE uak.isOn = true")
+    List<UserAlarmKeyword> findByIsOnTrue();
 }
