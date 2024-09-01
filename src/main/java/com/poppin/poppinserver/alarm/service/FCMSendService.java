@@ -1,22 +1,21 @@
 package com.poppin.poppinserver.alarm.service;
 
 import com.google.firebase.messaging.*;
-
-
-import com.poppin.poppinserver.core.config.APNsConfiguration;
-import com.poppin.poppinserver.core.config.AndroidConfiguration;
-import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.alarm.domain.InformAlarm;
+import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
+import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
-
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.core.config.APNsConfiguration;
+import com.poppin.poppinserver.core.config.AndroidConfiguration;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.core.type.EPushInfo;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.review.domain.Review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -149,6 +148,31 @@ public class FCMSendService {
     }
 
     /**
+     * 키워드 알림 토큰 메시지 발송
+     */
+    public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
+        log.info("token : " + token.getToken());
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(requestDto.title())
+                        .setBody(requestDto.body())
+                        .build())
+                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setAndroidConfig(androidConfiguration.androidConfig())
+                .setToken(token.getToken())
+                .putData("id", userAlarmKeyword.getId().toString())
+                .putData("type", "keyword")
+                .build();
+        try {
+            String result = firebaseMessaging.send(message);
+            log.info("Successfully sent message: " + result);
+            refreshToken(token); // 토큰일자 갱신
+        } catch (FirebaseMessagingException e) {
+            log.error("Failed to send message: " + e.getMessage());
+        }
+    }
+
+    /**
      * 안드로이드 FCM Topic 앱 푸시 알림 메서드
      * @param fcmRequestDtoList FCM 주제 발송 객체
      * @throws FirebaseMessagingException FCM 오류
@@ -157,7 +181,7 @@ public class FCMSendService {
 
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
 
-            Message message = null;
+            Message message;
 
             Popup popup = popupRepository.findById(fcmRequestDto.popupId())
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));

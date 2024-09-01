@@ -22,7 +22,10 @@ public enum EPushInfo {
     /* 공지사항 */
     UPDATE("업데이트 알림", "공지사항"),
     EVENT("이벤트 공지사항", "공지사항"),
-    ERROR("오류 공지사항", "공지사항");
+    ERROR("오류 공지사항", "공지사항"),
+
+    /* 키워드 알람 */
+    KEYWORD_ALARM("팝업 등록!", "키워드 관련 팝업이 나타났어요!");
 
     private final String title;
     private final String body;
