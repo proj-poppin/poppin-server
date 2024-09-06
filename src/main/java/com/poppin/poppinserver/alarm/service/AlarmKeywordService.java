@@ -3,11 +3,9 @@ package com.poppin.poppinserver.alarm.service;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmKeywordResponseDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +22,6 @@ import java.util.Set;
 public class AlarmKeywordService {
     private final UserRepository userRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
-    private final PopupRepository popupRepository;
-    private final FCMSendService fcmSendService;
-    private final FCMTokenRepository fcmTokenRepository;
 
     @Transactional(readOnly = true)
     public List<AlarmKeywordResponseDto> readAlarmKeywords(Long userId) {
@@ -55,6 +50,7 @@ public class AlarmKeywordService {
         UserAlarmKeyword newUserAlarmKeyword = UserAlarmKeyword.builder()
                 .user(user)
                 .keyword(newKeyword)
+                .fcmToken(alarmKeywordRequestDto.fcmToken())
                 .build();
 
         // 변경된 UserAlarmKeyword 저장
@@ -76,11 +72,14 @@ public class AlarmKeywordService {
 
         // 키워드 삭제
         userAlarmKeywordRepository.delete(userAlarmKeyword);
+
+//        Set<UserAlarmKeyword> userAlarmKeywordList = user.getUserAlarmKeywords();
+//        return AlarmKeywordResponseDto.fromEntity(userAlarmKeywordList);
     }
 
     // 알람 키워드 상태 변경
     @Transactional
-    public void setAlarmKeywordStatus(Long userId, Long keywordId, Boolean isOn) {
+    public List<AlarmKeywordResponseDto> setAlarmKeywordStatus(Long userId, Long keywordId, Boolean isOn) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -88,5 +87,9 @@ public class AlarmKeywordService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ALARM_KEYWORD));
 
         userAlarmKeyword.setAlarmStatus(isOn);
+
+        Set<UserAlarmKeyword> userAlarmKeywordList = user.getUserAlarmKeywords();
+
+        return AlarmKeywordResponseDto.fromEntity(userAlarmKeywordList);
     }
 }
