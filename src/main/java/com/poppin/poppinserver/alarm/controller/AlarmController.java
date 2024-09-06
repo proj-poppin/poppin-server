@@ -92,13 +92,11 @@ public class AlarmController {
     }
 
     // 마이페이지 > 키워드 알람 > 키워드 활성화/비활성화
-    @PostMapping("/keywords/{keywordId}")
+    @PutMapping("/keywords/{keywordId}")
     public ResponseDto<?> setAlarmKeywordStatus(@UserId Long userId,
                               @PathVariable(name = "keywordId") Long keywordId,
                               @RequestParam(name = "isOn") Boolean isOn)
     {
-        alarmKeywordService.setAlarmKeywordStatus(userId, keywordId, isOn);
-        return ResponseDto.ok("키워드 알람 활성화 상태 변경");
+        return ResponseDto.ok(alarmKeywordService.setAlarmKeywordStatus(userId, keywordId, isOn));
     }
-
 }
