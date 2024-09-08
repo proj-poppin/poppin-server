@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.core.util;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -22,12 +21,7 @@ public class FCMRefreshUtil implements ApplicationContextAware {
     }
 
     public static void refreshToken(FCMToken token) {
-        FCMTokenRepository fcmTokenRepository = context.getBean(FCMTokenRepository.class);
-
         log.info("refresh token : " + token.getToken());
-
         token.regenerateToken();
-
-        fcmTokenRepository.save(token);
     }
 }
