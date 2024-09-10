@@ -14,7 +14,7 @@ public record UserInformDto(
         String contactLink, // 정보를 접한 사이트 주소
         EInformProgress progress // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 ) {
-    public static UserInformDto fromEntity(UserInform userInform){
+    public static UserInformDto fromEntity(UserInform userInform) {
         PopupDto popupDto = PopupDto.fromEntity(userInform.getPopupId());
 
         Long informerId = null;

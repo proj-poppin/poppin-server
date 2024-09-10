@@ -14,7 +14,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class UserIdInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("authentication = {}", authentication);
         if (authentication == null) {

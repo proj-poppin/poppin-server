@@ -44,7 +44,7 @@ public record ReviewUncertiDto(
             VisitorDataRvDto visitorDataRvDto,
             String text,
             List<String> imageUrl
-    ){
+    ) {
         return ReviewUncertiDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)

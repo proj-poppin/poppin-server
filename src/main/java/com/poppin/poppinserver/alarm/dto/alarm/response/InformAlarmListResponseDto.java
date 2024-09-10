@@ -16,7 +16,7 @@ public record InformAlarmListResponseDto(
         Boolean isRead
 ) {
 
-    public static InformAlarmListResponseDto fromEntity(InformAlarm alarm, Boolean isRead){
+    public static InformAlarmListResponseDto fromEntity(InformAlarm alarm, Boolean isRead) {
 
         return InformAlarmListResponseDto.builder()
                 .id(alarm.getId())

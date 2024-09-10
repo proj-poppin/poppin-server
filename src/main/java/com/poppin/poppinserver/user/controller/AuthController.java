@@ -33,7 +33,8 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseDto<?> authSignIn(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader) {
+    public ResponseDto<?> authSignIn(
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader) {
         return ResponseDto.ok(authService.authSignIn(authorizationHeader));
     }
 
@@ -46,7 +47,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseDto<?> refresh(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken){
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken) {
         return ResponseDto.ok(authService.refresh(refreshToken));
     }
 
@@ -63,7 +64,8 @@ public class AuthController {
     }
 
     @PostMapping("/verification/password")
-    public ResponseDto<?> verifyPassword(@UserId Long userId, @RequestBody @Valid PasswordVerificationDto passwordVerificationDto) {
+    public ResponseDto<?> verifyPassword(@UserId Long userId,
+                                         @RequestBody @Valid PasswordVerificationDto passwordVerificationDto) {
         return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationDto));
     }
 

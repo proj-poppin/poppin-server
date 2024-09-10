@@ -14,10 +14,10 @@ public record ModifyInfoSummaryDto(
         String informedAt,
         Boolean isExecuted
 ) {
-    public static List<ModifyInfoSummaryDto> fromEntityList(List<ModifyInfo> modifyInfos){
+    public static List<ModifyInfoSummaryDto> fromEntityList(List<ModifyInfo> modifyInfos) {
         List<ModifyInfoSummaryDto> dtoList = new ArrayList<>();
 
-        for(ModifyInfo modifyInfo : modifyInfos){
+        for (ModifyInfo modifyInfo : modifyInfos) {
 
             ModifyInfoSummaryDto modifyInfoSummaryDto =
                     ModifyInfoSummaryDto.builder()

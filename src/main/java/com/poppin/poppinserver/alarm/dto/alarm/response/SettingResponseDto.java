@@ -14,7 +14,7 @@ public record SettingResponseDto(
         String changeInfoYn
 ) {
 
-    public static SettingResponseDto fromEntity(AlarmSetting setting){
+    public static SettingResponseDto fromEntity(AlarmSetting setting) {
         return SettingResponseDto.builder()
                 .fcmToken(setting.getToken())
                 .pushYn(setting.getPushYn())

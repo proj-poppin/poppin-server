@@ -24,7 +24,7 @@ public class UserScheduler {
     // @Scheduled(cron = "0 */3 * * * *") // test 3분마다
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
-    public void hardDeleteUser(){
+    public void hardDeleteUser() {
         List<User> users = userRepository.findAllByDeletedAtIsNotNullAndIsDeleted();
 
         List<User> usersToDelete = users.stream()

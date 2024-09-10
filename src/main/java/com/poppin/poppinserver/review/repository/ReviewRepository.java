@@ -22,7 +22,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Review findByReviewIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);
 
     @Query("SELECT r FROM Review r where r.user.id = :userId order by r.createdAt asc ")
-    List<Review> findByUserId(@Param("userId")Long userId);
+    List<Review> findByUserId(@Param("userId") Long userId);
 
     @Query("SELECT r FROM Review r WHERE r.id = :reviewId AND r.popup.id = :popupId ")
     Review findByIdAndPopupId(@Param("reviewId") Long reviewId, @Param("popupId") Long popupId);
@@ -40,7 +40,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     @Query("SELECT r FROM Review r WHERE r.user.id = :userId AND r.isVisible = :hidden ORDER BY r.createdAt DESC")
-    Page<Review> findByUserIdAndIsVisibleOrderByCreatedAtDesc(Long userId, Pageable pageable, @Param("hidden") Boolean hidden);
+    Page<Review> findByUserIdAndIsVisibleOrderByCreatedAtDesc(Long userId, Pageable pageable,
+                                                              @Param("hidden") Boolean hidden);
 
     List<Review> findByPopupId(Long popupId);
 

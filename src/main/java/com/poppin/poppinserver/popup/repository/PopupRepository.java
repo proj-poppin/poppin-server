@@ -158,7 +158,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
-                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) "
+                    +
                     "AND p.operation_status = :oper " +
                     "AND (" +
                     "(tp.fashion_beauty = :fashionBeauty) " +
@@ -207,9 +208,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
 
     /**
-     *
-     * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     *
+     * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * -
      */
     // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
     @Query("SELECT p FROM Popup p " +
@@ -243,7 +243,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "JOIN Visit v ON p.id = v.popup.id " +
             "JOIN User u ON v.user.id = u.id " +
             "WHERE v.createdAt between :threeHoursAndMin AND :threeHoursAgo")
-    List<Popup> findHoogi(@Param("threeHoursAndMin") LocalDateTime threeHoursAndMin, @Param("threeHoursAgo") LocalDateTime threeHoursAgo);
+    List<Popup> findHoogi(@Param("threeHoursAndMin") LocalDateTime threeHoursAndMin,
+                          @Param("threeHoursAgo") LocalDateTime threeHoursAgo);
 
     @Query("SELECT p FROM Popup p " +
             "WHERE p.operationStatus = :oper " +
@@ -256,6 +257,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "GROUP BY p.id " +
             "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
     List<Popup> findHotPopup(@Param("startOfWeek") LocalDateTime startOfWeek,
-                                                                          @Param("endOfWeek") LocalDateTime endOfWeek,
-                                                                          Pageable pageable);
+                             @Param("endOfWeek") LocalDateTime endOfWeek,
+                             Pageable pageable);
 }

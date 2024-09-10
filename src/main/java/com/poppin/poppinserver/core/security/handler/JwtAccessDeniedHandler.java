@@ -14,7 +14,8 @@ import java.io.IOException;
 @Component
 public class JwtAccessDeniedHandler extends AbstractFailureResponse implements AccessDeniedHandler {
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
         setFailureResponse(response, ErrorCode.ACCESS_DENIED_ERROR);
     }
 }

@@ -8,7 +8,7 @@ public record PagingResponseDto<T>(
         @Nullable T items,
         @Nullable PageInfoDto pageInfo
 ) {
-    public static <T> PagingResponseDto<T> fromEntityAndPageInfo(T data, PageInfoDto pageInfoDto){
+    public static <T> PagingResponseDto<T> fromEntityAndPageInfo(T data, PageInfoDto pageInfoDto) {
         return new PagingResponseDto<T>(data, pageInfoDto);
     }
 }

@@ -10,13 +10,13 @@ public record WhoWithDto(
         Boolean withFriend,
         Boolean withFamily,
         Boolean withLover) {
-        public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup){
-                return WhoWithDto.builder()
-                        .id(whoWithPopup.getId())
-                        .solo(whoWithPopup.getSolo())
-                        .withFriend(whoWithPopup.getWithFriend())
-                        .withFamily(whoWithPopup.getWithFamily())
-                        .withLover(whoWithPopup.getWithLover())
-                        .build();
-        }
+    public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup) {
+        return WhoWithDto.builder()
+                .id(whoWithPopup.getId())
+                .solo(whoWithPopup.getSolo())
+                .withFriend(whoWithPopup.getWithFriend())
+                .withFamily(whoWithPopup.getWithFamily())
+                .withLover(whoWithPopup.getWithLover())
+                .build();
+    }
 }

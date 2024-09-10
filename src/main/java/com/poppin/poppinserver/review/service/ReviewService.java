@@ -52,10 +52,11 @@ public class ReviewService {
     private final AlarmService alarmService;
 
 
-
     /*방문(인증)후기 생성*/
     @Transactional
-    public ReviewDto writeCertifiedReview(Long userId, String token, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
+    public ReviewDto writeCertifiedReview(Long userId, String token, Long popupId, String text, String visitDate,
+                                          String satisfaction, String congestion, String nickname,
+                                          List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -64,7 +65,9 @@ public class ReviewService {
 
         /*방문 내역 확인*/
         Optional<Visit> visit = visitRepository.findByUserId(userId, popup.getId());
-        if (visit.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        if (visit.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        }
 
         Review review = Review.builder()
                 .user(user)
@@ -102,7 +105,7 @@ public class ReviewService {
             reviewImageRepository.saveAll(posterImages);
             review.updateReviewUrl(fileUrls.get(0));
         }
-        log.info("image Status : {}",imageStatus);
+        log.info("image Status : {}", imageStatus);
 
         VisitorData visitorData = new VisitorData(
                 EVisitDate.fromValue(visitDate)
@@ -120,7 +123,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto writeUncertifiedReview(Long userId, String token, Long popupId,String text, String visitDate, String satisfaction, String congestion, String nickname, List<MultipartFile> images) {
+    public ReviewDto writeUncertifiedReview(Long userId, String token, Long popupId, String text, String visitDate,
+                                            String satisfaction, String congestion, String nickname,
+                                            List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -147,7 +152,7 @@ public class ReviewService {
 
             log.info("images Entity : {}", images);
             log.info("images Size : {}", images.size());
-            log.info("images first img name: {}",  images.get(0).getOriginalFilename());
+            log.info("images first img name: {}", images.get(0).getOriginalFilename());
 
             imageStatus = "1"; // 이미지가 null 이 아닐때
 
@@ -194,12 +199,19 @@ public class ReviewService {
         Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
 
         // 예외처리
-        if (review == null)throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
-        if (review.getUser().getId().equals(userId)) throw new CommonException(ErrorCode.REVIEW_RECOMMEND_ERROR);
+        if (review == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        }
+        if (review.getUser().getId().equals(userId)) {
+            throw new CommonException(ErrorCode.REVIEW_RECOMMEND_ERROR);
+        }
 
         Optional<ReviewRecommend> recommendCnt = reviewRecommendRepository.findByUserAndReview(user, review);
-        if (recommendCnt.isPresent())throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지
-        else review.addRecommendCnt();
+        if (recommendCnt.isPresent()) {
+            throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지
+        } else {
+            review.addRecommendCnt();
+        }
 
         reviewRepository.save(review);
 

@@ -12,11 +12,11 @@ import java.time.LocalDate;
 
 
 /*
-* Method : 유저 별 알림 종류 (팝업, 공지사항)
-* Author : sakang
-* Date   : 2024-04-24
-*
-* */
+ * Method : 유저 별 알림 종류 (팝업, 공지사항)
+ * Author : sakang
+ * Date   : 2024-04-24
+ *
+ * */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,18 +32,18 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "title" , nullable = false)
+    @Column(name = "title", nullable = false)
     private String title; // 제목
 
-    @Column(name = "content" , nullable = false)
+    @Column(name = "content", nullable = false)
     private String content; // 내용
 
-    @Column(name = "created_at",nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDate createdAt; // 생성일자
 
     @Column(name = "is_read", nullable = false)
     private boolean isRead;     // 읽음 여부
-    @Column(name = "type" , nullable = false)
+    @Column(name = "type", nullable = false)
     private String type; // 팝업, 공지사항
 
     @Builder
@@ -58,15 +58,10 @@ public class Notification {
 }
 
 /**
- * 알림
- * 1. id
- * 2. title
- * 3. content
- * 4. createdAt
- * 5. isRead
- * 6. icon -> string,
+ * 알림 1. id 2. title 3. content 4. createdAt 5. isRead 6. icon -> string,
+ * <p>
+ * 공지사항 상세 1. id 2. title 3. content 4. img -> nullable
  */
-
 
 /**
  * 공지사항 상세

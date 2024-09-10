@@ -18,10 +18,10 @@ public record PopupSummaryDto(
         @NotNull
         String introduce
 ) {
-    public static List<PopupSummaryDto> fromEntityList(List<Popup> popups){
+    public static List<PopupSummaryDto> fromEntityList(List<Popup> popups) {
         List<PopupSummaryDto> dtoList = new ArrayList<>();
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
             PopupSummaryDto popupSummaryDto =
                     PopupSummaryDto.builder()
                             .id(popup.getId())

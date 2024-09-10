@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AlarmSettingRepository extends JpaRepository<AlarmSetting, Long> {
 
-  @Query("SELECT a FROM AlarmSetting a WHERE a.token = :token")
-  AlarmSetting findByToken(String token);
+    @Query("SELECT a FROM AlarmSetting a WHERE a.token = :token")
+    AlarmSetting findByToken(String token);
 }

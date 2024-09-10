@@ -22,21 +22,20 @@ public class InformAlarm {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "title" , nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "body" , nullable = false)
+    @Column(name = "body", nullable = false)
     private String body;
 
     @Column(name = "keyword", nullable = false)
     private String keyword; // popup, inform
 
-    @Column(name = "icon" , nullable = false)
+    @Column(name = "icon", nullable = false)
     private String icon; // icon
 
-    @Column(name = "created_at" , nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
-
 
 
     @Builder

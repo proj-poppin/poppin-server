@@ -20,7 +20,7 @@ public record InformAlarmResponseDto(
             String body,
             String posterUrl,
             LocalDate createdAt
-    ){
+    ) {
         return InformAlarmResponseDto.builder().
                 id(id)
                 .title(title)

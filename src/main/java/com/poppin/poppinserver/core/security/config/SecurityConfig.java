@@ -50,7 +50,9 @@ public class SecurityConfig {
                                 .addLogoutHandler(customSignOutProcessHandler)
                                 .logoutSuccessHandler(customSignOutResultHandler)
                                 .deleteCookies(Constant.AUTHORIZATION_HEADER, Constant.REAUTHORIZATION))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)), LogoutFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil,
+                                new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)),
+                        LogoutFilter.class)
                 .addFilterAfter(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(), LogoutFilter.class)
                 .build();

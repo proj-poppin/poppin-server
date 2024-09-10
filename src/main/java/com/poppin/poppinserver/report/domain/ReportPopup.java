@@ -50,7 +50,8 @@ public class ReportPopup {
     private String executeContent;
 
     @Builder
-    public ReportPopup(User reporterId, Popup popupId, LocalDateTime reportedAt, String reportContent, Boolean isExecuted) {
+    public ReportPopup(User reporterId, Popup popupId, LocalDateTime reportedAt, String reportContent,
+                       Boolean isExecuted) {
         this.reporterId = reporterId;
         this.popupId = popupId;
         this.reportedAt = reportedAt;

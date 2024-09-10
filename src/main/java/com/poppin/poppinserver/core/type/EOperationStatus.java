@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.core.type;
 
-        import lombok.Getter;
-        import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter

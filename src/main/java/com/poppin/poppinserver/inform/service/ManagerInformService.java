@@ -58,7 +58,7 @@ public class ManagerInformService {
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
                                                 List<MultipartFile> images,
-                                                Long userId){
+                                                Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -117,7 +117,7 @@ public class ManagerInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -143,7 +143,7 @@ public class ManagerInformService {
 
     @Transactional
     public ManagerInformDto createGuestManagerInform(CreateManagerInformDto createManagerInformDto,
-                                                List<MultipartFile> images){
+                                                     List<MultipartFile> images) {
         CreateTasteDto createTasteDto = createManagerInformDto.taste();
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(createTasteDto.fashionBeauty())
@@ -199,7 +199,7 @@ public class ManagerInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -224,7 +224,7 @@ public class ManagerInformService {
     } //운영자 제보 생성
 
     @Transactional
-    public ManagerInformDto readManageInform(Long manageInformId){
+    public ManagerInformDto readManageInform(Long manageInformId) {
         ManagerInform managerInform = managerInformRepository.findById(manageInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
@@ -234,7 +234,7 @@ public class ManagerInformService {
     @Transactional
     public ManagerInformDto updateManageInform(UpdateManagerInfromDto updateManagerInfromDto,
                                                List<MultipartFile> images,
-                                               Long adminId){
+                                               Long adminId) {
         ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
@@ -283,7 +283,7 @@ public class ManagerInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -297,7 +297,7 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateManagerInfromDto.keywords()){
+        for (String keyword : updateManagerInfromDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -333,18 +333,17 @@ public class ManagerInformService {
                 EInformProgress.EXECUTING,
                 updateManagerInfromDto.affiliation(),
                 updateManagerInfromDto.informerEmail()
-                );
+        );
         managerInform = managerInformRepository.save(managerInform);
         log.info(managerInform.getProgress().toString());
-
 
         return ManagerInformDto.fromEntity(managerInform);
     } // 운영자 제보 임시저장
 
     @Transactional
     public ManagerInformDto uploadPopup(UpdateManagerInfromDto updateManagerInfromDto,
-                                               List<MultipartFile> images,
-                                               Long adminId){
+                                        List<MultipartFile> images,
+                                        Long adminId) {
         ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
@@ -393,7 +392,7 @@ public class ManagerInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -407,7 +406,7 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateManagerInfromDto.keywords()){
+        for (String keyword : updateManagerInfromDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -422,13 +421,12 @@ public class ManagerInformService {
 
         //현재 운영상태 정의
         String operationStatus;
-        if (updateManagerInfromDto.openDate().isAfter(LocalDate.now())){
+        if (updateManagerInfromDto.openDate().isAfter(LocalDate.now())) {
             Period period = Period.between(LocalDate.now(), updateManagerInfromDto.openDate());
             operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateManagerInfromDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
-        }
-        else{
+        } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
@@ -471,11 +469,13 @@ public class ManagerInformService {
     } // 운영자 제보 업로드 승인
 
     @Transactional
-    public PagingResponseDto reatManagerInformList(int page, int size, EInformProgress progress){
-        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page,size), progress);
+    public PagingResponseDto reatManagerInformList(int page, int size, EInformProgress progress) {
+        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page, size),
+                progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(managerInforms);
-        List<ManagerInformSummaryDto> userInformSummaryDtos = ManagerInformSummaryDto.fromEntityList(managerInforms.getContent());
+        List<ManagerInformSummaryDto> userInformSummaryDtos = ManagerInformSummaryDto.fromEntityList(
+                managerInforms.getContent());
 
         return PagingResponseDto.fromEntityAndPageInfo(userInformSummaryDtos, pageInfoDto);
     } // 제보 리스트 조회

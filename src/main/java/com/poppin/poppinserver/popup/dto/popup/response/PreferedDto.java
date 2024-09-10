@@ -11,13 +11,13 @@ public record PreferedDto(
         Boolean experience,
         Boolean wantFree
 ) {
-        public static PreferedDto fromEntity(PreferedPopup preferedPopup){
-                return PreferedDto.builder()
-                        .id(preferedPopup.getId())
-                        .market(preferedPopup.getMarket())
-                        .display(preferedPopup.getDisplay())
-                        .experience(preferedPopup.getExperience())
-                        .wantFree(preferedPopup.getWantFree())
-                        .build();
-        }
+    public static PreferedDto fromEntity(PreferedPopup preferedPopup) {
+        return PreferedDto.builder()
+                .id(preferedPopup.getId())
+                .market(preferedPopup.getMarket())
+                .display(preferedPopup.getDisplay())
+                .experience(preferedPopup.getExperience())
+                .wantFree(preferedPopup.getWantFree())
+                .build();
+    }
 }

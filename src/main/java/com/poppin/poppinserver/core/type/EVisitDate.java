@@ -7,6 +7,7 @@ public enum EVisitDate {
     WEEKEND_PM("주말 오후");
 
     private final String value;
+
     EVisitDate(String value) {
         this.value = value;
     }

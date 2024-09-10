@@ -10,6 +10,7 @@ public enum ESatisfaction {
     ;
 
     private final String value;
+
     ESatisfaction(String value) {
         this.value = value;
     }

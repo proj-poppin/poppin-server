@@ -11,19 +11,19 @@ public record UserTasteDto(
         TasteDto taste,
         WhoWithDto whoWith
 ) {
-        public static UserTasteDto fromEntity(
-                PreferedPopup preferedPopup,
-                TastePopup tastePopup,
-                WhoWithPopup whoWithPopup
-        ){
-                PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
-                TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
-                WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
+    public static UserTasteDto fromEntity(
+            PreferedPopup preferedPopup,
+            TastePopup tastePopup,
+            WhoWithPopup whoWithPopup
+    ) {
+        PreferedDto preferedDto = PreferedDto.fromEntity(preferedPopup);
+        TasteDto tasteDto = TasteDto.fromEntity(tastePopup);
+        WhoWithDto whoWithDto = WhoWithDto.fromEntity(whoWithPopup);
 
-                return UserTasteDto.builder()
-                        .preference(preferedDto)
-                        .taste(tasteDto)
-                        .whoWith(whoWithDto)
-                        .build();
-        }
+        return UserTasteDto.builder()
+                .preference(preferedDto)
+                .taste(tasteDto)
+                .whoWith(whoWithDto)
+                .build();
+    }
 }

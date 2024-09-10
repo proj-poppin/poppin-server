@@ -16,12 +16,14 @@ import java.util.Map;
 
 public class CustomLogoutFilter extends OncePerRequestFilter {
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         // Check if it's a logout request
-        if ("/api/v1/auth/sign-out".equals(httpRequest.getRequestURI()) && "POST".equalsIgnoreCase(httpRequest.getMethod())) {
+        if ("/api/v1/auth/sign-out".equals(httpRequest.getRequestURI()) && "POST".equalsIgnoreCase(
+                httpRequest.getMethod())) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             // If the user is not authenticated, return a failure response

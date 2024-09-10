@@ -87,8 +87,8 @@ public class AdminController {
     /* 후기 신고 처리 생성 */
     @PostMapping("/reports/reviews/{reportId}")
     public ResponseDto<?> processReviewReport(@UserId Long adminId,
-                                             @PathVariable Long reportId,
-                                             @RequestBody CreateReportExecContentDto createReportExecContentDto) {
+                                              @PathVariable Long reportId,
+                                              @RequestBody CreateReportExecContentDto createReportExecContentDto) {
         adminService.processReviewReport(adminId, reportId, createReportExecContentDto);
         return ResponseDto.created("후기 신고 처리가 완료되었습니다.");
     }
@@ -136,16 +136,17 @@ public class AdminController {
         return ResponseDto.created("팝업 신고 처리가 완료되었습니다.");
     }
 
-    @PostMapping(value = "/info/create" , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/info/create", consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createInformation(
             @UserId Long adminId,
             @RequestPart(value = "contents") InformAlarmCreateRequestDto requestDto,
             @RequestPart(value = "images") MultipartFile images
-    ){
+    ) {
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
-        return ResponseDto.ok(adminService.createInformation(adminId,requestDto,images));
+        return ResponseDto.ok(adminService.createInformation(adminId, requestDto, images));
     }
 
 }

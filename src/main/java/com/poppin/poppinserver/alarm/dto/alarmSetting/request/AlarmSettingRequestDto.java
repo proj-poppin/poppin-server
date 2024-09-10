@@ -15,7 +15,8 @@ public record AlarmSettingRequestDto(
 
 ) {
 
-    public static AlarmSettingRequestDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn, String changeInfoYn) {
+    public static AlarmSettingRequestDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn,
+                                                    String openYn, String magamYn, String changeInfoYn) {
         return AlarmSettingRequestDto.builder()
                 .fcmToken(token)
                 .pushYn(pushYn)

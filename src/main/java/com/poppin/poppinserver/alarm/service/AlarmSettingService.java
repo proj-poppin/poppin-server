@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -27,10 +26,12 @@ public class AlarmSettingService {
 
     public AlarmSettingResponseDto updateAlarmSetting(Long userId, AlarmSettingRequestDto reqDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting alarmSetting = alarmSettingRepository.findByToken(reqDto.fcmToken());
-        if (alarmSetting == null) throw new CommonException(ErrorCode.NOT_FOUND_ALARM_SETTING);
+        if (alarmSetting == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_ALARM_SETTING);
+        }
 
         alarmSettingRepository.delete(alarmSetting); // 삭제
 
@@ -57,9 +58,9 @@ public class AlarmSettingService {
     }
 
 
-    public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto){
+    public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new CommonException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting setting = alarmSettingRepository.findByToken(reqDto.fcmToken());
 

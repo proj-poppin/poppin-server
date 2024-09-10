@@ -25,14 +25,14 @@ public class ReviewRecommend {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id",nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "review_id", referencedColumnName = "id",nullable = false)
+    @JoinColumn(name = "review_id", referencedColumnName = "id", nullable = false)
     private Review review;
 
-    @Column(name = "created_at",nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Builder

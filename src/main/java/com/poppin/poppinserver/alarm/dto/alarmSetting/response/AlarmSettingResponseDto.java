@@ -14,7 +14,8 @@ public record AlarmSettingResponseDto(
         String changeInfoYn
 
 ) {
-    public static AlarmSettingResponseDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn, String changeInfoYn) {
+    public static AlarmSettingResponseDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn,
+                                                     String openYn, String magamYn, String changeInfoYn) {
         return AlarmSettingResponseDto.builder()
                 .token(token)
                 .pushYn(pushYn)

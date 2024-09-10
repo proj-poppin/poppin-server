@@ -13,46 +13,52 @@ import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.report.dto.report.response.*;
+import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.report.domain.ReportPopup;
+import com.poppin.poppinserver.report.domain.ReportReview;
+import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportContentDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
+import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
-import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.user.domain.FreqQuestion;
+import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
-import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.report.domain.ReportPopup;
-import com.poppin.poppinserver.report.domain.ReportReview;
-import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.user.domain.FreqQuestion;
-import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
-import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -180,7 +186,8 @@ public class AdminService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviewPage;
         if (hidden) {
-            reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable, false);    // visible = false인 후기만
+            reviewPage = reviewRepository.findByUserIdAndIsVisibleOrderByCreatedAtDesc(userId, pageable,
+                    false);    // visible = false인 후기만
         } else {
             reviewPage = reviewRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);   // 모든 후기
         }
@@ -359,7 +366,8 @@ public class AdminService {
 
     // 후기 신고 처리 생성 -> 후기 가리기
     @Transactional
-    public void processReviewReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {
+    public void processReviewReport(Long adminId, Long reportId,
+                                    CreateReportExecContentDto createReportExecContentDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
@@ -368,14 +376,14 @@ public class AdminService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
 
         User reviewAuthor = review.getUser();
-        if (review.getIsVisible() == true){ // 가려진 후기가 아닌 경우에만(즉 최초 신고 시에만) 신고 횟수 증가
+        if (review.getIsVisible()) { // 가려진 후기가 아닌 경우에만(즉 최초 신고 시에만) 신고 횟수 증가
             reviewAuthor.addReportCnt();
         }
 
         review.updateReviewInvisible(); // 후기 가리고
         reviewRepository.save(review);
 
-        if (reviewAuthor.getReportedCnt() >= 3){    // 신고 횟수 3회 이상 시 특별 관리 대상으로 변경
+        if (reviewAuthor.getReportedCnt() >= 3) {    // 신고 횟수 3회 이상 시 특별 관리 대상으로 변경
             reviewAuthor.requiresSpecialCare();
         }
         userRepository.save(reviewAuthor);
@@ -389,7 +397,7 @@ public class AdminService {
             Long adminId,
             InformAlarmCreateRequestDto requestDto,
             MultipartFile images
-    ){
+    ) {
         // 관리자 여부 확인
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -400,12 +408,15 @@ public class AdminService {
             log.info("INFORM ALARM Entity Saving");
 
             InformAlarm informAlarm = alarmService.insertInformAlarm(requestDto);
-            if (informAlarm.equals(null))throw new CommonException(ErrorCode.INFO_ALARM_ERROR);
-            else informAlarmRepository.save(informAlarm);
+            if (informAlarm.equals(null)) {
+                throw new CommonException(ErrorCode.INFO_ALARM_ERROR);
+            } else {
+                informAlarmRepository.save(informAlarm);
+            }
 
             // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
             List<FCMToken> tokenList = fcmTokenRepository.findAll();
-            for (FCMToken token: tokenList){
+            for (FCMToken token : tokenList) {
                 alarmListService.insertInformIsRead(token, informAlarm);
             }
 
@@ -413,7 +424,7 @@ public class AdminService {
             List<String> fileUrls = s3Service.uploadInformationPoster(images);
 
             List<InformAlarmImage> informAlarmImages = new ArrayList<>();
-            for(String url : fileUrls){
+            for (String url : fileUrls) {
                 InformAlarmImage informAlarmImage = InformAlarmImage.builder()
                         .informAlarm(informAlarm)
                         .posterUrl(url)
@@ -423,15 +434,16 @@ public class AdminService {
             informAlarmImageRepository.saveAll(informAlarmImages);
 
             // 저장 성공
-            if (informAlarm != null){
+            if (informAlarm != null) {
                 // 앱 푸시 발송
-                fcmSendService.sendInformationByFCMToken(tokenList, requestDto , informAlarm);
+                fcmSendService.sendInformationByFCMToken(tokenList, requestDto, informAlarm);
                 // 푸시 성공
-                InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm, fileUrls);
+                InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm,
+                        fileUrls);
                 return informApplyResponseDto; // 최종 성공 반환
             }
-        // InformAlarm 객체 저장 실패
-        }catch (Exception e){
+            // InformAlarm 객체 저장 실패
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("INFORM ALARM ERROR : " + e.getMessage());
         }

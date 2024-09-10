@@ -2,7 +2,7 @@ package com.poppin.poppinserver.user.dto.auth.request;
 
 import jakarta.validation.constraints.*;
 
-public record AuthSignUpDto (
+public record AuthSignUpDto(
         // 이메일 형식
         @NotBlank
         @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "올바른 이메일 형식이 아닙니다.")
@@ -33,4 +33,5 @@ public record AuthSignUpDto (
         // 서비스 이용 약관
         @NotNull(message = "서비스 이용 약관 동의가 필요합니다.")
         Boolean agreedToServiceTerms
-) { }
+) {
+}

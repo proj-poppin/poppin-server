@@ -45,20 +45,20 @@ public class AlarmService {
     private String alarmBucket;
 
     /**
-     *  홈 화면 진입 시 읽지 않은 공지 여부 판단
+     * 홈 화면 진입 시 읽지 않은 공지 여부 판단
+     *
      * @param fcmRequestDto :  FCM Token request dto
      * @return : UnreadAlarmResponseDto
      */
-    public AlarmStatusResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto){
+    public AlarmStatusResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto) {
         AlarmStatusResponseDto responseDto;
 
         List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(fcmRequestDto.fcmToken()); // 공지
         List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
 
-        if (!informAlarms.isEmpty() || !popupAlarms.isEmpty()){
+        if (!informAlarms.isEmpty() || !popupAlarms.isEmpty()) {
             responseDto = AlarmStatusResponseDto.fromEntity(true);
-        }
-        else {
+        } else {
             responseDto = AlarmStatusResponseDto.fromEntity(false);
         }
         return responseDto;

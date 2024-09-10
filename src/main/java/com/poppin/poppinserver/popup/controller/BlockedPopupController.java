@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/popup/block")
 public class BlockedPopupController {
     private final BlockedPopupService blockedPopupService;
+
     @PostMapping("/{blockPostId}")
     public ResponseDto<?> createdBlockedPopup(@PathVariable Long blockPostId,
                                               @UserId Long userId) {

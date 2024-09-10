@@ -13,10 +13,10 @@ public record ManageSearchingDto(
         String operationStatus,
         String adminName
 ) {
-    public static List<ManageSearchingDto> fromEntityList(List<Popup> popups){
+    public static List<ManageSearchingDto> fromEntityList(List<Popup> popups) {
         List<ManageSearchingDto> dtoList = new ArrayList<>();
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
 
             ManageSearchingDto manageSearchingDto =
                     ManageSearchingDto.builder()

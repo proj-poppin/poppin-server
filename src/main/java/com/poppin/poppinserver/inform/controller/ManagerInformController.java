@@ -76,8 +76,12 @@ public class ManagerInformController {
         }
 
         CreatePreferedDto prefered = new CreatePreferedDto(market, display, experience, null);
-        CreateTasteDto taste = new CreateTasteDto(fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings, movie, musical, sports, game, itTech, kpop, alcohol, animalPlant, etc);
-        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail, homepageLink, name, introduce, address, addressDetail, entranceRequired, entranceFee, availableAge, parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered, taste);
+        CreateTasteDto taste = new CreateTasteDto(fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings,
+                movie, musical, sports, game, itTech, kpop, alcohol, animalPlant, etc);
+        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail,
+                homepageLink, name, introduce, address, addressDetail, entranceRequired, entranceFee, availableAge,
+                parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered,
+                taste);
 
         return ResponseDto.ok(managerInformService.createManagerInform(createManagerInformDto, images, userId));
     } // 운영자 제보 생성
@@ -126,8 +130,12 @@ public class ManagerInformController {
         }
 
         CreatePreferedDto prefered = new CreatePreferedDto(market, display, experience, null);
-        CreateTasteDto taste = new CreateTasteDto(fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings, movie, musical, sports, game, itTech, kpop, alcohol, animalPlant, etc);
-        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail, homepageLink, name, introduce, address, addressDetail, entranceRequired, entranceFee, availableAge, parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered, taste);
+        CreateTasteDto taste = new CreateTasteDto(fashionBeauty, characters, foodBeverage, webtoonAni, interiorThings,
+                movie, musical, sports, game, itTech, kpop, alcohol, animalPlant, etc);
+        CreateManagerInformDto createManagerInformDto = new CreateManagerInformDto(affiliation, informerEmail,
+                homepageLink, name, introduce, address, addressDetail, entranceRequired, entranceFee, availableAge,
+                parkingAvailable, resvRequired, openDate, closeDate, openTime, closeTime, operationExcept, prefered,
+                taste);
 
         return ResponseDto.ok(managerInformService.createGuestManagerInform(createManagerInformDto, images));
     } // 운영자 제보 생성
@@ -142,8 +150,8 @@ public class ManagerInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                         @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
-                                         @UserId Long adminId) {
+                                            @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                            @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -156,8 +164,8 @@ public class ManagerInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
-                                           @UserId Long adminId) {
+                                              @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                              @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -170,7 +178,7 @@ public class ManagerInformController {
     @GetMapping("/list")
     public ResponseDto<?> readManagerInformList(@RequestParam(value = "page") int page,
                                                 @RequestParam(value = "size") int size,
-                                                @RequestParam(value = "prog") EInformProgress progress){
+                                                @RequestParam(value = "prog") EInformProgress progress) {
         return ResponseDto.ok(managerInformService.reatManagerInformList(page, size, progress));
     }
 }

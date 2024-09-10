@@ -68,7 +68,7 @@ public class APNsTestUtil {
 
     // APP PUSH
     public void sendAPNsToken(List<APNsRequestDto> requestDto) throws Exception {
-       for (APNsRequestDto user : requestDto){
+        for (APNsRequestDto user : requestDto) {
             if (user.token() != null) {
                 try {
                     PushNotificationPayload payload = PushNotificationPayload.complex();
@@ -81,7 +81,8 @@ public class APNsTestUtil {
                     Object obj = user.token();
                     ClassPathResource resource = new ClassPathResource(FILE_NAME);
 
-                    List<PushedNotification> NOTIFICATIONS = Push.payload(payload, resource.getPath(), PASSWORD, user.testType(), obj);
+                    List<PushedNotification> NOTIFICATIONS = Push.payload(payload, resource.getPath(), PASSWORD,
+                            user.testType(), obj);
 
                     for (PushedNotification NOTIFICATION : NOTIFICATIONS) {
                         if (NOTIFICATION.isSuccessful()) {
@@ -105,6 +106,6 @@ public class APNsTestUtil {
             } else {
                 log.info("서버에 저장된 해당 유저의 FirebaseToken이 존재하지 않습니다. targetUserID=" + null);
             }
-       }
+        }
     }
 }

@@ -7,7 +7,6 @@ import lombok.Builder;
 @Builder
 public record FCMRequestDto(
 
-
         @NotNull
         Long popupId,
 
@@ -24,13 +23,13 @@ public record FCMRequestDto(
         EPopupTopic topic
 
 ) {
-        public static FCMRequestDto fromEntity(Long popupId, String token, String title, String body, EPopupTopic topic){
-                return FCMRequestDto.builder()
-                        .popupId(popupId)
-                        .token(token)
-                        .title(title)
-                        .body(body)
-                        .topic(topic)
-                        .build();
-        }
+    public static FCMRequestDto fromEntity(Long popupId, String token, String title, String body, EPopupTopic topic) {
+        return FCMRequestDto.builder()
+                .popupId(popupId)
+                .token(token)
+                .title(title)
+                .body(body)
+                .topic(topic)
+                .build();
+    }
 }

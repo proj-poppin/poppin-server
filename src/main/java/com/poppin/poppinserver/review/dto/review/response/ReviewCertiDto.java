@@ -50,7 +50,7 @@ public record ReviewCertiDto(
             VisitorDataRvDto visitorDataRvDto,
             String text,
             List<String> imageUrl
-    ){
+    ) {
         return ReviewCertiDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)

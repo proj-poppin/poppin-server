@@ -11,7 +11,7 @@ public record ApplyTokenResponseDto(
         String token,
 
         @NotNull
-        String device ,// android or ios
+        String device, // android or ios
 
         @NotNull
         String response,
@@ -20,7 +20,8 @@ public record ApplyTokenResponseDto(
         String description
 
 ) {
-    public static ApplyTokenResponseDto fromEntity(ApplyTokenRequestDto applyTokenRequestDto, String response, String description){
+    public static ApplyTokenResponseDto fromEntity(ApplyTokenRequestDto applyTokenRequestDto, String response,
+                                                   String description) {
         return ApplyTokenResponseDto.builder()
                 .token(applyTokenRequestDto.fcmToken())
                 .device(applyTokenRequestDto.device())

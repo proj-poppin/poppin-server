@@ -37,7 +37,8 @@ public record ReviewInfoDto(
         @NotNull
         Long userId
 ) {
-    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls, List<String> profileUrls, List<Long> reviewCnt){
+    public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls,
+                                                     List<String> profileUrls, List<Long> reviewCnt) {
         List<ReviewInfoDto> reviewInfoDtoList = new ArrayList<>();
 
         for (int i = 0; i < reviews.size(); i++) {

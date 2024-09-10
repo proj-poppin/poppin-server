@@ -45,11 +45,13 @@ public record ResponseDto<T>(@JsonIgnore HttpStatus httpStatus,
     }
 
     public static ResponseDto<Object> fail(final MethodArgumentTypeMismatchException e) {
-        return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR, false, null, new ExceptionDto(ErrorCode.INVALID_PARAMETER));
+        return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR, false, null,
+                new ExceptionDto(ErrorCode.INVALID_PARAMETER));
     }
 
     public static ResponseDto<Object> fail(final MissingServletRequestParameterException e) {
-        return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null, new ExceptionDto(ErrorCode.MISSING_REQUEST_PARAMETER));
+        return new ResponseDto<>(HttpStatus.BAD_REQUEST, false, null,
+                new ExceptionDto(ErrorCode.MISSING_REQUEST_PARAMETER));
     }
 
     public static ResponseDto<Object> fail(final HttpMessageNotReadableException e) {

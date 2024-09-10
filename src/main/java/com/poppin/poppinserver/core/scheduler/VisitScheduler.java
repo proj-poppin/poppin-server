@@ -15,17 +15,18 @@ import java.time.temporal.ChronoUnit;
 public class VisitScheduler {
 
     private final VisitRepository visitRepository;
+
     /**
      * 방문한지 1 주일이 지난 데이터 Visit 테이블에서 삭제
      */
     @Scheduled(cron = "0 0 0 * * *")
-    public void deleteVisitData(){
+    public void deleteVisitData() {
 
         log.info("=====   방문일시가 1주일이 지난 데이터 삭제   =====");
         try {
             LocalDateTime oneWeekAgo = LocalDateTime.now().minus(1, ChronoUnit.WEEKS);
             visitRepository.deleteAllByCreatedAtBefore(oneWeekAgo);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
         }

@@ -42,7 +42,8 @@ public class VisitorData {
     private String satisfaction; // 만족, 보통, 불만족
 
     @Builder
-    public VisitorData(Enum<EVisitDate> visitDate, Popup popup, Review review, Enum<ECongestion> congestion, Enum<ESatisfaction> satisfaction) {
+    public VisitorData(Enum<EVisitDate> visitDate, Popup popup, Review review, Enum<ECongestion> congestion,
+                       Enum<ESatisfaction> satisfaction) {
         this.visitDate = visitDate.toString();
         this.popup = popup;
         this.review = review;

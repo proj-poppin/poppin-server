@@ -17,19 +17,21 @@ import java.util.Optional;
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Long> {
     @Query("SELECT COUNT(v) FROM Visit v JOIN v.popup p WHERE v.createdAt >= :thirtyMinutesAgo AND p = :popup")
-    Optional<Integer> showRealTimeVisitors(@Param("popup") Popup popup, @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo);
+    Optional<Integer> showRealTimeVisitors(@Param("popup") Popup popup,
+                                           @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo);
 
     @Query("SELECT COUNT(v) FROM Visit  v  WHERE v.createdAt >= :thirtyMinutesAgo AND v.user.id =  :userId AND v.popup.id = :popupId")
-    Integer findDuplicateVisitors(@Param("userId") Long userId , @Param("popupId") Long popupId, @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo );
+    Integer findDuplicateVisitors(@Param("userId") Long userId, @Param("popupId") Long popupId,
+                                  @Param("thirtyMinutesAgo") LocalDateTime thirtyMinutesAgo);
 
     @Query("SELECT v FROM Visit v JOIN v.user u JOIN v.popup p WHERE v.user.id = :userId AND  v.popup.id = :popupId")
-    Visit findByUserIdAndPopupId(@Param("userId") Long userId , @Param("popupId") Long popupId);
+    Visit findByUserIdAndPopupId(@Param("userId") Long userId, @Param("popupId") Long popupId);
 
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId")
     List<Visit> findAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId AND v.popup.id = :popupId")
-    Optional<Visit> findByUserId(@Param("userId")Long userId, @Param("popupId") Long popupId);
+    Optional<Visit> findByUserId(@Param("userId") Long userId, @Param("popupId") Long popupId);
 
     // createdAt 칼럼이 주어진 날짜 시간 이전인 모든 Visit을 찾습니다.
     List<Visit> findAllByCreatedAtBefore(LocalDateTime dateTime);

@@ -25,29 +25,30 @@ public class PopupAlarm {
     @JoinColumn(name = "popup_id", nullable = false)
     private Popup popupId;
 
-    @Column(name = "token" , nullable = false)
+    @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "title" , nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "body" , nullable = false)
+    @Column(name = "body", nullable = false)
     private String body;
 
     @Column(name = "keyword", nullable = false)
     private String keyword; // popup, notify
 
-    @Column(name = "icon" , nullable = false)
+    @Column(name = "icon", nullable = false)
     private String icon; // icon
 
-    @Column(name = "created_at" , nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
 
-    @Column(name = "is_read" , nullable = false)
+    @Column(name = "is_read", nullable = false)
     private Boolean isRead; // 읽음 여부
 
     @Builder
-    public PopupAlarm(Popup popupId,String token, String title, String body, String keyword, String icon, LocalDate createdAt , Boolean isRead) {
+    public PopupAlarm(Popup popupId, String token, String title, String body, String keyword, String icon,
+                      LocalDate createdAt, Boolean isRead) {
         this.popupId = popupId;
         this.token = token;
         this.title = title;

@@ -6,7 +6,11 @@ import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
-import com.poppin.poppinserver.alarm.repository.*;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
+import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
+import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
@@ -25,13 +29,30 @@ import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
-import com.poppin.poppinserver.popup.domain.*;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.domain.PosterImage;
+import com.poppin.poppinserver.popup.domain.PreferedPopup;
+import com.poppin.poppinserver.popup.domain.ReopenDemand;
+import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.dto.popup.response.InterestedPopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestSearchingDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupSearchingDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
+import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
+import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -49,6 +70,14 @@ import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -59,11 +88,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -145,12 +169,11 @@ public class PopupService {
 
         //현재 운영상태 정의
         String operationStatus;
-        if (createPopupDto.openDate().isAfter(LocalDate.now())){
+        if (createPopupDto.openDate().isAfter(LocalDate.now())) {
             operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
-        }
-        else{
+        } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
@@ -193,7 +216,7 @@ public class PopupService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -227,7 +250,7 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
-    public PopupDto readPopup(Long adminId, Long popupId){
+    public PopupDto readPopup(Long adminId, Long popupId) {
         // 팝업 정보 불러오기
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -235,22 +258,17 @@ public class PopupService {
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
-    public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size){
-        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size), oper.getStatus());
+    public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size) {
+        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
+                oper.getStatus());
 
         // 각 운영상태별로 팝업 개수 반환
-        Long num = 0L;
-        switch (oper){
-            case NOTYET:
-                num = popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
-                break;
-            case TERMINATED:
-                num = popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
-                break;
-            case OPERATING:
-                num = popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
-                break;
-        }
+        Long num = switch (oper) {
+            case NOTYET -> popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
+            case TERMINATED -> popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
+            case OPERATING -> popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
+            default -> 0L;
+        };
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
@@ -278,12 +296,11 @@ public class PopupService {
             List<String> reviewUrls = reviewImages.stream()
                     .map(ReviewImage::getImageUrl)
                     .toList();
-            if(reviewUrls.size() != 0){
+            if (reviewUrls.size() != 0) {
                 s3Service.deleteMultipleImages(reviewUrls);
                 reviewImageRepository.deleteAllByReviewId(review.getId());
             }
         }
-
 
         log.info("delete reveiw data");
 
@@ -294,10 +311,10 @@ public class PopupService {
         // 알람 관련 데이터(1. 구독 해제, 2. topic 삭제)
         List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
 
-        for (PopupTopic topic: topicList) {
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup, EPopupTopic.MAGAM );
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup,EPopupTopic.OPEN );
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(),popup,EPopupTopic.CHANGE_INFO);
+        for (PopupTopic topic : topicList) {
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.MAGAM);
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.OPEN);
+            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.CHANGE_INFO);
         }
 
         // 관심 추가 데이터
@@ -310,9 +327,9 @@ public class PopupService {
 
         // 제보 관련 데이터
         log.info("delete inform data");
-            // 운영자 제보
+        // 운영자 제보
         managerInformRepository.deleteAllByPopupId(popup);
-            // 사용자 제보
+        // 사용자 제보
         userInformRepository.deleteAllByPopupId(popup);
 
         // 정보수정요청 관련 데이터
@@ -329,7 +346,7 @@ public class PopupService {
         List<String> fileUrls = posterImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        if(fileUrls.size() != 0){
+        if (fileUrls.size() != 0) {
             s3Service.deleteMultipleImages(fileUrls);
             posterImageRepository.deleteAllByPopupId(popup);
         }
@@ -351,7 +368,7 @@ public class PopupService {
     @Transactional
     public PopupDto updatePopup(UpdatePopupDto updatePopupDto,
                                 List<MultipartFile> images,
-                                Long adminId){
+                                Long adminId) {
         Popup popup = popupRepository.findById(updatePopupDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -396,7 +413,7 @@ public class PopupService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -410,7 +427,7 @@ public class PopupService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updatePopupDto.keywords()){
+        for (String keyword : updatePopupDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -425,12 +442,11 @@ public class PopupService {
 
         //현재 운영상태 정의
         String operationStatus;
-        if (updatePopupDto.openDate().isAfter(LocalDate.now())){
+        if (updatePopupDto.openDate().isAfter(LocalDate.now())) {
             operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updatePopupDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
-        }
-        else{
+        } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
@@ -467,20 +483,21 @@ public class PopupService {
         // 팝업 정보 변경 시 앱푸시 보내기
         List<Popup> popupList = new ArrayList<>();
         popupList.add(popup);
-        fcmScheduler.schedulerFcmPopupTopicByType(popupList,EPopupTopic.CHANGE_INFO, EPushInfo.CHANGE_INFO);
+        fcmScheduler.schedulerFcmPopupTopicByType(popupList, EPopupTopic.CHANGE_INFO, EPushInfo.CHANGE_INFO);
 
         return PopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
     public PagingResponseDto searchManageList(String text, int page, int size,
-                                        EOperationStatus oper){
+                                              EOperationStatus oper) {
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-        if (text != null && text.trim() != ""){
+        if (text != null && text.trim() != "") {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size), oper.getStatus()); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size),
+                oper.getStatus()); // 운영 상태
 
         Long num = popupRepository.count();
 
@@ -490,7 +507,7 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
-    public PopupGuestDetailDto readGuestDetail(Long popupId){
+    public PopupGuestDetailDto readGuestDetail(Long popupId) {
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -504,11 +521,11 @@ public class PopupService {
         List<String> profileImagesList = new ArrayList<>();
         List<Long> reviewCntList = new ArrayList<>();
 
-        for (Review review : reviews){
+        for (Review review : reviews) {
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
             List<String> imagesList = new ArrayList<>();
-            for(ReviewImage reviewImage : reviewImages){
+            for (ReviewImage reviewImage : reviewImages) {
                 imagesList.add(reviewImage.getImageUrl());
             }
 
@@ -517,7 +534,8 @@ public class PopupService {
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList,profileImagesList, reviewCntList);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList,
+                reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -526,10 +544,10 @@ public class PopupService {
         popupRepository.save(popup);
 
         // 이미지 목록 가져오기
-        List<PosterImage> posterImages  = posterImageRepository.findByPopupId(popup);
+        List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
 
         List<String> imageList = new ArrayList<>();
-        for(PosterImage posterImage : posterImages){
+        for (PosterImage posterImage : posterImages) {
             imageList.add(posterImage.getPosterUrl());
         }
 
@@ -537,7 +555,7 @@ public class PopupService {
     } // 비로그인 상세조회
 
     @Transactional
-    public PopupDetailDto readDetail(Long popupId, Long userId){
+    public PopupDetailDto readDetail(Long popupId, Long userId) {
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -567,7 +585,7 @@ public class PopupService {
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
 
             List<String> imagesList = new ArrayList<>();
-            for(ReviewImage reviewImage : reviewImages){
+            for (ReviewImage reviewImage : reviewImages) {
                 imagesList.add(reviewImage.getImageUrl());
             }
 
@@ -576,7 +594,8 @@ public class PopupService {
             reviewCntList.add(review.getUser().getReviewCnt());
         }
 
-        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(filteredReviews, reviewImagesList, profileImagesList, reviewCntList);
+        List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(filteredReviews, reviewImagesList,
+                profileImagesList, reviewCntList);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
 
@@ -585,17 +604,17 @@ public class PopupService {
         popupRepository.save(popup);
 
         // 이미지 목록 가져오기
-        List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
+        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
 
         List<String> imageList = new ArrayList<>();
-        for(PosterImage posterImage : posterImages){
+        for (PosterImage posterImage : posterImages) {
             imageList.add(posterImage.getPosterUrl());
         }
 
         // 관심 여부 확인
         Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
 
-        Optional<Visit> visit = visitRepository.findByUserId(userId,popupId);
+        Optional<Visit> visit = visitRepository.findByUserId(userId, popupId);
 
         // 차단 여부 확인
         User user = userRepository.findById(userId)
@@ -603,30 +622,34 @@ public class PopupService {
         Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
 
         // 방문 여부 확인
-        if (!visit.isEmpty())
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, true, isBlocked); // 이미 방문함
-        else
-            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors, false, isBlocked); // 방문 한적 없음
+        if (!visit.isEmpty()) {
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors,
+                    true, isBlocked); // 이미 방문함
+        } else {
+            return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors,
+                    false, isBlocked); // 방문 한적 없음
+        }
     } // 로그인 상세조회
 
-    public List<PopupSummaryDto> readHotList(){
+    public List<PopupSummaryDto> readHotList() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
 
-        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, PageRequest.of(0, 5));
+        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
+                PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 인기 팝업 조회
 
-    public List<PopupSummaryDto> readNewList(){
+    public List<PopupSummaryDto> readNewList() {
 
         List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 새로 오픈 팝업 조회
 
-    public List<PopupSummaryDto> readClosingList(){
+    public List<PopupSummaryDto> readClosingList() {
 
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
 
@@ -634,7 +657,7 @@ public class PopupService {
     } // 종료 임박 팝업 조회
 
     @Transactional
-    public List<InterestedPopupDto> readInterestedPopups(Long userId){
+    public List<InterestedPopupDto> readInterestedPopups(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -702,7 +725,7 @@ public class PopupService {
 //    } // 취향저격 팝업 조회
 
     @Transactional
-    public PopupTasteDto readTasteList(Long userId){
+    public PopupTasteDto readTasteList(Long userId) {
         // 사용자가 설정한 태그의 팝업들 5개씩 다 가져오기
         // 태그의 개수만큼 랜덤 변수 생성해서 하나 뽑기
         // 5개 선정
@@ -712,7 +735,7 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         //취향설정이 되지 않은 유저의 경우
-        if(user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null){
+        if (user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null) {
             return null;
         }
 
@@ -754,19 +777,20 @@ public class PopupService {
         Random random = new Random();
         Integer randomIndex = random.nextInt(selectedList.size());
 
-        log.info("취향 저격 "+selectedList.get(randomIndex));
+        log.info("취향 저격 " + selectedList.get(randomIndex));
 
-        return new PopupTasteDto(selectedList.get(randomIndex), PopupSummaryDto.fromEntityList(popups.get(randomIndex)));
+        return new PopupTasteDto(selectedList.get(randomIndex),
+                PopupSummaryDto.fromEntityList(popups.get(randomIndex)));
     } // 취향저격 팝업 조회
 
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
-                                               Long userId){
+                                               Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 카테고리 요청 코드 길이 유효성 체크
-        if(taste.length() < 3 || prepered.length() < 14){
+        if (taste.length() < 3 || prepered.length() < 14) {
             throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
         }
 
@@ -803,7 +827,7 @@ public class PopupService {
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-        if (text != null && text.trim() != ""){
+        if (text != null && text.trim() != "") {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
@@ -826,14 +850,15 @@ public class PopupService {
             }
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText, PageRequest.of(page, size, sort),
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText,
+                PageRequest.of(page, size, sort),
                 market, display, experience, // 팝업 형태 3개
                 fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
                 webtoonAni, interiorThings, movie,
                 musical, sports, game,
                 itTech, kpop, alcohol,
                 animalPlant, etc,
-                oper.getStatus(),userId); // 운영 상태
+                oper.getStatus(), userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
@@ -841,17 +866,18 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 로그인 팝업 검색
 
-    public PagingResponseDto readBaseList(String text, int page, int size, Long userId){
+    public PagingResponseDto readBaseList(String text, int page, int size, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-        if (text != null && text.trim() != ""){
+        if (text != null && text.trim() != "") {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText, PageRequest.of(page, size), userId); // 운영 상태
+        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText,
+                PageRequest.of(page, size), userId); // 운영 상태
 
         List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
@@ -860,9 +886,9 @@ public class PopupService {
     } // 로그인 베이스 팝업 검색
 
     public PagingResponseDto readGuestSearchingList(String text, String taste, String prepered,
-                                                               EOperationStatus oper, EPopupSort order, int page, int size){
+                                                    EOperationStatus oper, EPopupSort order, int page, int size) {
         // 카테고리 요청 코드 길이 유효성 체크
-        if(taste.length() < 3 || prepered.length() < 14){
+        if (taste.length() < 3 || prepered.length() < 14) {
             throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
         }
 
@@ -899,7 +925,7 @@ public class PopupService {
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-        if (text != null && text.trim() != ""){
+        if (text != null && text.trim() != "") {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
@@ -937,10 +963,10 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 비로그인 팝업 검색
 
-    public PagingResponseDto readGuestBaseList(String text, int page, int size){
+    public PagingResponseDto readGuestBaseList(String text, int page, int size) {
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-        if (text != null && text.trim() != ""){
+        if (text != null && text.trim() != "") {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
@@ -952,7 +978,7 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
     } // 비로그인 베이스 팝업 검색
 
-    public String reopenDemand(Long userId, PushRequestDto pushRequestDto){
+    public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -960,9 +986,12 @@ public class PopupService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());
-        if (token==null) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        if (token == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        }
 
-        ReopenDemand reopenDemand = new ReopenDemand(user, popup, pushRequestDto.token(), token.getMod_dtm(),token.getExp_dtm());
+        ReopenDemand reopenDemand = new ReopenDemand(user, popup, pushRequestDto.token(), token.getMod_dtm(),
+                token.getExp_dtm());
         reopenDemandRepository.save(reopenDemand);
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
@@ -972,7 +1001,6 @@ public class PopupService {
         log.info("재오픈 수요 체크 시 FCM TOPIC 등록");
 //        String pushToken = pushRequestDto.token();
 //        fcmService.fcmAddTopic(pushToken, popup, EPopupTopic.REOPEN);
-
 
         return "재오픈 수요 체크 되었습니다.";
     }

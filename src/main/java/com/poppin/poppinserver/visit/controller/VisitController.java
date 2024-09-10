@@ -16,10 +16,14 @@ public class VisitController {
 
     private final VisitService visitService;
 
-    @GetMapping ("/show-visitors")
-    public ResponseDto<?> getRealTimeVisitorsCnt(@RequestParam("popupId") Long popupId){ return ResponseDto.ok(visitService.showRealTimeVisitors(popupId));}
+    @GetMapping("/show-visitors")
+    public ResponseDto<?> getRealTimeVisitorsCnt(@RequestParam("popupId") Long popupId) {
+        return ResponseDto.ok(visitService.showRealTimeVisitors(popupId));
+    }
 
     @PostMapping("/add-visitors") /*방문하기*/
-    public  ResponseDto<?> addRealTimeVisitors(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto){return ResponseDto.ok(visitService.addRealTimeVisitors(userId,visitorsInfoDto));}
+    public ResponseDto<?> addRealTimeVisitors(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) {
+        return ResponseDto.ok(visitService.addRealTimeVisitors(userId, visitorsInfoDto));
+    }
 
 }

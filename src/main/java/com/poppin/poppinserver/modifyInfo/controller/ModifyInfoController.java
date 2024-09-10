@@ -42,15 +42,15 @@ public class ModifyInfoController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
     public ResponseDto<?> readModifyInfo(@RequestParam("infoId") Long modifyInfoId,
-                                         @UserId Long adminId){
+                                         @UserId Long adminId) {
         return ResponseDto.ok(modifyInfoService.readModifyInfo(modifyInfoId, adminId));
     } // 요청 조회
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping ("/list")
+    @GetMapping("/list")
     public ResponseDto<?> readModifyInfoList(@RequestParam("isExec") Boolean isExec,
                                              @RequestParam("page") int page,
-                                             @RequestParam("size") int size){
+                                             @RequestParam("size") int size) {
         return ResponseDto.ok(modifyInfoService.readModifyInfoList(page, size, isExec));
     } // 목록 조회
 
@@ -70,8 +70,8 @@ public class ModifyInfoController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> modifyConfirm(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
-                                            @UserId Long adminId) {
+                                        @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
+                                        @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);

@@ -31,7 +31,7 @@ public class ReportService {
     private final ReportPopupRepository reportPopupRepository;
     private final PopupRepository popupRepository;
 
-    public void createReviewReport(Long userId, Long reviewId, CreateReviewReportDto createReviewReportDto){
+    public void createReviewReport(Long userId, Long reviewId, CreateReviewReportDto createReviewReportDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Review review = reviewRepository.findById(reviewId)
@@ -46,7 +46,7 @@ public class ReportService {
         reportReviewRepository.save(reportReview);
     }
 
-    public void createPopupReport(Long userId, Long popupId, CreatePopupReportDto createPopupReportDto){
+    public void createPopupReport(Long userId, Long popupId, CreatePopupReportDto createPopupReportDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)

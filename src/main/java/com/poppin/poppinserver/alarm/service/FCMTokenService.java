@@ -38,10 +38,10 @@ public class FCMTokenService {
     private final PopupRepository popupRepository;
 
     /* FCM TOKEN 등록 */
-    public ApplyTokenResponseDto fcmApplyToken(ApplyTokenRequestDto requestDto){
+    public ApplyTokenResponseDto fcmApplyToken(ApplyTokenRequestDto requestDto) {
 
         log.info("applying token");
-        log.info("apply token : {}" , requestDto.fcmToken());
+        log.info("apply token : {}", requestDto.fcmToken());
 
         try {
             // 토큰 저장 여부 확인
@@ -53,10 +53,10 @@ public class FCMTokenService {
                 if (alarmSetting == null) {
                     alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
                     alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting." , "알람 세팅이 생성되었습니다.");
-                }
-                else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting." , "기존 알람 세팅이 존재합니다.");
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
+                } else {
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting.",
+                            "기존 알람 세팅이 존재합니다.");
                 }
             }
             // 디바이스 ID는 동일하지만 토큰이 다른 경우
@@ -79,7 +79,7 @@ public class FCMTokenService {
 
                     // review token refreshing
                     List<Review> reviews = reviewRepository.findAllByToken(fcmTokenOptional.get().getToken());
-                    for (Review review : reviews){
+                    for (Review review : reviews) {
                         review.setToken(requestDto.fcmToken());
                         reviewRepository.save(review);
                     }
@@ -89,10 +89,11 @@ public class FCMTokenService {
                 if (alarmSetting == null) {
                     alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
                     alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated device id. update token. create new alarm setting." , "토큰 업데이트 및 알림 세팅 생성");
-                }
-                else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "duplicated device id. update token. already exist alarm setting.", "토큰 업데이트");
+                    return ApplyTokenResponseDto.fromEntity(requestDto,
+                            "duplicated device id. update token. create new alarm setting.", "토큰 업데이트 및 알림 세팅 생성");
+                } else {
+                    return ApplyTokenResponseDto.fromEntity(requestDto,
+                            "duplicated device id. update token. already exist alarm setting.", "토큰 업데이트");
                 }
 
             } else {    // device id가 다를 때
@@ -111,15 +112,15 @@ public class FCMTokenService {
                 if (alarmSetting == null) {
                     alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
                     alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting." , "알람 세팅이 생성되었습니다.");
-                }
-                else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting." , "기존 알람 세팅이 존재합니다.");
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
+                } else {
+                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting.",
+                            "기존 알람 세팅이 존재합니다.");
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("applying token failed {}", e.getMessage());
-            return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail" , e.getMessage());
+            return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail", e.getMessage());
         }
     }
 
@@ -127,7 +128,7 @@ public class FCMTokenService {
 
         // 구독내역 존재 시 전부 삭제
         Optional<List<PopupTopic>> topicsNeedToDelete = popupTopicRepository.findByToken(token);
-        if (topicsNeedToDelete.isPresent()){
+        if (topicsNeedToDelete.isPresent()) {
             for (PopupTopic topic : topicsNeedToDelete.get()) {
                 popupTopicRepository.delete(topic);
                 fcmSubscribeService.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.MAGAM);
@@ -142,20 +143,22 @@ public class FCMTokenService {
 
     }
 
-    public void fcmAddPopupTopic(String token, Popup popup, EPopupTopic topic){
-        if(token != null){
+    public void fcmAddPopupTopic(String token, Popup popup, EPopupTopic topic) {
+        if (token != null) {
             // 팝업 관련
             try {
                 log.info("subscribe popup topic");
 
                 FCMToken pushToken = fcmTokenRepository.findByToken(token);
-                if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-                fcmSubscribeService.subscribePopupTopic(pushToken, popup , topic); // 관심팝업
-            }catch (CommonException | FirebaseMessagingException e){
+                if (pushToken == null) {
+                    throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+                }
+                fcmSubscribeService.subscribePopupTopic(pushToken, popup, topic); // 관심팝업
+            } catch (CommonException | FirebaseMessagingException e) {
                 log.error("failed to subscribe popup topic");
                 e.printStackTrace();
             }
-        }else{
+        } else {
             log.error("토큰이 존재하지 않아 앱푸시 팝업 주제 추가하지 않습니다");
         }
     }
@@ -165,30 +168,32 @@ public class FCMTokenService {
           Author : sakang
           Date   : 2024-04-27
     */
-    public void fcmRemovePopupTopic(String token, Popup popup, EPopupTopic topic){
+    public void fcmRemovePopupTopic(String token, Popup popup, EPopupTopic topic) {
 
         try {
             log.info("unsubscribe popup topic");
             FCMToken pushToken = fcmTokenRepository.findByToken(token);
-            if (pushToken == null)throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+            if (pushToken == null) {
+                throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+            }
             fcmSubscribeService.unsubscribePopupTopic(pushToken, popup, topic); // 구독 및 저장
-        }catch (CommonException | FirebaseMessagingException e){
+        } catch (CommonException | FirebaseMessagingException e) {
             log.error("failed to unsubscribe popup topic");
             e.printStackTrace();
         }
     }
 
 
-    public String resetPopupTopic(){
+    public String resetPopupTopic() {
 
         List<FCMToken> fcmTokenList = fcmTokenRepository.findAll();
-        for (FCMToken token : fcmTokenList){
+        for (FCMToken token : fcmTokenList) {
             Optional<List<PopupTopic>> topics = popupTopicRepository.findByToken(token);
-            if (topics.isPresent()){
-                for (PopupTopic topic : topics.get()){
-                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.MAGAM);
-                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.OPEN);
-                    fcmRemovePopupTopic(token.getToken(),topic.getPopup(),EPopupTopic.CHANGE_INFO);
+            if (topics.isPresent()) {
+                for (PopupTopic topic : topics.get()) {
+                    fcmRemovePopupTopic(token.getToken(), topic.getPopup(), EPopupTopic.MAGAM);
+                    fcmRemovePopupTopic(token.getToken(), topic.getPopup(), EPopupTopic.OPEN);
+                    fcmRemovePopupTopic(token.getToken(), topic.getPopup(), EPopupTopic.CHANGE_INFO);
                 }
             }
         }

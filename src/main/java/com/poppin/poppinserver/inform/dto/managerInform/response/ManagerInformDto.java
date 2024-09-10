@@ -15,7 +15,7 @@ public record ManagerInformDto(
         PopupDto popup, // 팝업
         EInformProgress progress // 처리 상태(NOTEXECUTED | EXECUTING | EXECUTED)
 ) {
-    public static ManagerInformDto fromEntity(ManagerInform managerInform){
+    public static ManagerInformDto fromEntity(ManagerInform managerInform) {
         PopupDto popupDto = PopupDto.fromEntity(managerInform.getPopupId());
 
         Long informerId = null;
