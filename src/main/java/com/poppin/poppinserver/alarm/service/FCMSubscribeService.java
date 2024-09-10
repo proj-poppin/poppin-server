@@ -35,19 +35,20 @@ public class FCMSubscribeService {
 
         // 중복 저장되는 오류 방어 코드 작성
         PopupTopic topicExist = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
-        if (topicExist == null){
+        if (topicExist == null) {
             PopupTopic popupTopic = new PopupTopic(token, popup, topic.getCode());
             popupTopicRepository.save(popupTopic); // 데이터 저장
 
             response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString()); // 구독
-            log.info(response.getSuccessCount() + " token(s) were subscribed successfully : {}" , token.getToken());
-        }else{
+            log.info(response.getSuccessCount() + " token(s) were subscribed successfully : {}", token.getToken());
+        } else {
             log.info(registrationTokens + "already subscribed");
         }
     }
 
     // 관심 팝업 구독 해제
-    public void unsubscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
+    public void unsubscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic)
+            throws FirebaseMessagingException {
 
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());
@@ -55,7 +56,9 @@ public class FCMSubscribeService {
         TopicManagementResponse response = null;
 
         PopupTopic topicExist = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
-        if (topicExist != null) popupTopicRepository.delete(topicExist);
+        if (topicExist != null) {
+            popupTopicRepository.delete(topicExist);
+        }
         response = firebaseMessaging.unsubscribeFromTopic(registrationTokens, topic.toString()); // 구독 해제
 
         log.info(response.getSuccessCount() + " token(s) were unsubscribed successfully");

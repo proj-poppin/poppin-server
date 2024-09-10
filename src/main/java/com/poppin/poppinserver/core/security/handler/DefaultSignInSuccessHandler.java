@@ -22,8 +22,10 @@ import java.util.Map;
 public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
 
@@ -38,7 +40,8 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
 
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
-        result.put("data", Map.of("accessToken", jwtTokenDto.accessToken(), "refreshToken", jwtTokenDto.refreshToken()));
+        result.put("data",
+                Map.of("accessToken", jwtTokenDto.accessToken(), "refreshToken", jwtTokenDto.refreshToken()));
         result.put("error", null);
 
         response.getWriter().write(JSONValue.toJSONString(result));

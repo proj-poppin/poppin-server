@@ -14,10 +14,10 @@ public record ManageSummaryDto(
         String adminName,
         String createdAt
 ) {
-    public static List<ManageSummaryDto> fromEntityList(List<Popup> popups){
+    public static List<ManageSummaryDto> fromEntityList(List<Popup> popups) {
         List<ManageSummaryDto> dtoList = new ArrayList<>();
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
             ManageSummaryDto manageSummaryDto =
                     ManageSummaryDto.builder()
                             .id(popup.getId())

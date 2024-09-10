@@ -18,10 +18,18 @@ public class SelectRandomUtil {
         List<String> preferences = new ArrayList<>();
 
         // PreferedPopup의 모든 속성을 검사하고 true로 설정된 항목들을 리스트에 추가
-        if (preferedPopup.getMarket()) preferences.add("market");
-        if (preferedPopup.getDisplay()) preferences.add("display");
-        if (preferedPopup.getExperience()) preferences.add("experience");
-        if (preferedPopup.getWantFree()) preferences.add("wantFree");
+        if (preferedPopup.getMarket()) {
+            preferences.add("market");
+        }
+        if (preferedPopup.getDisplay()) {
+            preferences.add("display");
+        }
+        if (preferedPopup.getExperience()) {
+            preferences.add("experience");
+        }
+        if (preferedPopup.getWantFree()) {
+            preferences.add("wantFree");
+        }
 
         // 랜덤하게 하나의 항목을 선택
         if (preferences.isEmpty()) {
@@ -37,10 +45,18 @@ public class SelectRandomUtil {
         List<String> preferences = new ArrayList<>();
 
         // PreferedPopup의 모든 속성을 검사하고 true로 설정된 항목들을 리스트에 추가
-        if (preferedPopup.getMarket()) preferences.add("market");
-        if (preferedPopup.getDisplay()) preferences.add("display");
-        if (preferedPopup.getExperience()) preferences.add("experience");
-        if (preferedPopup.getWantFree()) preferences.add("wantFree");
+        if (preferedPopup.getMarket()) {
+            preferences.add("market");
+        }
+        if (preferedPopup.getDisplay()) {
+            preferences.add("display");
+        }
+        if (preferedPopup.getExperience()) {
+            preferences.add("experience");
+        }
+        if (preferedPopup.getWantFree()) {
+            preferences.add("wantFree");
+        }
 
         return preferences;
     }
@@ -49,19 +65,45 @@ public class SelectRandomUtil {
         List<String> tastes = new ArrayList<>();
 
         // TastePopup의 모든 속성을 검사하고 true로 설정된 항목들을 리스트에 추가
-        if (tastePopup.getFashionBeauty()) tastes.add("fashionBeauty");
-        if (tastePopup.getCharacters()) tastes.add("characters");
-        if (tastePopup.getFoodBeverage()) tastes.add("foodBeverage");
-        if (tastePopup.getWebtoonAni()) tastes.add("webtoonAni");
-        if (tastePopup.getInteriorThings()) tastes.add("interiorThings");
-        if (tastePopup.getMovie()) tastes.add("movie");
-        if (tastePopup.getMusical()) tastes.add("musical");
-        if (tastePopup.getSports()) tastes.add("sports");
-        if (tastePopup.getGame()) tastes.add("game");
-        if (tastePopup.getItTech()) tastes.add("itTech");
-        if (tastePopup.getKpop()) tastes.add("kpop");
-        if (tastePopup.getAlcohol()) tastes.add("alcohol");
-        if (tastePopup.getAnimalPlant()) tastes.add("animalPlant");
+        if (tastePopup.getFashionBeauty()) {
+            tastes.add("fashionBeauty");
+        }
+        if (tastePopup.getCharacters()) {
+            tastes.add("characters");
+        }
+        if (tastePopup.getFoodBeverage()) {
+            tastes.add("foodBeverage");
+        }
+        if (tastePopup.getWebtoonAni()) {
+            tastes.add("webtoonAni");
+        }
+        if (tastePopup.getInteriorThings()) {
+            tastes.add("interiorThings");
+        }
+        if (tastePopup.getMovie()) {
+            tastes.add("movie");
+        }
+        if (tastePopup.getMusical()) {
+            tastes.add("musical");
+        }
+        if (tastePopup.getSports()) {
+            tastes.add("sports");
+        }
+        if (tastePopup.getGame()) {
+            tastes.add("game");
+        }
+        if (tastePopup.getItTech()) {
+            tastes.add("itTech");
+        }
+        if (tastePopup.getKpop()) {
+            tastes.add("kpop");
+        }
+        if (tastePopup.getAlcohol()) {
+            tastes.add("alcohol");
+        }
+        if (tastePopup.getAnimalPlant()) {
+            tastes.add("animalPlant");
+        }
 
         // 랜덤하게 하나의 항목을 선택
         if (tastes.isEmpty()) {
@@ -77,19 +119,45 @@ public class SelectRandomUtil {
         List<String> tastes = new ArrayList<>();
 
         // TastePopup의 모든 속성을 검사하고 true로 설정된 항목들을 리스트에 추가
-        if (tastePopup.getFashionBeauty()) tastes.add("fashionBeauty");
-        if (tastePopup.getCharacters()) tastes.add("characters");
-        if (tastePopup.getFoodBeverage()) tastes.add("foodBeverage");
-        if (tastePopup.getWebtoonAni()) tastes.add("webtoonAni");
-        if (tastePopup.getInteriorThings()) tastes.add("interiorThings");
-        if (tastePopup.getMovie()) tastes.add("movie");
-        if (tastePopup.getMusical()) tastes.add("musical");
-        if (tastePopup.getSports()) tastes.add("sports");
-        if (tastePopup.getGame()) tastes.add("game");
-        if (tastePopup.getItTech()) tastes.add("itTech");
-        if (tastePopup.getKpop()) tastes.add("kpop");
-        if (tastePopup.getAlcohol()) tastes.add("alcohol");
-        if (tastePopup.getAnimalPlant()) tastes.add("animalPlant");
+        if (tastePopup.getFashionBeauty()) {
+            tastes.add("fashionBeauty");
+        }
+        if (tastePopup.getCharacters()) {
+            tastes.add("characters");
+        }
+        if (tastePopup.getFoodBeverage()) {
+            tastes.add("foodBeverage");
+        }
+        if (tastePopup.getWebtoonAni()) {
+            tastes.add("webtoonAni");
+        }
+        if (tastePopup.getInteriorThings()) {
+            tastes.add("interiorThings");
+        }
+        if (tastePopup.getMovie()) {
+            tastes.add("movie");
+        }
+        if (tastePopup.getMusical()) {
+            tastes.add("musical");
+        }
+        if (tastePopup.getSports()) {
+            tastes.add("sports");
+        }
+        if (tastePopup.getGame()) {
+            tastes.add("game");
+        }
+        if (tastePopup.getItTech()) {
+            tastes.add("itTech");
+        }
+        if (tastePopup.getKpop()) {
+            tastes.add("kpop");
+        }
+        if (tastePopup.getAlcohol()) {
+            tastes.add("alcohol");
+        }
+        if (tastePopup.getAnimalPlant()) {
+            tastes.add("animalPlant");
+        }
 
         return tastes;
     }

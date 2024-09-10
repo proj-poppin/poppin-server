@@ -20,23 +20,23 @@ public record TasteDto(
         Boolean alcohol,
         Boolean animalPlant,
         Boolean etc) {
-        public static TasteDto fromEntity(TastePopup tastePopup){
-                return TasteDto.builder()
-                        .id(tastePopup.getId())
-                        .fashionBeauty(tastePopup.getFashionBeauty())
-                        .characters(tastePopup.getCharacters())
-                        .foodBeverage(tastePopup.getFoodBeverage())
-                        .webtoonAni(tastePopup.getWebtoonAni())
-                        .interiorThings(tastePopup.getInteriorThings())
-                        .movie(tastePopup.getMovie())
-                        .musical(tastePopup.getMusical())
-                        .sports(tastePopup.getSports())
-                        .game(tastePopup.getGame())
-                        .itTech(tastePopup.getItTech())
-                        .kpop(tastePopup.getKpop())
-                        .alcohol(tastePopup.getAlcohol())
-                        .animalPlant(tastePopup.getAnimalPlant())
-                        .etc(tastePopup.getEtc())
-                        .build();
-        }
+    public static TasteDto fromEntity(TastePopup tastePopup) {
+        return TasteDto.builder()
+                .id(tastePopup.getId())
+                .fashionBeauty(tastePopup.getFashionBeauty())
+                .characters(tastePopup.getCharacters())
+                .foodBeverage(tastePopup.getFoodBeverage())
+                .webtoonAni(tastePopup.getWebtoonAni())
+                .interiorThings(tastePopup.getInteriorThings())
+                .movie(tastePopup.getMovie())
+                .musical(tastePopup.getMusical())
+                .sports(tastePopup.getSports())
+                .game(tastePopup.getGame())
+                .itTech(tastePopup.getItTech())
+                .kpop(tastePopup.getKpop())
+                .alcohol(tastePopup.getAlcohol())
+                .animalPlant(tastePopup.getAnimalPlant())
+                .etc(tastePopup.getEtc())
+                .build();
+    }
 }

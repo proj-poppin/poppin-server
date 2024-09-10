@@ -21,21 +21,21 @@ public class ReviewImage {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch  = FetchType.LAZY)
-    @JoinColumn(name="review_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id", referencedColumnName = "id", nullable = false)
     private Review review;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "created_at",nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "edited_at",nullable = false)
+    @Column(name = "edited_at", nullable = false)
     private LocalDateTime editedAt;
 
     @Builder
-    public ReviewImage(String imageUrl, Review review){
+    public ReviewImage(String imageUrl, Review review) {
         this.imageUrl = imageUrl;
         this.review = review;
         this.createdAt = LocalDateTime.now();

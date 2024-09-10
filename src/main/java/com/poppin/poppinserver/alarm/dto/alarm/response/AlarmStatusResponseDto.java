@@ -8,7 +8,7 @@ public record AlarmStatusResponseDto(
         Boolean alarmStatus
 
 ) {
-    public static AlarmStatusResponseDto fromEntity(Boolean alarmStatus){
+    public static AlarmStatusResponseDto fromEntity(Boolean alarmStatus) {
 
         return AlarmStatusResponseDto.builder()
                 .alarmStatus(alarmStatus)

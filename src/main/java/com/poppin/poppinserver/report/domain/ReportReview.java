@@ -50,7 +50,8 @@ public class ReportReview {
     private String executeContent;
 
     @Builder
-    public ReportReview(User reporterId, Review reviewId, LocalDateTime reportedAt, String reportContent, Boolean isExecuted) {
+    public ReportReview(User reporterId, Review reviewId, LocalDateTime reportedAt, String reportContent,
+                        Boolean isExecuted) {
         this.reporterId = reporterId;
         this.reviewId = reviewId;
         this.reportedAt = reportedAt;

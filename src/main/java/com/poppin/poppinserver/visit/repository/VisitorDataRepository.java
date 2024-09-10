@@ -15,11 +15,15 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
 
     @Query("SELECT " +
             "CASE " +
-            "   WHEN SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) " +
-            "       AND SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) " +
+            "   WHEN SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) "
+            +
+            "       AND SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) "
+            +
             "   THEN '혼잡' " +
-            "   WHEN SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) " +
-            "       AND SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) " +
+            "   WHEN SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) "
+            +
+            "       AND SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) "
+            +
             "   THEN '보통' " +
             "   ELSE '여유' " +
             "END AS congestionRate, " +
@@ -27,14 +31,19 @@ public interface VisitorDataRepository extends JpaRepository<VisitorData, Long> 
             "   WHEN COUNT(v) = 0 THEN 0 " +
             "   ELSE " +
             "        SUM (CASE WHEN v.congestion = (SELECT CASE " +
-            "                                           WHEN SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) " +
-            "                                               AND SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) " +
+            "                                           WHEN SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) "
+            +
+            "                                               AND SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) "
+            +
             "                                           THEN 'CROWDED' " +
-            "                                           WHEN SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) " +
-            "                                               AND SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) " +
+            "                                           WHEN SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) "
+            +
+            "                                               AND SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) > SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END) "
+            +
             "                                           THEN 'NORMAL' " +
             "                                           ELSE 'RELAXED' " +
-            "                                       END FROM VisitorData v WHERE p.id = :popupId AND v.visitDate = :visitDateEnum) THEN 1 ELSE 0 END) * 100 / (SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) + " +
+            "                                       END FROM VisitorData v WHERE p.id = :popupId AND v.visitDate = :visitDateEnum) THEN 1 ELSE 0 END) * 100 / (SUM(CASE WHEN v.congestion = 'CROWDED' THEN 1 ELSE 0 END) + "
+            +
             "                                             SUM(CASE WHEN v.congestion = 'NORMAL' THEN 1 ELSE 0 END) + " +
             "                                             SUM(CASE WHEN v.congestion = 'RELAXED' THEN 1 ELSE 0 END)) " +
             "END AS congestionRatio " +

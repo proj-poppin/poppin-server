@@ -112,7 +112,7 @@ public class Popup {
     @JoinColumn(name = "agent")
     private User agent;
 
-    @OneToMany(mappedBy = "popup" , fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "popup", fetch = FetchType.EAGER)
     private Set<Interest> interest = new HashSet<>();
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
@@ -157,10 +157,11 @@ public class Popup {
     }
 
     public void update(String homepageLink, String name, String introduce,
-                 String address, String addressDetail, Boolean entranceRequired, String entranceFee,
-                 Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
-                 LocalDate openDate, LocalDate closeDate, LocalTime openTime,
-                 LocalTime closeTime, Double latitude, Double longitude, String operationExcept, String operationStatus,
+                       String address, String addressDetail, Boolean entranceRequired, String entranceFee,
+                       Boolean resvRequired, EAvailableAge availableAge, Boolean parkingAvailable,
+                       LocalDate openDate, LocalDate closeDate, LocalTime openTime,
+                       LocalTime closeTime, Double latitude, Double longitude, String operationExcept,
+                       String operationStatus,
                        User agent) {
         this.homepageLink = homepageLink;
         this.name = name;
@@ -188,17 +189,28 @@ public class Popup {
         this.agent = agent;
     }
 
-    public void addInterestCnt() {this.interestCnt += 1;}
+    public void addInterestCnt() {
+        this.interestCnt += 1;
+    }
 
-    public void addreopenDemandCnt() {this.reopenDemandCnt += 1;}
+    public void addreopenDemandCnt() {
+        this.reopenDemandCnt += 1;
+    }
 
-    public void addViewCnt() {this.viewCnt += 1;}
+    public void addViewCnt() {
+        this.viewCnt += 1;
+    }
 
 
-    public void updatePosterUrl(String url) {this.posterUrl = url;}
+    public void updatePosterUrl(String url) {
+        this.posterUrl = url;
+    }
 
-    public void updateOpStatus(String op) {this.operationStatus = op;}
+    public void updateOpStatus(String op) {
+        this.operationStatus = op;
+    }
 
-    public void updateAgent(User agent){
-        this.agent = agent;}
+    public void updateAgent(User agent) {
+        this.agent = agent;
+    }
 }

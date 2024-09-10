@@ -126,11 +126,13 @@ public class UserInformService {
     } // 제보 생성
 
     @Transactional
-    public UserInformDto createGuestUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
-                                          Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
-                                          Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
-                                          Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
-                                          List<MultipartFile> images) {
+    public UserInformDto createGuestUserInform(String name, String contactLink, Boolean fashionBeauty,
+                                               Boolean characters,
+                                               Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
+                                               Boolean movie, Boolean musical, Boolean sports, Boolean game,
+                                               Boolean itTech,
+                                               Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
+                                               List<MultipartFile> images) {
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(fashionBeauty)
@@ -195,7 +197,7 @@ public class UserInformService {
     } // 제보 생성
 
     @Transactional
-    public UserInformDto readUserInform(Long userInformId){
+    public UserInformDto readUserInform(Long userInformId) {
         UserInform userInform = userInformRepository.findById(userInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
@@ -205,7 +207,7 @@ public class UserInformService {
     @Transactional
     public UserInformDto updateUserInform(UpdateUserInfromDto updateUserInfromDto,
                                           List<MultipartFile> images,
-                                          Long adminId){
+                                          Long adminId) {
         UserInform userInform = userInformRepository.findById(updateUserInfromDto.userInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
@@ -254,7 +256,7 @@ public class UserInformService {
         List<String> newUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : newUrls){
+        for (String url : newUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -268,7 +270,7 @@ public class UserInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateUserInfromDto.keywords()){
+        for (String keyword : updateUserInfromDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -307,8 +309,8 @@ public class UserInformService {
 
     @Transactional
     public UserInformDto uploadPopup(UpdateUserInfromDto updateUserInfromDto,
-                                          List<MultipartFile> images,
-                                          Long adminId){
+                                     List<MultipartFile> images,
+                                     Long adminId) {
         UserInform userInform = userInformRepository.findById(updateUserInfromDto.userInformId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
@@ -357,7 +359,7 @@ public class UserInformService {
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
         List<PosterImage> posterImages = new ArrayList<>();
-        for(String url : fileUrls){
+        for (String url : fileUrls) {
             PosterImage posterImage = PosterImage.builder()
                     .posterUrl(url)
                     .popup(popup)
@@ -371,7 +373,7 @@ public class UserInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateUserInfromDto.keywords()){
+        for (String keyword : updateUserInfromDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -386,12 +388,11 @@ public class UserInformService {
 
         //현재 운영상태 정의
         String operationStatus;
-        if (updateUserInfromDto.openDate().isAfter(LocalDate.now())){
+        if (updateUserInfromDto.openDate().isAfter(LocalDate.now())) {
             operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateUserInfromDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
-        }
-        else{
+        } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
@@ -432,11 +433,12 @@ public class UserInformService {
     @Transactional
     public PagingResponseDto reatUserInformList(int page,
                                                 int size,
-                                                EInformProgress progress){
+                                                EInformProgress progress) {
         Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);
-        List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(userInforms.getContent());
+        List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(
+                userInforms.getContent());
 
         return PagingResponseDto.fromEntityAndPageInfo(userInformSummaryDtos, pageInfoDto);
     } // 제보 리스트 조회

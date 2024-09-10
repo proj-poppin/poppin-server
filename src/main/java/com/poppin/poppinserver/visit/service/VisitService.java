@@ -32,7 +32,7 @@ public class VisitService {
     private final FCMTokenService fcmTokenService;
 
     /* 실시간 방문자 조회 */
-    public Optional<Integer> showRealTimeVisitors(Long popupId){
+    public Optional<Integer> showRealTimeVisitors(Long popupId) {
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -47,7 +47,7 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, VisitorsInfoDto visitorsInfoDto){
+    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, VisitorsInfoDto visitorsInfoDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -62,22 +62,29 @@ public class VisitService {
                 .popup(popup)
                 .build();
 
-        Integer visitors = visitRepository.findDuplicateVisitors(userId,popup.getId(), thirtyMinutesAgo);
-        if (visitors > 0)throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
+        Integer visitors = visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo);
+        if (visitors > 0) {
+            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
+        }
 
         visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 일 주일 전 생성된 데이터만 삭제 예정*/
         user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
 
         // fcm 구독
         String token = visitorsInfoDto.fcmToken();
-        if (token.isEmpty()) throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        if (token.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        }
         fcmTokenService.fcmAddPopupTopic(token, popup, EPopupTopic.HOOGI);
 
-        Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo); /*실시간 방문자 수*/
+        Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
+                thirtyMinutesAgo); /*실시간 방문자 수*/
 
-        if (realTimeVisitorsCount.isEmpty()){realTimeVisitorsCount = Optional.of(0);} // empty 면 0으로.
+        if (realTimeVisitorsCount.isEmpty()) {
+            realTimeVisitorsCount = Optional.of(0);
+        } // empty 면 0으로.
 
-            RealTimeVisitorsDto realTimeVisitorsDto = RealTimeVisitorsDto.builder()
+        RealTimeVisitorsDto realTimeVisitorsDto = RealTimeVisitorsDto.builder()
                 .userId(realTimeVisit.getUser().getId())
                 .popupId(realTimeVisit.getPopup().getId())
                 .visitorsCnt(realTimeVisitorsCount)

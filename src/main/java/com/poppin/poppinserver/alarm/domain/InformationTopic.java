@@ -31,16 +31,16 @@ public class InformationTopic {
     private Popup popup; // 토큰 id
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "topic" , nullable = false)
+    @Column(name = "topic", nullable = false)
     private EInformationTopic topic; // 주제
 
-    @Column(name = "topic_type" , nullable = false)
+    @Column(name = "topic_type", nullable = false)
     private String type; // 타입
 
-    @Column(name = "created_at" , nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "modify_date" , nullable = false)
+    @Column(name = "modify_date", nullable = false)
     private LocalDateTime mod_dtm;
 
 

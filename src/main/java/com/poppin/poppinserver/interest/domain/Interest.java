@@ -42,7 +42,8 @@ public class Interest {
         private Long userId;
         private Long popupId;
 
-        public InterestId() {}
+        public InterestId() {
+        }
 
         public InterestId(Long userId, Long popupId) {
             this.userId = userId;
@@ -51,8 +52,12 @@ public class Interest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             InterestId that = (InterestId) o;
             return Objects.equals(userId, that.userId) &&
                     Objects.equals(popupId, that.popupId);

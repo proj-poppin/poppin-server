@@ -17,12 +17,12 @@ public class PopupScheduler {
 
     // 자정마다 팝업 상태 변경
     @Scheduled(cron = "0 0 0 * * *")
-    public void changePopupOperatingStatus(){
+    public void changePopupOperatingStatus() {
         List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
             //현재 운영상태 수정
-            if (popup.getOpenDate().isAfter(LocalDate.now())){
+            if (popup.getOpenDate().isAfter(LocalDate.now())) {
                 popup.updateOpStatus(EOperationStatus.NOTYET.getStatus());
             } else if (popup.getCloseDate().isBefore(LocalDate.now())) {
                 popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());

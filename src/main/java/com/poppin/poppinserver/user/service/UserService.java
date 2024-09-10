@@ -1,22 +1,46 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.repository.NotificationRepository;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.util.RandomNicknameUtil;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
-import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.domain.PosterImage;
+import com.poppin.poppinserver.popup.domain.PreferedPopup;
+import com.poppin.poppinserver.popup.domain.TastePopup;
+import com.poppin.poppinserver.popup.domain.WhoWithPopup;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupCertiDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PreferedDto;
+import com.poppin.poppinserver.popup.dto.popup.response.TasteDto;
+import com.poppin.poppinserver.popup.dto.popup.response.UserTasteDto;
+import com.poppin.poppinserver.popup.dto.popup.response.WhoWithDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
+import com.poppin.poppinserver.popup.repository.TastePopupRepository;
+import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
+import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
+import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.review.domain.ReviewImage;
+import com.poppin.poppinserver.review.dto.review.response.ReviewCertiDto;
+import com.poppin.poppinserver.review.dto.review.response.ReviewFinishDto;
+import com.poppin.poppinserver.review.dto.review.response.ReviewUncertiDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
-import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.user.domain.BlockedUser;
+import com.poppin.poppinserver.user.domain.FreqQuestion;
+import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
-import com.poppin.poppinserver.review.dto.review.response.ReviewFinishDto;
-import com.poppin.poppinserver.review.dto.review.response.ReviewUncertiDto;
-import com.poppin.poppinserver.review.dto.review.response.ReviewCertiDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UserInfoDto;
 import com.poppin.poppinserver.user.dto.user.response.NicknameDto;
@@ -26,31 +50,19 @@ import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
-import com.poppin.poppinserver.popup.domain.*;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.core.util.RandomNicknameUtil;
-import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.user.domain.BlockedUser;
-import com.poppin.poppinserver.user.domain.FreqQuestion;
-import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.domain.VisitorData;
+import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -295,48 +307,53 @@ public class UserService {
     }
 
     /*마이페이지 - 작성완료 후기 조회*/
-    public List<ReviewFinishDto> getFinishReviewList(Long userId){
+    public List<ReviewFinishDto> getFinishReviewList(Long userId) {
 
         List<ReviewFinishDto> reviewFinishDtoList = new ArrayList<>();
         List<Review> reviewList = reviewRepository.findByUserId(userId);
 
-        for (Review review : reviewList){
+        for (Review review : reviewList) {
             // 팝업 정보
             Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
 
             // 팝업 이미지 정보
-            List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
+            List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
             List<String> imageList = new ArrayList<>();
-            if (!posterImages.isEmpty())
-            {
-                for(PosterImage posterImage : posterImages){
+            if (!posterImages.isEmpty()) {
+                for (PosterImage posterImage : posterImages) {
                     imageList.add(posterImage.getPosterUrl());
                 }
-            }else{
+            } else {
                 imageList.add(null);
             }
 
-            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt(),imageList);
+            ReviewFinishDto reviewFinishDto = ReviewFinishDto.fromEntity(review.getId(), popup.getId(), popup.getName(),
+                    review.getIsCertificated(), review.getCreatedAt(), imageList);
             reviewFinishDtoList.add(reviewFinishDto);
         }
         return reviewFinishDtoList;
     }
 
     /*마이페이지 - 작성 완료 후기 조회 - 인증 후기 보기*/
-    public ReviewCertiDto getCertifiedReview(Long userId, Long reviewId, Long popupId){
+    public ReviewCertiDto getCertifiedReview(Long userId, Long reviewId, Long popupId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP)); /*여기서 인증된 후기의 popupId로 조회한다*/
 
         Review review = reviewRepository.findByIdAndPopupId(reviewId, popupId); /* 후기 */
-        if (review == null) throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        if (review == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        }
 
         Visit visit = visitRepository.findByUserIdAndPopupId(userId, popupId);
-        if (visit == null) throw new CommonException(ErrorCode.NOT_FOUND_REALTIMEVISIT); /*인증 테이블에 값이 없으면 익셉션 처리*/
+        if (visit == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_REALTIMEVISIT); /*인증 테이블에 값이 없으면 익셉션 처리*/
+        }
 
-        VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId,popupId);
-        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),visitorData.getSatisfaction(),visitorData.getCongestion());
+        VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popupId);
+        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),
+                visitorData.getSatisfaction(), visitorData.getCongestion());
 
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
@@ -354,17 +371,20 @@ public class UserService {
     }
 
     /*마이페이지 - 작성완료 후기 조회 - 일반 후기 보기*/
-    public ReviewUncertiDto getUncertifiedReview(Long userId, Long reviewId, Long popupId){
+    public ReviewUncertiDto getUncertifiedReview(Long userId, Long reviewId, Long popupId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP)); /*여기서 인증된 후기의 popupId로 조회한다*/
 
         Review review = reviewRepository.findByIdAndPopupId(reviewId, popupId); /* 후기 */
-        if (review == null )throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        if (review == null) {
+            throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
+        }
 
-        VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId,popupId);
-        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),visitorData.getSatisfaction(),visitorData.getCongestion());
+        VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popupId);
+        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),
+                visitorData.getSatisfaction(), visitorData.getCongestion());
 
         List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
@@ -380,19 +400,22 @@ public class UserService {
         );
     }
 
-    public List<PopupCertiDto> getCertifiedPopupList(Long userId){
+    public List<PopupCertiDto> getCertifiedPopupList(Long userId) {
         /* 1. userId로 visit 리스트 뽑기
          *  2. visit 리스트의 popupid 와 popup의 id 일치하는 popup 뽑기
          */
         List<Visit> visitList = visitRepository.findAllByUserId(userId);
-        if (visitList.isEmpty())throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        if (visitList.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        }
 
         List<PopupCertiDto> popupCertiDtoList = new ArrayList<>();
 
-        for (Visit visit : visitList){
+        for (Visit visit : visitList) {
             Long vdPopupId = visit.getPopup().getId();
             Popup popup = popupRepository.findTopByPopupId(vdPopupId);
-            PopupCertiDto popupCertiDto = PopupCertiDto.fromEntity(popup.getName(),popup.getPosterUrl(),visit.getCreatedAt());
+            PopupCertiDto popupCertiDto = PopupCertiDto.fromEntity(popup.getName(), popup.getPosterUrl(),
+                    visit.getCreatedAt());
             popupCertiDtoList.add(popupCertiDto);
         }
         return popupCertiDtoList;
@@ -521,6 +544,7 @@ public class UserService {
     private void deleteUserNotificationAlarmInfo(Long userId) {
         notificationRepository.deleteAllByUserId(userId);
     }
+
     /*
         팝업 차단 목록 삭제
      */
@@ -528,7 +552,7 @@ public class UserService {
         blockedPopupRepository.deleteAllByUserId(userId);
     }
 
-    public void addReviewCnt(User user){
+    public void addReviewCnt(User user) {
         user.addReviewCnt();
         userRepository.save(user);
     }
@@ -572,18 +596,18 @@ public class UserService {
 
         userRepository.save(user);
 
-        if (preferedPopup.getDisplay() == false && preferedPopup.getExperience() == false &&
-                preferedPopup.getMarket() == false && preferedPopup.getWantFree() == false &&
-            tastePopup.getAlcohol() == false && tastePopup.getAnimalPlant() == false &&
-                tastePopup.getCharacters() == false && tastePopup.getFashionBeauty() == false &&
-                tastePopup.getFoodBeverage() == false && tastePopup.getGame() == false &&
-                tastePopup.getInteriorThings() == false && tastePopup.getItTech() == false &&
-                tastePopup.getKpop() == false && tastePopup.getMovie() == false &&
-                tastePopup.getMusical() == false && tastePopup.getSports() == false &&
-                tastePopup.getWebtoonAni() == false &&
-            whoWithPopup.getSolo() == false && whoWithPopup.getWithFamily() == false &&
-                whoWithPopup.getWithFriend() == false && whoWithPopup.getWithLover() == false
-            ) {
+        if (!preferedPopup.getDisplay() && !preferedPopup.getExperience() &&
+                !preferedPopup.getMarket() && !preferedPopup.getWantFree() &&
+                !tastePopup.getAlcohol() && !tastePopup.getAnimalPlant() &&
+                !tastePopup.getCharacters() && !tastePopup.getFashionBeauty() &&
+                !tastePopup.getFoodBeverage() && !tastePopup.getGame() &&
+                !tastePopup.getInteriorThings() && !tastePopup.getItTech() &&
+                !tastePopup.getKpop() && !tastePopup.getMovie() &&
+                !tastePopup.getMusical() && !tastePopup.getSports() &&
+                !tastePopup.getWebtoonAni() &&
+                !whoWithPopup.getSolo() && !whoWithPopup.getWithFamily() &&
+                !whoWithPopup.getWithFriend() && !whoWithPopup.getWithLover()
+        ) {
             hasPreferences = false;
         }
 
@@ -638,7 +662,8 @@ public class UserService {
             throw new CommonException(ErrorCode.CANNOT_BLOCK_MYSELF);
         }
 
-        Optional<BlockedUser> checkBlockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId, blockUserId);
+        Optional<BlockedUser> checkBlockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId,
+                blockUserId);
         if (checkBlockedUser.isPresent()) {
             throw new CommonException(ErrorCode.ALREADY_BLOCKED_USER);
         }

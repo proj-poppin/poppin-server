@@ -16,7 +16,7 @@ public record AlarmKeywordResponseDto(
     public static List<AlarmKeywordResponseDto> fromEntity(Set<UserAlarmKeyword> userAlarmKeywords) {
         List<AlarmKeywordResponseDto> AlarmKeywordDtoList = new ArrayList<>();
 
-        for(UserAlarmKeyword userAlarmKeyword : userAlarmKeywords) {
+        for (UserAlarmKeyword userAlarmKeyword : userAlarmKeywords) {
             AlarmKeywordResponseDto alarmKeywordResponseDto = AlarmKeywordResponseDto.builder()
                     .keywordId(userAlarmKeyword.getId())
                     .keyword(userAlarmKeyword.getKeyword())

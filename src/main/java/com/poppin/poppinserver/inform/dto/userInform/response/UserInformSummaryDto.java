@@ -9,26 +9,26 @@ import java.util.List;
 
 @Builder
 public record UserInformSummaryDto(
-   Long id,
-   EInformProgress progress,
-   String popupName,
-   String informerName,
-   String informedAt,
-   String adminName,
-   String executedAt
+        Long id,
+        EInformProgress progress,
+        String popupName,
+        String informerName,
+        String informedAt,
+        String adminName,
+        String executedAt
 ) {
-    public static List<UserInformSummaryDto> fromEntityList(List<UserInform> userInforms){
+    public static List<UserInformSummaryDto> fromEntityList(List<UserInform> userInforms) {
         List<UserInformSummaryDto> dtoList = new ArrayList<>();
 
-        for(UserInform userInform : userInforms){
+        for (UserInform userInform : userInforms) {
 
             String executedAt = null;
-            if(userInform.getExecutedAt() != null){
+            if (userInform.getExecutedAt() != null) {
                 executedAt = userInform.getExecutedAt().toString();
             }
 
             String informerName = null;
-            if (userInform.getInformerId() != null){
+            if (userInform.getInformerId() != null) {
                 informerName = userInform.getInformerId().getNickname();
             }
 

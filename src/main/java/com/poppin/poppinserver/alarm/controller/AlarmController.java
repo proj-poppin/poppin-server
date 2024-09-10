@@ -28,47 +28,47 @@ public class AlarmController {
 
     // 알림 안읽은 것 여부
     @PostMapping("/unread")
-    public ResponseDto<?> readAlarm( @RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+    public ResponseDto<?> readAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
         return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
     }
 
     // 팝업 알림 보여주기(1 depth)
     @PostMapping("/popup")
-    public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto){
+    public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
         return ResponseDto.ok(alarmListService.readPopupAlarmList(alarmTokenRequestDto));
     }
 
     // 팝업 알림 보여주기 - 로그인 (2 depth)
     @PostMapping("/detail/popup")
-    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto){
+    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto) {
         return ResponseDto.ok(alarmListService.readPopupDetail(userId, requestDto));
     }
 
     // 팝업 알림 보여주기 - 비로그인 (2 depth)
     @PostMapping("/popup/guest/detail")
-    public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto){
+    public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto) {
         return ResponseDto.ok(alarmListService.readPopupDetailGuest(requestDto));
     }
 
     // 공지사항 알림 보여주기(1 depth)
     @PostMapping("/info")
-    public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto){
+    public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto) {
         return ResponseDto.ok(alarmListService.readInformAlarmList(requestDto));
     }
 
     // 공지사항 디테일 (2 depth)
     @PostMapping("/info/detail")
-    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto){
+    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto) {
         return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
     }
 
     @PostMapping("/read/setting")
-    public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody AlarmTokenRequestDto dto){
-        return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId,dto));
+    public ResponseDto<?> readAlarmSetting(@UserId Long userId, @RequestBody AlarmTokenRequestDto dto) {
+        return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId, dto));
     }
 
     @PostMapping("/update/setting")
-    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto){
+    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {
         return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
     }
 
@@ -80,7 +80,8 @@ public class AlarmController {
 
     // 마이페이지 > 키워드 알람 > 키워드 등록
     @PostMapping("/keywords")
-    public ResponseDto<?> createAlarmKeyword(@UserId Long userId, @RequestBody AlarmKeywordRequestDto alarmKeywordRequestDto) {
+    public ResponseDto<?> createAlarmKeyword(@UserId Long userId,
+                                             @RequestBody AlarmKeywordRequestDto alarmKeywordRequestDto) {
         return ResponseDto.ok(alarmKeywordService.createAlarmKeyword(userId, alarmKeywordRequestDto));
     }
 
@@ -94,9 +95,8 @@ public class AlarmController {
     // 마이페이지 > 키워드 알람 > 키워드 활성화/비활성화
     @PutMapping("/keywords/{keywordId}")
     public ResponseDto<?> setAlarmKeywordStatus(@UserId Long userId,
-                              @PathVariable(name = "keywordId") Long keywordId,
-                              @RequestParam(name = "isOn") Boolean isOn)
-    {
+                                                @PathVariable(name = "keywordId") Long keywordId,
+                                                @RequestParam(name = "isOn") Boolean isOn) {
         return ResponseDto.ok(alarmKeywordService.setAlarmKeywordStatus(userId, keywordId, isOn));
     }
 }

@@ -41,7 +41,9 @@ public record PopupDetailDto(Long id,
                              Boolean isVisited,
                              Boolean isBlocked
 ) {
-    public static PopupDetailDto fromEntity(Popup popup, List<String> images, Boolean isInterested, List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto, Optional<Integer> realTimeVisit, Boolean isVisited, Boolean isBlocked){
+    public static PopupDetailDto fromEntity(Popup popup, List<String> images, Boolean isInterested,
+                                            List<ReviewInfoDto> reviewInfoList, VisitorDataInfoDto visitorDataDto,
+                                            Optional<Integer> realTimeVisit, Boolean isVisited, Boolean isBlocked) {
 
         Boolean isInstagram = popup.getHomepageLink().contains("instagram");
 

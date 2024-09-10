@@ -16,8 +16,7 @@ public record InformApplyResponseDto(
         String iconUrl,
         List<String> posterUrl
 ) {
-    public static InformApplyResponseDto fromEntity(InformAlarm alarm, List<String> posterUrl)
-    {
+    public static InformApplyResponseDto fromEntity(InformAlarm alarm, List<String> posterUrl) {
         return InformApplyResponseDto.builder()
                 .title(alarm.getTitle())
                 .body(alarm.getBody())

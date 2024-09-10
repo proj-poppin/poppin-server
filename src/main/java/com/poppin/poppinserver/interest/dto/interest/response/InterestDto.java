@@ -13,7 +13,7 @@ public record InterestDto(
         UserDto user,
         PopupDto popup
 ) {
-    public static InterestDto fromEntity(Interest intereste, User user, Popup popup){
+    public static InterestDto fromEntity(Interest intereste, User user, Popup popup) {
         return InterestDto.builder()
                 .createAt(intereste.getCreatedAt().toString())
                 .user(UserDto.fromEntity(user))

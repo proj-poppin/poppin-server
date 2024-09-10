@@ -23,9 +23,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         CustomUserDetails userDetails = null;
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername((String) authentication.getPrincipal());
+            userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(
+                    (String) authentication.getPrincipal());
             if (!bCryptPasswordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())) {
-                throw new AuthenticationException("Invalid Password") {};
+                throw new AuthenticationException("Invalid Password") {
+                };
             }
         } else if (authentication instanceof JwtAuthenticationToken) {
             JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
@@ -34,16 +36,19 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                     .build();
             userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUserId(jwtUserInfo.id());
             if (userDetails.getRole() != jwtUserInfo.role()) {
-                throw new AuthenticationException("Invalid Role") {};
+                throw new AuthenticationException("Invalid Role") {
+                };
             }
         } else {
-            throw new AuthenticationException("Invalid Authentication") {};
+            throw new AuthenticationException("Invalid Authentication") {
+            };
         }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(JwtAuthenticationToken.class) || authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return authentication.equals(JwtAuthenticationToken.class) || authentication.equals(
+                UsernamePasswordAuthenticationToken.class);
     }
 }

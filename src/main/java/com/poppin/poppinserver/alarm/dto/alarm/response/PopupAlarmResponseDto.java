@@ -8,15 +8,15 @@ import java.time.LocalDate;
 
 @Builder
 public record PopupAlarmResponseDto(
-    Long alarmId,
-    Long id, // popup id
-    String title,
-    String body,
-    LocalDate createdAt,
-    String iconUrl,
-    Boolean isRead
+        Long alarmId,
+        Long id, // popup id
+        String title,
+        String body,
+        LocalDate createdAt,
+        String iconUrl,
+        Boolean isRead
 ) {
-    public static PopupAlarmResponseDto fromEntity(PopupAlarm alarm){
+    public static PopupAlarmResponseDto fromEntity(PopupAlarm alarm) {
 
         return PopupAlarmResponseDto.builder()
                 .alarmId(alarm.getId())

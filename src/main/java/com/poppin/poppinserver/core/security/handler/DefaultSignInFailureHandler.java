@@ -14,7 +14,8 @@ import java.io.IOException;
 @Component
 public class DefaultSignInFailureHandler extends AbstractFailureResponse implements AuthenticationFailureHandler {
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                                        AuthenticationException exception) throws IOException, ServletException {
         setFailureResponse(response, ErrorCode.FAILURE_LOGIN);
     }
 }

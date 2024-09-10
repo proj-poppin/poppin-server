@@ -33,10 +33,8 @@ public class FCMScheduler {
     private final FCMSendService fcmSendService;
 
 
-
-
     @Scheduled(cron = "0 */05 * * * *")
-    private void reopenPopup(){
+    private void reopenPopup() {
 
         /**
          * 재오픈 수요 팝업 재오픈 알림
@@ -49,14 +47,15 @@ public class FCMScheduler {
         log.info("REOPEN popup scheduler start");
 
         List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
-        if (reopenPopup.isEmpty())log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
-        else{
+        if (reopenPopup.isEmpty()) {
+            log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
+        } else {
             schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPushInfo.REOPEN);
         }
     }
 
     @Scheduled(cron = "0 0 9 * * *")
-    private void magamPopup(){
+    private void magamPopup() {
         /**
          * 마감 팝업 알림
          * 1. popup 을 추출(조건 : 마감 일자가 오늘~내일 사이 일때(24시간 이내) )
@@ -70,8 +69,9 @@ public class FCMScheduler {
 
         log.info("MAGAM popup scheduler start");
         List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow); // null, 1, many
-        if (magamPopup.isEmpty())log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
-        else{
+        if (magamPopup.isEmpty()) {
+            log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
+        } else {
             schedulerFcmPopupTopicByType(magamPopup, EPopupTopic.MAGAM, EPushInfo.MAGAM);
         }
     }
@@ -98,9 +98,10 @@ public class FCMScheduler {
 
         List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
 
-        if (openPopup.isEmpty())log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
-        else {
-            schedulerFcmPopupTopicByType(openPopup,EPopupTopic.OPEN, EPushInfo.OPEN);
+        if (openPopup.isEmpty()) {
+            log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
+        } else {
+            schedulerFcmPopupTopicByType(openPopup, EPopupTopic.OPEN, EPushInfo.OPEN);
         }
     }
 
@@ -123,16 +124,15 @@ public class FCMScheduler {
 
         List<Popup> hotPopup = popupRepository.findHotPopup(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
 
-        if (hotPopup.isEmpty())log.info("인기 팝업이 없습니다");
-        else {
-            fcmSendService.sendHotByFCMToken(hotPopup,EPushInfo.HOTPOPUP);
+        if (hotPopup.isEmpty()) {
+            log.info("인기 팝업이 없습니다");
+        } else {
+            fcmSendService.sendHotByFCMToken(hotPopup, EPushInfo.HOTPOPUP);
         }
     }
 
     /**
-     * 후기 요청
-     * 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
-     *
+     * 후기 요청 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
      */
     @Scheduled(cron = "0 */05 * * * *")
     private void hoogi() {
@@ -145,40 +145,43 @@ public class FCMScheduler {
 
         log.info("hoogi scheduler start");
         List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAndMin, threeHoursAgo);
-        if (hoogiList.isEmpty())log.info("후기 요청을 보낼 팝업이 없습니다.");
-        else{
-            schedulerFcmPopupTopicByType(hoogiList,EPopupTopic.HOOGI, EPushInfo.HOOGI);
+        if (hoogiList.isEmpty()) {
+            log.info("후기 요청을 보낼 팝업이 없습니다.");
+        } else {
+            schedulerFcmPopupTopicByType(hoogiList, EPopupTopic.HOOGI, EPushInfo.HOOGI);
         }
     }
 
 
     /**
      * 스케줄러 FCM 앱 푸시 팝업 알림 공통 메서드
+     *
      * @param popupList : 팝업 리스트
-     * @param topic : 팝업 주제
-     * @param info : 푸시 알림 제목, 메시지
+     * @param topic     : 팝업 주제
+     * @param info      : 푸시 알림 제목, 메시지
      * @throws FirebaseMessagingException
      */
-    public void schedulerFcmPopupTopicByType(List<Popup> popupList,EPopupTopic topic, EPushInfo info) {
+    public void schedulerFcmPopupTopicByType(List<Popup> popupList, EPopupTopic topic, EPushInfo info) {
 
         List<FCMRequestDto> fcmRequestDtoList = new ArrayList<>();
 
-        for (Popup popup : popupList){
+        for (Popup popup : popupList) {
             Long popupId = popup.getId();
-            log.info("topic code : {}" , topic.getCode());
-            log.info("popupId : {}" , popupId);
+            log.info("topic code : {}", topic.getCode());
+            log.info("popupId : {}", popupId);
             List<FCMToken> tokenList = (fcmTokenRepository.findTokenIdByTopicAndType(topic.getCode(), popupId));
-            if (tokenList.isEmpty()) log.info("nothing subscribed on : " + topic);
-            else{
-                for (FCMToken token : tokenList){
+            if (tokenList.isEmpty()) {
+                log.info("nothing subscribed on : " + topic);
+            } else {
+                for (FCMToken token : tokenList) {
 
                     // 알림 세팅을 "1"이라야 가능하게 함.
-                    log.info("token : {}" ,token.getToken());
+                    log.info("token : {}", token.getToken());
                     AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
                     log.info("setting : {}", set);
                     String setDefVal = set.getPushYn();
                     String setVal;
-                    switch (topic){
+                    switch (topic) {
                         case OPEN -> setVal = set.getOpenYn();
                         case MAGAM -> setVal = set.getMagamYn();
                         case CHANGE_INFO -> setVal = set.getChangeInfoYn();
@@ -186,34 +189,38 @@ public class FCMScheduler {
                         default -> setVal = "1";
                     }
 
-                    log.info("pushYn value : {}" ,  setDefVal);
+                    log.info("pushYn value : {}", setDefVal);
                     log.info("topic setting value : {}", setVal);
 
-                    if (setDefVal.equals("1") && setVal.equals("1")){
+                    if (setDefVal.equals("1") && setVal.equals("1")) {
                         if (
                                 info.equals(EPushInfo.HOTPOPUP) ||
-                                info.equals(EPushInfo.MAGAM) ||
-                                info.equals(EPushInfo.REOPEN) ||
-                                info.equals(EPushInfo.KEYWORD)
-                        ){
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), "[" + popup.getName() + "] " + info.getBody() , topic);
+                                        info.equals(EPushInfo.MAGAM) ||
+                                        info.equals(EPushInfo.REOPEN) ||
+                                        info.equals(EPushInfo.KEYWORD)
+                        ) {
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(),
+                                    "[" + popup.getName() + "] " + info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
-                        }
-                        else if (
+                        } else if (
                                 info.equals(EPushInfo.OPEN)
                         ) {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), "[" + popup.getName() + "] " + info.getTitle(), info.getBody() , topic);
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(),
+                                    "[" + popup.getName() + "] " + info.getTitle(), info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
-                        }else{
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(), info.getBody() , topic);
+                        } else {
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(),
+                                    info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         }
                     }
                 }
             }
         }
-        if (fcmRequestDtoList == null) {log.info("tokens doesn't have existed on : " + topic);}
-        else {
-            fcmSendService.sendFCMTopicMessage(fcmRequestDtoList);} // 메시지 발송
+        if (fcmRequestDtoList == null) {
+            log.info("tokens doesn't have existed on : " + topic);
+        } else {
+            fcmSendService.sendFCMTopicMessage(fcmRequestDtoList);
+        } // 메시지 발송
     }
 }

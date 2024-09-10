@@ -29,7 +29,7 @@ public class InterestService {
     private final FCMTokenService fcmTokenService;
 
     @Transactional
-    public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto){
+    public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto) {
         //중복검사
         interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
                 .ifPresent(interest -> {
@@ -57,10 +57,10 @@ public class InterestService {
         fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
         fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
-        return InterestDto.fromEntity(interest,user,popup);
+        return InterestDto.fromEntity(interest, user, popup);
     }
 
-    public Boolean removeInterest(Long userId,InterestRequestDto requestDto){
+    public Boolean removeInterest(Long userId, InterestRequestDto requestDto) {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
@@ -72,9 +72,9 @@ public class InterestService {
 
         String fcmToken = requestDto.fcmToken();
 
-        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken,popup, EPopupTopic.CHANGE_INFO);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
         return true;
     }
 }

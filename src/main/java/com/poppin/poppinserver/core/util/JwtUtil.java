@@ -67,11 +67,13 @@ public class JwtUtil implements InitializingBean {
     }
 
     public JwtTokenDto generateToken(String email, EUserRole role) {
-        return new JwtTokenDto(createToken(email, role, accessTokenExpirationPeriod), createToken(email, role, refreshTokenExpirationPeriod));
+        return new JwtTokenDto(createToken(email, role, accessTokenExpirationPeriod),
+                createToken(email, role, refreshTokenExpirationPeriod));
     }
 
     public JwtTokenDto generateToken(Long id, EUserRole role) {
-        return new JwtTokenDto(createToken(id, role, accessTokenExpirationPeriod), createToken(id, role, refreshTokenExpirationPeriod));
+        return new JwtTokenDto(createToken(id, role, accessTokenExpirationPeriod),
+                createToken(id, role, refreshTokenExpirationPeriod));
     }
 
     public Claims validateAndGetClaimsFromToken(String token) throws JwtException {

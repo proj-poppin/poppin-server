@@ -10,6 +10,7 @@ public enum ECongestion {
     ;
 
     private final String value;
+
     ECongestion(String value) {
         this.value = value;
     }

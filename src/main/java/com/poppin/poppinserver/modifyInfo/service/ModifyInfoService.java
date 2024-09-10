@@ -60,7 +60,7 @@ public class ModifyInfoService {
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
                                           List<MultipartFile> images,
-                                          Long userId){
+                                          Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
@@ -128,7 +128,7 @@ public class ModifyInfoService {
         List<String> proxyUrls = s3Service.copyImageListToAnotherFolder(posterUrls, proxyPopup.getId());
 
         List<PosterImage> proxyImages = new ArrayList<>();
-        for(String proxyUrl : proxyUrls){
+        for (String proxyUrl : proxyUrls) {
             PosterImage proxyImage = PosterImage.builder()
                     .posterUrl(proxyUrl)
                     .popup(proxyPopup)
@@ -137,7 +137,6 @@ public class ModifyInfoService {
         }
         posterImageRepository.saveAll(proxyImages);
         proxyPopup.updatePosterUrl(proxyImages.get(0).getPosterUrl());
-
 
         // 프록시 알람키워드 생성
         List<PopupAlarmKeyword> popupAlarmKeywords = popupAlarmKeywordRepository.findByPopupId(popup);
@@ -176,7 +175,7 @@ public class ModifyInfoService {
             fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
 
             List<ModifyImages> modifyImagesList = new ArrayList<>();
-            for(String url : fileUrls){
+            for (String url : fileUrls) {
                 ModifyImages modifyImage = ModifyImages.builder()
                         .modifyId(modifyInfo)
                         .imageUrl(url)
@@ -190,7 +189,7 @@ public class ModifyInfoService {
     } // 요청 생성
 
     @Transactional
-    public ModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId){
+    public ModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -200,12 +199,12 @@ public class ModifyInfoService {
         List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
 
         List<String> imageList = new ArrayList<>();
-        for(ModifyImages modifyImages : modifyImageList){
+        for (ModifyImages modifyImages : modifyImageList) {
             imageList.add(modifyImages.getImageUrl());
         }
 
         PopupDto popupDto = null;
-        if(modifyInfo != null){
+        if (modifyInfo != null) {
             popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
         }
 
@@ -236,19 +235,21 @@ public class ModifyInfoService {
     } // 조회
 
     @Transactional
-    public PagingResponseDto readModifyInfoList(int page, int size, Boolean isExec){
-        Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByIsExecuted(PageRequest.of(page, size), isExec);
+    public PagingResponseDto readModifyInfoList(int page, int size, Boolean isExec) {
+        Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByIsExecuted(PageRequest.of(page, size),
+                isExec);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(modifyInfoList);
-        List<ModifyInfoSummaryDto> modifyInfoSummaryDtos = ModifyInfoSummaryDto.fromEntityList(modifyInfoList.getContent());
+        List<ModifyInfoSummaryDto> modifyInfoSummaryDtos = ModifyInfoSummaryDto.fromEntityList(
+                modifyInfoList.getContent());
 
         return PagingResponseDto.fromEntityAndPageInfo(modifyInfoSummaryDtos, pageInfoDto);
     }// 목록 조회
 
     @Transactional
     public ModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                               List<MultipartFile> images,
-                                                Long adminId){
+                                          List<MultipartFile> images,
+                                          Long adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
 
@@ -290,15 +291,14 @@ public class ModifyInfoService {
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
-        if(originUrls.size() != 0){
+        if (originUrls.size() != 0) {
             s3Service.deleteMultipleImages(originUrls);
             posterImageRepository.deleteAllByPopupId(popup);
         }
-        
 
         //새로운 이미지 추가
         List<String> fileUrls = new ArrayList<>();
-        if(images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
+        if (images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
             fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
             List<PosterImage> posterImages = new ArrayList<>();
@@ -317,7 +317,7 @@ public class ModifyInfoService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateModifyInfoDto.keywords()){
+        for (String keyword : updateModifyInfoDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -356,8 +356,8 @@ public class ModifyInfoService {
 
     @Transactional
     public ModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                        List<MultipartFile> images,
-                                          Long adminId){
+                                          List<MultipartFile> images,
+                                          Long adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
 
@@ -399,7 +399,7 @@ public class ModifyInfoService {
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
-        if(originUrls.size() != 0){
+        if (originUrls.size() != 0) {
             s3Service.deleteMultipleImages(originUrls);
             posterImageRepository.deleteAllByPopupId(originPopup);
         }
@@ -410,14 +410,14 @@ public class ModifyInfoService {
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        if(proxyUrls.size() != 0){
+        if (proxyUrls.size() != 0) {
             s3Service.deleteMultipleImages(proxyUrls);
             posterImageRepository.deleteAllByPopupId(proxyPopup);
         }
 
         //새로운 이미지 추가
         List<String> fileUrls = new ArrayList<>();
-        if(images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
+        if (images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
             fileUrls = s3Service.uploadPopupPoster(images, originPopup.getId());
 
             List<PosterImage> posterImages = new ArrayList<>();
@@ -436,7 +436,7 @@ public class ModifyInfoService {
         popupAlarmKeywordRepository.deleteAll(originPopup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for(String keyword : updateModifyInfoDto.keywords()){
+        for (String keyword : updateModifyInfoDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(originPopup)
                     .keyword(keyword)
@@ -454,12 +454,11 @@ public class ModifyInfoService {
 
         //현재 운영상태 정의
         String operationStatus;
-        if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())){
+        if (updateModifyInfoDto.openDate().isAfter(LocalDate.now())) {
             operationStatus = EOperationStatus.NOTYET.getStatus();
         } else if (updateModifyInfoDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
-        }
-        else{
+        } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
@@ -516,27 +515,27 @@ public class ModifyInfoService {
             List<String> modifyUrls = modifyImages.stream()
                     .map(ModifyImages::getImageUrl)
                     .toList();
-            if(modifyUrls.size() != 0){
+            if (modifyUrls.size() != 0) {
                 s3Service.deleteMultipleImages(modifyUrls);
                 modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
             }
             // modify info 삭제
             modifyInformRepository.delete(modifyInfo);
 
-                // proxy popup 이미지 삭제
+            // proxy popup 이미지 삭제
             List<PosterImage> proxyImages = posterImageRepository.findAllByPopupId(proxyPopup);
             List<String> proxyUrls = proxyImages.stream()
                     .map(PosterImage::getPosterUrl)
                     .toList();
-            if(proxyUrls.size() != 0){
+            if (proxyUrls.size() != 0) {
                 s3Service.deleteMultipleImages(proxyUrls);
                 posterImageRepository.deleteAllByPopupId(proxyPopup);
             }
 
-                // proxy popup 알람 키워드 삭제
+            // proxy popup 알람 키워드 삭제
             popupAlarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
-                // proxy popup 삭제
+            // proxy popup 삭제
             log.info("delete proxy popup");
             popupRepository.delete(proxyPopup);
 

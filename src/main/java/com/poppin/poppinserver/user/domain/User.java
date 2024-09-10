@@ -131,7 +131,8 @@ public class User {
         this.reportedCnt = 0L;
     }
 
-    public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword, ELoginProvider eLoginProvider) {
+    public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword,
+                                    ELoginProvider eLoginProvider) {
         return User.builder()
                 .email(authSignUpDto.email())
                 .password(encodedPassword)
@@ -144,7 +145,8 @@ public class User {
                 .build();
     }
 
-    public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword, ELoginProvider eLoginProvider) {
+    public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword,
+                                     ELoginProvider eLoginProvider) {
         return User.builder()
                 .email(oAuth2UserInfo.email())
                 .password(encodedPassword)
@@ -188,8 +190,9 @@ public class User {
     }
 
     public void updateUserNickname(String nickname) {
-        if (nickname != null && !nickname.isEmpty())
+        if (nickname != null && !nickname.isEmpty()) {
             this.nickname = nickname;
+        }
     }
 
     public void updateProfileImage(String profileImageUrl) {
@@ -214,15 +217,15 @@ public class User {
         this.deletedAt = null;
     }
 
-    public void addReportCnt(){
+    public void addReportCnt() {
         this.reportedCnt++;
     }
 
-    public void addReviewCnt(){
+    public void addReviewCnt() {
         this.reviewCnt++;
     }
 
-    public void addVisitedPopupCnt(){
+    public void addVisitedPopupCnt() {
         this.visitedPopupCnt++;
     }
 }

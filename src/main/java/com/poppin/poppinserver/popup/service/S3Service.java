@@ -66,12 +66,14 @@ public class S3Service {
                 objectMetadata.setContentType(file.getContentType());
 
                 // 조정된 이미지를 S3에 업로드
-                s3Client.putObject(new PutObjectRequest(bucketPopupPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                s3Client.putObject(
+                        new PutObjectRequest(bucketPopupPoster, fileName, new ByteArrayInputStream(imageBytes),
+                                objectMetadata)
+                                .withCannedAcl(CannedAccessControlList.PublicRead));
                 String imgUrl = s3Client.getUrl(bucketPopupPoster, fileName).toString();
                 imgUrlList.add(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
                 log.info(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 log.error("Error processing image for modifyInfoId: " + popupId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
@@ -99,12 +101,14 @@ public class S3Service {
                 objectMetadata.setContentType(file.getContentType());
 
                 // 조정된 이미지를 S3에 업로드
-                s3Client.putObject(new PutObjectRequest(bucketReviewImage, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                s3Client.putObject(
+                        new PutObjectRequest(bucketReviewImage, fileName, new ByteArrayInputStream(imageBytes),
+                                objectMetadata)
+                                .withCannedAcl(CannedAccessControlList.PublicRead));
                 String imgUrl = s3Client.getUrl(bucketReviewImage, fileName).toString();
                 imgUrlList.add(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
                 log.info(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 log.error("Error processing image for modifyInfoId: " + reviewId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
@@ -151,7 +155,8 @@ public class S3Service {
             objectMetadata.setContentType(multipartFile.getContentType());
 
             // 조정된 이미지를 S3에 업로드
-            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
+            s3Client.putObject(new PutObjectRequest(bucketUserProfile, fileName, new ByteArrayInputStream(imageBytes),
+                    objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             String imgUrl = s3Client.getUrl(bucketUserProfile, fileName).toString();
             imageUrl = URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString());
@@ -183,12 +188,14 @@ public class S3Service {
                 objectMetadata.setContentType(file.getContentType());
 
                 // 조정된 이미지를 S3에 업로드
-                s3Client.putObject(new PutObjectRequest(bucketModifyInfo, fileName, new ByteArrayInputStream(imageBytes), objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                s3Client.putObject(
+                        new PutObjectRequest(bucketModifyInfo, fileName, new ByteArrayInputStream(imageBytes),
+                                objectMetadata)
+                                .withCannedAcl(CannedAccessControlList.PublicRead));
                 String imgUrl = s3Client.getUrl(bucketModifyInfo, fileName).toString();
                 imgUrlList.add(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
                 log.info(URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 log.error("Error processing image for modifyInfoId: " + modifyInfoId + ", fileName: " + fileName, e);
                 throw new CommonException(ErrorCode.SERVER_ERROR);
             }
@@ -324,7 +331,7 @@ public class S3Service {
             s3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             log.info("Replaced image in bucket {}: {}", bucketName, fileName);
-            String imgUrl =  s3Client.getUrl(bucketName, fileName).toString();
+            String imgUrl = s3Client.getUrl(bucketName, fileName).toString();
             return (URLDecoder.decode(imgUrl, StandardCharsets.UTF_8.toString()));
         } catch (IOException e) {
             log.error("Error replacing image in bucket {}: {}", bucketName, fileName);
@@ -334,7 +341,7 @@ public class S3Service {
 
     // 이미지파일명 중복 방지
     private String createFileName(String fileName, Long popupId) {
-        if(fileName.isEmpty()){
+        if (fileName.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
         // 파일 확장자 추출
@@ -407,7 +414,8 @@ public class S3Service {
             objectMetadata.setContentType(file.getContentType());
 
             // 조정된 이미지를 S3에 업로드
-            s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes), objectMetadata));
+            s3Client.putObject(new PutObjectRequest(bucketInformPoster, fileName, new ByteArrayInputStream(imageBytes),
+                    objectMetadata));
             imgUrlList.add(s3Client.getUrl(bucketInformPoster, fileName).toString());
         } catch (IOException e) {
             log.error("Error processing image for modifyInfoId: " + seq + ", fileName: " + fileName, e);

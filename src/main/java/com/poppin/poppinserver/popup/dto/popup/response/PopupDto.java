@@ -39,50 +39,50 @@ public record PopupDto(
         List<String> posterList,
         List<String> keywordList
 ) {
-    public static PopupDto fromEntity(Popup popup){
+    public static PopupDto fromEntity(Popup popup) {
 
         // 각 nullable 부분들에 대해 예외처리
 
         PreferedDto preferedDto = null;
-        if (popup.getPreferedPopup() != null){
+        if (popup.getPreferedPopup() != null) {
             preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
         }
 
         String openDate = null;
-        if(popup.getOpenDate() != null){
+        if (popup.getOpenDate() != null) {
             openDate = popup.getOpenDate().toString();
         }
 
         String closeDate = null;
-        if(popup.getOpenDate() != null){
+        if (popup.getOpenDate() != null) {
             closeDate = popup.getCloseDate().toString();
         }
 
         String openTime = null;
-        if(popup.getOpenDate() != null){
+        if (popup.getOpenDate() != null) {
             openTime = popup.getOpenTime().toString();
         }
 
         String closeTime = null;
-        if(popup.getOpenDate() != null){
+        if (popup.getOpenDate() != null) {
             closeTime = popup.getCloseTime().toString();
         }
 
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
         List<String> posterList = new ArrayList<>();
-        for(PosterImage posterImage : popup.getPosterImages()){
+        for (PosterImage posterImage : popup.getPosterImages()) {
             posterList.add(posterImage.getPosterUrl());
         }
 
         List<String> keywordList = new ArrayList<>();
-        for(PopupAlarmKeyword popupAlarmKeyword : popup.getPopupAlarmKeywords()){
+        for (PopupAlarmKeyword popupAlarmKeyword : popup.getPopupAlarmKeywords()) {
             keywordList.add(popupAlarmKeyword.getKeyword());
         }
 
         String availableAge = null;
         String availableAgeValue = null;
-        if(popup.getAvailableAge() != null){
+        if (popup.getAvailableAge() != null) {
             availableAge = popup.getAvailableAge().getAvailableAgeProvider();
             availableAgeValue = popup.getAvailableAge().toString();
         }

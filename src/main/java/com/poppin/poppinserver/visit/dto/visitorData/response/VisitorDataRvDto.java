@@ -19,7 +19,7 @@ public record VisitorDataRvDto(
             String visitDate,
             String satisfaction,
             String congestion
-    ){
+    ) {
         return VisitorDataRvDto.builder()
                 .visitDate(visitDate)
                 .satisfaction(satisfaction)

@@ -21,10 +21,10 @@ public record PopupGuestSearchingDto(
         PreferedDto prefered,
         TasteDto taste
 ) {
-    public static List<PopupGuestSearchingDto> fromEntityList(List<Popup> popups){
+    public static List<PopupGuestSearchingDto> fromEntityList(List<Popup> popups) {
         List<PopupGuestSearchingDto> dtoList = new ArrayList<>();
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
 
             PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());

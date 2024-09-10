@@ -6,7 +6,7 @@ import lombok.Builder;
 public record UnreadAlarmsResponseDto(
         int unread
 ) {
-    public static UnreadAlarmsResponseDto fromEntity(int count){
+    public static UnreadAlarmsResponseDto fromEntity(int count) {
         return UnreadAlarmsResponseDto.builder()
                 .unread(count)
                 .build();

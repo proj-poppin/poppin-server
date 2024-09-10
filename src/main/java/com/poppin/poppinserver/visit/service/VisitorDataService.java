@@ -21,15 +21,21 @@ public class VisitorDataService {
 
     private final VisitorDataRepository visitorDataRepository;
 
-    public VisitorDataInfoDto getVisitorData(Long popupId){
+    public VisitorDataInfoDto getVisitorData(Long popupId) {
 
-        Map<String,Object> weekdayAm = checkAndInitialize(visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("평일 오전").toString()));
-        Map<String,Object> weekdayPm = checkAndInitialize(visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("평일 오후").toString()));
-        Map<String,Object> weekendAm = checkAndInitialize(visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("주말 오전").toString()));
-        Map<String,Object> weekendPm = checkAndInitialize(visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("주말 오후").toString()));
-        Optional<Integer> satisfaction = visitorDataRepository.satisfactionRate(popupId, ESatisfaction.fromValue("만족").toString());
+        Map<String, Object> weekdayAm = checkAndInitialize(
+                visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("평일 오전").toString()));
+        Map<String, Object> weekdayPm = checkAndInitialize(
+                visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("평일 오후").toString()));
+        Map<String, Object> weekendAm = checkAndInitialize(
+                visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("주말 오전").toString()));
+        Map<String, Object> weekendPm = checkAndInitialize(
+                visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("주말 오후").toString()));
+        Optional<Integer> satisfaction = visitorDataRepository.satisfactionRate(popupId,
+                ESatisfaction.fromValue("만족").toString());
 
-        VisitorDataInfoDto visitorDataDto = VisitorDataInfoDto.fromEntity(weekdayAm, weekdayPm, weekendAm, weekendPm, satisfaction);
+        VisitorDataInfoDto visitorDataDto = VisitorDataInfoDto.fromEntity(weekdayAm, weekdayPm, weekendAm, weekendPm,
+                satisfaction);
 
         return visitorDataDto;
     }

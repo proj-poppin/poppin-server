@@ -8,6 +8,6 @@ public record PushRequestDto(
 
         @NotNull
         String token
-){
+) {
 
 }

@@ -21,7 +21,8 @@ public class AppleOAuthService {
 
     public OAuth2UserInfo getAppleUserInfo(String idToken) {
         Map<String, String> headers = appleJwtParser.parseHeaders(idToken);
-        ResponseEntity<ApplePublicKeys> applePublicKeys = restTemplate.getForEntity(APPLE_PUBLIC_KEYS_URL, ApplePublicKeys.class);
+        ResponseEntity<ApplePublicKeys> applePublicKeys = restTemplate.getForEntity(APPLE_PUBLIC_KEYS_URL,
+                ApplePublicKeys.class);
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, applePublicKeys.getBody());
         Claims claims = appleJwtParser.parseClaims(idToken, publicKey);
         return OAuth2UserInfo.of(

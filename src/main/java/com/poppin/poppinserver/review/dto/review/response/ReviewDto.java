@@ -18,7 +18,7 @@ public record ReviewDto(
         Boolean isCertificated,
         Integer recommendCnt
 ) {
-    public static ReviewDto fromEntity(Review review,VisitorData visitorData){
+    public static ReviewDto fromEntity(Review review, VisitorData visitorData) {
         VisitorData vd = visitorData;
         return ReviewDto.builder()
                 .id(review.getId())

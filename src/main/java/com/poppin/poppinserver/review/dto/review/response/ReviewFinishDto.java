@@ -28,14 +28,15 @@ public record ReviewFinishDto(
         List<String> imageList /*팝업 이미지*/
 
 ) {
-        public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated, LocalDateTime createdAt, List<String> imageList){
-               return  ReviewFinishDto.builder()
-                        .reviewId(reviewId)
-                        .popupId(popupId)
-                        .name(name)
-                        .isCertificated(isCertificated)
-                        .createdAt(createdAt)
-                        .imageList(imageList)
-                        .build();
-        }
+    public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
+                                             LocalDateTime createdAt, List<String> imageList) {
+        return ReviewFinishDto.builder()
+                .reviewId(reviewId)
+                .popupId(popupId)
+                .name(name)
+                .isCertificated(isCertificated)
+                .createdAt(createdAt)
+                .imageList(imageList)
+                .build();
+    }
 }

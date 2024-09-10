@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface ReviewRecommendRepository extends JpaRepository<ReviewRecommend, Long> {
 
-    Optional<ReviewRecommend> findByUserAndReview(User user , Review review);
+    Optional<ReviewRecommend> findByUserAndReview(User user, Review review);
 
     void deleteAllByReviewPopup(Popup popup);
 

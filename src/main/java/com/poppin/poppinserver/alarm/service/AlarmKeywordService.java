@@ -32,7 +32,8 @@ public class AlarmKeywordService {
     }
 
     @Transactional
-    public List<AlarmKeywordResponseDto> createAlarmKeyword(Long userId, AlarmKeywordRequestDto alarmKeywordRequestDto) {
+    public List<AlarmKeywordResponseDto> createAlarmKeyword(Long userId,
+                                                            AlarmKeywordRequestDto alarmKeywordRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 

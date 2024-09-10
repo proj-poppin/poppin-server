@@ -50,7 +50,9 @@ public class AuthService {
                     throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
                 });
         // 유저 생성, 패스워드 암호화
-        User newUser = userRepository.save(User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()), ELoginProvider.DEFAULT));
+        User newUser = userRepository.save(
+                User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()),
+                        ELoginProvider.DEFAULT));
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
@@ -67,7 +69,8 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtTokenDto socialRegister(String accessToken, SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+    public JwtTokenDto socialRegister(String accessToken,
+                                      SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         String token = refineToken(accessToken);    // poppin access token
 
         Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
@@ -85,8 +88,8 @@ public class AuthService {
         return jwtTokenDto;
     }
 
-    private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken){
-        if (provider.equals(ELoginProvider.KAKAO.toString())){
+    private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken) {
+        if (provider.equals(ELoginProvider.KAKAO.toString())) {
             return oAuth2Util.getKakaoUserInfo(accessToken);
         } else if (provider.equals(ELoginProvider.NAVER.toString())) {
             return oAuth2Util.getNaverUserInfo(accessToken);
@@ -94,8 +97,7 @@ public class AuthService {
             return oAuth2Util.getGoogleUserInfo(accessToken);
         } else if (provider.equals(ELoginProvider.APPLE.toString())) {
             return appleOAuthService.getAppleUserInfo(accessToken);
-        }
-        else {
+        } else {
             throw new CommonException(ErrorCode.INVALID_OAUTH2_PROVIDER);
         }
     }
@@ -103,8 +105,7 @@ public class AuthService {
     private String refineToken(String accessToken) {
         if (accessToken.startsWith(Constant.BEARER_PREFIX)) {
             return accessToken.substring(Constant.BEARER_PREFIX.length());
-        }
-        else {
+        } else {
             return accessToken;
         }
     }

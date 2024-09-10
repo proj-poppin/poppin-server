@@ -22,8 +22,8 @@ public class InformAlarmImage {
     private Long id;
 
 
-    @OneToOne(fetch  = FetchType.LAZY)
-    @JoinColumn(name="alarm_id" , referencedColumnName = "id",nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alarm_id", referencedColumnName = "id", nullable = false)
     private InformAlarm informAlarm;
 
     @Column(name = "poster_url")

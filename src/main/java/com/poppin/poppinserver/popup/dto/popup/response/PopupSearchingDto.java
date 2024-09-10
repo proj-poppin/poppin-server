@@ -27,26 +27,27 @@ public record PopupSearchingDto(
         PreferedDto prefered,
         TasteDto taste
 ) {
-    public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user){
+    public static List<PopupSearchingDto> fromEntityList(List<Popup> popups, User user) {
         List<PopupSearchingDto> dtoList = new ArrayList<>();
 
         Set<Interest> interest = user.getInterest();
 
         List<Long> interestedPopups = new ArrayList<>();
-        for(Interest i : interest){
+        for (Interest i : interest) {
             interestedPopups.add(i.getPopup().getId());
         }
 
-        for(Popup popup : popups){
+        for (Popup popup : popups) {
             Boolean isInterested;
 
             PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
-            if(interestedPopups.contains(popup.getId())) {
+            if (interestedPopups.contains(popup.getId())) {
                 isInterested = Boolean.TRUE;
+            } else {
+                isInterested = Boolean.FALSE;
             }
-            else isInterested = Boolean.FALSE;
 
             PopupSearchingDto popupSummaryDto =
                     PopupSearchingDto.builder()

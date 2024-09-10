@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.user.oauth;
 
 
-public record OAuth2UserInfo (
+public record OAuth2UserInfo(
         String oAuthId,    // 구글/애플 sub, 카카오 id, 네이버 response안의 id
         String email
 ) {

@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RandomCodeUtil {
     /**
      * 6자리 랜덤 난수를 생성하여 반환합니다.
+     *
      * @return 생성된 6자리 난수 문자열
      */
     public static String generateVerificationCode() {

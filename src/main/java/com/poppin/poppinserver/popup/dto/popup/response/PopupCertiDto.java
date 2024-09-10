@@ -18,7 +18,7 @@ public record PopupCertiDto(
         LocalDateTime visitDate
 
 ) {
-    public static PopupCertiDto fromEntity(String name, String posterUrl, LocalDateTime visitDate){
+    public static PopupCertiDto fromEntity(String name, String posterUrl, LocalDateTime visitDate) {
         return PopupCertiDto.builder()
                 .name(name)
                 .posterUrl(posterUrl)

@@ -1,6 +1,14 @@
 package com.poppin.poppinserver.alarm.service;
 
-import com.google.firebase.messaging.*;
+import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
+
+import com.google.firebase.messaging.BatchResponse;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.SendResponse;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
@@ -16,16 +24,13 @@ import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +50,8 @@ public class FCMSendService {
     /**
      * 공지사항 토큰 메시지 발송
      */
-    public void sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
+    public void sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto,
+                                          InformAlarm informAlarm) {
 
         for (FCMToken token : tokenList) {
             log.info("token : " + token.getToken());
@@ -72,15 +78,16 @@ public class FCMSendService {
 
     /**
      * 인기팝업
+     *
      * @param popupList 주간 인기 팝업 리스트
-     * @param info 인기 팝업 앱푸시 메시지 enum
+     * @param info      인기 팝업 앱푸시 메시지 enum
      * @return
      */
-    public String sendHotByFCMToken(List<Popup> popupList , EPushInfo info) {
+    public String sendHotByFCMToken(List<Popup> popupList, EPushInfo info) {
         try {
             // 인기,
             List<Long> popupIdList = new ArrayList<>();
-            for (Popup p : popupList){
+            for (Popup p : popupList) {
                 popupIdList.add(p.getId());
             }
 
@@ -110,7 +117,7 @@ public class FCMSendService {
                 }
             }
             return "1";
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "0";
         }
@@ -118,15 +125,16 @@ public class FCMSendService {
 
     /**
      * 후기 추천 앱푸시 메서드
+     *
      * @param review 해당 후기
-     * @param info 후기 추천 앱 푸시 메시지 enum
+     * @param info   후기 추천 앱 푸시 메시지 enum
      */
-    public void sendChoochunByFCMToken(Review review, EPushInfo info){
+    public void sendChoochunByFCMToken(Review review, EPushInfo info) {
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(info.getTitle())
-                        .setBody( "[" + review.getPopup().getName() + "] " + info.getBody())
+                        .setBody("[" + review.getPopup().getName() + "] " + info.getBody())
                         .build())
                 .setApnsConfig(apnsConfiguration.apnsConfig())
                 .setAndroidConfig(androidConfiguration.androidConfig())
@@ -150,7 +158,8 @@ public class FCMSendService {
     /**
      * 키워드 알림 토큰 메시지 발송
      */
-    public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
+    public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto,
+                                           UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
         Message message = Message.builder()
                 .setNotification(Notification.builder()
@@ -174,12 +183,13 @@ public class FCMSendService {
 
     /**
      * 안드로이드 FCM Topic 앱 푸시 알림 메서드
+     *
      * @param fcmRequestDtoList FCM 주제 발송 객체
      * @throws FirebaseMessagingException FCM 오류
      */
-    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList){
+    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList) {
 
-        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
+        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
             Message message;
 
@@ -189,12 +199,12 @@ public class FCMSendService {
             message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(fcmRequestDto.title())
-                            .setBody( "[" + popup.getName() + "] "  + fcmRequestDto.body())
+                            .setBody("[" + popup.getName() + "] " + fcmRequestDto.body())
                             .build())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setApnsConfig(apnsConfiguration.apnsConfig())
-                    .putData("id" , fcmRequestDto.popupId().toString())
+                    .putData("id", fcmRequestDto.popupId().toString())
                     .putData("type", "popup")
                     .build();
 
@@ -202,17 +212,17 @@ public class FCMSendService {
             try {
 
                 String result = firebaseMessaging.send(message);
-                log.debug( "Successfully sent message: " + result);
+                log.debug("Successfully sent message: " + result);
 
                 FCMToken token = fcmTokenRepository.findByToken(fcmRequestDto.token());
                 refreshToken(token); // 토큰 갱신
 
                 // 알림 키워드 등록
                 String flag = alarmService.insertPopupAlarm(fcmRequestDto);
-                if (flag.equals("1")){
-                    log.info(fcmRequestDto.token() +    " alarm success");
-                }else{
-                    log.error(fcmRequestDto.token() +   " alarm fail");
+                if (flag.equals("1")) {
+                    log.info(fcmRequestDto.token() + " alarm success");
+                } else {
+                    log.error(fcmRequestDto.token() + " alarm fail");
                 }
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
@@ -223,12 +233,13 @@ public class FCMSendService {
 
     /**
      * 여러 기기 동시 전송
+     *
      * @param fcmRequestDtoList 멀티 FCM 발송 객체
      * @throws FirebaseMessagingException 발송 오류
      */
-    public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList)throws FirebaseMessagingException {
+    public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList) throws FirebaseMessagingException {
         List<String> tokenList = null;
-        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList){
+        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
             tokenList = IntStream.rangeClosed(1, 1000)
                     .mapToObj(index -> fcmRequestDto.token())
                     .collect(Collectors.toList());
@@ -241,7 +252,7 @@ public class FCMSendService {
                 )
                 .addAllTokens(tokenList)
                 .build();
-        if (message != null){
+        if (message != null) {
             BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
 
             if (response.getFailureCount() > 0) {
@@ -253,7 +264,9 @@ public class FCMSendService {
                     }
                 }
                 log.error(" List of tokens that caused failures: " + failedTokens);
-            }else log.info(" List of tokens send messages SUCCESSFULLY");
+            } else {
+                log.info(" List of tokens send messages SUCCESSFULLY");
+            }
         }
     }
 

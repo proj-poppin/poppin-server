@@ -5,17 +5,17 @@ import lombok.Builder;
 
 @Builder
 public record UserDto(
-    Long id,
-    String email,
-    String nickname,
-    String provider,
-    String role,
-    Boolean agreedToPrivacyPolicy,
-    Boolean agreedToServiceTerms,
-    Boolean agreedToGPS,
-    String createdAt
+        Long id,
+        String email,
+        String nickname,
+        String provider,
+        String role,
+        Boolean agreedToPrivacyPolicy,
+        Boolean agreedToServiceTerms,
+        Boolean agreedToGPS,
+        String createdAt
 ) {
-    public static UserDto fromEntity(User user){
+    public static UserDto fromEntity(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())

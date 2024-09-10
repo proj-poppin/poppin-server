@@ -60,7 +60,7 @@ public class PopupController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<?> removePopup(@RequestParam("id") Long popupId,
-                                      @UserId Long adminId){
+                                      @UserId Long adminId) {
         return ResponseDto.ok(popupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
@@ -133,9 +133,9 @@ public class PopupController {
 
     @GetMapping("/search/base") // 로그인 팝업 베이스 검색
     public ResponseDto<?> readBaseList(@RequestParam("text") String text,
-                                         @RequestParam("page") int page,
-                                         @RequestParam("size") int size,
-                                         @UserId Long userId) {
+                                       @RequestParam("page") int page,
+                                       @RequestParam("size") int size,
+                                       @UserId Long userId) {
         return ResponseDto.ok(popupService.readBaseList(text, page, size, userId));
     }
 
@@ -152,8 +152,8 @@ public class PopupController {
 
     @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색
     public ResponseDto<?> readGuestBaseList(@RequestParam("text") String text,
-                                       @RequestParam("page") int page,
-                                       @RequestParam("size") int size) {
+                                            @RequestParam("page") int page,
+                                            @RequestParam("size") int size) {
         return ResponseDto.ok(popupService.readGuestBaseList(text, page, size));
     }
 
@@ -163,7 +163,7 @@ public class PopupController {
     }
 
     @PostMapping("/reopen") // 재오픈 수요
-    public ResponseDto<?> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto){
+    public ResponseDto<?> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto) {
         return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
     }
 }

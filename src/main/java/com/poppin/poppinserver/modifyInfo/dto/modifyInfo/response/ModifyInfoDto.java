@@ -22,15 +22,15 @@ public record ModifyInfoDto(
         String agentName, // 담당 관리자
         List<String> images
 ) {
-    public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images){
+    public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images) {
 
         PopupDto popupDto = null;
-        if(modifyInfo != null){
+        if (modifyInfo != null) {
             popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
         }
 
         String agentName = null;
-        if(modifyInfo.getOriginPopup().getAgent() != null){
+        if (modifyInfo.getOriginPopup().getAgent() != null) {
             agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
         }
 

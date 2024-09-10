@@ -28,13 +28,13 @@ public class PopupTopic {
     @JoinColumn(name = "popup_id", nullable = false)
     private Popup popup; // 팝업 id
 
-    @Column(name = "topic" , nullable = false)
+    @Column(name = "topic", nullable = false)
     private String topicCode; // 타입
 
     @Builder
-    public PopupTopic(FCMToken token, Popup popup, String topicCode){
-        this.tokenId        = token;
-        this.popup          = popup;
-        this.topicCode      = topicCode;
+    public PopupTopic(FCMToken token, Popup popup, String topicCode) {
+        this.tokenId = token;
+        this.popup = popup;
+        this.topicCode = topicCode;
     }
 }
