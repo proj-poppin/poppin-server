@@ -32,7 +32,9 @@ public class AuthController {
 
     // 자체 회원가입 API
     @PostMapping("/sign-up")
-    public ResponseDto<?> authSignUp(@RequestBody @Valid AuthSignUpDto authSignUpDto) {
+    public ResponseDto<?> authSignUp(
+            @RequestBody @Valid AuthSignUpDto authSignUpDto
+    ) {
         log.info("authSignUpDto : " + authSignUpDto);
         return ResponseDto.created(authService.authSignUp(authSignUpDto));
     }
@@ -53,10 +55,13 @@ public class AuthController {
     }
 
     @PostMapping("/login/{provider}")
-    public ResponseDto<?> authSocialLogin(@PathVariable String provider,
-                                          @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+    public ResponseDto<?> authSocialLogin(
+            @PathVariable String provider,
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+    ) {
         log.info("accessToken : " + accessToken);   // 'bearer ' 제거 필요
-        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider));
+        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
     }
 
     @PostMapping("/refresh")
