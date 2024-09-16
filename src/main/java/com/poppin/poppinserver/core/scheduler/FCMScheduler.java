@@ -3,23 +3,26 @@ package com.poppin.poppinserver.core.scheduler;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
-
-import java.time.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -179,20 +182,20 @@ public class FCMScheduler {
                     log.info("token : {}", token.getToken());
                     AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
                     log.info("setting : {}", set);
-                    String setDefVal = set.getPushYn();
-                    String setVal;
+                    Boolean setDefVal = set.getPushYn();
+                    Boolean setVal;
                     switch (topic) {
                         case OPEN -> setVal = set.getOpenYn();
                         case MAGAM -> setVal = set.getMagamYn();
                         case CHANGE_INFO -> setVal = set.getChangeInfoYn();
                         case HOOGI -> setVal = set.getHoogiYn();
-                        default -> setVal = "1";
+                        default -> setVal = true;
                     }
 
                     log.info("pushYn value : {}", setDefVal);
                     log.info("topic setting value : {}", setVal);
 
-                    if (setDefVal.equals("1") && setVal.equals("1")) {
+                    if (setDefVal.equals(true) && setVal.equals(true)) {
                         if (
                                 info.equals(EPushInfo.HOTPOPUP) ||
                                         info.equals(EPushInfo.MAGAM) ||

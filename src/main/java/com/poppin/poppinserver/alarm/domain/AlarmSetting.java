@@ -1,6 +1,11 @@
 package com.poppin.poppinserver.alarm.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,26 +27,31 @@ public class AlarmSetting {
     private String token;
 
     @Column(name = "push_yn", nullable = false)
-    private String pushYn; // 푸시 알림 on off
+    private Boolean pushYn; // 푸시 알림 on off
 
     @Column(name = "push_night_yn", nullable = false)
-    private String pushNightYn; // 야간 푸시 알림 on off
+    private Boolean pushNightYn; // 야간 푸시 알림 on off
 
     @Column(name = "hoogi_yn", nullable = false)
-    private String hoogiYn; // 도움이 된 후기 알림 on off
+    private Boolean hoogiYn; // 도움이 된 후기 알림 on off
 
     @Column(name = "open_yn", nullable = false)
-    private String openYn; // 관심 팝업 오픈 알림 on off
+    private Boolean openYn; // 관심 팝업 오픈 알림 on off
 
     @Column(name = "magam_yn", nullable = false)
-    private String magamYn; // 관심 팝업 마감 임박 알림 on off
+    private Boolean magamYn; // 관심 팝업 마감 임박 알림 on off
 
     @Column(name = "change_info_yn", nullable = false)
-    private String changeInfoYn; // 관심 팝업 정보 변경 알림 on off
+    private Boolean changeInfoYn; // 관심 팝업 정보 변경 알림 on off
 
 
-    public AlarmSetting(String token, String pushYn, String pushNightYn, String hoogiYn, String openYn, String magamYn,
-                        String changeInfoYn) {
+    public AlarmSetting(String token,
+                        Boolean pushYn,
+                        Boolean pushNightYn,
+                        Boolean hoogiYn,
+                        Boolean openYn,
+                        Boolean magamYn,
+                        Boolean changeInfoYn) {
         this.token = token;
         this.pushYn = pushYn;
         this.pushNightYn = pushNightYn;

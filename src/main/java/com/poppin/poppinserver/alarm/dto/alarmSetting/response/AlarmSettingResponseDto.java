@@ -1,29 +1,29 @@
 package com.poppin.poppinserver.alarm.dto.alarmSetting.response;
 
+import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import lombok.Builder;
 
 @Builder
 public record AlarmSettingResponseDto(
 
         String token,
-        String pushYn,
-        String pushNightYn,
-        String hoogiYn,
-        String openYn,
-        String magamYn,
-        String changeInfoYn
+        Boolean appPush,
+        Boolean nightPush,
+        Boolean helpfulReviewPush,
+        Boolean interestedPopupOpenPush,
+        Boolean interestedPopupDeadlinePush,
+        Boolean interestedPopupInfoUpdatedPush
 
 ) {
-    public static AlarmSettingResponseDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn,
-                                                     String openYn, String magamYn, String changeInfoYn) {
+    public static AlarmSettingResponseDto fromEntity(AlarmSetting alarmSetting) {
         return AlarmSettingResponseDto.builder()
-                .token(token)
-                .pushYn(pushYn)
-                .pushNightYn(pushNightYn)
-                .hoogiYn(hoogiYn)
-                .openYn(openYn)
-                .magamYn(magamYn)
-                .changeInfoYn(changeInfoYn)
+                .token(alarmSetting.getToken())
+                .appPush(alarmSetting.getPushYn())
+                .nightPush(alarmSetting.getPushNightYn())
+                .helpfulReviewPush(alarmSetting.getHoogiYn())
+                .interestedPopupOpenPush(alarmSetting.getOpenYn())
+                .interestedPopupDeadlinePush(alarmSetting.getMagamYn())
+                .interestedPopupInfoUpdatedPush(alarmSetting.getChangeInfoYn())
                 .build();
     }
 }

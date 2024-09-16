@@ -10,16 +10,27 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -77,10 +88,10 @@ public class User {
     private String refreshToken;
 
     @Column(name = "review_cnt", nullable = false)
-    private Long reviewCnt;
+    private Integer reviewCnt;
 
     @Column(name = "visited_popup_cnt", nullable = false)
-    private Long visitedPopupCnt;
+    private Integer visitedPopupCnt;
 
     @Column(name = "require_special_care", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean requiresSpecialCare;
@@ -104,7 +115,8 @@ public class User {
     private WhoWithPopup whoWithPopup;
 
     @Column(name = "reported_cnt", nullable = false)
-    private Long reportedCnt;
+    private Integer reportedCnt;
+
 
     @Builder
     public User(String email, String password, String nickname,
@@ -126,9 +138,9 @@ public class User {
         this.isDeleted = false;
         this.profileImageUrl = null;
         this.requiresSpecialCare = false;
-        this.reviewCnt = 0L;
-        this.visitedPopupCnt = 0L;
-        this.reportedCnt = 0L;
+        this.reviewCnt = 0;
+        this.visitedPopupCnt = 0;
+        this.reportedCnt = 0;
     }
 
     public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword,

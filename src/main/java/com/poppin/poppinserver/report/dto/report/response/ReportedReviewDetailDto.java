@@ -1,14 +1,13 @@
 package com.poppin.poppinserver.report.dto.report.response;
 
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record ReportedReviewDetailDto(
         Long reviewId,
         String reviewWriter,
-        Long reviewCnt,
+        Integer reviewCnt,
         String reviewContent,
         String reviewCreatedAt,
         boolean isCertificated,

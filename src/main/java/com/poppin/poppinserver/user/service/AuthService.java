@@ -1,27 +1,39 @@
 package com.poppin.poppinserver.user.service;
 
+import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.core.constant.Constant;
-import com.poppin.poppinserver.core.util.*;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.ELoginProvider;
+import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.core.util.HeaderUtil;
+import com.poppin.poppinserver.core.util.JwtUtil;
+import com.poppin.poppinserver.core.util.OAuth2Util;
+import com.poppin.poppinserver.core.util.PasswordUtil;
+import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
+import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.core.type.ELoginProvider;
-import com.poppin.poppinserver.core.type.EUserRole;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Base64;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Base64;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +45,7 @@ public class AuthService {
     private final OAuth2Util oAuth2Util;
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
+    private final AlarmSettingRepository alarmSettingRepository;
 
     public JwtTokenDto authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
@@ -197,7 +210,7 @@ public class AuthService {
         return jwtToken;
     }
 
-    public JwtTokenDto authSignIn(String authorizationHeader) {
+    public UserInfoResponseDto authSignIn(String authorizationHeader, FcmTokenRequestDto fcmTokenRequestDto) {
         String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
         String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
         String email = decoded[0];
@@ -210,9 +223,15 @@ public class AuthService {
         if (user.getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
+        AlarmSetting alarmSetting = alarmSettingRepository.findByToken(fcmTokenRequestDto.fcmToken());
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
-        return jwtTokenDto;
+        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+                user,
+                alarmSetting,
+                jwtTokenDto
+        );
+        return userInfoResponseDto;
     }
 
     @Transactional

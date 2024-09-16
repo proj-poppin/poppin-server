@@ -1,15 +1,14 @@
 package com.poppin.poppinserver.alarm.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
-import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.SettingResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.response.AlarmSettingResponseDto;
-
+import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
+import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,24 +36,16 @@ public class AlarmSettingService {
 
         AlarmSetting newAlarmSetting = new AlarmSetting(
                 reqDto.fcmToken(),
-                reqDto.pushYn(),
-                reqDto.pushNightYn(),
-                reqDto.hoogiYn(),
-                reqDto.openYn(),
-                reqDto.magamYn(),
-                reqDto.changeInfoYn()
+                reqDto.appPush(),
+                reqDto.nightPush(),
+                reqDto.helpfulReviewPush(),
+                reqDto.interestedPopupOpenPush(),
+                reqDto.interestedPopupDeadlinePush(),
+                reqDto.interestedPopupInfoUpdatedPush()
         );
         alarmSettingRepository.save(newAlarmSetting);
-        AlarmSettingResponseDto resDto = AlarmSettingResponseDto.fromEntity(
-                reqDto.fcmToken(),
-                reqDto.pushYn(),
-                reqDto.pushNightYn(),
-                reqDto.hoogiYn(),
-                reqDto.openYn(),
-                reqDto.magamYn(),
-                reqDto.changeInfoYn()
-        );
-        return resDto;
+
+        return AlarmSettingResponseDto.fromEntity(newAlarmSetting);
     }
 
 

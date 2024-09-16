@@ -6,12 +6,12 @@ import lombok.Builder;
 @Builder
 public record SettingResponseDto(
         String fcmToken,
-        String pushYn,
-        String pushNightYn,
-        String hoogiYn,
-        String openYn,
-        String magamYn,
-        String changeInfoYn
+        Boolean pushYn,
+        Boolean pushNightYn,
+        Boolean hoogiYn,
+        Boolean openYn,
+        Boolean magamYn,
+        Boolean changeInfoYn
 ) {
 
     public static SettingResponseDto fromEntity(AlarmSetting setting) {

@@ -519,7 +519,7 @@ public class PopupService {
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
-        List<Long> reviewCntList = new ArrayList<>();
+        List<Integer> reviewCntList = new ArrayList<>();
 
         for (Review review : reviews) {
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
@@ -572,7 +572,7 @@ public class PopupService {
         // 리뷰 이미지 목록, 프로필 이미지 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
-        List<Long> reviewCntList = new ArrayList<>();
+        List<Integer> reviewCntList = new ArrayList<>();
 
         for (Review review : reviews) {
             if (blockedUserIds.contains(review.getUser().getId())) {
@@ -932,20 +932,12 @@ public class PopupService {
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
-            switch (order) {
-                case OPEN:
-                    sort = Sort.by(Sort.Direction.DESC, "open_date");
-                    break;
-                case CLOSE:
-                    sort = Sort.by(Sort.Direction.ASC, "close_date");
-                    break;
-                case VIEW:
-                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
-                    break;
-                case UPLOAD:
-                    sort = Sort.by(Sort.Direction.DESC, "created_at");
-                    break;
-            }
+            sort = switch (order) {
+                case OPEN -> Sort.by(Sort.Direction.DESC, "open_date");
+                case CLOSE -> Sort.by(Sort.Direction.ASC, "close_date");
+                case VIEW -> Sort.by(Sort.Direction.DESC, "view_cnt");
+                case UPLOAD -> Sort.by(Sort.Direction.DESC, "created_at");
+            };
         }
 
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
