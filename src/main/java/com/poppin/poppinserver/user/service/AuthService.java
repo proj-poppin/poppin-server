@@ -47,7 +47,7 @@ public class AuthService {
     private final MailService mailService;
     private final AlarmSettingRepository alarmSettingRepository;
 
-    public JwtTokenDto authSignUp(AuthSignUpDto authSignUpDto) {
+    public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
         userRepository.findByEmail(authSignUpDto.email())
                 .ifPresent(user -> {
@@ -67,10 +67,26 @@ public class AuthService {
                 User.toUserEntity(authSignUpDto, bCryptPasswordEncoder.encode(authSignUpDto.password()),
                         ELoginProvider.DEFAULT));
 
+        // 알람 setting 객체 반환
+        AlarmSetting alarmSetting = alarmSettingRepository.findByToken(authSignUpDto.fcmToken());
+
+        // 알람 setting 객체가 없으면 생성
+        if (alarmSetting == null) {
+            alarmSetting = new AlarmSetting(authSignUpDto.fcmToken(), true, true, true, true, true, true);
+            alarmSettingRepository.save(alarmSetting);
+        }
+
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
         userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
-        return jwtToken;
+
+        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+                newUser,
+                alarmSetting,
+                jwtToken
+        );
+
+        return userInfoResponseDto;
     }
 
     public Object authSocialLogin(String token, String provider) {

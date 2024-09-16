@@ -32,7 +32,9 @@ public class AuthController {
 
     // 자체 회원가입 API
     @PostMapping("/sign-up")
-    public ResponseDto<?> authSignUp(@RequestBody @Valid AuthSignUpDto authSignUpDto) {
+    public ResponseDto<?> authSignUp(
+            @RequestBody @Valid AuthSignUpDto authSignUpDto
+    ) {
         log.info("authSignUpDto : " + authSignUpDto);
         return ResponseDto.created(authService.authSignUp(authSignUpDto));
     }
