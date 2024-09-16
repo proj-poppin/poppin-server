@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
-import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
@@ -45,8 +44,9 @@ public class AuthService {
     private final OAuth2Util oAuth2Util;
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
-    private final AlarmSettingRepository alarmSettingRepository;
+    private final UserAlarmSettingService userAlarmSettingService;
 
+    @Transactional
     public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
         // 유저 이메일 중복 확인
         userRepository.findByEmail(authSignUpDto.email())
@@ -68,13 +68,7 @@ public class AuthService {
                         ELoginProvider.DEFAULT));
 
         // 알람 setting 객체 반환
-        AlarmSetting alarmSetting = alarmSettingRepository.findByToken(authSignUpDto.fcmToken());
-
-        // 알람 setting 객체가 없으면 생성
-        if (alarmSetting == null) {
-            alarmSetting = new AlarmSetting(authSignUpDto.fcmToken(), true, true, true, true, true, true);
-            alarmSettingRepository.save(alarmSetting);
-        }
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpDto.fcmToken());
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
@@ -89,12 +83,18 @@ public class AuthService {
         return userInfoResponseDto;
     }
 
-    public Object authSocialLogin(String token, String provider) {
+    @Transactional
+    public Object authSocialLogin(String token, String provider, FcmTokenRequestDto fcmTokenRequestDto) {
         String accessToken = refineToken(token);
         String loginProvider = provider.toUpperCase();
         log.info("loginProvider : " + loginProvider);
         OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
-        return processUserLogin(oAuth2UserInfoDto, ELoginProvider.valueOf(loginProvider));
+
+        return processUserLogin(
+                oAuth2UserInfoDto,
+                ELoginProvider.valueOf(loginProvider),
+                fcmTokenRequestDto.fcmToken()
+        );
     }
 
     @Transactional
@@ -139,21 +139,29 @@ public class AuthService {
         }
     }
 
-    private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider) {
+    private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider, String fcmToken) {
         Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // 회원 탈퇴 여부 확인
         if (user.isPresent() && user.get().getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
+
         // 이미 가입된 계정이 있는지 확인
         if (user.isPresent() && !user.get().getProvider().equals(provider)) {
             throw new CommonException(ErrorCode.DUPLICATED_SOCIAL_ID);
         }
+
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (user.isPresent() && user.get().getProvider().equals(provider)) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
-            return jwtTokenDto;
+            AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+            UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+                    user.get(),
+                    alarmSetting,
+                    jwtTokenDto
+            );
+            return userInfoResponseDto;
         } else {
             // 비밀번호 랜덤 생성 후 암호화해서 DB에 저장
             User newUser = userRepository.findByEmail(oAuth2UserInfo.email())
@@ -239,9 +247,12 @@ public class AuthService {
         if (user.getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
-        AlarmSetting alarmSetting = alarmSettingRepository.findByToken(fcmTokenRequestDto.fcmToken());
+        
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
+
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,

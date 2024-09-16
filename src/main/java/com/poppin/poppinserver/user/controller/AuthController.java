@@ -55,10 +55,13 @@ public class AuthController {
     }
 
     @PostMapping("/login/{provider}")
-    public ResponseDto<?> authSocialLogin(@PathVariable String provider,
-                                          @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken) {
+    public ResponseDto<?> authSocialLogin(
+            @PathVariable String provider,
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+    ) {
         log.info("accessToken : " + accessToken);   // 'bearer ' 제거 필요
-        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider));
+        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
     }
 
     @PostMapping("/refresh")
