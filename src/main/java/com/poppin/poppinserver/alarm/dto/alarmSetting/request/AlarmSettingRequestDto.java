@@ -1,31 +1,16 @@
 package com.poppin.poppinserver.alarm.dto.alarmSetting.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
 public record AlarmSettingRequestDto(
-
-        String fcmToken,
-        String pushYn,
-        String pushNightYn,
-        String hoogiYn,
-        String openYn,
-        String magamYn,
-        String changeInfoYn
-
+        @NotNull String fcmToken,
+        @NotNull Boolean appPush,
+        @NotNull Boolean nightPush,
+        @NotNull Boolean helpfulReviewPush,
+        @NotNull Boolean interestedPopupOpenPush,
+        @NotNull Boolean interestedPopupDeadlinePush,
+        @NotNull Boolean interestedPopupInfoUpdatedPush
 ) {
-
-    public static AlarmSettingRequestDto fromEntity(String token, String pushYn, String pushNightYn, String hoogiYn,
-                                                    String openYn, String magamYn, String changeInfoYn) {
-        return AlarmSettingRequestDto.builder()
-                .fcmToken(token)
-                .pushYn(pushYn)
-                .pushNightYn(pushNightYn)
-                .hoogiYn(hoogiYn)
-                .openYn(openYn)
-                .magamYn(magamYn)
-                .changeInfoYn(changeInfoYn)
-                .build();
-    }
-
 }

@@ -11,18 +11,17 @@ import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -51,7 +50,7 @@ public class FCMTokenService {
             if (isDuplicate && requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
                 AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
                 if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
+                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
                     alarmSettingRepository.save(alarmSetting);
                     return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
                 } else {
@@ -87,7 +86,7 @@ public class FCMTokenService {
 
                 AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
                 if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
+                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
                     alarmSettingRepository.save(alarmSetting);
                     return ApplyTokenResponseDto.fromEntity(requestDto,
                             "duplicated device id. update token. create new alarm setting.", "토큰 업데이트 및 알림 세팅 생성");
@@ -110,7 +109,7 @@ public class FCMTokenService {
 
                 AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
                 if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), "1", "1", "1", "1", "1", "1");
+                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
                     alarmSettingRepository.save(alarmSetting);
                     return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
                 } else {
