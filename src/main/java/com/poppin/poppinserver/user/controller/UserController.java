@@ -7,7 +7,7 @@ import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.review.service.ReviewService;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.service.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -89,9 +89,9 @@ public class UserController {
     @PutMapping("/settings")
     public ResponseDto<?> updateUserNickname(
             @UserId Long userId,
-            @RequestBody UserInfoDto userInfoDto
+            @RequestBody UpdateUserInfoDto updateUserInfoDto
     ) {
-        return ResponseDto.ok(userService.updateUserNickname(userId, userInfoDto));
+        return ResponseDto.ok(userService.updateUserNickname(userId, updateUserInfoDto));
     }
 
     @DeleteMapping("/withdrawal")

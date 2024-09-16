@@ -42,7 +42,7 @@ import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.dto.user.response.NicknameDto;
 import com.poppin.poppinserver.user.dto.user.response.UserMypageDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
@@ -229,6 +229,7 @@ public class UserService {
                 .build();
     }
 
+    // TODO: 삭제 예정
     public UserMypageDto readUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -241,6 +242,7 @@ public class UserService {
                 .build();
     }
 
+    // TODO: 삭제 예정
     public UserProfileDto readUserProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -281,13 +283,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserProfileDto updateUserNickname(Long userId, UserInfoDto userInfoDto) {
+    public UserProfileDto updateUserNickname(Long userId, UpdateUserInfoDto updateUserInfoDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (userRepository.findByNickname(userInfoDto.nickname()).isPresent() && (userId != user.getId())) {
+        if (userRepository.findByNickname(updateUserInfoDto.nickname()).isPresent() && (userId != user.getId())) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
-        user.updateUserNickname(userInfoDto.nickname());
+        user.updateUserNickname(updateUserInfoDto.nickname());
         userRepository.save(user);
 
         return UserProfileDto.builder()
