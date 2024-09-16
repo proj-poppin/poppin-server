@@ -98,23 +98,30 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtTokenDto socialRegister(String accessToken,
-                                      SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+    public UserInfoResponseDto socialRegister(String accessToken,
+                                              SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         String token = refineToken(accessToken);    // poppin access token
 
         Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
 
         // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
-        User user = userRepository.findByIdAndELoginProvider(userId, socialRegisterRequestDto.provider())
+        User user = userRepository.findByIdAndELoginProvider(userId,
+                        ELoginProvider.valueOf(socialRegisterRequestDto.provider()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        // 닉네임과 생년월일을 등록 -> 소셜 회원가입 완료
+        // 닉네임 등록 -> 소셜 회원가입 완료
         user.register(socialRegisterRequestDto.nickname());
 
         final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         user.updateRefreshToken(jwtTokenDto.refreshToken());
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
 
-        return jwtTokenDto;
+        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+                user,
+                alarmSetting,
+                jwtTokenDto
+        );
+        return userInfoResponseDto;
     }
 
     private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken) {
@@ -247,7 +254,7 @@ public class AuthService {
         if (user.getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
-        
+
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
