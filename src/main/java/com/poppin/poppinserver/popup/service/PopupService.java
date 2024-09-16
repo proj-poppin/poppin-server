@@ -519,7 +519,7 @@ public class PopupService {
         // 리뷰 이미지 목록 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
-        List<Long> reviewCntList = new ArrayList<>();
+        List<Integer> reviewCntList = new ArrayList<>();
 
         for (Review review : reviews) {
             List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
@@ -572,7 +572,7 @@ public class PopupService {
         // 리뷰 이미지 목록, 프로필 이미지 가져오기
         List<List<String>> reviewImagesList = new ArrayList<>();
         List<String> profileImagesList = new ArrayList<>();
-        List<Long> reviewCntList = new ArrayList<>();
+        List<Integer> reviewCntList = new ArrayList<>();
 
         for (Review review : reviews) {
             if (blockedUserIds.contains(review.getUser().getId())) {

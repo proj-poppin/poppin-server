@@ -2,10 +2,9 @@ package com.poppin.poppinserver.review.dto.review.response;
 
 import com.poppin.poppinserver.review.domain.Review;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record ReviewInfoDto(
@@ -17,7 +16,7 @@ public record ReviewInfoDto(
         String nickname,
 
         @NotNull
-        Long reviewCnt, // 사용자가 쓴 리뷰 개수
+        Integer reviewCnt, // 사용자가 쓴 리뷰 개수
 
         @NotNull
         String text,
@@ -38,7 +37,7 @@ public record ReviewInfoDto(
         Long userId
 ) {
     public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls,
-                                                     List<String> profileUrls, List<Long> reviewCnt) {
+                                                     List<String> profileUrls, List<Integer> reviewCnt) {
         List<ReviewInfoDto> reviewInfoDtoList = new ArrayList<>();
 
         for (int i = 0; i < reviews.size(); i++) {

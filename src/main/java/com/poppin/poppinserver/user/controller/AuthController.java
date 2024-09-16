@@ -3,13 +3,25 @@ package com.poppin.poppinserver.user.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
+import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
-import com.poppin.poppinserver.user.dto.auth.request.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
@@ -34,8 +46,10 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseDto<?> authSignIn(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader) {
-        return ResponseDto.ok(authService.authSignIn(authorizationHeader));
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader,
+            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+    ) {
+        return ResponseDto.ok(authService.authSignIn(authorizationHeader, fcmTokenRequestDto));
     }
 
     @PostMapping("/login/{provider}")
