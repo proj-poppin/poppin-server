@@ -2,21 +2,29 @@ package com.poppin.poppinserver.user.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.request.UserInfoDto;
-import com.poppin.poppinserver.popup.service.PopupService;
-import com.poppin.poppinserver.review.service.ReviewService;
-import com.poppin.poppinserver.user.service.UserService;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
+import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.review.service.ReviewService;
+import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
+import com.poppin.poppinserver.user.dto.user.request.UserInfoDto;
+import com.poppin.poppinserver.user.service.UserService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,11 +56,13 @@ public class UserController {
         return ResponseDto.ok(userService.updateUserTaste(userId, userTasteDto));
     }
 
+    // TODO: 삭제 예정
     @GetMapping("")
     public ResponseDto<?> readUser(@UserId Long userId) {
         return ResponseDto.ok(userService.readUser(userId));
     }
 
+    // TODO: 삭제 예정
     @GetMapping("/settings")
     public ResponseDto<?> readUserProfile(@UserId Long userId) {
         return ResponseDto.ok(userService.readUserProfile(userId));
@@ -177,14 +187,15 @@ public class UserController {
         return ResponseDto.ok(userService.generateRandomNickname());
     }
 
+    // TODO: 삭제 예정
     @GetMapping("/preference-setting")
     public ResponseDto<?> readUserPreferenceSettingCreated(@UserId Long userId) {
         return ResponseDto.ok(userService.readUserPreferenceSettingCreated(userId));
     }
 
     @PostMapping("/block/{blockUserId}")
-    public ResponseDto<?> createblockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
-        userService.createblockedUser(userId, blockUserId);
+    public ResponseDto<?> createBlockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
+        userService.createBlockedUser(userId, blockUserId);
         return ResponseDto.ok("차단 완료되었습니다.");
     }
 }

@@ -23,6 +23,7 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
@@ -45,6 +46,7 @@ public class AuthService {
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
+    private final UserService userService;
 
     @Transactional
     public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
@@ -74,10 +76,15 @@ public class AuthService {
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
         userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                newUser.getId()
+        );
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
-                jwtToken
+                jwtToken,
+                userPreferenceSettingDto
         );
 
         return userInfoResponseDto;
@@ -116,10 +123,15 @@ public class AuthService {
         user.updateRefreshToken(jwtTokenDto.refreshToken());
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
 
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                user.getId()
+        );
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
-                jwtTokenDto
+                jwtTokenDto,
+                userPreferenceSettingDto
         );
         return userInfoResponseDto;
     }
@@ -163,10 +175,15 @@ public class AuthService {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
             AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+            UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                    user.get().getId()
+            );
+
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                     user.get(),
                     alarmSetting,
-                    jwtTokenDto
+                    jwtTokenDto,
+                    userPreferenceSettingDto
             );
             return userInfoResponseDto;
         } else {
@@ -259,12 +276,15 @@ public class AuthService {
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(user.getId());
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
-                jwtTokenDto
+                jwtTokenDto,
+                userPreferenceSettingDto
         );
+
         return userInfoResponseDto;
     }
 

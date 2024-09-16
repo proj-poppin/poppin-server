@@ -153,7 +153,6 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
     public UserTasteDto readUserTaste(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -562,10 +561,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        UserTasteDto userTasteDto = readUserTaste(userId);
         boolean isPreferenceSettingCreated = updatePreferenceSettings(user);
 
         return UserPreferenceSettingDto.builder()
                 .isPreferenceSettingCreated(isPreferenceSettingCreated)
+                .userTasteDto(userTasteDto)
                 .build();
     }
 
@@ -651,7 +652,7 @@ public class UserService {
     }
 
     @Transactional
-    public void createblockedUser(Long userId, Long blockUserId) {
+    public void createBlockedUser(Long userId, Long blockUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 

@@ -3,6 +3,7 @@ package com.poppin.poppinserver.alarm.dto.alarm.response;
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import lombok.Builder;
 
+// TODO: 삭제 예정
 @Builder
 public record SettingResponseDto(
         String fcmToken,
