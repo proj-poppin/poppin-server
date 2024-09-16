@@ -49,6 +49,7 @@ public class AlarmSettingService {
     }
 
 
+    // TODO: 삭제 예정
     public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));

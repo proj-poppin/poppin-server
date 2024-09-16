@@ -23,6 +23,7 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.EmailResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
@@ -45,6 +46,7 @@ public class AuthService {
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
+    private final UserService userService;
 
     @Transactional
     public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
@@ -74,10 +76,15 @@ public class AuthService {
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
         userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                newUser.getId()
+        );
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
-                jwtToken
+                jwtToken,
+                userPreferenceSettingDto
         );
 
         return userInfoResponseDto;
@@ -98,23 +105,35 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtTokenDto socialRegister(String accessToken,
-                                      SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+    public UserInfoResponseDto socialRegister(String accessToken,
+                                              SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         String token = refineToken(accessToken);    // poppin access token
 
         Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
 
         // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
-        User user = userRepository.findByIdAndELoginProvider(userId, socialRegisterRequestDto.provider())
+        User user = userRepository.findByIdAndELoginProvider(userId,
+                        ELoginProvider.valueOf(socialRegisterRequestDto.provider()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        // 닉네임과 생년월일을 등록 -> 소셜 회원가입 완료
+        // 닉네임 등록 -> 소셜 회원가입 완료
         user.register(socialRegisterRequestDto.nickname());
 
         final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         user.updateRefreshToken(jwtTokenDto.refreshToken());
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
 
-        return jwtTokenDto;
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                user.getId()
+        );
+
+        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+                user,
+                alarmSetting,
+                jwtTokenDto,
+                userPreferenceSettingDto
+        );
+        return userInfoResponseDto;
     }
 
     private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken) {
@@ -156,10 +175,15 @@ public class AuthService {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
             AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+            UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+                    user.get().getId()
+            );
+
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                     user.get(),
                     alarmSetting,
-                    jwtTokenDto
+                    jwtTokenDto,
+                    userPreferenceSettingDto
             );
             return userInfoResponseDto;
         } else {
@@ -247,17 +271,20 @@ public class AuthService {
         if (user.getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
         }
-        
+
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(user.getId());
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
-                jwtTokenDto
+                jwtTokenDto,
+                userPreferenceSettingDto
         );
+
         return userInfoResponseDto;
     }
 
