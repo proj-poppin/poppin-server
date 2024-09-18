@@ -47,6 +47,7 @@ public class AuthService {
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserService userService;
+    private final UserPreferenceSettingService userPreferenceSettingService;
 
     @Transactional
     public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
@@ -76,7 +77,7 @@ public class AuthService {
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
         userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 newUser.getId()
         );
 
@@ -123,7 +124,7 @@ public class AuthService {
         user.updateRefreshToken(jwtTokenDto.refreshToken());
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId()
         );
 
@@ -175,7 +176,7 @@ public class AuthService {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
             AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
-            UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(
+            UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                     user.get().getId()
             );
 
@@ -276,7 +277,8 @@ public class AuthService {
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
-        UserPreferenceSettingDto userPreferenceSettingDto = userService.readUserPreferenceSettingCreated(user.getId());
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+                user.getId());
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
