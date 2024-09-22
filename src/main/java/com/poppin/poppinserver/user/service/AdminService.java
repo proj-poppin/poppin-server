@@ -11,10 +11,13 @@ import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
 import com.poppin.poppinserver.alarm.service.AlarmListService;
 import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
+import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.util.HeaderUtil;
+import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
@@ -36,6 +39,7 @@ import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.faq.request.FaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
@@ -48,6 +52,7 @@ import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,6 +61,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,6 +85,8 @@ public class AdminService {
     private final AlarmService alarmService;
     private final AlarmListService alarmListService;
     private final FCMSendService fcmSendService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtUtil jwtUtil;
 
     public List<FaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
@@ -226,7 +234,7 @@ public class AdminService {
                     .requiresSpecialCare(user.getRequiresSpecialCare())
                     .build());
         }
-        Long userCnt = Long.valueOf(userAdministrationDtoList.size());
+        Long userCnt = (long) userAdministrationDtoList.size();
         return UserListDto.builder()
                 .userList(userAdministrationDtoList)
                 .userCnt(userCnt)
@@ -481,5 +489,25 @@ public class AdminService {
                 .executedAt(reportReview.getExecutedAt().toString())
                 .content(reportReview.getExecuteContent())
                 .build();
+    }
+
+    public JwtTokenDto authSignIn(String authorizationHeader) {
+        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
+        String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
+        String email = decoded[0];
+        String password = decoded[1];
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw new CommonException(ErrorCode.INVALID_LOGIN);
+        }
+        if (user.getIsDeleted()) {
+            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+        }
+
+        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
+        userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+
+        return jwtTokenDto;
     }
 }

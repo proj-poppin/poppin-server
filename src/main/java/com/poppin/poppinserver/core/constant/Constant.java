@@ -47,8 +47,8 @@ public class Constant {
             "/api/v1/alarm/info/detail",                                    // 공지사항 알림 2 depth
 
             "/api/v1/alarm/popup",                                          // 팝업 알림 1 depth
-            "/api/v1/alarm/popup/guest/detail"                              // 팝업 알림 2 depth
-
+            "/api/v1/alarm/popup/guest/detail",                              // 팝업 알림 2 depth
+            "/api/v1/admin/sign-in"                                         // 관리자 로그인
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";
