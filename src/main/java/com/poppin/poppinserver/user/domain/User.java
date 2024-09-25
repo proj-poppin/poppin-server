@@ -67,9 +67,6 @@ public class User {
     @Column(name = "agreed_to_service_terms", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean agreedToServiceTerms;
 
-    @Column(name = "agreed_to_gps", columnDefinition = "TINYINT(1)", nullable = false)
-    private Boolean agreedToGPS;
-
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -121,7 +118,7 @@ public class User {
     @Builder
     public User(String email, String password, String nickname,
                 ELoginProvider eLoginProvider, EUserRole role,
-                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms, Boolean agreedToGPS
+                Boolean agreedToPrivacyPolicy, Boolean agreedToServiceTerms
     ) {
         this.email = email;
         this.password = password;
@@ -130,7 +127,6 @@ public class User {
         this.role = role;
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
         this.agreedToServiceTerms = agreedToServiceTerms;
-        this.agreedToGPS = agreedToGPS;
         this.createdAt = LocalDateTime.now();
         this.isLogin = false;
         this.refreshToken = null;
@@ -153,7 +149,6 @@ public class User {
                 .role(EUserRole.USER)
                 .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
                 .agreedToServiceTerms(authSignUpDto.agreedToServiceTerms())
-                .agreedToGPS(false)
                 .build();
     }
 
@@ -166,7 +161,6 @@ public class User {
                 .role(EUserRole.GUEST)
                 .agreedToPrivacyPolicy(true)
                 .agreedToServiceTerms(true)
-                .agreedToGPS(false)
                 .build();
     }
 
