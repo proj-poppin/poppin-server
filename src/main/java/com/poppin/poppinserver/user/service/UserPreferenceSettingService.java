@@ -174,7 +174,7 @@ public class UserPreferenceSettingService {
 
         return UserPreferenceSettingDto.builder()
                 .isPreferenceSettingCreated(isPreferenceSettingCreated)
-                .userTasteDto(userTasteResponseDto)
+                .userTasteResponseDto(userTasteResponseDto)
                 .build();
     }
 
