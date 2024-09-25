@@ -26,7 +26,7 @@ public record UserInfoResponseDto(
                 .userPreferenceSettingDto(
                         UserPreferenceSettingDto.fromUserPreferenceInfo(
                                 userPreferenceSettingDto.isPreferenceSettingCreated(),
-                                userPreferenceSettingDto.userTasteDto())
+                                userPreferenceSettingDto.userTasteResponseDto())
                 )
                 .build();
     }

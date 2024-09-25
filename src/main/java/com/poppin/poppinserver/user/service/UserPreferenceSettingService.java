@@ -7,7 +7,6 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.response.TasteDto;
-import com.poppin.poppinserver.popup.dto.popup.response.UserTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.response.WhoWithDto;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
@@ -15,6 +14,7 @@ import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class UserPreferenceSettingService {
     private final WhoWithPopupRepository whoWithPopupRepository;
 
     @Transactional
-    public UserTasteDto createUserTaste(
+    public UserTasteResponseDto createUserTaste(
             Long userId,
             CreateUserTasteDto createUserTasteDto
     ) {
@@ -81,14 +81,14 @@ public class UserPreferenceSettingService {
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
         userRepository.save(user);
 
-        return UserTasteDto.builder()
+        return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(preferedPopup))
                 .taste(TasteDto.fromEntity(tastePopup))
                 .whoWith(WhoWithDto.fromEntity(whoWithPopup))
                 .build();
     }
 
-    public UserTasteDto readUserTaste(Long userId) {
+    public UserTasteResponseDto readUserTaste(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -111,7 +111,7 @@ public class UserPreferenceSettingService {
         }
 
         userRepository.save(user);
-        return UserTasteDto.builder()
+        return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(user.getPreferedPopup()))
                 .taste(TasteDto.fromEntity(user.getTastePopup()))
                 .whoWith(WhoWithDto.fromEntity(user.getWhoWithPopup()))
@@ -119,7 +119,7 @@ public class UserPreferenceSettingService {
     }
 
     @Transactional
-    public UserTasteDto updateUserTaste(Long userId, CreateUserTasteDto createUserTasteDto) {
+    public UserTasteResponseDto updateUserTaste(Long userId, CreateUserTasteDto createUserTasteDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -157,7 +157,7 @@ public class UserPreferenceSettingService {
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
         userRepository.save(user);
 
-        return UserTasteDto.builder()
+        return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(preferedPopup))
                 .taste(TasteDto.fromEntity(tastePopup))
                 .whoWith(WhoWithDto.fromEntity(whoWithPopup))
@@ -169,12 +169,12 @@ public class UserPreferenceSettingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        UserTasteDto userTasteDto = readUserTaste(userId);
+        UserTasteResponseDto userTasteResponseDto = readUserTaste(userId);
         boolean isPreferenceSettingCreated = updatePreferenceSettings(user);
 
         return UserPreferenceSettingDto.builder()
                 .isPreferenceSettingCreated(isPreferenceSettingCreated)
-                .userTasteDto(userTasteDto)
+                .userTasteResponseDto(userTasteResponseDto)
                 .build();
     }
 

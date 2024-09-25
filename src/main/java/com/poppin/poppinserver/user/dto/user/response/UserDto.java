@@ -12,7 +12,6 @@ public record UserDto(
         String role,
         Boolean agreedToPrivacyPolicy,
         Boolean agreedToServiceTerms,
-        Boolean agreedToGPS,
         String createdAt
 ) {
     public static UserDto fromEntity(User user) {
@@ -24,7 +23,6 @@ public record UserDto(
                 .role(user.getRole().toString())
                 .agreedToPrivacyPolicy(user.getAgreedToPrivacyPolicy())
                 .agreedToServiceTerms(user.getAgreedToServiceTerms())
-                .agreedToGPS(user.getAgreedToGPS())
                 .createdAt(user.getCreatedAt().toString())
                 .build();
     }
