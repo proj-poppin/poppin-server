@@ -6,10 +6,11 @@ import lombok.Builder;
 @Builder
 public record WhoWithDto(
         Long id,
-        Boolean solo,
-        Boolean withFriend,
-        Boolean withFamily,
-        Boolean withLover) {
+        Boolean solo,   // 혼자
+        Boolean withFriend, // 친구와 함께
+        Boolean withFamily, // 가족과 함께
+        Boolean withLover   // 연인과 함께
+) {
     public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup) {
         return WhoWithDto.builder()
                 .id(whoWithPopup.getId())
