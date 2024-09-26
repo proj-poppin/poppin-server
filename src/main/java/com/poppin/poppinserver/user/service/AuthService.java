@@ -20,7 +20,7 @@ import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
 import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
-import com.poppin.poppinserver.user.dto.auth.response.EmailResponseDto;
+import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
@@ -214,24 +214,24 @@ public class AuthService {
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 
-    public EmailResponseDto sendPasswordResetVerificationEmail(EmailRequestDto emailRequestDto) {
+    public AuthCodeResponseDto sendPasswordResetVerificationEmail(EmailRequestDto emailRequestDto) {
         if (!userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
             throw new CommonException(ErrorCode.NOT_FOUND_USER);
         }
         String authCode = RandomCodeUtil.generateVerificationCode();
         mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
-        return EmailResponseDto.builder()
+        return AuthCodeResponseDto.builder()
                 .authCode(authCode)
                 .build();
     }
 
-    public EmailResponseDto sendSignUpEmail(EmailRequestDto emailRequestDto) {
+    public AuthCodeResponseDto sendSignUpEmail(EmailRequestDto emailRequestDto) {
         if (userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
             throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
         }
         String authCode = RandomCodeUtil.generateVerificationCode();
         mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
-        return EmailResponseDto.builder()
+        return AuthCodeResponseDto.builder()
                 .authCode(authCode)
                 .build();
     }
