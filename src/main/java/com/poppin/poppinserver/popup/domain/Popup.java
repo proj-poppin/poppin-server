@@ -3,7 +3,9 @@ package com.poppin.poppinserver.popup.domain;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.core.type.EAvailableAge;
 import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.visit.domain.VisitorData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -120,6 +122,12 @@ public class Popup {
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
     private Set<PopupAlarmKeyword> popupAlarmKeywords = new HashSet<>();
+
+    @OneToMany(mappedBy = "popup", fetch = FetchType.EAGER)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "popup", fetch = FetchType.EAGER)
+    private List<VisitorData> visitorData = new ArrayList<>();
 
     @Builder
     public Popup(String posterUrl, String homepageLink, String name, String introduce,
