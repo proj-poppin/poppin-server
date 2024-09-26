@@ -51,13 +51,13 @@ public class InterestService {
         popup.addInterestCnt();
 
         /*알림 구독*/
-        String fcmToken = requestDto.fcmToken();
+//        String fcmToken = requestDto.fcmToken();
+//
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
-
-        return InterestDto.fromEntity(interest, user, popup);
+        return InterestDto.fromEntity(interest, popup);
     }
 
     public Boolean removeInterest(Long userId, InterestRequestDto requestDto) {
