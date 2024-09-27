@@ -76,7 +76,7 @@ public class AlarmController {
         return ResponseDto.ok(alarmSettingService.readAlarmSetting(userId, dto));
     }
 
-    @PostMapping("/update/setting")
+    @PutMapping("/settings")
     public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {
         return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
     }
