@@ -12,7 +12,9 @@ import com.poppin.poppinserver.core.util.OAuth2Util;
 import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
@@ -22,6 +24,7 @@ import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
 import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
+import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
@@ -321,5 +324,16 @@ public class AuthService {
 
     public Boolean appStart(AppStartRequestDto appStartRequestDto) {
         return Boolean.TRUE;
+    }
+
+    public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
+        Optional<User> user = userRepository.findByEmail(accountRequestDto.email());
+        EAccountStatus accountStatus;
+        if (user.isPresent()) {
+            accountStatus = EAccountStatus.LOGIN;
+        } else {
+            accountStatus = EAccountStatus.SIGNUP;
+        }
+        return AccountStatusResponseDto.fromEnum(accountStatus);
     }
 }
