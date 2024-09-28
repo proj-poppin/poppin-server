@@ -3,6 +3,7 @@ package com.poppin.poppinserver.user.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +37,12 @@ public class AuthController {
     @PostMapping("/app/start")
     public ResponseDto<?> appStart(@RequestBody @Valid AppStartRequestDto appStartRequestDto) {
         return ResponseDto.ok(authService.appStart(appStartRequestDto));
+    }
+
+    // 계정 상태 반환 API
+    @GetMapping("/account/status")
+    public ResponseDto<?> getAccountStatus(@RequestBody @Valid AccountRequestDto accountRequestDto) {
+        return ResponseDto.ok(authService.getAccountStatus(accountRequestDto));
     }
 
     // 자체 회원가입 API
