@@ -852,16 +852,13 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus(), userId); // 운영 상태
 
-        List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
+        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
-        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
+        return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 로그인 팝업 검색
 
     public PagingResponseDto readBaseList(String text, int page, int size, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
         if (text != null && text.trim() != "") {
@@ -871,10 +868,10 @@ public class PopupService {
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText,
                 PageRequest.of(page, size), userId); // 운영 상태
 
-        List<PopupSearchingDto> popupSearchingDtos = PopupSearchingDto.fromEntityList(popups.getContent(), user);
+        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
-        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
+        return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 로그인 베이스 팝업 검색
 
     public PagingResponseDto readGuestSearchingList(String text, String taste, String prepered,
@@ -956,10 +953,10 @@ public class PopupService {
 
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
 
-        List<PopupGuestSearchingDto> popupSearchingDtos = PopupGuestSearchingDto.fromEntityList(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
-        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
+        return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 비로그인 베이스 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {

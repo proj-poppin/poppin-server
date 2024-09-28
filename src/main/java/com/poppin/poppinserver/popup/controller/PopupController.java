@@ -120,23 +120,23 @@ public class PopupController {
     }
 
     @GetMapping("/search") // 로그인 팝업 검색
-    public ResponseDto<?> readSearchList(@RequestParam("text") String text,
-                                         @RequestParam("taste") String taste,
-                                         @RequestParam("prepered") String prepered,
+    public ResponseDto<?> readSearchList(@RequestParam("searchName") String searchName,
+                                         @RequestParam("selectedPreferenceCategories") String selectedPreferenceCategories,
+                                         @RequestParam("selectedPreferencePopupStores") String selectedPreferencePopupStores,
                                          @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long userId) {
-        return ResponseDto.ok(popupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
+        return ResponseDto.ok(popupService.readSearchingList(searchName, selectedPreferenceCategories, selectedPreferencePopupStores, oper, order, page, size, userId));
     }
 
     @GetMapping("/search/base") // 로그인 팝업 베이스 검색
-    public ResponseDto<?> readBaseList(@RequestParam("text") String text,
+    public ResponseDto<?> readBaseList(@RequestParam("searchName") String searchName,
                                        @RequestParam("page") int page,
                                        @RequestParam("size") int size,
                                        @UserId Long userId) {
-        return ResponseDto.ok(popupService.readBaseList(text, page, size, userId));
+        return ResponseDto.ok(popupService.readBaseList(searchName, page, size, userId));
     }
 
     @GetMapping("/guest/search") // 비로그인 팝업 검색
@@ -151,10 +151,10 @@ public class PopupController {
     }
 
     @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색
-    public ResponseDto<?> readGuestBaseList(@RequestParam("text") String text,
+    public ResponseDto<?> readGuestBaseList(@RequestParam("searchName") String searchName,
                                             @RequestParam("page") int page,
                                             @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readGuestBaseList(text, page, size));
+        return ResponseDto.ok(popupService.readGuestBaseList(searchName, page, size));
     }
 
     @GetMapping("/taste-list") // 취향 저격 팝업 목록
