@@ -12,8 +12,10 @@ import com.poppin.poppinserver.core.util.OAuth2Util;
 import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.EVerificationType;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
-import com.poppin.poppinserver.user.dto.auth.request.EmailRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
@@ -214,27 +216,44 @@ public class AuthService {
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 
-    public AuthCodeResponseDto sendPasswordResetVerificationEmail(EmailRequestDto emailRequestDto) {
-        if (!userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_USER);
-        }
+//    public AuthCodeResponseDto sendPasswordResetVerificationEmail(
+//            EmailVerificationRequestDto emailVerificationRequestDto) {
+//        if (!userRepository.findByEmail(emailVerificationRequestDto.email()).isPresent()) {
+//            throw new CommonException(ErrorCode.NOT_FOUND_USER);
+//        }
+//        String authCode = RandomCodeUtil.generateVerificationCode();
+//        mailService.sendEmail(emailVerificationRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
+//        return AuthCodeResponseDto.builder()
+//                .authCode(authCode)
+//                .build();
+//    }
+
+    public AuthCodeResponseDto sendEmailVerificationCode(EmailVerificationRequestDto emailVerificationRequestDto) {
+        EVerificationType verificationType = EVerificationType.valueOf(
+                emailVerificationRequestDto.verificationType().toUpperCase()
+        );
+
+        validateEmail(verificationType, emailVerificationRequestDto.email());
+
         String authCode = RandomCodeUtil.generateVerificationCode();
-        mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
+        mailService.sendEmail(emailVerificationRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
         return AuthCodeResponseDto.builder()
                 .authCode(authCode)
                 .build();
     }
 
-    public AuthCodeResponseDto sendSignUpEmail(EmailRequestDto emailRequestDto) {
-        if (userRepository.findByEmail(emailRequestDto.email()).isPresent()) {
+    private void validateEmail(EVerificationType verificationType, String email) {
+        boolean userExists = userRepository.findByEmail(email).isPresent();
+
+        if (verificationType.equals(EVerificationType.SIGN_UP) && userExists) {
+            // 회원가입 시에 이메일 중복 -> 중복 이메일 Exception 반환
             throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
+        } else if (verificationType.equals(EVerificationType.PASSWORD_RESET) && !userExists) {
+            // 비밀번호 재설정 시에 이메일 없음 -> 이메일 없음 Exception 반환
+            throw new CommonException(ErrorCode.NOT_FOUND_USER);
         }
-        String authCode = RandomCodeUtil.generateVerificationCode();
-        mailService.sendEmail(emailRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
-        return AuthCodeResponseDto.builder()
-                .authCode(authCode)
-                .build();
     }
+
 
     public Boolean verifyPassword(Long userId, PasswordVerificationDto passwordVerificationDto) {
         User user = userRepository.findById(userId)
@@ -298,5 +317,9 @@ public class AuthService {
             throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
         }
         user.updatePassword(bCryptPasswordEncoder.encode(passwordResetDto.password()));
+    }
+
+    public Boolean appStart(AppStartRequestDto appStartRequestDto) {
+        return Boolean.TRUE;
     }
 }

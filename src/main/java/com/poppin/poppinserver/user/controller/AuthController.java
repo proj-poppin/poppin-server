@@ -3,8 +3,9 @@ package com.poppin.poppinserver.user.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
-import com.poppin.poppinserver.user.dto.auth.request.EmailRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
@@ -29,6 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
+
+    // 앱 진입 시
+    @PostMapping("/app/start")
+    public ResponseDto<?> appStart(@RequestBody @Valid AppStartRequestDto appStartRequestDto) {
+        return ResponseDto.ok(authService.appStart(appStartRequestDto));
+    }
 
     // 자체 회원가입 API
     @PostMapping("/sign-up")
@@ -88,13 +95,15 @@ public class AuthController {
         return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationDto));
     }
 
-    @PostMapping("/email/verification/password")
-    public ResponseDto<?> sendPasswordResetVerificationEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
-        return ResponseDto.ok(authService.sendPasswordResetVerificationEmail(emailRequestDto));
+    @PostMapping("/email/verification")
+    public ResponseDto<?> sendEmailVerificationCode(
+            @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {
+        return ResponseDto.ok(authService.sendEmailVerificationCode(emailVerificationRequestDto));
     }
 
-    @PostMapping("/email/verification")
-    public ResponseDto<?> sendSignUpEmail(@RequestBody @Valid EmailRequestDto emailRequestDto) {
-        return ResponseDto.ok(authService.sendSignUpEmail(emailRequestDto));
-    }
+    //    @PostMapping("/email/verification/password")
+//    public ResponseDto<?> sendPasswordResetVerificationEmail(
+//            @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {
+//        return ResponseDto.ok(authService.sendPasswordResetVerificationEmail(emailVerificationRequestDto));
+//    }
 }
