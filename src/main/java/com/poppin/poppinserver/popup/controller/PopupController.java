@@ -140,14 +140,14 @@ public class PopupController {
     }
 
     @GetMapping("/guest/search") // 비로그인 팝업 검색
-    public ResponseDto<?> readGuestSearchList(@RequestParam("text") String text,
-                                              @RequestParam("taste") String taste,
-                                              @RequestParam("prepered") String prepered,
+    public ResponseDto<?> readGuestSearchList(@RequestParam("searchName") String searchName,
+                                              @RequestParam("selectedPreferenceCategories") String selectedPreferenceCategories,
+                                              @RequestParam("selectedPreferencePopupStores") String selectedPreferencePopupStores,
                                               @RequestParam("oper") EOperationStatus oper,
                                               @RequestParam("order") EPopupSort order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readGuestSearchingList(text, taste, prepered, oper, order, page, size));
+        return ResponseDto.ok(popupService.readGuestSearchingList(searchName, selectedPreferenceCategories, selectedPreferencePopupStores, oper, order, page, size));
     }
 
     @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색

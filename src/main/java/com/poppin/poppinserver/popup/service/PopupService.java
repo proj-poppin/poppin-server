@@ -38,15 +38,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.InterestedPopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestSearchingDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupSearchingDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
+import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
@@ -949,10 +941,10 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
-        List<PopupGuestSearchingDto> popupSearchingDtos = PopupGuestSearchingDto.fromEntityList(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
-        return PagingResponseDto.fromEntityAndPageInfo(popupSearchingDtos, pageInfoDto);
+        return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 비로그인 팝업 검색
 
     public PagingResponseDto readGuestBaseList(String text, int page, int size) {
