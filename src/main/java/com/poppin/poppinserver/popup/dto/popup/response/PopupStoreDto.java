@@ -83,4 +83,12 @@ public record PopupStoreDto(
                 .preferences(PreferenceDto.fromPopup(popup))
                 .build();
     }
+
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups) {
+        List<PopupStoreDto> popupDtos = new ArrayList<>();
+        for (Popup popup : popups) {
+            popupDtos.add(fromEntity(popup));
+        }
+        return popupDtos;
+    }
 }
