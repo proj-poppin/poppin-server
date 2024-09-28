@@ -60,21 +60,24 @@ public class InterestService {
         return InterestDto.fromEntity(interest, popup);
     }
 
-    public Boolean removeInterest(Long userId, InterestRequestDto requestDto) {
+    public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) {
         Interest interest = interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+
+        Popup popup = popupRepository.findById(requestDto.popupId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        InterestDto interestDto = InterestDto.fromEntity(interest, popup);
 
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        Popup popup = popupRepository.findById(requestDto.popupId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
         String fcmToken = requestDto.fcmToken();
 
         fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
         fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
         fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
-        return true;
+
+        return interestDto;
     }
 }

@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/interest")
 public class InterestController {
     private final InterestService interestService;
 
-    @PostMapping("/popup/scrap")
+    @PostMapping("")
     public ResponseDto<?> addInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) {
         log.info("userId : " + userId.toString());
         return ResponseDto.ok(interestService.userAddInterest(userId, interestRequestDto));
     }
 
-    @DeleteMapping("/remove-interest")
+    @DeleteMapping("")
     public ResponseDto<?> removeInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) {
         return ResponseDto.ok(interestService.removeInterest(userId, interestRequestDto));
     }
