@@ -262,6 +262,9 @@ public class S3Service {
                 CopyObjectResult copyObjectResponse = s3Client.copyObject(copyObjectRequest);
                 log.info("Copied image to new folder: {}", destinationKey);
 
+                // 복사된 이미지에 퍼블릭 액세스 권한 부여
+                s3Client.setObjectAcl(destinationBucket, destinationKey, CannedAccessControlList.PublicRead);
+
                 // 복사된 이미지의 URL 반환
                 String newUrl = s3Client.getResourceUrl(destinationBucket, destinationKey);
                 newUrls.add(URLDecoder.decode(newUrl, StandardCharsets.UTF_8.toString()));
