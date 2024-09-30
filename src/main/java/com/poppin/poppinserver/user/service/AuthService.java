@@ -351,11 +351,11 @@ public class AuthService {
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
-        if (user.getIsDeleted()) {
-            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
-        }
 
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
+
+        // FCM 토큰 검증
+        fcmTokenService.verifyFCMToken(user.getId(), fcmTokenRequestDto.fcmToken());
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
