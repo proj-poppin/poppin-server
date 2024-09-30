@@ -86,7 +86,8 @@ public enum ErrorCode {
     // Server, File Up/DownLoad Error
     SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
     FCM_ERROR("50001", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 중 앱 푸시 알림 오류입니다."),
-    INFO_ALARM_ERROR("50002", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 과정 중 알림 등록 오류 발생하였습니다");
+    REVIEW_FCM_ERROR("50002", HttpStatus.INTERNAL_SERVER_ERROR, "후기 생성 중 오류가 발생하였습니다:fcm 오류"),
+    INFO_ALARM_ERROR("50003", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 과정 중 알림 등록 오류 발생하였습니다");
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;

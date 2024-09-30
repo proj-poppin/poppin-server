@@ -1,17 +1,20 @@
 package com.poppin.poppinserver.visit.service;
 
+import com.poppin.poppinserver.alarm.domain.FCMToken;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
-import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.visit.domain.Visit;
-import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
-import com.poppin.poppinserver.visit.dto.visit.response.RealTimeVisitorsDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.core.type.EPopupTopic;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,8 +31,10 @@ public class VisitService {
     private final VisitRepository visitRepository;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
-
+    private final FCMTokenRepository fcmTokenRepository;
     private final FCMTokenService fcmTokenService;
+    private final VisitorDataService visitorDataService;
+
 
     /* 실시간 방문자 조회 */
     public Optional<Integer> showRealTimeVisitors(Long popupId) {
@@ -47,7 +52,7 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public RealTimeVisitorsDto addRealTimeVisitors(Long userId, VisitorsInfoDto visitorsInfoDto) {
+    public PopupStoreDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -71,11 +76,13 @@ public class VisitService {
         user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
 
         // fcm 구독
-        String token = visitorsInfoDto.fcmToken();
+        Optional<FCMToken> token = fcmTokenRepository.findByUserId(userId);
         if (token.isEmpty()) {
             throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        }else{
+            String fcmToken = token.get().getToken();
+            fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.HOOGI);
         }
-        fcmTokenService.fcmAddPopupTopic(token, popup, EPopupTopic.HOOGI);
 
         Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
                 thirtyMinutesAgo); /*실시간 방문자 수*/
@@ -84,12 +91,9 @@ public class VisitService {
             realTimeVisitorsCount = Optional.of(0);
         } // empty 면 0으로.
 
-        RealTimeVisitorsDto realTimeVisitorsDto = RealTimeVisitorsDto.builder()
-                .userId(realTimeVisit.getUser().getId())
-                .popupId(realTimeVisit.getPopup().getId())
-                .visitorsCnt(realTimeVisitorsCount)
-                .build();
-
-        return realTimeVisitorsDto;
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+        Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt);
+        return popupStoreDto;
     }
 }

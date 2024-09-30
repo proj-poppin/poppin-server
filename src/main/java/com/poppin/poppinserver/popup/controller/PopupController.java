@@ -2,14 +2,16 @@ package com.poppin.poppinserver.popup.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
+import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
+import com.poppin.poppinserver.visit.service.VisitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
+    private final VisitService visitService;
 
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
@@ -165,5 +168,10 @@ public class PopupController {
     @PostMapping("/reopen") // 재오픈 수요
     public ResponseDto<?> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto) {
         return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
+    }
+
+    @PostMapping("/visit") // 팝업 방문하기
+    public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) {
+        return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 }

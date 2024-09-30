@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.modifyInfo.dto.modifyInfo.request;
+package com.poppin.poppinserver.modifyInfo.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 

@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.modifyInfo.dto.modifyInfo.request;
+package com.poppin.poppinserver.modifyInfo.dto.request;
 
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;

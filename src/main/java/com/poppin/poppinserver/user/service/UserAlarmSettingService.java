@@ -13,7 +13,7 @@ public class UserAlarmSettingService {
     public AlarmSetting getUserAlarmSetting(String fcmToken) {
         AlarmSetting alarmSetting = alarmSettingRepository.findByToken(fcmToken);
         if (alarmSetting == null) {
-            createUserAlarmSetting(fcmToken);
+            alarmSetting = createUserAlarmSetting(fcmToken);
         }
         return alarmSetting;
     }

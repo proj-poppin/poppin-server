@@ -7,9 +7,6 @@ public record ApplyTokenRequestDto(
         String fcmToken,
 
         @NotNull
-        String device,
-
-        @NotNull
-        String deviceId
+        Long userId
 ) {
 }

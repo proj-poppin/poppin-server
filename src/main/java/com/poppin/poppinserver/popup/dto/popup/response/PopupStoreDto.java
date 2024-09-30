@@ -2,14 +2,13 @@ package com.poppin.poppinserver.popup.dto.popup.response;
 
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.review.dto.review.response.PopupReviewDto;
-import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataDto;
+import com.poppin.poppinserver.review.dto.response.PopupReviewDto;
+import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Builder
 public record PopupStoreDto(
@@ -40,11 +39,11 @@ public record PopupStoreDto(
         String mainImageUrl,
         List<String> imageUrls,
         Optional<List<PopupReviewDto>> review,
-        VisitorDataDto visitorData,
-        int realTimeVisit,
+        VisitorDataInfoDto visitorData,
+        Optional<Integer> realTimeVisit,
         PreferenceDto preferences
 ) {
-    public static PopupStoreDto fromEntity(Popup popup) {
+    public static PopupStoreDto fromEntity(Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt) {
         List<String> imageUrls = popup.getPosterImages()
                 .stream()
                 .map(PosterImage::getPosterUrl)
@@ -78,16 +77,16 @@ public record PopupStoreDto(
                 .mainImageUrl(popup.getPosterUrl())
                 .imageUrls(imageUrls)
                 .review(Optional.of(PopupReviewDto.fromEntities(popup.getReviews())))
-                //.visitorData(null)
-                // .realTimeVisit()
+                .visitorData(visitorDataDto)
+                .realTimeVisit(visitorCnt)
                 .preferences(PreferenceDto.fromPopup(popup))
                 .build();
     }
 
-    public static List<PopupStoreDto> fromEntities(List<Popup> popups) {
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
-        for (Popup popup : popups) {
-            popupDtos.add(fromEntity(popup));
+        for(int i = 0 ; i < popups.size();i++){
+            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i)));
         }
         return popupDtos;
     }

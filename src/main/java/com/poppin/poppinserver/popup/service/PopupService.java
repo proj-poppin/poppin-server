@@ -6,11 +6,7 @@ import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
-import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.*;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
@@ -29,27 +25,18 @@ import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
-import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.domain.PreferedPopup;
-import com.poppin.poppinserver.popup.domain.ReopenDemand;
-import com.poppin.poppinserver.popup.domain.TastePopup;
+import com.poppin.poppinserver.popup.domain.*;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
+import com.poppin.poppinserver.popup.repository.*;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.dto.review.response.ReviewInfoDto;
+import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
@@ -62,14 +49,6 @@ import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -80,6 +59,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -852,7 +836,7 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus(), userId); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -868,7 +852,7 @@ public class PopupService {
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText,
                 PageRequest.of(page, size), userId); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -938,7 +922,7 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -953,7 +937,7 @@ public class PopupService {
 
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
 
-        List<PopupStoreDto> popupStoreDtos = PopupStoreDto.fromEntities(popups.getContent());
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -986,5 +970,23 @@ public class PopupService {
         return "재오픈 수요 체크 되었습니다.";
     }
 
+
+    public List<PopupStoreDto> getPopupStoreDtos(Page<Popup> popups) {
+        // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
+        List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
+        List<Optional<Integer>> visitorCntList = new ArrayList<>();
+
+        // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
+        for (Popup popup : popups.getContent()) {
+            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            visitorDataInfoDtos.add(visitorDataDto);
+
+            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            visitorCntList.add(visitorCnt);
+        }
+
+        // PopupStoreDto 리스트를 생성하여 반환
+        return PopupStoreDto.fromEntities(popups.getContent(), visitorDataInfoDtos, visitorCntList);
+    }
 
 }

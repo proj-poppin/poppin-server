@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.review.domain;
 
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,9 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity

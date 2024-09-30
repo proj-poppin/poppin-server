@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.modifyInfo.dto.modifyInfo.response;
+package com.poppin.poppinserver.modifyInfo.dto.response;
 
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import lombok.Builder;

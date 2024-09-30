@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.review.dto.review.response;
+package com.poppin.poppinserver.review.dto.response;
 
 import com.poppin.poppinserver.review.domain.Review;
 import jakarta.validation.constraints.NotNull;

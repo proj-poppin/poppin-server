@@ -17,7 +17,6 @@ public class InterestController {
 
     @PostMapping("")
     public ResponseDto<?> addInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) {
-        log.info("userId : " + userId.toString());
         return ResponseDto.ok(interestService.userAddInterest(userId, interestRequestDto));
     }
 

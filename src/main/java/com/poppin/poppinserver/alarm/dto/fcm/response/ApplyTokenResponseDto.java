@@ -11,9 +11,6 @@ public record ApplyTokenResponseDto(
         String token,
 
         @NotNull
-        String device, // android or ios
-
-        @NotNull
         String response,
 
         @NotNull
@@ -24,7 +21,6 @@ public record ApplyTokenResponseDto(
                                                    String description) {
         return ApplyTokenResponseDto.builder()
                 .token(applyTokenRequestDto.fcmToken())
-                .device(applyTokenRequestDto.device())
                 .response(response)
                 .description(description)
                 .build();

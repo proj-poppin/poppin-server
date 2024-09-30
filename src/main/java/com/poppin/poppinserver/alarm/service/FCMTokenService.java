@@ -1,12 +1,10 @@
 package com.poppin.poppinserver.alarm.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.dto.fcm.request.ApplyTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.response.ApplyTokenResponseDto;
-import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -14,14 +12,17 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,101 +32,33 @@ public class FCMTokenService {
     private final FCMTokenRepository fcmTokenRepository;
 
     private final PopupTopicRepository popupTopicRepository;
-    private final AlarmSettingRepository alarmSettingRepository;
+    private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final FCMSubscribeService fcmSubscribeService;
     private final PopupRepository popupRepository;
 
-    /* FCM TOKEN 등록 */
-    public ApplyTokenResponseDto fcmApplyToken(ApplyTokenRequestDto requestDto) {
+    /* FCM TOKEN 등록, 회원가입 시 사용하기 */
+    @Transactional
+    public ApplyTokenResponseDto applyFCMToken(ApplyTokenRequestDto requestDto) {
 
-        log.info("applying token");
-        log.info("apply token : {}", requestDto.fcmToken());
+        log.info("Applying FCM token: {}", requestDto.fcmToken());
 
-        try {
-            // 토큰 저장 여부 확인
-            Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByDeviceId(requestDto.deviceId());
-            Boolean isDuplicate = fcmTokenOptional.isPresent();
-            // 디바이스 ID와 토큰이 모두 동일한 경우
-            if (isDuplicate && requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
-                AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
-                if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
-                    alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
-                } else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting.",
-                            "기존 알람 세팅이 존재합니다.");
-                }
-            }
-            // 디바이스 ID는 동일하지만 토큰이 다른 경우
-            else if (isDuplicate && !requestDto.fcmToken().equals(fcmTokenOptional.get().getToken())) {
-                if (fcmTokenOptional.get().getToken() == null) {   // 토큰이 없을 때
-                    // 토큰 저장
-                    FCMToken FCMToken = new FCMToken(
-                            requestDto.fcmToken(),
-                            LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+1달)
-                            requestDto.device(), // android or ios
-                            requestDto.deviceId()
-                    );
+        // 유저 조회
+        User user = userRepository.findById(requestDto.userId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-                    fcmTokenRepository.save(FCMToken); // 토큰 저장
-                } else {    // 토큰이 다를 때
-                    // fcm token refreshing
-                    fcmTokenOptional.get().setToken(requestDto.fcmToken());
-                    fcmTokenOptional.get().regenerateToken();
-                    fcmTokenRepository.save(fcmTokenOptional.get());
+        // FCM 토큰 저장
+        FCMToken fcmToken = new FCMToken(user, requestDto.fcmToken(), LocalDateTime.now());
+        fcmTokenRepository.save(fcmToken);
 
-                    // review token refreshing
-                    List<Review> reviews = reviewRepository.findAllByToken(fcmTokenOptional.get().getToken());
-                    for (Review review : reviews) {
-                        review.setToken(requestDto.fcmToken());
-                        reviewRepository.save(review);
-                    }
-                }
-
-                AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
-                if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
-                    alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto,
-                            "duplicated device id. update token. create new alarm setting.", "토큰 업데이트 및 알림 세팅 생성");
-                } else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto,
-                            "duplicated device id. update token. already exist alarm setting.", "토큰 업데이트");
-                }
-
-            } else {    // device id가 다를 때
-                log.info("----------new device id----------");
-                // 새로운 토큰 저장
-                FCMToken FCMToken = new FCMToken(
-                        requestDto.fcmToken(),
-                        LocalDateTime.now(), // 토큰 등록 시간 + 토큰 만기 시간(+1달)
-                        requestDto.device(), // android or ios
-                        requestDto.deviceId()
-                );
-
-                fcmTokenRepository.save(FCMToken); // 토큰 저장
-
-                AlarmSetting alarmSetting = alarmSettingRepository.findByToken(requestDto.fcmToken());
-                if (alarmSetting == null) {
-                    alarmSetting = new AlarmSetting(requestDto.fcmToken(), true, true, true, true, true, true);
-                    alarmSettingRepository.save(alarmSetting);
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "create new alarm setting.", "알람 세팅이 생성되었습니다.");
-                } else {
-                    return ApplyTokenResponseDto.fromEntity(requestDto, "already exist alarm setting.",
-                            "기존 알람 세팅이 존재합니다.");
-                }
-            }
-        } catch (Exception e) {
-            log.error("applying token failed {}", e.getMessage());
-            return ApplyTokenResponseDto.fromEntity(requestDto, "fcm token save fail", e.getMessage());
-        }
+        // 성공적으로 저장된 경우 응답 생성
+        return ApplyTokenResponseDto.fromEntity(requestDto, "200", "토큰 등록 성공");
     }
+
 
     public void fcmRemoveToken(FCMToken token) throws FirebaseMessagingException {
 
-        // 구독내역 존재 시 전부 삭제
+        // 관심 팝업 관련 구독 내역 존재 시 전부 삭제
         Optional<List<PopupTopic>> topicsNeedToDelete = popupTopicRepository.findByToken(token);
         if (topicsNeedToDelete.isPresent()) {
             for (PopupTopic topic : topicsNeedToDelete.get()) {
@@ -135,11 +68,22 @@ public class FCMTokenService {
                 fcmSubscribeService.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.CHANGE_INFO);
             }
         }
-
-        // 후기쪽 토큰 refresh
         // 토큰 삭제
         fcmTokenRepository.delete(token);
+    }
 
+    // 토큰 update 필요 여부 검증 메서드, 앱진입, 로그인 시 사용
+    public void verifyFCMToken(Long userId, String fcmToken){
+        log.info("verify token : {}", fcmToken);
+
+        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);
+        if (!fcmTokenOptional.isEmpty()){
+            String currentToken = fcmTokenOptional.get().getToken();
+            if (!currentToken.equals(fcmToken)){
+                fcmTokenOptional.get().setToken(fcmToken);
+                fcmTokenRepository.save(fcmTokenOptional.get());
+            }
+        }
     }
 
     public void fcmAddPopupTopic(String token, Popup popup, EPopupTopic topic) {
@@ -181,7 +125,6 @@ public class FCMTokenService {
             e.printStackTrace();
         }
     }
-
 
     public String resetPopupTopic() {
 

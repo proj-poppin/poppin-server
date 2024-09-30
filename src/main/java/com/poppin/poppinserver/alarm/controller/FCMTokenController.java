@@ -1,10 +1,9 @@
 package com.poppin.poppinserver.alarm.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushDto;
-import com.poppin.poppinserver.alarm.dto.fcm.request.ApplyTokenRequestDto;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.util.push.android.FCMTestUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +33,12 @@ public class FCMTokenController {
         FCMTestUtil.sendNotificationByTopicTest(pushDto);
     }
 
-    /* 알림 허용 시 데이터 저장 */
-    @PostMapping("/apply/FCMtoken")
-    public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto) {
-        return ResponseDto.ok(fcmTokenService.fcmApplyToken(applyTokenRequestDto));
-    }
+    // 삭제 예정
+//    /* 알림 허용 시 데이터 저장 */
+//    @PostMapping("/apply/FCMtoken")
+//    public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto) {
+//        return ResponseDto.ok(fcmTokenService.fcmApplyToken(applyTokenRequestDto));
+//    }
 
     // 데이터베이스 초기화 시 토큰 팝업 구독 해제
     @PostMapping("/reset/topic")

@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.popup.dto.popup.response;
 
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.review.dto.review.response.ReviewInfoDto;
+import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import lombok.Builder;
 

@@ -21,9 +21,9 @@ import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.dto.review.response.ReviewCertiDto;
-import com.poppin.poppinserver.review.dto.review.response.ReviewFinishDto;
-import com.poppin.poppinserver.review.dto.review.response.ReviewUncertiDto;
+import com.poppin.poppinserver.review.dto.response.ReviewCertiDto;
+import com.poppin.poppinserver.review.dto.response.ReviewFinishDto;
+import com.poppin.poppinserver.review.dto.response.ReviewUncertiDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
@@ -42,12 +42,13 @@ import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service

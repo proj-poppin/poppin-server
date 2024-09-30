@@ -2,8 +2,8 @@ package com.poppin.poppinserver.modifyInfo.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.modifyInfo.dto.modifyInfo.request.CreateModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.modifyInfo.request.UpdateModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;

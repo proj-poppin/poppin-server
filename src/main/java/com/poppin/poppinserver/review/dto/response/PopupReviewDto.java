@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.review.dto.review.response;
+package com.poppin.poppinserver.review.dto.response;
 
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
@@ -6,7 +6,6 @@ import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Builder
 public record PopupReviewDto(

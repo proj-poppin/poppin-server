@@ -1,15 +1,15 @@
 package com.poppin.poppinserver.popup.service;
 
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.dto.blockedPopup.response.BlockedPopupDto;
 import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.popup.dto.blockedPopup.response.BlockedPopupDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.review.dto.review.response;
+package com.poppin.poppinserver.review.dto.response;
 
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import jakarta.validation.constraints.NotNull;
@@ -7,10 +7,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/*마이페이지 인증후기 조회*/
 @Builder
-public record ReviewCertiDto(
-
+public record ReviewUncertiDto(
         @NotNull
         String introduce,
 
@@ -22,9 +20,6 @@ public record ReviewCertiDto(
 
         @NotNull
         String nickname, /*user nickname*/
-
-        @NotNull
-        LocalDateTime visitDate, /*visitor class createdAt*/
 
         @NotNull
         LocalDateTime createDate, /*review class createdAt*/
@@ -40,28 +35,25 @@ public record ReviewCertiDto(
 
 ) {
 
-    public static ReviewCertiDto fromEntity(
+    public static ReviewUncertiDto fromEntity(
             String introduce,
             String posterUrl,
             Boolean isCertificated,
             String nickname,
-            LocalDateTime visitDate,
             LocalDateTime createDate,
             VisitorDataRvDto visitorDataRvDto,
             String text,
             List<String> imageUrl
     ) {
-        return ReviewCertiDto.builder()
+        return ReviewUncertiDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)
                 .nickname(nickname)
-                .visitDate(visitDate)
                 .createDate(createDate)
                 .visitorData(visitorDataRvDto)
                 .text(text)
                 .imageUrl(imageUrl)
                 .build();
     }
-
 }
