@@ -39,6 +39,7 @@ public enum ErrorCode {
     ALREADY_BLOCKED_USER("40028", HttpStatus.BAD_REQUEST, "이미 차단된 사용자입니다."),
     DUPLICATED_ALARM_KEYWORD("40029", HttpStatus.BAD_REQUEST, "이미 등록된 알람 키워드입니다."),
     NOT_FOUND_ALARM_KEYWORD("40030", HttpStatus.BAD_REQUEST, "존재하지 않는 알람 키워드입니다."),
+    ALREADY_EXIST_FCM_TOKEN("40031", HttpStatus.BAD_REQUEST, "중복된 FCM 토큰입니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
@@ -88,6 +89,7 @@ public enum ErrorCode {
     FCM_ERROR("50001", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 중 앱 푸시 알림 오류입니다."),
     REVIEW_FCM_ERROR("50002", HttpStatus.INTERNAL_SERVER_ERROR, "후기 생성 중 오류가 발생하였습니다:fcm 오류"),
     INFO_ALARM_ERROR("50003", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 과정 중 알림 등록 오류 발생하였습니다");
+
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;

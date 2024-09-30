@@ -1,14 +1,13 @@
 package com.poppin.poppinserver.alarm.repository;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 
 @Repository
@@ -31,4 +30,7 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     @Query("SELECT token FROM FCMToken token WHERE token.user.id = :userId")
     Optional<FCMToken> findByUserId(Long userId);
+
+    @Query("SELECT token FROM FCMToken token WHERE token.token = :fcmToken")
+    Optional<FCMToken> findByFcmToken(@Param("fcmToken") String fcmToken);
 }

@@ -500,7 +500,7 @@ public class AdminService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (!user.getRole().equals("ADMIN")) {
-            throw new CommonException(ErrorCode.INVALID_LOGIN);
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
