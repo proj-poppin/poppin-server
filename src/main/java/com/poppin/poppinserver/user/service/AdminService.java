@@ -498,11 +498,12 @@ public class AdminService {
         String password = decoded[1];
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+
+        if (!user.getRole().equals("ADMIN")) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
-        if (user.getIsDeleted()) {
-            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
