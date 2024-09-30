@@ -11,7 +11,6 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
-import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -54,12 +53,12 @@ public class AuthController {
         return ResponseDto.created(authService.authSignUp(authSignUpDto));
     }
 
-    @PostMapping("/register")
-    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
-                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
-        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
-        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
-    }
+//    @PostMapping("/register")
+//    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+//                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
+//        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
+//        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
+//    }
 
     @PostMapping("/sign-in")
     public ResponseDto<?> authSignIn(

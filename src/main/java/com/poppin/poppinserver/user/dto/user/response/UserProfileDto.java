@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
-import com.poppin.poppinserver.core.type.ELoginProvider;
+import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import lombok.Builder;
 
 // TODO: 리팩 후 삭제예정

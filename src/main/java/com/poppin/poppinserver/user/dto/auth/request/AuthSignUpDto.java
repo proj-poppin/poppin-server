@@ -13,11 +13,9 @@ public record AuthSignUpDto(
         String email,
 
         // 영문/숫자 둘 중 하나 이상 반드시 포함, 특수문자 반드시 포함, 8자 이상
-        @NotBlank
         @Pattern(regexp = "^(?=.*[A-Za-z\\d])(?=.*[!@#$%^&*()]).{8,}$", message = "올바른 비밀번호 형식이 아닙니다.")
         String password,
 
-        @NotBlank(message = "비밀번호 확인을 입력하세요.")
         String passwordConfirm,
 
         // 한글/영문 1자 이상 10자 이하(공백 포함), 공백만 입력 불가
@@ -29,6 +27,10 @@ public record AuthSignUpDto(
         // FCM 토큰
         @NotNull(message = "fcmToken is required.")
         String fcmToken,
+
+        // KAKAO, NAVER, GOOGLE, APPLE, DEFAULT
+        @NotBlank(message = "accountType is required.")
+        String accountType,
 
         // 개인정보 보호정책 동의 여부
         @NotNull(message = "개인정보 보호정책 동의가 필요합니다.")
