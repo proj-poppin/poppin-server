@@ -1,16 +1,28 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EUserRole;
-import com.poppin.poppinserver.core.util.*;
+import com.poppin.poppinserver.core.util.HeaderUtil;
+import com.poppin.poppinserver.core.util.JwtUtil;
+import com.poppin.poppinserver.core.util.OAuth2Util;
+import com.poppin.poppinserver.core.util.PasswordUtil;
+import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
@@ -20,14 +32,13 @@ import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import java.util.Base64;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +53,7 @@ public class AuthService {
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserService userService;
     private final UserPreferenceSettingService userPreferenceSettingService;
+    private final FCMTokenService fcmTokenService;
 
     public UserInfoResponseDto handleSignUp(AuthSignUpDto authSignUpDto) {
         if (authSignUpDto.password() == null || authSignUpDto.passwordConfirm() == null) {
@@ -78,6 +90,9 @@ public class AuthService {
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpDto.fcmToken());
+
+        // FCM 토큰 등록
+        fcmTokenService.applyFCMToken(authSignUpDto.fcmToken(), newUser.getId());
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
@@ -336,11 +351,11 @@ public class AuthService {
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
-        if (user.getIsDeleted()) {
-            throw new CommonException(ErrorCode.DELETED_USER_ERROR);
-        }
 
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
+
+        // FCM 토큰 검증
+        fcmTokenService.verifyFCMToken(user.getId(), fcmTokenRequestDto.fcmToken());
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);

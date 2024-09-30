@@ -3,8 +3,6 @@ package com.poppin.poppinserver.alarm.service;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
-import com.poppin.poppinserver.alarm.dto.fcm.request.ApplyTokenRequestDto;
-import com.poppin.poppinserver.alarm.dto.fcm.response.ApplyTokenResponseDto;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -16,13 +14,12 @@ import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -39,20 +36,24 @@ public class FCMTokenService {
 
     /* FCM TOKEN 등록, 회원가입 시 사용하기 */
     @Transactional
-    public ApplyTokenResponseDto applyFCMToken(ApplyTokenRequestDto requestDto) {
+    public void applyFCMToken(String fcmToken, Long userId) {
 
-        log.info("Applying FCM token: {}", requestDto.fcmToken());
+        log.info("Applying FCM token: {}", fcmToken);
 
         // 유저 조회
-        User user = userRepository.findById(requestDto.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        // FCM 토큰 저장
-        FCMToken fcmToken = new FCMToken(user, requestDto.fcmToken(), LocalDateTime.now());
-        fcmTokenRepository.save(fcmToken);
+        // FCM 토큰이 이미 존재하는 경우 -> 에러: 회원가입 한 유저는 새로운 FCM 토큰이어야 함.
+        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByFcmToken(fcmToken);
 
-        // 성공적으로 저장된 경우 응답 생성
-        return ApplyTokenResponseDto.fromEntity(requestDto, "200", "토큰 등록 성공");
+        if (fcmTokenOptional.isPresent()) {
+            throw new CommonException(ErrorCode.ALREADY_EXIST_FCM_TOKEN);
+        }
+
+        // FCM 토큰 저장
+        FCMToken fcmTokenEntity = new FCMToken(user, fcmToken, LocalDateTime.now());
+        fcmTokenRepository.save(fcmTokenEntity);
     }
 
 
@@ -73,13 +74,13 @@ public class FCMTokenService {
     }
 
     // 토큰 update 필요 여부 검증 메서드, 앱진입, 로그인 시 사용
-    public void verifyFCMToken(Long userId, String fcmToken){
+    public void verifyFCMToken(Long userId, String fcmToken) {
         log.info("verify token : {}", fcmToken);
 
         Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);
-        if (!fcmTokenOptional.isEmpty()){
+        if (!fcmTokenOptional.isEmpty()) {
             String currentToken = fcmTokenOptional.get().getToken();
-            if (!currentToken.equals(fcmToken)){
+            if (!currentToken.equals(fcmToken)) {
                 fcmTokenOptional.get().setToken(fcmToken);
                 fcmTokenRepository.save(fcmTokenOptional.get());
             }
