@@ -4,7 +4,6 @@ import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.type.ELoginProvider;
 import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.JwtUtil;
@@ -13,6 +12,7 @@ import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
+import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
@@ -22,7 +22,6 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
-import com.poppin.poppinserver.user.dto.auth.request.SocialRegisterRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
@@ -54,8 +53,20 @@ public class AuthService {
     private final UserService userService;
     private final UserPreferenceSettingService userPreferenceSettingService;
 
+    public UserInfoResponseDto handleSignUp(AuthSignUpDto authSignUpDto) {
+        if (authSignUpDto.password() == null || authSignUpDto.passwordConfirm() == null) {
+            // 소셜 로그인 로직 처리
+            return socialSignUp(authSignUpDto);
+        } else {
+            // 자체 로그인 로직 처리
+            return authSignUp(authSignUpDto);
+        }
+    }
+
     @Transactional
     public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
+        ELoginProvider provider = ELoginProvider.valueOf(authSignUpDto.accountType());
+
         // 유저 이메일 중복 확인
         userRepository.findByEmail(authSignUpDto.email())
                 .ifPresent(user -> {
@@ -111,36 +122,80 @@ public class AuthService {
     }
 
     @Transactional
-    public UserInfoResponseDto socialRegister(String accessToken,
-                                              SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
-        String token = refineToken(accessToken);    // poppin access token
+    public UserInfoResponseDto socialSignUp(AuthSignUpDto authSignUpDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+        // DTO에서 소셜 프로바이더 추출
+        ELoginProvider provider = ELoginProvider.valueOf(authSignUpDto.accountType());
 
-        Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
+        // 유저 이메일 중복 확인
+        userRepository.findByEmail(authSignUpDto.email())
+                .ifPresent(user -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
+                });
+        // 유저 닉네임 중복 확인
+        userRepository.findByNickname(authSignUpDto.nickname())
+                .ifPresent(user -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
+                });
 
-        // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
-        User user = userRepository.findByIdAndELoginProvider(userId,
-                        ELoginProvider.valueOf(socialRegisterRequestDto.provider()))
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        // 유저 생성, 패스워드 암호화
+        User newUser = userRepository.save(
+                User.toUserEntity(
+                        authSignUpDto, bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
+                        provider
+                )
+        );
 
-        // 닉네임 등록 -> 소셜 회원가입 완료
-        user.register(socialRegisterRequestDto.nickname());
+        // 알람 setting 객체 반환
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpDto.fcmToken());
 
-        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-        user.updateRefreshToken(jwtTokenDto.refreshToken());
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
+        // 회원 가입 후 바로 로그인 상태로 변경
+        JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
+        userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
-                user.getId()
+                newUser.getId()
         );
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
-                user,
+                newUser,
                 alarmSetting,
-                jwtTokenDto,
+                jwtToken,
                 userPreferenceSettingDto
         );
         return userInfoResponseDto;
     }
+
+//    @Transactional
+//    public UserInfoResponseDto socialSignUp(String accessToken,
+//                                            SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+//        String token = refineToken(accessToken);    // poppin access token
+//
+//        Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
+//
+//        // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
+//        User user = userRepository.findByIdAndELoginProvider(userId,
+//                        ELoginProvider.valueOf(socialRegisterRequestDto.provider()))
+//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+//
+//        // 닉네임 등록 -> 소셜 회원가입 완료
+//        user.register(socialRegisterRequestDto.nickname());
+//
+//        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
+//        user.updateRefreshToken(jwtTokenDto.refreshToken());
+//        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
+//
+//        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+//                user.getId()
+//        );
+//
+//        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+//                user,
+//                alarmSetting,
+//                jwtTokenDto,
+//                userPreferenceSettingDto
+//        );
+//        return userInfoResponseDto;
+//    }
 
     private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken) {
         if (provider.equals(ELoginProvider.KAKAO.toString())) {

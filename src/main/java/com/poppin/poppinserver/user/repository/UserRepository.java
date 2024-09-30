@@ -1,8 +1,8 @@
 package com.poppin.poppinserver.user.repository;
 
-import com.poppin.poppinserver.core.type.ELoginProvider;
 import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -35,6 +35,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.provider = :eLoginProvider")
     Optional<User> findByIdAndELoginProvider(Long id, ELoginProvider eLoginProvider);
+
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.provider = :eLoginProvider")
+    Optional<User> findByEmailAndELoginProvider(String email, ELoginProvider eLoginProvider);
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.role = :role")
     Optional<User> findByEmailAndRole(String email, EUserRole role);
