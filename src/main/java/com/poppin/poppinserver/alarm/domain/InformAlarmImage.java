@@ -21,7 +21,6 @@ public class InformAlarmImage {
     @Column(name = "id")
     private Long id;
 
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alarm_id", referencedColumnName = "id", nullable = false)
     private InformAlarm informAlarm;
