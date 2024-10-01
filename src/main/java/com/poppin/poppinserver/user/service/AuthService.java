@@ -51,10 +51,10 @@ public class AuthService {
     private final AppleOAuthService appleOAuthService;
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
-    private final UserService userService;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final FCMTokenService fcmTokenService;
 
+    @Transactional
     public UserInfoResponseDto handleSignUp(AuthSignUpDto authSignUpDto) {
         if (authSignUpDto.password() == null || authSignUpDto.passwordConfirm() == null) {
             // 소셜 로그인 로직 처리
@@ -65,8 +65,7 @@ public class AuthService {
         }
     }
 
-    @Transactional
-    public UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
+    private UserInfoResponseDto authSignUp(AuthSignUpDto authSignUpDto) {
         ELoginProvider provider = ELoginProvider.valueOf(authSignUpDto.accountType());
 
         // 유저 이메일 중복 확인
@@ -112,22 +111,7 @@ public class AuthService {
         return userInfoResponseDto;
     }
 
-    @Transactional
-    public Object authSocialLogin(String token, String provider, FcmTokenRequestDto fcmTokenRequestDto) {
-        String accessToken = refineToken(token);
-        String loginProvider = provider.toUpperCase();
-        log.info("loginProvider : " + loginProvider);
-        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
-
-        return processUserLogin(
-                oAuth2UserInfoDto,
-                ELoginProvider.valueOf(loginProvider),
-                fcmTokenRequestDto.fcmToken()
-        );
-    }
-
-    @Transactional
-    public UserInfoResponseDto socialSignUp(AuthSignUpDto authSignUpDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
+    private UserInfoResponseDto socialSignUp(AuthSignUpDto authSignUpDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
         // DTO에서 소셜 프로바이더 추출
         ELoginProvider provider = ELoginProvider.valueOf(authSignUpDto.accountType());
 
@@ -168,6 +152,20 @@ public class AuthService {
                 userPreferenceSettingDto
         );
         return userInfoResponseDto;
+    }
+
+    @Transactional
+    public Object authSocialLogin(String token, String provider, FcmTokenRequestDto fcmTokenRequestDto) {
+        String accessToken = refineToken(token);
+        String loginProvider = provider.toUpperCase();
+        log.info("loginProvider : " + loginProvider);
+        OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
+
+        return processUserLogin(
+                oAuth2UserInfoDto,
+                ELoginProvider.valueOf(loginProvider),
+                fcmTokenRequestDto.fcmToken()
+        );
     }
 
 //    @Transactional
