@@ -476,7 +476,7 @@ public class PopupService {
         Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size),
                 oper.getStatus()); // 운영 상태
 
-        Long num = popupRepository.count();
+        Long num = popupRepository.countByOperationStatus(oper.getStatus());
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
@@ -656,7 +656,7 @@ public class PopupService {
                 .recommendedPopupStores(recommendedPopupStores)
                 .notices(notice)
                 .build();
-    }
+    } // 부트스트랩 로딩 api
 
     public List<PopupSummaryDto> readHotList() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
