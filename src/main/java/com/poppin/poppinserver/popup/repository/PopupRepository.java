@@ -252,9 +252,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "ORDER BY p.name ASC")
     Page<Popup> findByOperationStatusAndOrderByName(Pageable pageable, String oper);
 
-
-    @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
-            "ON i.createdAt >= :startOfWeek AND i.createdAt < :endOfWeek " +
+    @Query("SELECT p FROM Popup p JOIN p.interest i " +
+            "WHERE i.createdAt >= :startOfWeek AND i.createdAt < :endOfWeek " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
     List<Popup> findHotPopup(@Param("startOfWeek") LocalDateTime startOfWeek,

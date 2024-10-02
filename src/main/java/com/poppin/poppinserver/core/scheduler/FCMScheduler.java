@@ -105,7 +105,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */01 * * * *")
+    @Scheduled(cron = "0 0 13 * * MON")
     private void hotPopup() {
         /**
          * 인기 팝업 알림
