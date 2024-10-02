@@ -11,14 +11,16 @@ public record UserInfoResponseDto(
         UserSchemaResponseDto user,
         JwtTokenDto jwtToken,
         UserPreferenceSettingDto userPreferenceSetting,
-        UserNoticeResponseDto userNotice
+        UserNoticeResponseDto userNotice,
+        UserActivityResponseDto userActivities
 ) {
     public static UserInfoResponseDto fromUserEntity(
             User user,
             AlarmSetting alarmSetting,
             JwtTokenDto jwtTokenDto,
             UserPreferenceSettingDto userPreferenceSettingDto,
-            UserNoticeResponseDto userNoticeResponseDto
+            UserNoticeResponseDto userNoticeResponseDto,
+            UserActivityResponseDto userActivities
     ) {
         return UserInfoResponseDto.builder()
                 .userNotificationSetting(UserNotificationSettingResponseDto.fromEntity(alarmSetting))
@@ -29,6 +31,8 @@ public record UserInfoResponseDto(
                                 userPreferenceSettingDto.isPreferenceSettingCreated(),
                                 userPreferenceSettingDto.userTasteResponseDto())
                 )
+                .userNotice(userNoticeResponseDto)
+                .userActivities(userActivities)
                 .build();
     }
 }
