@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -62,38 +63,57 @@ public class VisitService {
         /*30분 전 시간*/
         LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);
 
-        Visit realTimeVisit = Visit.builder()
-                .user(user)
-                .popup(popup)
-                .build();
-
-        Integer visitors = visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo);
-        if (visitors > 0) {
+        Integer duplicateVisitors = visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo);
+        if (duplicateVisitors > 0) {
             throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
         }
 
-        visitRepository.save(realTimeVisit); /*마이페이지 - 후기 요청하기 시 보여야하기에 배치돌며 일 주일 전 생성된 데이터만 삭제 예정*/
-        user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
+        Optional<Visit> visit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
 
-        // fcm 구독
-        Optional<FCMToken> token = fcmTokenRepository.findByUserId(userId);
-        if (token.isEmpty()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+        //재오픈인경우
+        if (visit.isPresent()){
+            visit.get().changeStatus("VISIT_NOW");
+            visitRepository.save(visit.get());
         }else{
-            String fcmToken = token.get().getToken();
-            fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.HOOGI);
+            //방문하기
+            Visit visitor = Visit.builder()
+                    .user(user)
+                    .popup(popup)
+                    .status("VISIT_COMPLETE")
+                    .build();
+
+            visitRepository.save(visitor);
+            user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
+
+            // fcm 구독
+            Optional<FCMToken> token = fcmTokenRepository.findByUserId(userId);
+            if (token.isEmpty()) {
+                throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+            }else{
+                String fcmToken = token.get().getToken();
+                fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.HOOGI);
+            }
+
+            Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
+                    thirtyMinutesAgo); /*실시간 방문자 수*/
+
+            if (realTimeVisitorsCount.isEmpty()) {
+                realTimeVisitorsCount = Optional.of(0);
+            } // empty 면 0으로.
         }
 
-        Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
-                thirtyMinutesAgo); /*실시간 방문자 수*/
-
-        if (realTimeVisitorsCount.isEmpty()) {
-            realTimeVisitorsCount = Optional.of(0);
-        } // empty 면 0으로.
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
         PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt);
         return popupStoreDto;
+    }
+
+    public void changeVisitStatus(Long popupId){
+        List<Visit> visitList = visitRepository.findByPopupId(popupId);
+        for (Visit v: visitList){
+            v.changeStatus("RECEIVE_REOPEN_ALERT");
+            visitRepository.save(v);
+        }
     }
 }
