@@ -10,13 +10,15 @@ public record UserInfoResponseDto(
         UserNotificationSettingResponseDto userNotificationSetting,
         UserSchemaResponseDto user,
         JwtTokenDto jwtToken,
-        UserPreferenceSettingDto userPreferenceSetting
+        UserPreferenceSettingDto userPreferenceSetting,
+        UserNoticeResponseDto userNotice
 ) {
     public static UserInfoResponseDto fromUserEntity(
             User user,
             AlarmSetting alarmSetting,
             JwtTokenDto jwtTokenDto,
-            UserPreferenceSettingDto userPreferenceSettingDto
+            UserPreferenceSettingDto userPreferenceSettingDto,
+            UserNoticeResponseDto userNoticeResponseDto
     ) {
         return UserInfoResponseDto.builder()
                 .userNotificationSetting(UserNotificationSettingResponseDto.fromEntity(alarmSetting))

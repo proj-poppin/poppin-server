@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -28,11 +29,13 @@ import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,30 @@ public class AuthService {
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final FCMTokenService fcmTokenService;
+    private final InformIsReadRepository informIsReadRepository;
+
+    // 유저 이메일 중복 확인 메서드
+    private void checkDuplicatedEmail(String email) {
+        userRepository.findByEmail(email)
+                .ifPresent(user -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
+                });
+    }
+
+    // 유저 비밀번호 및 비밀번호 확인 일치 여부 검증 메서드
+    private void checkPasswordMatch(String password, String passwordConfirm) {
+        if (!password.equals(passwordConfirm)) {
+            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+    }
+
+    // 유저 닉네임 중복 확인 메서드
+    private void checkDuplicatedNickname(String nickname) {
+        userRepository.findByNickname(nickname)
+                .ifPresent(user -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
+                });
+    }
 
     @Transactional
     public UserInfoResponseDto handleSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
@@ -66,26 +93,23 @@ public class AuthService {
     }
 
     private UserInfoResponseDto authSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        ELoginProvider provider = ELoginProvider.valueOf(authSignUpRequestDto.accountType());
-
         // 유저 이메일 중복 확인
-        userRepository.findByEmail(authSignUpRequestDto.email())
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
-                });
+        checkDuplicatedEmail(authSignUpRequestDto.email());
+
         // 비밀번호와 비밀번호 확인 일치 여부 검증
-        if (!authSignUpRequestDto.password().equals(authSignUpRequestDto.passwordConfirm())) {
-            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
+        checkPasswordMatch(authSignUpRequestDto.password(), authSignUpRequestDto.passwordConfirm());
+
         // 유저 닉네임 중복 확인
-        userRepository.findByNickname(authSignUpRequestDto.nickname())
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
-                });
+        checkDuplicatedNickname(authSignUpRequestDto.nickname());
+
         // 유저 생성, 패스워드 암호화
         User newUser = userRepository.save(
-                User.toUserEntity(authSignUpRequestDto, bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
-                        ELoginProvider.DEFAULT));
+                User.toUserEntity(
+                        authSignUpRequestDto,
+                        bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
+                        ELoginProvider.DEFAULT
+                )
+        );
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
@@ -101,11 +125,27 @@ public class AuthService {
                 newUser.getId()
         );
 
+        // 유저가 읽은 공지사항 알람 리스트 조회
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
+                authSignUpRequestDto.fcmToken()).stream().map(
+                Object::toString
+        ).toList();
+
+        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
+                authSignUpRequestDto.fcmToken()).toString();
+
+        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
+                .lastCheck(informLastCheckedTime)
+                .checkedNoticeIds(checkedNoticeIds)
+                .build();
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
-                userPreferenceSettingDto
+                userPreferenceSettingDto,
+                userNoticeResponseDto
         );
 
         return userInfoResponseDto;
@@ -116,15 +156,10 @@ public class AuthService {
         ELoginProvider provider = ELoginProvider.valueOf(authSignUpRequestDto.accountType());
 
         // 유저 이메일 중복 확인
-        userRepository.findByEmail(authSignUpRequestDto.email())
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
-                });
+        checkDuplicatedEmail(authSignUpRequestDto.email());
+
         // 유저 닉네임 중복 확인
-        userRepository.findByNickname(authSignUpRequestDto.nickname())
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
-                });
+        checkDuplicatedNickname(authSignUpRequestDto.nickname());
 
         // 유저 생성, 패스워드 암호화
         User newUser = userRepository.save(
@@ -145,11 +180,27 @@ public class AuthService {
                 newUser.getId()
         );
 
+        // 유저가 읽은 공지사항 알람 리스트 조회
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
+                authSignUpRequestDto.fcmToken()).stream().map(
+                Object::toString
+        ).toList();
+
+        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
+                authSignUpRequestDto.fcmToken()).toString();
+
+        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
+                .lastCheck(informLastCheckedTime)
+                .checkedNoticeIds(checkedNoticeIds)
+                .build();
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
-                userPreferenceSettingDto
+                userPreferenceSettingDto,
+                userNoticeResponseDto
         );
         return userInfoResponseDto;
     }
@@ -242,12 +293,27 @@ public class AuthService {
             UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                     user.get().getId()
             );
+            // 유저가 읽은 공지사항 알람 리스트 조회
+            List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
+                    fcmToken).stream().map(
+                    Object::toString
+            ).toList();
+
+            // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+            String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
+                    fcmToken).toString();
+
+            UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
+                    .lastCheck(informLastCheckedTime)
+                    .checkedNoticeIds(checkedNoticeIds)
+                    .build();
 
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                     user.get(),
                     alarmSetting,
                     jwtTokenDto,
-                    userPreferenceSettingDto
+                    userPreferenceSettingDto,
+                    userNoticeResponseDto
             );
             return userInfoResponseDto;
         } else {
@@ -266,29 +332,20 @@ public class AuthService {
         }
     }
 
+    // 비밀번호 재설정 메서드
     @Transactional
     public void resetPassword(Long userId, PasswordUpdateRequestDto passwordRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (!passwordRequestDto.password().equals(passwordRequestDto.passwordConfirm())) {
-            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
+
+        // 비밀번호와 비밀번호 확인 일치 여부 검증
+        checkPasswordMatch(passwordRequestDto.password(), passwordRequestDto.passwordConfirm());
+
         // 기존 쓰던 비밀번호로 설정해도 무방
         user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
     }
 
-//    public AuthCodeResponseDto sendPasswordResetVerificationEmail(
-//            EmailVerificationRequestDto emailVerificationRequestDto) {
-//        if (!userRepository.findByEmail(emailVerificationRequestDto.email()).isPresent()) {
-//            throw new CommonException(ErrorCode.NOT_FOUND_USER);
-//        }
-//        String authCode = RandomCodeUtil.generateVerificationCode();
-//        mailService.sendEmail(emailVerificationRequestDto.email(), "[Poppin] 이메일 인증코드", authCode);
-//        return AuthCodeResponseDto.builder()
-//                .authCode(authCode)
-//                .build();
-//    }
-
+    // 이메일 확인 코드 전송 메서드
     public AuthCodeResponseDto sendEmailVerificationCode(EmailVerificationRequestDto emailVerificationRequestDto) {
         EVerificationType verificationType = EVerificationType.valueOf(
                 emailVerificationRequestDto.verificationType().toUpperCase()
@@ -319,12 +376,14 @@ public class AuthService {
     public Boolean verifyPassword(Long userId, PasswordVerificationRequestDto passwordVerificationRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
         if (!bCryptPasswordEncoder.matches(passwordVerificationRequestDto.password(), user.getPassword())) {
             throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
         }
         return Boolean.TRUE;
     }
 
+    // 토큰 재발급 메서드
     @Transactional
     public JwtTokenDto refresh(String refreshToken) {
         String token = refineToken(refreshToken);
@@ -339,32 +398,51 @@ public class AuthService {
         return jwtToken;
     }
 
+    // 로그인 메서드
+    @Transactional
     public UserInfoResponseDto authSignIn(String authorizationHeader, FcmTokenRequestDto fcmTokenRequestDto) {
         String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
         String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
         String email = decoded[0];
         String password = decoded[1];
+        String fcmToken = fcmTokenRequestDto.fcmToken();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
 
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmTokenRequestDto.fcmToken());
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(user.getId(), fcmTokenRequestDto.fcmToken());
+        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId());
+        
+        // 유저가 읽은 공지사항 알람 리스트 조회
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
+                fcmToken).stream().map(
+                Object::toString
+        ).toList();
+
+        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
+                fcmToken).toString();
+
+        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
+                .lastCheck(informLastCheckedTime)
+                .checkedNoticeIds(checkedNoticeIds)
+                .build();
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
                 jwtTokenDto,
-                userPreferenceSettingDto
+                userPreferenceSettingDto,
+                userNoticeResponseDto
         );
 
         return userInfoResponseDto;
@@ -384,6 +462,7 @@ public class AuthService {
         return Boolean.TRUE;
     }
 
+    @Transactional(readOnly = true)
     public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
         Optional<User> user = userRepository.findByEmail(accountRequestDto.email());
         EAccountStatus accountStatus;
