@@ -8,7 +8,7 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
-import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -139,16 +139,16 @@ public class User {
         this.reportedCnt = 0;
     }
 
-    public static User toUserEntity(AuthSignUpDto authSignUpDto, String encodedPassword,
+    public static User toUserEntity(AuthSignUpRequestDto authSignUpRequestDto, String encodedPassword,
                                     ELoginProvider eLoginProvider) {
         return User.builder()
-                .email(authSignUpDto.email())
+                .email(authSignUpRequestDto.email())
                 .password(encodedPassword)
-                .nickname(authSignUpDto.nickname())
+                .nickname(authSignUpRequestDto.nickname())
                 .eLoginProvider(eLoginProvider)
                 .role(EUserRole.USER)
-                .agreedToPrivacyPolicy(authSignUpDto.agreedToPrivacyPolicy())
-                .agreedToServiceTerms(authSignUpDto.agreedToServiceTerms())
+                .agreedToPrivacyPolicy(authSignUpRequestDto.agreedToPrivacyPolicy())
+                .agreedToServiceTerms(authSignUpRequestDto.agreedToServiceTerms())
                 .build();
     }
 
