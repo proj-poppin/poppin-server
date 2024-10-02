@@ -1,36 +1,33 @@
 package com.poppin.poppinserver.alarm.service;
 
-import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
-
-import com.google.firebase.messaging.BatchResponse;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.Notification;
-import com.google.firebase.messaging.SendResponse;
+import com.google.firebase.messaging.*;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
+import com.poppin.poppinserver.alarm.dto.popupAlarm.request.PopupAlarmDto;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.core.config.APNsConfiguration;
 import com.poppin.poppinserver.core.config.AndroidConfiguration;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+
+import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,16 +37,11 @@ public class FCMSendService {
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
     private final AndroidConfiguration androidConfiguration;
-
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmService alarmService;
-    private final FCMSubscribeService fcmSubscribeService;
 
-
-    /**
-     * 공지사항 토큰 메시지 발송
-     */
+    //공지사항
     public void sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto,
                                           InformAlarm informAlarm) {
 
@@ -76,60 +68,60 @@ public class FCMSendService {
         }
     }
 
-    /**
-     * 인기팝업
-     *
-     * @param popupList 주간 인기 팝업 리스트
-     * @param info      인기 팝업 앱푸시 메시지 enum
-     * @return
-     */
-    public String sendHotByFCMToken(List<Popup> popupList, EPushInfo info) {
-        try {
-            // 인기,
-            List<Long> popupIdList = new ArrayList<>();
-            for (Popup p : popupList) {
-                popupIdList.add(p.getId());
-            }
 
-            List<FCMToken> tokenList = fcmTokenRepository.findAll();
+    //인기팝업, 재오픈 팝업 알림 전송 메서드
+    public void sendAlarmByFCMToken(List<Popup> popupList, EPushInfo info) {
 
-            for (FCMToken token : tokenList) {
-                log.info("token : " + token.getToken());
-                Message message = Message.builder()
-                        .setNotification(Notification.builder()
-                                .setTitle(info.getTitle())
-                                .setBody(info.getBody())
-                                .build())
-                        .setApnsConfig(apnsConfiguration.apnsConfig())
-                        .setAndroidConfig(androidConfiguration.androidConfig())
-                        .setToken(token.getToken())
-                        .putData("popupList", popupIdList.toString())
-                        .build();
+        List<Long> popupIdList = new ArrayList<>();
+        for (Popup p : popupList) {
+            popupIdList.add(p.getId());
+        }
 
-                try {
-                    String result = firebaseMessaging.send(message);
-                    log.info(" Successfully sent message: " + result);
+        List<FCMToken> tokenList = fcmTokenRepository.findAll();
 
-                    refreshToken(token);
+        for (FCMToken token : tokenList) {
+            log.info("token : " + token.getToken());
+            Message message = Message.builder()
+                    .setNotification(Notification.builder()
+                            .setTitle(info.getTitle())
+                            .setBody(info.getBody())
+                            .build())
+                    .setApnsConfig(apnsConfiguration.apnsConfig())
+                    .setAndroidConfig(androidConfiguration.androidConfig())
+                    .setToken(token.getToken())
+                    .putData("popupList", popupIdList.toString())
+                    .build();
 
-                } catch (FirebaseMessagingException e) {
-                    log.error("Failed to send message: " + e.getMessage());
+            try {
+                String result = firebaseMessaging.send(message);
+                log.info(" Successfully sent message: " + result);
+
+                refreshToken(token);
+
+                // 팝업 알림 등록(리스트)
+                for (Popup p : popupList) {
+                    // 파라미터 EPushInfo에 따라 재오픈, 인기 토픽 지정
+                    EPopupTopic topic = (info.equals(EPushInfo.REOPEN)) ? EPopupTopic.REOPEN : EPopupTopic.HOT;
+
+                    PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
+                            p,
+                            token.getToken(),
+                            info.getTitle(),
+                            info.getBody(),
+                            topic
+                    );
+                    // 등록&로그 메서드
+                    logAlarmStatus(popupAlarmDto);
                 }
+
+            } catch (FirebaseMessagingException e) {
+                log.error("Failed to send message: " + e.getMessage());
             }
-            return "1";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "0";
         }
     }
 
-    /**
-     * 후기 추천 앱푸시 메서드
-     *
-     * @param review 해당 후기
-     * @param info   후기 추천 앱 푸시 메시지 enum
-     */
-    public void sendChoochunByFCMToken(Review review, EPushInfo info) {
+    //후기 추천 앱푸시 메서드
+    public void sendChoochunByFCMToken(Popup popup, Review review, EPushInfo info) {
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
@@ -153,11 +145,19 @@ public class FCMSendService {
         } catch (FirebaseMessagingException e) {
             log.error("Failed to send message: " + e.getMessage());
         }
+
+        PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
+                popup,
+                review.getToken(),
+                info.getTitle(),
+                info.getBody(),
+                EPopupTopic.CHOOCHUN
+        );
+        // 등록&로그 메서드
+        logAlarmStatus(popupAlarmDto);
     }
 
-    /**
-     * 키워드 알림 토큰 메시지 발송
-     */
+    // 키워드 알림 전송
     public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto,
                                            UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
@@ -181,12 +181,7 @@ public class FCMSendService {
         }
     }
 
-    /**
-     * 안드로이드 FCM Topic 앱 푸시 알림 메서드
-     *
-     * @param fcmRequestDtoList FCM 주제 발송 객체
-     * @throws FirebaseMessagingException FCM 오류
-     */
+    // FCM 토픽 메시지 전송 메서드
     public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList) {
 
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
@@ -217,13 +212,15 @@ public class FCMSendService {
                 FCMToken token = fcmTokenRepository.findByToken(fcmRequestDto.token());
                 refreshToken(token); // 토큰 갱신
 
-                // 알림 키워드 등록
-                String flag = alarmService.insertPopupAlarm(fcmRequestDto);
-                if (flag.equals("1")) {
-                    log.info(fcmRequestDto.token() + " alarm success");
-                } else {
-                    log.error(fcmRequestDto.token() + " alarm fail");
-                }
+                // 팝업 알림 등록
+                PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
+                        popup,
+                        fcmRequestDto.token(),
+                        fcmRequestDto.title(),
+                        fcmRequestDto.body(),
+                        fcmRequestDto.topic()
+                );
+                logAlarmStatus(popupAlarmDto);
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
             }
@@ -231,12 +228,7 @@ public class FCMSendService {
 
     }
 
-    /**
-     * 여러 기기 동시 전송
-     *
-     * @param fcmRequestDtoList 멀티 FCM 발송 객체
-     * @throws FirebaseMessagingException 발송 오류
-     */
+    // 여러기기 FCM 동시 전송 메서드
     public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList) throws FirebaseMessagingException {
         List<String> tokenList = null;
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
@@ -270,4 +262,13 @@ public class FCMSendService {
         }
     }
 
+    // 팝업 알림 리스트 생성 & 로그 남기는 메서드
+    private void logAlarmStatus(PopupAlarmDto popupAlarmDto) {
+        String flag = alarmService.insertPopupAlarm(popupAlarmDto);
+        if (flag.equals("1")) {
+            log.info(popupAlarmDto.fcmToken() + " alarm success");
+        } else {
+            log.error(popupAlarmDto.fcmToken() + " alarm fail");
+        }
+    }
 }

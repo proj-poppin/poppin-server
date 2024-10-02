@@ -34,9 +34,6 @@ public class PopupAlarm {
     @Column(name = "body", nullable = false)
     private String body;
 
-    @Column(name = "keyword", nullable = false)
-    private String keyword; // popup, notify
-
     @Column(name = "icon", nullable = false)
     private String icon; // icon
 
@@ -47,13 +44,12 @@ public class PopupAlarm {
     private Boolean isRead; // 읽음 여부
 
     @Builder
-    public PopupAlarm(Popup popupId, String token, String title, String body, String keyword, String icon,
+    public PopupAlarm(Popup popupId, String token, String title, String body, String icon,
                       LocalDate createdAt, Boolean isRead) {
         this.popupId = popupId;
         this.token = token;
         this.title = title;
         this.body = body;
-        this.keyword = keyword;
         this.icon = icon;
         this.createdAt = createdAt;
         this.isRead = isRead;

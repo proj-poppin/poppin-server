@@ -211,12 +211,13 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
      * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * -
      */
-    // POPUP 테이블 칼럼 추가, 등등 새로 조건이 삽입되고 쿼리 수정도 필요함
     @Query("SELECT p FROM Popup p " +
-            "JOIN PopupAlarmKeyword al ON p.id = al.popupId.id " +
-            "WHERE p.openDate >= :nowDate " +
-            "AND EXISTS (SELECT 1 FROM ReopenDemand rod WHERE p.id = rod.popup.id)")
-    List<Popup> findReopenPopupWithDemand(LocalDate nowDate);
+            "JOIN ReopenDemand rd ON p.id = rd.popup.id " +
+            "JOIN FCMToken ft ON rd.token = ft.token " +
+            "WHERE p.openDate < :nowDate " +
+            "AND ft.token = rd.token")
+    List<Popup> findReopenPopupWithDemand(@Param("nowDate") LocalDate nowDate);
+
 
 
     @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus != 'TERMINATED' AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")

@@ -11,18 +11,15 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -42,7 +39,7 @@ public class FCMScheduler {
         /**
          * 재오픈 수요 팝업 재오픈 알림
          * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
-         * 2. popup topic 테이블에서 popup id + RO 조건으로 token list 추출
+         * 2.재오픈을 눌러놨던 유저의 토큰을 모두 가져와서 전송
          */
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
@@ -53,7 +50,7 @@ public class FCMScheduler {
         if (reopenPopup.isEmpty()) {
             log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
         } else {
-            schedulerFcmPopupTopicByType(reopenPopup, EPopupTopic.REOPEN, EPushInfo.REOPEN);
+            fcmSendService.sendAlarmByFCMToken(reopenPopup, EPushInfo.REOPEN);
         }
     }
 
@@ -108,7 +105,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * MON")
+    @Scheduled(cron = "0 */01 * * * *")
     private void hotPopup() {
         /**
          * 인기 팝업 알림
@@ -130,7 +127,10 @@ public class FCMScheduler {
         if (hotPopup.isEmpty()) {
             log.info("인기 팝업이 없습니다");
         } else {
-            fcmSendService.sendHotByFCMToken(hotPopup, EPushInfo.HOTPOPUP);
+            for (Popup p : hotPopup){
+                log.info("hot popup name {}", p.getName());
+            }
+            fcmSendService.sendAlarmByFCMToken(hotPopup, EPushInfo.HOTPOPUP);
         }
     }
 

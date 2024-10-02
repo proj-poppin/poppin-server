@@ -1,13 +1,15 @@
 package com.poppin.poppinserver.review.service;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.type.*;
+import com.poppin.poppinserver.core.type.ECongestion;
+import com.poppin.poppinserver.core.type.EPushInfo;
+import com.poppin.poppinserver.core.type.ESatisfaction;
+import com.poppin.poppinserver.core.type.EVisitDate;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
@@ -149,26 +151,17 @@ public class ReviewService {
             review.addRecommendCnt();
         }
 
-        reviewRepository.save(review);
-
         ReviewRecommend reviewRecommend = ReviewRecommend.builder()
                 .user(user)
                 .review(review)
                 .build();
+
+        reviewRepository.save(review);
         reviewRecommendRepository.save(reviewRecommend);
 
-        // FCM 알림
-        FCMRequestDto requestDto = FCMRequestDto.fromEntity(
-                popupId,
-                review.getToken(),
-                EPushInfo.CHOOCHUN.getTitle(),
-                "[" + popup.getName() + "] " + EPushInfo.CHOOCHUN.getBody(),
-                EPopupTopic.CHOOCHUN
-        );
+        fcmSendService.sendChoochunByFCMToken(popup, review, EPushInfo.CHOOCHUN); // 알림
 
-        fcmSendService.sendChoochunByFCMToken(review, EPushInfo.CHOOCHUN); // 알림
-        alarmService.insertPopupAlarm(requestDto); // 저장
         return "정상적으로 반환되었습니다";
-    }
 
+    }
 }

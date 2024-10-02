@@ -8,17 +8,16 @@ import com.poppin.poppinserver.alarm.domain.PopupAlarm;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmStatusResponseDto;
-import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
-
+import com.poppin.poppinserver.alarm.dto.popupAlarm.request.PopupAlarmDto;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.core.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +25,8 @@ import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.time.LocalDate;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 
 @Service
@@ -50,7 +47,6 @@ public class AlarmService {
 
     /**
      * 홈 화면 진입 시 읽지 않은 공지 여부 판단
-     *
      * @param fcmRequestDto :  FCM Token request dto
      * @return : UnreadAlarmResponseDto
      */
@@ -69,24 +65,21 @@ public class AlarmService {
     }
 
     // 알림 - 팝업 공지사항 등록
-    public String insertPopupAlarm(FCMRequestDto fcmRequestDto) {
+    public String insertPopupAlarm(PopupAlarmDto popupAlarmDto) {
 
         log.info("POPUP ALARM insert");
 
         try {
-            Popup popup = popupRepository.findById(fcmRequestDto.popupId())
+            Popup popup = popupRepository.findById(popupAlarmDto.popupId().getId())
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-            String keyword = "POPUP"; // 팝업 알림
-
-            String url = Objects.requireNonNull(getUrlForTopic(fcmRequestDto.topic())).toString();
+            String url = Objects.requireNonNull(getUrlForTopic(popupAlarmDto.topic())).toString();
 
             PopupAlarm alarm = PopupAlarm.builder()
                     .popupId(popup)
-                    .token(fcmRequestDto.token())
-                    .title(fcmRequestDto.title())
-                    .body(fcmRequestDto.body())
-                    .keyword(keyword)
+                    .token(popupAlarmDto.fcmToken())
+                    .title(popupAlarmDto.title())
+                    .body(popupAlarmDto.body())
                     .icon(url)
                     .createdAt(LocalDate.now())
                     .isRead(false) // 읽음 여부
@@ -107,13 +100,11 @@ public class AlarmService {
         log.info("INFORM ALARM insert");
 
         try {
-            String keyword = "INFORM";
             String iconUrl = s3Client.getUrl(alarmBucket, EPopupTopic.CHANGE_INFO.getImgName()).toString();
 
             InformAlarm alarm = InformAlarm.builder()
                     .title(requestDto.title())
                     .body(requestDto.body())
-                    .keyword(keyword)
                     .icon(iconUrl)
                     .createdAt(LocalDate.now())
                     .build();
