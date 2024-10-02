@@ -40,19 +40,24 @@ public class FCMSendService {
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmService alarmService;
+    private final AlarmListService alarmListService;
 
     //공지사항
-    public void sendInformationByFCMToken(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto,
+    public void sendInformationByFCMToken(List<FCMToken> tokenList,
+                                          InformAlarmCreateRequestDto requestDto,
                                           InformAlarm informAlarm) {
 
         for (FCMToken token : tokenList) {
+
+            int badge = alarmListService.countUnreadAlarms(token.getToken());
+
             log.info("token : " + token.getToken());
             Message message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(requestDto.title())
                             .setBody(requestDto.body())
                             .build())
-                    .setApnsConfig(apnsConfiguration.apnsConfig())
+                    .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setToken(token.getToken())
                     .putData("id", informAlarm.getId().toString())
@@ -68,7 +73,6 @@ public class FCMSendService {
         }
     }
 
-
     //인기팝업, 재오픈 팝업 알림 전송 메서드
     public void sendAlarmByFCMToken(List<Popup> popupList, EPushInfo info) {
 
@@ -81,12 +85,13 @@ public class FCMSendService {
 
         for (FCMToken token : tokenList) {
             log.info("token : " + token.getToken());
+            int badge = alarmListService.countUnreadAlarms(token.getToken());
             Message message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(info.getTitle())
                             .setBody(info.getBody())
                             .build())
-                    .setApnsConfig(apnsConfiguration.apnsConfig())
+                    .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setToken(token.getToken())
                     .putData("popupList", popupIdList.toString())
@@ -122,13 +127,14 @@ public class FCMSendService {
 
     //후기 추천 앱푸시 메서드
     public void sendChoochunByFCMToken(Popup popup, Review review, EPushInfo info) {
+        int badge = alarmListService.countUnreadAlarms(review.getToken());
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(info.getTitle())
                         .setBody("[" + review.getPopup().getName() + "] " + info.getBody())
                         .build())
-                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                 .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(review.getToken())
                 .putData("id", review.getPopup().getId().toString())
@@ -161,12 +167,14 @@ public class FCMSendService {
     public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto,
                                            UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
+
+        int badge = alarmListService.countUnreadAlarms(token.getToken());
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(requestDto.title())
                         .setBody(requestDto.body())
                         .build())
-                .setApnsConfig(apnsConfiguration.apnsConfig())
+                .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                 .setAndroidConfig(androidConfiguration.androidConfig())
                 .setToken(token.getToken())
                 .putData("id", userAlarmKeyword.getId().toString())
@@ -186,6 +194,8 @@ public class FCMSendService {
 
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
+            int badge = alarmListService.countUnreadAlarms(fcmRequestDto.token());
+
             Message message;
 
             Popup popup = popupRepository.findById(fcmRequestDto.popupId())
@@ -198,7 +208,7 @@ public class FCMSendService {
                             .build())
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfiguration.androidConfig())
-                    .setApnsConfig(apnsConfiguration.apnsConfig())
+                    .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                     .putData("id", fcmRequestDto.popupId().toString())
                     .putData("type", "popup")
                     .build();

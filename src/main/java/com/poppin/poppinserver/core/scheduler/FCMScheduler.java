@@ -224,6 +224,6 @@ public class FCMScheduler {
             log.info("tokens doesn't have existed on : " + topic);
         } else {
             fcmSendService.sendFCMTopicMessage(fcmRequestDtoList);
-        } // 메시지 발송
+        }
     }
 }
