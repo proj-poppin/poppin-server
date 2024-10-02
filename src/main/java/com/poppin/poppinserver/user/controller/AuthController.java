@@ -5,12 +5,12 @@ import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordResetDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -47,10 +47,10 @@ public class AuthController {
     // 자체 회원가입 API
     @PostMapping("/sign-up")
     public ResponseDto<?> authSignUp(
-            @RequestBody @Valid AuthSignUpDto authSignUpDto
+            @RequestBody @Valid AuthSignUpRequestDto authSignUpRequestDto
     ) {
-        log.info("authSignUpDto : " + authSignUpDto);
-        return ResponseDto.created(authService.handleSignUp(authSignUpDto));
+        log.info("authSignUpDto : " + authSignUpRequestDto);
+        return ResponseDto.created(authService.handleSignUp(authSignUpRequestDto));
     }
 
 //    @PostMapping("/register")
@@ -85,21 +85,22 @@ public class AuthController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseDto<?> resetPassword(@UserId Long userId, @RequestBody @Valid PasswordUpdateDto passwordRequestDto) {
+    public ResponseDto<?> resetPassword(@UserId Long userId,
+                                        @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto) {
         authService.resetPassword(userId, passwordRequestDto);
         return ResponseDto.ok("비밀번호 변경 성공");
     }
 
     @PostMapping("/reset-password/no-auth")
-    public ResponseDto<?> resetPasswordNoAuth(@RequestBody @Valid PasswordResetDto passwordResetDto) {
-        authService.resetPasswordNoAuth(passwordResetDto);
+    public ResponseDto<?> resetPasswordNoAuth(@RequestBody @Valid PasswordResetRequestDto passwordResetRequestDto) {
+        authService.resetPasswordNoAuth(passwordResetRequestDto);
         return ResponseDto.ok("비밀번호가 재설정되었습니다.");
     }
 
     @PostMapping("/verification/password")
     public ResponseDto<?> verifyPassword(@UserId Long userId,
-                                         @RequestBody @Valid PasswordVerificationDto passwordVerificationDto) {
-        return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationDto));
+                                         @RequestBody @Valid PasswordVerificationRequestDto passwordVerificationRequestDto) {
+        return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationRequestDto));
     }
 
     @PostMapping("/email/verification")

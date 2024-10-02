@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
-public record NicknameDto(
+public record UserNicknameResponseDto(
         String randomNickname
 ) {
 }

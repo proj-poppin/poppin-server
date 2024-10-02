@@ -31,8 +31,8 @@ import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
-import com.poppin.poppinserver.user.dto.user.response.NicknameDto;
 import com.poppin.poppinserver.user.dto.user.response.UserMypageDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
@@ -42,13 +42,12 @@ import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -284,9 +283,9 @@ public class UserService {
         return faqDtoList;
     }
 
-    public NicknameDto generateRandomNickname() {
+    public UserNicknameResponseDto generateRandomNickname() {
         String randomNickname = RandomNicknameUtil.generateRandomNickname();
-        return new NicknameDto(randomNickname);
+        return new UserNicknameResponseDto(randomNickname);
     }
 
     public void deleteAllRelatedInfo(User user) {

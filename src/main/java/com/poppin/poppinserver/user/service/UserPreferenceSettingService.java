@@ -28,6 +28,7 @@ public class UserPreferenceSettingService {
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
 
+    // TODO: 삭제 예정
     @Transactional
     public UserTasteResponseDto createUserTaste(
             Long userId,
@@ -88,6 +89,7 @@ public class UserPreferenceSettingService {
                 .build();
     }
 
+    // TODO: 삭제 예정
     public UserTasteResponseDto readUserTaste(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
