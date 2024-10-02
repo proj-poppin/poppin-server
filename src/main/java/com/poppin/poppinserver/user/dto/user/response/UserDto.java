@@ -3,6 +3,7 @@ package com.poppin.poppinserver.user.dto.user.response;
 import com.poppin.poppinserver.user.domain.User;
 import lombok.Builder;
 
+// TODO: 삭제 예정
 @Builder
 public record UserDto(
         Long id,
