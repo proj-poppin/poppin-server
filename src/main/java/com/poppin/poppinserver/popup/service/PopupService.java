@@ -614,7 +614,7 @@ public class PopupService {
     @Transactional(readOnly = true)
     public BootstrapDto bootstrap(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
-        if (!userRepository.existsById(userId)) {
+        if (userId != null && !userRepository.existsById(userId)) {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
 
