@@ -14,12 +14,13 @@ import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -128,7 +129,6 @@ public class FCMTokenService {
     }
 
     public String resetPopupTopic() {
-
         List<FCMToken> fcmTokenList = fcmTokenRepository.findAll();
         for (FCMToken token : fcmTokenList) {
             Optional<List<PopupTopic>> topics = popupTopicRepository.findByToken(token);

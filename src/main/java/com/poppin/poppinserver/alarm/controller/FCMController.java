@@ -1,15 +1,10 @@
 package com.poppin.poppinserver.alarm.controller;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.alarm.dto.fcm.request.PushDto;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.core.util.push.android.FCMTestUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,21 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/noti")
 public class FCMController {
 
-    private final FCMTokenService fcmTokenService;
-    private final FCMTestUtil FCMTestUtil;
+    //TODO: 삭제 예정
+      private final FCMTokenService fcmTokenService;
+//    private final FCMTestUtil FCMTestUtil;
+//
+//    @PostMapping("/token/test")
+//    public void sendNotificationByTokenTest(@Valid @RequestBody PushDto pushDto) {
+//        FCMTestUtil.sendNotificationByTokenTest(pushDto);
+//    }
+//
+//    @PostMapping("topic/test")
+//    public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto)
+//            throws FirebaseMessagingException {
+//        FCMTestUtil.sendNotificationByTopicTest(pushDto);
+//    }
 
-    @PostMapping("/token/test")
-    public void sendNotificationByTokenTest(@Valid @RequestBody PushDto pushDto) {
-        FCMTestUtil.sendNotificationByTokenTest(pushDto);
-    }
-
-    @PostMapping("topic/test")
-    public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto)
-            throws FirebaseMessagingException {
-        FCMTestUtil.sendNotificationByTopicTest(pushDto);
-    }
-
-    // 삭제 예정
+    //TODO: 삭제 예정
 //    /* 알림 허용 시 데이터 저장 */
 //    @PostMapping("/apply/FCMtoken")
 //    public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto) {
