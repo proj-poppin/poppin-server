@@ -259,4 +259,5 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHotPopup(@Param("startOfWeek") LocalDateTime startOfWeek,
                              @Param("endOfWeek") LocalDateTime endOfWeek,
                              Pageable pageable);
+
 }

@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.alarm.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.InformIsRead;
 import com.poppin.poppinserver.alarm.domain.PopupAlarm;
@@ -9,6 +10,7 @@ import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestD
 import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmStatusResponseDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
@@ -27,6 +29,7 @@ import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -40,6 +43,7 @@ public class AlarmService {
     private final PopupRepository popupRepository;
     private final InformAlarmRepository informAlarmRepository;
     private final InformIsReadRepository informIsReadRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     @Value("${cloud.aws.s3.alarm.bucket.name}")
     private String alarmBucket;
@@ -124,13 +128,18 @@ public class AlarmService {
         }
     }
 
+    public List<InformAlarm> getInformAlarms(Long userId) {
+        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_FCM_TOKEN));
+
+        List<InformAlarm> informAlarms = informAlarmRepository.findByKeywordOrderByIdDesc(fcmToken.getToken());
+        return informAlarms;
+    }
     private URL getUrlForTopic(EPopupTopic topic) {
         URL url = s3Client.getUrl(alarmBucket, topic.getImgName());
         log.info("Generated URL for topic {}: {}", topic, url);
         return url;
     }
-
-
 }
 
 
