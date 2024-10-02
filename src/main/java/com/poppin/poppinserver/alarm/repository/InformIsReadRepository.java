@@ -1,16 +1,16 @@
 package com.poppin.poppinserver.alarm.repository;
 
 import com.poppin.poppinserver.alarm.domain.InformIsRead;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long> {
-
 
     @Query("SELECT inform FROM InformIsRead inform " +
             "WHERE inform.fcmToken.token = :fcmToken AND inform.informAlarm.id = :alarmId")
@@ -22,4 +22,13 @@ public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long
     @Query("SELECT COUNT(inform) from InformIsRead inform WHERE inform.fcmToken.token = :fcmToken AND inform.isRead = false")
     int unreadInforms(@Param("fcmToken") String fcmToken);
 
+    @Query("SELECT informIsRead.informAlarm.id " +
+            "FROM InformIsRead informIsRead " +
+            "WHERE informIsRead.fcmToken.token = :fcmToken AND informIsRead.isRead = true")
+    List<Long> findReadInformAlarmIdsByFcmToken(@Param("fcmToken") String fcmToken);
+
+    @Query("SELECT MAX(informIsRead.readAt) " +
+            "FROM InformIsRead informIsRead " +
+            "WHERE informIsRead.fcmToken.token = :fcmToken AND informIsRead.isRead = true")
+    Optional<LocalDateTime> findLastReadTimeByFcmToken(@Param("fcmToken") String fcmToken);
 }
