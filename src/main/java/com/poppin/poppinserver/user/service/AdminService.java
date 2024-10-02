@@ -16,6 +16,7 @@ import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -499,7 +500,7 @@ public class AdminService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        if (!user.getRole().equals("ADMIN")) {
+        if (!user.getRole().equals(EUserRole.ADMIN)) {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
