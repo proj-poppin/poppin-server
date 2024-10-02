@@ -832,6 +832,12 @@ public class PopupService {
         return popups.get(randomIndex);
     } // 취향저격 팝업 조회
 
+    public PopupStoreDto readPopupStore(Long popupId) {
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        return getPopupStoreDto(popup);
+    }
+
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                Long userId) {
@@ -1081,6 +1087,19 @@ public class PopupService {
 
         // PopupStoreDto 리스트를 생성하여 반환
         return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList);
+    }
+
+    public PopupStoreDto getPopupStoreDto(Popup popup) {
+        if (popup == null) {
+            return null;
+        }
+
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+
+        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+
+        // PopupStoreDto 리스트를 생성하여 반환
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt);
     }
 
 }
