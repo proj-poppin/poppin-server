@@ -174,4 +174,9 @@ public class PopupController {
     public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
+
+    @GetMapping("/detail/{popupId}")
+    public ResponseDto<?> readPopup(@PathVariable Long popupId) {
+        return ResponseDto.ok(popupService.readPopupStore(popupId));
+    }
 }
