@@ -24,21 +24,28 @@ public class Visit {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "popup_id", referencedColumnName = "id")
+    @JoinColumn(name = "popup_id", referencedColumnName = "id", nullable = false)
     private Popup popup;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt; /*방문한 날짜*/
 
+    @Column(name = "status", nullable = false)
+    private String status;
+
     @Builder
-    public Visit(User user, Popup popup) {
+    public Visit(User user, Popup popup, String status) {
         this.user = user;
         this.popup = popup;
         this.createdAt = LocalDateTime.now();
+        this.status = status;
     }
 
+    public void changeStatus(String status){
+        this.status = status;
+    }
 }

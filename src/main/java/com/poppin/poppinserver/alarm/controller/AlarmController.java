@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.alarm.controller;
 
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
@@ -13,15 +12,7 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -46,17 +37,18 @@ public class AlarmController {
         return ResponseDto.ok(alarmListService.readPopupAlarmList(alarmTokenRequestDto));
     }
 
-    // 팝업 알림 보여주기 - 로그인 (2 depth)
-    @PostMapping("/detail/popup")
-    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto) {
-        return ResponseDto.ok(alarmListService.readPopupDetail(userId, requestDto));
-    }
-
-    // 팝업 알림 보여주기 - 비로그인 (2 depth)
-    @PostMapping("/popup/guest/detail")
-    public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto) {
-        return ResponseDto.ok(alarmListService.readPopupDetailGuest(requestDto));
-    }
+    //TODO: 삭제 예정
+//    // 팝업 알림 보여주기 - 로그인 (2 depth)
+//    @PostMapping("/detail/popup")
+//    public ResponseDto<?> readPopupDetail(@UserId Long userId, @RequestBody AlarmPopupRequestDto requestDto) {
+//        return ResponseDto.ok(alarmListService.readPopupDetail(userId, requestDto));
+//    }
+    //TODO: 삭제 예정
+//    // 팝업 알림 보여주기 - 비로그인 (2 depth)
+//    @PostMapping("/popup/guest/detail")
+//    public ResponseDto<?> readPopupDetailGuest(@RequestBody AlarmPopupRequestDto requestDto) {
+//        return ResponseDto.ok(alarmListService.readPopupDetailGuest(requestDto));
+//    }
 
     // 공지사항 알림 보여주기(1 depth)
     @PostMapping("/info")

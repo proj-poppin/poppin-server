@@ -44,4 +44,7 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     @Modifying
     @Query("DELETE FROM Visit v WHERE v.user.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT v FROM Visit v WHERE v.popup.id = :popupId")
+    List<Visit> findByPopupId(@Param("popupId") Long popupId);
 }
