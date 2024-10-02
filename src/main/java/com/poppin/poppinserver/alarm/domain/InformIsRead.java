@@ -1,6 +1,14 @@
 package com.poppin.poppinserver.alarm.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +37,9 @@ public class InformIsRead {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead;
 
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+
     @Builder
     public InformIsRead(InformAlarm informAlarm, FCMToken token) {
         this.informAlarm = informAlarm;
@@ -39,5 +50,6 @@ public class InformIsRead {
     // isRead를 변경하는 메서드 추가
     public void markAsRead() {
         this.isRead = true;
+        this.readAt = LocalDateTime.now();
     }
 }
