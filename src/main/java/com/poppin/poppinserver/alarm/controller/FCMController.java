@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/noti")
-public class FCMTokenController {
+public class FCMController {
 
     private final FCMTokenService fcmTokenService;
     private final FCMTestUtil FCMTestUtil;

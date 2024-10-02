@@ -1,35 +1,27 @@
 package com.poppin.poppinserver.alarm.service;
 
-import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
-
-import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.alarm.domain.InformAlarm;
-import com.poppin.poppinserver.alarm.domain.InformAlarmImage;
-import com.poppin.poppinserver.alarm.domain.InformIsRead;
-import com.poppin.poppinserver.alarm.domain.PopupAlarm;
+import com.poppin.poppinserver.alarm.domain.*;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmPopupRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformAlarmListResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformAlarmResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.PopupAlarmResponseDto;
-import com.poppin.poppinserver.alarm.dto.alarm.response.UnreadAlarmsResponseDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.repository.InformAlarmImageRepository;
-import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
-import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
+import com.poppin.poppinserver.alarm.repository.*;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
 import com.poppin.poppinserver.popup.service.PopupService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
 
 @Service
 @Slf4j
@@ -191,8 +183,7 @@ public class AlarmListService {
         informIsReadRepository.save(informIsRead);
     }
 
-    public UnreadAlarmsResponseDto countUnreadAlarms(String fcmToken) {
-
+    public int countUnreadAlarms(String fcmToken) {
         int resultCount;
 
         int unreadInformAlarms = informIsReadRepository.unreadInforms(fcmToken);
@@ -200,8 +191,6 @@ public class AlarmListService {
 
         resultCount = unreadInformAlarms + unreadPopupAlarms;
 
-        UnreadAlarmsResponseDto responseDto = UnreadAlarmsResponseDto.fromEntity(resultCount);
-
-        return responseDto;
+        return resultCount;
     }
 }
