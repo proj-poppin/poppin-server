@@ -17,6 +17,7 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
+import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
 import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
@@ -48,6 +49,7 @@ import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -101,6 +103,7 @@ public class PopupService {
 
     private final FCMSendService fcmSendService;
     private final AlarmService alarmService;
+    private final HeaderUtil headerUtil;
 
 
     @Transactional
@@ -609,7 +612,11 @@ public class PopupService {
     } // 로그인 상세조회
 
     @Transactional(readOnly = true)
-    public BootstrapDto bootstrap(Long userId) {
+    public BootstrapDto bootstrap(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
+        if (!userRepository.existsById(userId)) {
+            throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
+        }
 
         // 인기 팝업 조회
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -628,34 +635,46 @@ public class PopupService {
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
         List<PopupStoreDto> closingSoonPopupStores = getPopupStoreDtos(popups);
 
-        // 취향 저격 팝업 조회
-        List<Popup> recommendPopup = getRecommendPopup(userId);
-        List<PopupStoreDto> recommendedPopupStores = getPopupStoreDtos(recommendPopup);
+        if (userId != null) { // 로그인 요청일 경우
+            // 취향 저격 팝업 조회
+            List<Popup> recommendPopup = getRecommendPopup(userId);
+            List<PopupStoreDto> recommendedPopupStores = getPopupStoreDtos(recommendPopup);
 
-        // 관심 저장 팝업 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+            // 관심 저장 팝업 조회
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Set<Interest> interest = user.getInterest();
-        List<Popup> interestedPopup = interest.stream()
-                .map(Interest::getPopup)
-                .toList();
+            Set<Interest> interest = user.getInterest();
+            List<Popup> interestedPopup = interest.stream()
+                    .map(Interest::getPopup)
+                    .toList();
 
-        List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup);
+            List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup);
 
-        // 공지 조회
-        List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
+            // 공지 조회
+            List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
 
-        List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
+            List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
 
-        return BootstrapDto.builder()
-                .popularTop5PopupStores(popularTop5PopupStores)
-                .newlyOpenedPopupStores(newlyOpenedPopupStores)
-                .closingSoonPopupStores(closingSoonPopupStores)
-                .interestedPopupStores(interestedPopupStores)
-                .recommendedPopupStores(recommendedPopupStores)
-                .notices(notice)
-                .build();
+            return BootstrapDto.builder()
+                    .popularTop5PopupStores(popularTop5PopupStores)
+                    .newlyOpenedPopupStores(newlyOpenedPopupStores)
+                    .closingSoonPopupStores(closingSoonPopupStores)
+                    .interestedPopupStores(interestedPopupStores)
+                    .recommendedPopupStores(recommendedPopupStores)
+                    .notices(notice)
+                    .build();
+        } else { // 비로그인 요청일 경우 유저 관련 로직 생략
+            return BootstrapDto.builder()
+                    .popularTop5PopupStores(popularTop5PopupStores)
+                    .newlyOpenedPopupStores(newlyOpenedPopupStores)
+                    .closingSoonPopupStores(closingSoonPopupStores)
+                    .interestedPopupStores(null)
+                    .recommendedPopupStores(null)
+                    .notices(null)
+                    .build();
+        }
+
     } // 부트스트랩 로딩 api
 
     public List<PopupSummaryDto> readHotList() {
@@ -692,64 +711,6 @@ public class PopupService {
 
         return InterestedPopupDto.fromEntityList(interest);
     } // 관심 팝업 목록 조회
-
-//    @Transactional
-//    public PopupTasteDto readTasteList(Long userId){
-//        //유저가 선택한 카테고리 중 랜덤으로 하나 선택
-//        //선택된 카테고리로 리스트 생성
-//        //랜덤함수에서 선택 리스트 만큼 수 추출
-//        //고른 카테고리 기반이 true인 팝업 긁어오기
-//
-//        // 사용자가 설정한 태그의 팝업들 5개씩 다 가져오기
-//        // 태그의 개수만큼 랜덤 변수 생성해서 하나 뽑기
-//        // 5개 선정
-//        // 관심 테이블에서
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//
-//        //취향설정이 되지 않은 유저의 경우
-//        if(user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null){
-//            return null;
-//        }
-//
-//        Random random = new Random();
-//        Integer randomIndex = random.nextInt(17);
-//
-//        log.info(randomIndex.toString());
-//
-//        if (randomIndex > 4){
-//            // Taste
-//            TastePopup tastePopup = user.getTastePopup();
-//            String selectedTaste = selectRandomUtil.selectRandomTaste(tastePopup);
-//            log.info("taste"+selectedTaste);
-//
-//            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-//            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(selectedTaste, true))
-//                    .and(PopupSpecification.isOperating());
-//
-//            log.info(combinedSpec.toString());
-//
-//            List<Popup> popups = popupRepository.findAll(combinedSpec, pageable).getContent();
-//
-//            return new PopupTasteDto(selectedTaste, PopupSummaryDto.fromEntityList(popups));
-//        }
-//        else{
-//            // Prefered
-//            PreferedPopup preferedPopup = user.getPreferedPopup();
-//            String selectedPreference = selectRandomUtil.selectRandomPreference(preferedPopup);
-//            log.info(selectedPreference);
-//
-//            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-//            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(selectedPreference, true))
-//                    .and(PopupSpecification.isOperating());
-//
-//
-//            List<Popup> popups = popupRepository.findAll(combinedSpec, pageable).getContent();
-//
-//            return new PopupTasteDto(selectedPreference, PopupSummaryDto.fromEntityList(popups));
-//        }
-//    } // 취향저격 팝업 조회
 
     @Transactional
     public PopupTasteDto readTasteList(Long userId) {
@@ -860,6 +821,9 @@ public class PopupService {
             }
         }
 
+        if (selectedList.isEmpty()) {
+            return null;
+        }
         Random random = new Random();
         Integer randomIndex = random.nextInt(selectedList.size());
 
@@ -1099,6 +1063,9 @@ public class PopupService {
     }
 
     public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups) {
+        if (popups == null || popups.isEmpty()) {
+            return null;
+        }
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();

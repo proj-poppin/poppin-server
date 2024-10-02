@@ -3,6 +3,7 @@ package com.poppin.poppinserver.popup.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.popup.service.PopupService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ public class BootstrapController {
     private final PopupService popupService;
 
     @GetMapping("/bootstrap")
-    public ResponseDto<?> bootstrap(@UserId Long userId) {
-        return ResponseDto.ok(popupService.bootstrap(userId));
+    public ResponseDto<?> bootstrap(HttpServletRequest request) {
+        return ResponseDto.ok(popupService.bootstrap(request));
     }
 }
