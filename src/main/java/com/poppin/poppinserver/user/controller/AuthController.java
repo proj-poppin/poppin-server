@@ -50,7 +50,7 @@ public class AuthController {
             @RequestBody @Valid AuthSignUpDto authSignUpDto
     ) {
         log.info("authSignUpDto : " + authSignUpDto);
-        return ResponseDto.created(authService.authSignUp(authSignUpDto));
+        return ResponseDto.created(authService.handleSignUp(authSignUpDto));
     }
 
 //    @PostMapping("/register")
