@@ -13,12 +13,15 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitResponseDto;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitStatusDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -53,61 +56,63 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public PopupStoreDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
+    public VisitResponseDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
 
+        // 사용자 및 팝업 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(visitorsInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        /*30분 전 시간*/
+        // 30분 전 시간 계산
         LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);
 
-        Integer duplicateVisitors = visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo);
-        if (duplicateVisitors > 0) {
-            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
+        // 중복 방문 검사 (30분 이내 재방문 방지)
+        if (visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo) > 0) {
+            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT);
         }
 
-        Optional<Visit> visit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
+        // 방문 이력 조회
+        Optional<Visit> existingVisit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
 
-        //재오픈인경우
-        if (visit.isPresent()){
-            visit.get().changeStatus("VISIT_NOW");
-            visitRepository.save(visit.get());
-        }else{
-            //방문하기
-            Visit visitor = Visit.builder()
+        if (existingVisit.isPresent()) {
+            // 재오픈 시 상태 변경
+            existingVisit.get().changeStatus("VISIT_NOW");
+            visitRepository.save(existingVisit.get());
+        } else {
+            // 새로운 방문 처리
+            Visit newVisit = Visit.builder()
                     .user(user)
                     .popup(popup)
                     .status("VISIT_COMPLETE")
                     .build();
+            visitRepository.save(newVisit);
+            user.addVisitedPopupCnt(); // 사용자의 방문 팝업 수 증가
 
-            visitRepository.save(visitor);
-            user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
-
-            // fcm 구독
-            Optional<FCMToken> token = fcmTokenRepository.findByUserId(userId);
-            if (token.isEmpty()) {
-                throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-            }else{
-                String fcmToken = token.get().getToken();
-                fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.HOOGI);
-            }
-
-            Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
-                    thirtyMinutesAgo); /*실시간 방문자 수*/
-
-            if (realTimeVisitorsCount.isEmpty()) {
-                realTimeVisitorsCount = Optional.of(0);
-            } // empty 면 0으로.
+            // FCM 토큰 조회 및 구독 처리
+            FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
+            fcmTokenService.fcmAddPopupTopic(fcmToken.getToken(), popup, EPopupTopic.HOOGI);
         }
 
+        // 실시간 방문자 수 조회 (Optional의 처리 간소화)
+        int realTimeVisitors = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo)
+                .orElse(0); // 값이 없으면 0으로 처리
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
-        Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
-        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt);
-        return popupStoreDto;
+        // 방문자 데이터 및 응답 객체 생성
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId());
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, Optional.of(realTimeVisitors));
+        VisitStatusDto visitStatusDto = VisitStatusDto.fromEntity(
+                existingVisit.map(Visit::getId).orElse(null),
+                popup.getId(),
+                user.getId(),
+                existingVisit.map(Visit::getStatus).orElse("VISIT_COMPLETE"),
+                LocalDate.now()
+        );
+
+        return VisitResponseDto.fromEntity(popupStoreDto, visitStatusDto);
     }
+
 
     public void changeVisitStatus(Long popupId){
         List<Visit> visitList = visitRepository.findByPopupId(popupId);
