@@ -17,6 +17,7 @@ import com.poppin.poppinserver.visit.dto.visit.response.VisitResponseDto;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitStatusDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,8 +57,10 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
+    @Transactional
     public VisitResponseDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
 
+        // 사용자 및 팝업 조회
         // 사용자 및 팝업 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -65,55 +68,79 @@ public class VisitService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 30분 전 시간 계산
-        LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);
+        LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minusMinutes(30);
 
         // 중복 방문 검사 (30분 이내 재방문 방지)
-        if (visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo) > 0) {
+        if (isDuplicateVisit(userId, popup.getId(), thirtyMinutesAgo)) {
             throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT);
         }
 
-        // 방문 이력 조회
-        Optional<Visit> existingVisit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
-
-        if (existingVisit.isPresent()) {
-            // 재오픈 시 상태 변경
-            existingVisit.get().changeStatus("VISIT_NOW");
-            visitRepository.save(existingVisit.get());
-        } else {
-            // 새로운 방문 처리
-            Visit newVisit = Visit.builder()
-                    .user(user)
-                    .popup(popup)
-                    .status("VISIT_COMPLETE")
-                    .build();
-            visitRepository.save(newVisit);
-            user.addVisitedPopupCnt(); // 사용자의 방문 팝업 수 증가
-
-            // FCM 토큰 조회 및 구독 처리
-            FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
-                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
-            fcmTokenService.fcmAddPopupTopic(fcmToken.getToken(), popup, EPopupTopic.HOOGI);
-        }
-
-        // 실시간 방문자 수 조회 (Optional의 처리 간소화)
-        int realTimeVisitors = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo)
-                .orElse(0); // 값이 없으면 0으로 처리
+        // 방문 이력 조회 및 처리
+        Optional<Visit> existingVisitOpt = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
+        existingVisitOpt.ifPresentOrElse(
+                visit -> handleExistingVisit(visit),
+                () -> handleNewVisit(user, popup, userId)
+        );
 
         // 방문자 데이터 및 응답 객체 생성
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId());
+        int realTimeVisitors = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo)
+                .orElse(0);
+
         PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, Optional.of(realTimeVisitors));
-        VisitStatusDto visitStatusDto = VisitStatusDto.fromEntity(
-                existingVisit.map(Visit::getId).orElse(null),
-                popup.getId(),
-                user.getId(),
-                existingVisit.map(Visit::getStatus).orElse("VISIT_COMPLETE"),
-                LocalDate.now()
-        );
+        VisitStatusDto visitStatusDto = createVisitStatusDto(existingVisitOpt, popup, user);
 
         return VisitResponseDto.fromEntity(popupStoreDto, visitStatusDto);
     }
 
+    private boolean isDuplicateVisit(Long userId, Long popupId, LocalDateTime thirtyMinutesAgo) {
+        return visitRepository.findDuplicateVisitors(userId, popupId, thirtyMinutesAgo) > 0;
+    }
 
+    private void handleExistingVisit(Visit visit) {
+        String status = visit.getStatus();
+        if ("RECEIVE_REOPEN_ALERT".equals(status)) {
+            visit.changeStatus("VISIT_NOW");
+            visitRepository.save(visit);
+            log.info("재오픈 수요 알림 >> visit ID: {}", visit.getId());
+        } else if ("VISIT_COMPLETE".equals(status)) {
+            log.warn("이미 방문완료 상태 >> visit ID: {}", visit.getId());
+            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT);
+        } else {
+            log.warn("예외 >> visit ID: {}", status, visit.getId());
+        }
+    }
+
+    private void handleNewVisit(User user, Popup popup, Long userId) {
+        // 새로운 방문 처리
+        Visit newVisit = Visit.builder()
+                .user(user)
+                .popup(popup)
+                .status("VISIT_COMPLETE")
+                .build();
+        visitRepository.save(newVisit);
+        user.addVisitedPopupCnt();
+        log.info("새로운 방문 >> 방문 ID: {} , 유저 ID: {}", newVisit.getId(), user.getId());
+
+        // FCM 토큰 조회 및 구독 처리
+        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
+        fcmTokenService.fcmAddPopupTopic(fcmToken.getToken(), popup, EPopupTopic.HOOGI);
+        log.info("FCM topic '{}' added for token: {}", EPopupTopic.HOOGI, fcmToken.getToken());
+    }
+
+    private VisitStatusDto createVisitStatusDto(Optional<Visit> existingVisitOpt, Popup popup, User user) {
+        Long visitId = existingVisitOpt.map(Visit::getId).orElse(null);
+        String status = existingVisitOpt.map(Visit::getStatus).orElse("VISIT_COMPLETE");
+        return VisitStatusDto.fromEntity(
+                visitId,
+                popup.getId(),
+                user.getId(),
+                status,
+                LocalDate.now()
+        );
+    }
+    
     public void changeVisitStatus(Long popupId){
         List<Visit> visitList = visitRepository.findByPopupId(popupId);
         for (Visit v: visitList){
