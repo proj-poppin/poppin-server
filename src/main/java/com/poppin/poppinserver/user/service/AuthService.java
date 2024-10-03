@@ -28,6 +28,7 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
@@ -133,11 +134,14 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken()).toString();
+                authSignUpRequestDto.fcmToken());
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
+                .build();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
                 .build();
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -145,7 +149,8 @@ public class AuthService {
                 alarmSetting,
                 jwtToken,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
 
         return userInfoResponseDto;
@@ -188,11 +193,14 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken()).toString();
+                authSignUpRequestDto.fcmToken());
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
+                .build();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
                 .build();
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -200,7 +208,8 @@ public class AuthService {
                 alarmSetting,
                 jwtToken,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
         return userInfoResponseDto;
     }
@@ -301,11 +310,14 @@ public class AuthService {
 
             // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
             String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                    fcmToken).toString();
+                    fcmToken);
 
             UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                     .lastCheck(informLastCheckedTime)
                     .checkedNoticeIds(checkedNoticeIds)
+                    .build();
+
+            UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
                     .build();
 
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -313,7 +325,8 @@ public class AuthService {
                     alarmSetting,
                     jwtTokenDto,
                     userPreferenceSettingDto,
-                    userNoticeResponseDto
+                    userNoticeResponseDto,
+                    userActivities
             );
             return userInfoResponseDto;
         } else {
@@ -421,7 +434,7 @@ public class AuthService {
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId());
-        
+
         // 유저가 읽은 공지사항 알람 리스트 조회
         List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
                 fcmToken).stream().map(
@@ -430,19 +443,23 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                fcmToken).toString();
+                fcmToken);
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
+        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
+                .build();
+        
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
                 jwtTokenDto,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
 
         return userInfoResponseDto;
@@ -458,8 +475,17 @@ public class AuthService {
         user.updatePassword(bCryptPasswordEncoder.encode(passwordResetRequestDto.password()));
     }
 
+    // OS와 앱 버전 확인 메서드
     public Boolean appStart(AppStartRequestDto appStartRequestDto) {
-        return Boolean.TRUE;
+        String platform = appStartRequestDto.os();
+        String appVersion = appStartRequestDto.appVersion();
+        if (platform.equals(Constant.iOS) && appVersion.equals(Constant.iOS_APP_VERSION)) {
+            return Boolean.TRUE;
+        }
+        if (platform.equals(Constant.ANDROID) && appVersion.equals(Constant.ANDROID_APP_VERSION)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     @Transactional(readOnly = true)
