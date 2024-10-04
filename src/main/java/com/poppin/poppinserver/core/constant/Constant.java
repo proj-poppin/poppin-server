@@ -58,7 +58,7 @@ public class Constant {
             "/api/v1/admin/sign-in",                                         // 관리자 로그인
 
             "/api/v1/bootstrap",                                             // 부트스트랩
-            "/api/v1/app/start"                                             // 앱 시작 시 버전 확인
+            "/api/v1/app/start",                                             // 앱 시작 시 버전 확인
             "/api/v1/popup/detail/**"
     );
 
