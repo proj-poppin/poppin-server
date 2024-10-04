@@ -1,7 +1,12 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import com.poppin.poppinserver.alarm.domain.PopupAlarm;
+import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
+import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
+import com.poppin.poppinserver.alarm.repository.NotificationRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -12,6 +17,8 @@ import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.core.util.OAuth2Util;
 import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
+import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
@@ -31,11 +38,13 @@ import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +67,8 @@ public class AuthService {
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final FCMTokenService fcmTokenService;
     private final InformIsReadRepository informIsReadRepository;
+    private final PopupAlarmRepository popupAlarmRepository;
+    private final NotificationRepository notificationRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -141,8 +152,35 @@ public class AuthService {
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
-        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
-                .build();
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        PopupAlarm popupAlarm =
+
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.fromProperties(
+                null, String.valueOf(newUser.getId()), null, null,
+                null, null, null, null,
+                null, null, null,
+                destinationResponseDto
+        );
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                Collections.singletonList(notificationResponseDto),
+                Collections.singletonList(notificationResponseDto)
+        );
+
+        List<PopupScrapDto> popupScrapDtoList = Collections.singletonList(
+                PopupScrapDto.fromInterest(Interest.builder().build()));
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
@@ -200,8 +238,33 @@ public class AuthService {
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
-        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
-                .build();
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null,
+                null, null, null,
+                destinationResponseDto
+        );
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                Collections.singletonList(notificationResponseDto),
+                Collections.singletonList(notificationResponseDto)
+        );
+
+        List<PopupScrapDto> popupScrapDtoList = Collections.singletonList(
+                PopupScrapDto.fromInterest(Interest.builder().build()));
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
@@ -317,8 +380,33 @@ public class AuthService {
                     .checkedNoticeIds(checkedNoticeIds)
                     .build();
 
-            UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
-                    .build();
+            // TODO: 여기부터 수정 필요
+            DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                    null, null, null, null,
+                    null, null, null, null, null
+            );
+
+            NotificationResponseDto notificationResponseDto = NotificationResponseDto.fromProperties(
+                    null, null, null, null,
+                    null, null, null, null,
+                    null, null, null,
+                    destinationResponseDto
+            );
+
+            UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                    Collections.singletonList(notificationResponseDto),
+                    Collections.singletonList(notificationResponseDto)
+            );
+
+            List<PopupScrapDto> popupScrapDtoList = Collections.singletonList(
+                    PopupScrapDto.fromInterest(Interest.builder().build()));
+
+            UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                    popupScrapDtoList,
+                    userNotificationResponseDto
+            );
+
+            // TODO: 여기까지 수정 필요
 
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                     user.get(),
@@ -450,9 +538,34 @@ public class AuthService {
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
-        UserActivityResponseDto userActivities = UserActivityResponseDto.builder()
-                .build();
-        
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null,
+                null, null, null,
+                destinationResponseDto
+        );
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                Collections.singletonList(notificationResponseDto),
+                Collections.singletonList(notificationResponseDto)
+        );
+
+        List<PopupScrapDto> popupScrapDtoList = Collections.singletonList(
+                PopupScrapDto.fromInterest(Interest.builder().build()));
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
