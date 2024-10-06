@@ -1,14 +1,13 @@
 package com.poppin.poppinserver.alarm.repository;
 
-import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.alarm.domain.PopupAlarm;
+import com.poppin.poppinserver.popup.domain.Popup;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
@@ -26,4 +25,7 @@ public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
     int UnreadPopupAlarms(@Param("fcmToken") String fcmToken);
 
     void deleteAllByPopupId(Popup popup);
+
+    @Query("SELECT popupAlarm FROM PopupAlarm popupAlarm WHERE popupAlarm.token = :fcmToken")
+    List<PopupAlarm> findByFcmToken(@Param("fcmToken") String fcmToken);
 }
