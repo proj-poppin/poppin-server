@@ -29,4 +29,7 @@ public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long
             "FROM InformIsRead informIsRead " +
             "WHERE informIsRead.fcmToken.token = :fcmToken AND informIsRead.isRead = true")
     String findLastReadTimeByFcmToken(@Param("fcmToken") String fcmToken);
+
+    @Query("SELECT informIsRead FROM InformIsRead informIsRead WHERE informIsRead.fcmToken.token = :fcmToken")
+    List<InformIsRead> findAllByFcmToken(@Param("fcmToken") String token);
 }
