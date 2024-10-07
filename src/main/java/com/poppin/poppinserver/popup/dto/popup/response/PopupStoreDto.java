@@ -41,9 +41,10 @@ public record PopupStoreDto(
         Optional<List<PopupReviewDto>> review,
         VisitorDataInfoDto visitorData,
         Optional<Integer> realTimeVisit,
-        PreferenceDto preferences
+        PreferenceDto preferences,
+        Boolean isBlocked
 ) {
-    public static PopupStoreDto fromEntity(Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt) {
+    public static PopupStoreDto fromEntity(Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt, Boolean isBlocked) {
         List<String> imageUrls = popup.getPosterImages()
                 .stream()
                 .map(PosterImage::getPosterUrl)
@@ -80,14 +81,27 @@ public record PopupStoreDto(
                 .visitorData(visitorDataDto)
                 .realTimeVisit(visitorCnt)
                 .preferences(PreferenceDto.fromPopup(popup))
+                .isBlocked(isBlocked)
                 .build();
+    }
+
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked) {
+        List<PopupStoreDto> popupDtos = new ArrayList<>();
+
+        for (int i = 0; i < popups.size(); i++) {
+            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i)));
+        }
+
+        return popupDtos;
     }
 
     public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
-        for(int i = 0 ; i < popups.size();i++){
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i)));
+
+        for (int i = 0; i < popups.size(); i++) {
+            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), null));
         }
+
         return popupDtos;
     }
 }

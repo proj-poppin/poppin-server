@@ -14,9 +14,9 @@ public record InterestDto(
         PopupStoreDto updatedPopup,
         PopupScrapDto newPopupScrap
 ) {
-    public static InterestDto fromEntity(Interest intereste, Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt) {
+    public static InterestDto fromEntity(Interest intereste, Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt, Boolean isBlocked) {
         return InterestDto.builder()
-                .updatedPopup(PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt))
+                .updatedPopup(PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked))
                 .newPopupScrap(PopupScrapDto.fromInterest(intereste))
                 .build();
     }

@@ -9,7 +9,9 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
@@ -33,6 +35,8 @@ public class VisitService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
+
     private final FCMTokenService fcmTokenService;
     private final VisitorDataService visitorDataService;
 
@@ -105,7 +109,8 @@ public class VisitService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
-        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt);
+        Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt, isBlocked);
         return popupStoreDto;
     }
 

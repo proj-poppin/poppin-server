@@ -20,4 +20,8 @@ public interface BlockedPopupRepository extends JpaRepository<BlockedPopup, Long
     void deleteAllByUserId(@Param("userId") Long userId);
 
     void deleteAllByPopupId(Popup popup);
+
+    @Query("SELECT CASE WHEN COUNT(bp) > 0 THEN TRUE ELSE FALSE END " +
+                  "FROM BlockedPopup bp WHERE bp.popupId.id = :popupId AND bp.userId.id = :userId")
+    Boolean existsByPopupIdAndUserId(@Param("popupId") Long popupId, @Param("userId") Long userId);
 }
