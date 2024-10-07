@@ -58,7 +58,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewDto writeReview(Long userId, Long popupId, String text, String visitDate,
-                                 String satisfaction, String congestion, String nickname,
+                                 String satisfaction, String congestion,
                                  List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
