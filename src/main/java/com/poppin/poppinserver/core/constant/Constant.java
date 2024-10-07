@@ -15,6 +15,13 @@ public class Constant {
     public static final String USER_EMAIL_CLAIM_NAME = "email";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final Long MEMBER_INFO_RETENTION_PERIOD = 30L;
+
+    // 앱 버전 및 OS
+    public static final String iOS_APP_VERSION = "1.0.4";
+    public static final String iOS = "ios";
+    public static final String ANDROID_APP_VERSION = "1.0.0";
+    public static final String ANDROID = "android";
+
     public static final List<String> NO_NEED_AUTH_URLS = List.of(
 
             "/api/v1/auth/sign-up",                                // 회원가입
@@ -51,7 +58,7 @@ public class Constant {
             "/api/v1/admin/sign-in",                                         // 관리자 로그인
 
             "/api/v1/bootstrap",                                             // 부트스트랩
-
+            "/api/v1/app/start",                                             // 앱 시작 시 버전 확인
             "/api/v1/popup/detail/**"
     );
 

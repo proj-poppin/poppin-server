@@ -1,9 +1,7 @@
 package com.poppin.poppinserver.alarm.repository;
 
 import com.poppin.poppinserver.alarm.domain.InformIsRead;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,5 +28,8 @@ public interface InformIsReadRepository extends JpaRepository<InformIsRead, Long
     @Query("SELECT MAX(informIsRead.readAt) " +
             "FROM InformIsRead informIsRead " +
             "WHERE informIsRead.fcmToken.token = :fcmToken AND informIsRead.isRead = true")
-    Optional<LocalDateTime> findLastReadTimeByFcmToken(@Param("fcmToken") String fcmToken);
+    String findLastReadTimeByFcmToken(@Param("fcmToken") String fcmToken);
+
+    @Query("SELECT informIsRead FROM InformIsRead informIsRead WHERE informIsRead.fcmToken.token = :fcmToken")
+    List<InformIsRead> findAllByFcmToken(@Param("fcmToken") String token);
 }

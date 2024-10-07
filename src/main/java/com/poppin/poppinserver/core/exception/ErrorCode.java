@@ -23,7 +23,7 @@ public enum ErrorCode {
     EXPIRED_APPLE_IDENTITY_TOKEN_ERROR("40012", HttpStatus.BAD_REQUEST, "만료된 Apple Identity Token입니다."),
     INVALID_APPLE_PUBLIC_KEY_ERROR("40013", HttpStatus.BAD_REQUEST, "유효하지 않은 Apple Public Key입니다."),
     PASSWORD_SAME("40014", HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일합니다."),
-    DUPLICATED_REALTIME_VISIT("40015", HttpStatus.BAD_REQUEST, "30분 이내 방문하기 버튼을 2번 이상 누르실 수 없습니다."),
+    DUPLICATED_REALTIME_VISIT("40015", HttpStatus.BAD_REQUEST, "방문하기 버튼을 2번 이상 누르실 수 없습니다."),
     ALREADY_EXISTS_PREFERENCE("40016", HttpStatus.BAD_REQUEST, "이미 취향 정보가 존재합니다."),
     INVALID_DATE_PARAMETER("40017", HttpStatus.BAD_REQUEST, "종료 날짜가 오픈 날짜보다 빠를 수 없습니다."),
     MAIL_SEND_ERROR("40018", HttpStatus.BAD_REQUEST, "메일 전송에 실패하였습니다."),

@@ -4,7 +4,6 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
@@ -31,12 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
-
-    // 앱 진입 시
-    @PostMapping("/app/start")
-    public ResponseDto<?> appStart(@RequestBody @Valid AppStartRequestDto appStartRequestDto) {
-        return ResponseDto.ok(authService.appStart(appStartRequestDto));
-    }
 
     // 계정 상태 반환 API
     @GetMapping("/account/status")

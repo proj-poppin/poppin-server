@@ -1,7 +1,14 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import com.poppin.poppinserver.alarm.domain.InformAlarm;
+import com.poppin.poppinserver.alarm.domain.InformIsRead;
+import com.poppin.poppinserver.alarm.domain.PopupAlarm;
+import com.poppin.poppinserver.alarm.domain.type.ENotificationCategory;
+import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
+import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -12,6 +19,9 @@ import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.core.util.OAuth2Util;
 import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
+import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
@@ -28,8 +38,10 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
@@ -57,6 +69,8 @@ public class AuthService {
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final FCMTokenService fcmTokenService;
     private final InformIsReadRepository informIsReadRepository;
+    private final PopupAlarmRepository popupAlarmRepository;
+    private final InterestRepository interestRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -133,19 +147,78 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken()).toString();
+                authSignUpRequestDto.fcmToken());
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(authSignUpRequestDto.fcmToken());
+        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(authSignUpRequestDto.fcmToken());
+
+        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                popupAlarm -> NotificationResponseDto.fromProperties(
+                        String.valueOf(popupAlarm.getId()), String.valueOf(newUser.getId()), null,
+                        String.valueOf(ENotificationCategory.POPUP),
+                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                        destinationResponseDto
+                )
+        ).toList();
+
+        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                .map(informIsRead -> {
+                    InformAlarm informAlarm = informIsRead.getInformAlarm();
+                    Boolean isRead = informIsRead.getIsRead();
+
+                    return NotificationResponseDto.fromProperties(
+                            String.valueOf(informAlarm.getId()),
+                            String.valueOf(newUser.getId()),
+                            null,
+                            String.valueOf(ENotificationCategory.NOTICE),
+                            informAlarm.getTitle(),
+                            informAlarm.getBody(),
+                            null,
+                            isRead,
+                            String.valueOf(informAlarm.getCreatedAt()),
+                            null,
+                            String.valueOf(informAlarm.getId()),
+                            destinationResponseDto
+                    );
+                }).toList();
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                popupNotificationResponseDtoList,
+                noticeNotificationResponseDtoList
+        );
+
+        List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
+
+        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                interest -> PopupScrapDto.fromInterest(interest)
+        ).toList();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
 
         return userInfoResponseDto;
@@ -188,19 +261,78 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken()).toString();
+                authSignUpRequestDto.fcmToken());
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(authSignUpRequestDto.fcmToken());
+        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(authSignUpRequestDto.fcmToken());
+
+        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                popupAlarm -> NotificationResponseDto.fromProperties(
+                        String.valueOf(popupAlarm.getId()), String.valueOf(newUser.getId()), null,
+                        String.valueOf(ENotificationCategory.POPUP),
+                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                        destinationResponseDto
+                )
+        ).toList();
+
+        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                .map(informIsRead -> {
+                    InformAlarm informAlarm = informIsRead.getInformAlarm();
+                    Boolean isRead = informIsRead.getIsRead();
+
+                    return NotificationResponseDto.fromProperties(
+                            String.valueOf(informAlarm.getId()),
+                            String.valueOf(newUser.getId()),
+                            null,
+                            String.valueOf(ENotificationCategory.NOTICE),
+                            informAlarm.getTitle(),
+                            informAlarm.getBody(),
+                            null,
+                            isRead,
+                            String.valueOf(informAlarm.getCreatedAt()),
+                            null,
+                            String.valueOf(informAlarm.getId()),
+                            destinationResponseDto
+                    );
+                }).toList();
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                popupNotificationResponseDtoList,
+                noticeNotificationResponseDtoList
+        );
+
+        List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
+
+        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                interest -> PopupScrapDto.fromInterest(interest)
+        ).toList();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
         return userInfoResponseDto;
     }
@@ -301,19 +433,78 @@ public class AuthService {
 
             // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
             String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                    fcmToken).toString();
+                    fcmToken);
 
             UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                     .lastCheck(informLastCheckedTime)
                     .checkedNoticeIds(checkedNoticeIds)
                     .build();
 
+            // TODO: 여기부터 수정 필요
+            DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                    null, null, null, null,
+                    null, null, null, null, null
+            );
+
+            List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(fcmToken);
+            List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(fcmToken);
+
+            List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                    popupAlarm -> NotificationResponseDto.fromProperties(
+                            String.valueOf(popupAlarm.getId()), String.valueOf(user.get().getId()), null,
+                            String.valueOf(ENotificationCategory.POPUP),
+                            popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                            String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                            destinationResponseDto
+                    )
+            ).toList();
+
+            List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                    .map(informIsRead -> {
+                        InformAlarm informAlarm = informIsRead.getInformAlarm();
+                        Boolean isRead = informIsRead.getIsRead();
+
+                        return NotificationResponseDto.fromProperties(
+                                String.valueOf(informAlarm.getId()),
+                                String.valueOf(user.get().getId()),
+                                null,
+                                String.valueOf(ENotificationCategory.NOTICE),
+                                informAlarm.getTitle(),
+                                informAlarm.getBody(),
+                                null,
+                                isRead,
+                                String.valueOf(informAlarm.getCreatedAt()),
+                                null,
+                                String.valueOf(informAlarm.getId()),
+                                destinationResponseDto
+                        );
+                    }).toList();
+
+            UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                    popupNotificationResponseDtoList,
+                    noticeNotificationResponseDtoList
+            );
+
+            List<Interest> userInterestPopupList = interestRepository.findByUserId(user.get().getId());
+
+            List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                    interest -> PopupScrapDto.fromInterest(interest)
+            ).toList();
+
+            UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                    popupScrapDtoList,
+                    userNotificationResponseDto
+            );
+
+            // TODO: 여기까지 수정 필요
+
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                     user.get(),
                     alarmSetting,
                     jwtTokenDto,
                     userPreferenceSettingDto,
-                    userNoticeResponseDto
+                    userNoticeResponseDto,
+                    userActivities
             );
             return userInfoResponseDto;
         } else {
@@ -421,7 +612,7 @@ public class AuthService {
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId());
-        
+
         // 유저가 읽은 공지사항 알람 리스트 조회
         List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
                 fcmToken).stream().map(
@@ -430,19 +621,78 @@ public class AuthService {
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
         String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                fcmToken).toString();
+                fcmToken);
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
                 .lastCheck(informLastCheckedTime)
                 .checkedNoticeIds(checkedNoticeIds)
                 .build();
 
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(fcmToken);
+        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(fcmToken);
+
+        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                popupAlarm -> NotificationResponseDto.fromProperties(
+                        String.valueOf(popupAlarm.getId()), String.valueOf(user.getId()), null,
+                        String.valueOf(ENotificationCategory.POPUP),
+                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                        destinationResponseDto
+                )
+        ).toList();
+
+        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                .map(informIsRead -> {
+                    InformAlarm informAlarm = informIsRead.getInformAlarm();
+                    Boolean isRead = informIsRead.getIsRead();
+
+                    return NotificationResponseDto.fromProperties(
+                            String.valueOf(informAlarm.getId()),
+                            String.valueOf(user.getId()),
+                            null,
+                            String.valueOf(ENotificationCategory.NOTICE),
+                            informAlarm.getTitle(),
+                            informAlarm.getBody(),
+                            null,
+                            isRead,
+                            String.valueOf(informAlarm.getCreatedAt()),
+                            null,
+                            String.valueOf(informAlarm.getId()),
+                            destinationResponseDto
+                    );
+                }).toList();
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                popupNotificationResponseDtoList,
+                noticeNotificationResponseDtoList
+        );
+
+        List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
+
+        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                interest -> PopupScrapDto.fromInterest(interest)
+        ).toList();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        // TODO: 여기까지 수정 필요
+
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
                 jwtTokenDto,
                 userPreferenceSettingDto,
-                userNoticeResponseDto
+                userNoticeResponseDto,
+                userActivities
         );
 
         return userInfoResponseDto;
@@ -458,8 +708,17 @@ public class AuthService {
         user.updatePassword(bCryptPasswordEncoder.encode(passwordResetRequestDto.password()));
     }
 
+    // OS와 앱 버전 확인 메서드
     public Boolean appStart(AppStartRequestDto appStartRequestDto) {
-        return Boolean.TRUE;
+        String platform = appStartRequestDto.os();
+        String appVersion = appStartRequestDto.appVersion();
+        if (platform.equals(Constant.iOS) && appVersion.equals(Constant.iOS_APP_VERSION)) {
+            return Boolean.TRUE;
+        }
+        if (platform.equals(Constant.ANDROID) && appVersion.equals(Constant.ANDROID_APP_VERSION)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     @Transactional(readOnly = true)
