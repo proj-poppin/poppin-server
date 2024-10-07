@@ -7,7 +7,9 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.user.domain.User;
@@ -30,6 +32,8 @@ public class InterestService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
+
     private final FCMTokenService fcmTokenService;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
@@ -64,8 +68,9 @@ public class InterestService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
+        Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
 
-        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt);
+        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
     }
 
     public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) {
@@ -78,7 +83,9 @@ public class InterestService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
-        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt);
+        Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+
+        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
 
         interestRepository.delete(interest);
 

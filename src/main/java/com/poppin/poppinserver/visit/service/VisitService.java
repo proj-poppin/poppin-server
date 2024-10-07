@@ -9,20 +9,17 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
-import com.poppin.poppinserver.visit.dto.visit.response.VisitResponseDto;
-import com.poppin.poppinserver.visit.dto.visit.response.VisitStatusDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -39,6 +36,7 @@ public class VisitService {
     private final FCMTokenRepository fcmTokenRepository;
     private final FCMTokenService fcmTokenService;
     private final VisitorDataService visitorDataService;
+    private final BlockedPopupRepository blockedPopupRepository;
 
 
     /* 실시간 방문자 조회 */
@@ -57,90 +55,63 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    @Transactional
-    public VisitResponseDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
+    public PopupStoreDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
 
-        // 사용자 및 팝업 조회
-        // 사용자 및 팝업 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(visitorsInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        // 30분 전 시간 계산
-        LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minusMinutes(30);
+        /*30분 전 시간*/
+        LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);
 
-        // 중복 방문 검사 (30분 이내 재방문 방지)
-        if (isDuplicateVisit(userId, popup.getId(), thirtyMinutesAgo)) {
-            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT);
+        Integer duplicateVisitors = visitRepository.findDuplicateVisitors(userId, popup.getId(), thirtyMinutesAgo);
+        if (duplicateVisitors > 0) {
+            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
         }
 
-        // 방문 이력 조회 및 처리
-        Optional<Visit> existingVisitOpt = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
-        existingVisitOpt.ifPresentOrElse(
-                visit -> handleExistingVisit(visit),
-                () -> handleNewVisit(user, popup, userId)
-        );
+        Optional<Visit> visit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
 
-        // 방문자 데이터 및 응답 객체 생성
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId());
-        int realTimeVisitors = visitRepository.showRealTimeVisitors(popup, thirtyMinutesAgo)
-                .orElse(0);
+        //재오픈인경우
+        if (visit.isPresent()){
+            visit.get().changeStatus("VISIT_NOW");
+            visitRepository.save(visit.get());
+        }else{
+            //방문하기
+            Visit visitor = Visit.builder()
+                    .user(user)
+                    .popup(popup)
+                    .status("VISIT_COMPLETE")
+                    .build();
 
-        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, Optional.of(realTimeVisitors));
-        VisitStatusDto visitStatusDto = createVisitStatusDto(existingVisitOpt, popup, user);
+            visitRepository.save(visitor);
+            user.addVisitedPopupCnt(); // 방문한 팝업 수 증가
 
-        return VisitResponseDto.fromEntity(popupStoreDto, visitStatusDto);
-    }
+            // fcm 구독
+            Optional<FCMToken> token = fcmTokenRepository.findByUserId(userId);
+            if (token.isEmpty()) {
+                throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
+            }else{
+                String fcmToken = token.get().getToken();
+                fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.HOOGI);
+            }
 
-    private boolean isDuplicateVisit(Long userId, Long popupId, LocalDateTime thirtyMinutesAgo) {
-        return visitRepository.findDuplicateVisitors(userId, popupId, thirtyMinutesAgo) > 0;
-    }
+            Optional<Integer> realTimeVisitorsCount = visitRepository.showRealTimeVisitors(popup,
+                    thirtyMinutesAgo); /*실시간 방문자 수*/
 
-    private void handleExistingVisit(Visit visit) {
-        String status = visit.getStatus();
-        if ("RECEIVE_REOPEN_ALERT".equals(status)) {
-            visit.changeStatus("VISIT_NOW");
-            visitRepository.save(visit);
-            log.info("재오픈 수요 알림 >> visit ID: {}", visit.getId());
-        } else if ("VISIT_COMPLETE".equals(status)) {
-            log.warn("이미 방문완료 상태 >> visit ID: {}", visit.getId());
-            throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT);
-        } else {
-            log.warn("예외 >> visit ID: {}", status, visit.getId());
+            if (realTimeVisitorsCount.isEmpty()) {
+                realTimeVisitorsCount = Optional.of(0);
+            } // empty 면 0으로.
         }
+
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+        Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
+        Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup,visitorDataDto,visitorCnt, isBlocked);
+        return popupStoreDto;
     }
 
-    private void handleNewVisit(User user, Popup popup, Long userId) {
-        // 새로운 방문 처리
-        Visit newVisit = Visit.builder()
-                .user(user)
-                .popup(popup)
-                .status("VISIT_COMPLETE")
-                .build();
-        visitRepository.save(newVisit);
-        user.addVisitedPopupCnt();
-        log.info("새로운 방문 >> 방문 ID: {} , 유저 ID: {}", newVisit.getId(), user.getId());
-
-        // FCM 토큰 조회 및 구독 처리
-        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
-        fcmTokenService.fcmAddPopupTopic(fcmToken.getToken(), popup, EPopupTopic.HOOGI);
-        log.info("FCM topic '{}' added for token: {}", EPopupTopic.HOOGI, fcmToken.getToken());
-    }
-
-    private VisitStatusDto createVisitStatusDto(Optional<Visit> existingVisitOpt, Popup popup, User user) {
-        Long visitId = existingVisitOpt.map(Visit::getId).orElse(null);
-        String status = existingVisitOpt.map(Visit::getStatus).orElse("VISIT_COMPLETE");
-        return VisitStatusDto.fromEntity(
-                visitId,
-                popup.getId(),
-                user.getId(),
-                status,
-                LocalDate.now()
-        );
-    }
-    
     public void changeVisitStatus(Long popupId){
         List<Visit> visitList = visitRepository.findByPopupId(popupId);
         for (Visit v: visitList){

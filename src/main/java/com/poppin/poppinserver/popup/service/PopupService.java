@@ -625,20 +625,21 @@ public class PopupService {
 
         List<Popup> popularTop5Popup = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
                 PageRequest.of(0, 5));
-        List<PopupStoreDto> popularTop5PopupStores = getPopupStoreDtos(popularTop5Popup);
 
         // 새로 오픈 팝업 조회
         List<Popup> newlyOpenedPopup = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
-        List<PopupStoreDto> newlyOpenedPopupStores = getPopupStoreDtos(newlyOpenedPopup);
 
         // 종료 임박 팝업 조회
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
-        List<PopupStoreDto> closingSoonPopupStores = getPopupStoreDtos(popups);
 
         if (userId != null) { // 로그인 요청일 경우
+            List<PopupStoreDto> popularTop5PopupStores = getPopupStoreDtos(popularTop5Popup, userId);
+            List<PopupStoreDto> newlyOpenedPopupStores = getPopupStoreDtos(newlyOpenedPopup, userId);
+            List<PopupStoreDto> closingSoonPopupStores = getPopupStoreDtos(popups, userId);
+
             // 취향 저격 팝업 조회
             List<Popup> recommendPopup = getRecommendPopup(userId);
-            List<PopupStoreDto> recommendedPopupStores = getPopupStoreDtos(recommendPopup);
+            List<PopupStoreDto> recommendedPopupStores = getPopupStoreDtos(recommendPopup,userId);
 
             // 관심 저장 팝업 조회
             User user = userRepository.findById(userId)
@@ -649,7 +650,7 @@ public class PopupService {
                     .map(Interest::getPopup)
                     .toList();
 
-            List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup);
+            List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
             List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
@@ -665,6 +666,10 @@ public class PopupService {
                     .notices(notice)
                     .build();
         } else { // 비로그인 요청일 경우 유저 관련 로직 생략
+            List<PopupStoreDto> popularTop5PopupStores = guestGetPopupStoreDtos(popularTop5Popup);
+            List<PopupStoreDto> newlyOpenedPopupStores = guestGetPopupStoreDtos(newlyOpenedPopup);
+            List<PopupStoreDto> closingSoonPopupStores = guestGetPopupStoreDtos(popups);
+
             return BootstrapDto.builder()
                     .popularTop5PopupStores(popularTop5PopupStores)
                     .newlyOpenedPopupStores(newlyOpenedPopupStores)
@@ -832,10 +837,17 @@ public class PopupService {
         return popups.get(randomIndex);
     } // 취향저격 팝업 조회
 
-    public PopupStoreDto readPopupStore(Long popupId) {
+    public PopupStoreDto readPopupStore(Long popupId, HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-        return getPopupStoreDto(popup);
+
+        if (userId != null) {
+            return getPopupStoreDto(popup, userId);
+        } else {
+            return guestGetPopupStoreDto(popup);
+        }
+
     }
 
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
@@ -915,7 +927,7 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus(), userId); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups, userId);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -931,7 +943,7 @@ public class PopupService {
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBaseByBlackList(searchText,
                 PageRequest.of(page, size), userId); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
+        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups, userId);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -1001,7 +1013,7 @@ public class PopupService {
                 animalPlant, etc,
                 oper.getStatus()); // 운영 상태
 
-        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
+        List<PopupStoreDto> popupStoreDtos = guestGetPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -1016,7 +1028,7 @@ public class PopupService {
 
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceBase(searchText, PageRequest.of(page, size));
 
-        List<PopupStoreDto> popupStoreDtos = getPopupStoreDtos(popups);
+        List<PopupStoreDto> popupStoreDtos = guestGetPopupStoreDtos(popups);
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
@@ -1050,7 +1062,69 @@ public class PopupService {
     }
 
 
-    public List<PopupStoreDto> getPopupStoreDtos(Page<Popup> popups) {
+    public List<PopupStoreDto> getPopupStoreDtos(Page<Popup> popups, Long userId) {
+        // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
+        List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
+        List<Optional<Integer>> visitorCntList = new ArrayList<>();
+        List<Boolean> isBlockedList = new ArrayList<>();
+
+        // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
+        for (Popup popup : popups.getContent()) {
+            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            visitorDataInfoDtos.add(visitorDataDto);
+
+            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            visitorCntList.add(visitorCnt);
+
+            Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+            isBlockedList.add(idBlocked);
+        }
+
+        // PopupStoreDto 리스트를 생성하여 반환
+        return PopupStoreDto.fromEntities(popups.getContent(), visitorDataInfoDtos, visitorCntList, isBlockedList);
+    }
+
+    public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups, Long userId) {
+        if (popups == null || popups.isEmpty()) {
+            return null;
+        }
+        // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
+        List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
+        List<Optional<Integer>> visitorCntList = new ArrayList<>();
+        List<Boolean> isBlockedList = new ArrayList<>();
+
+        // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
+        for (Popup popup : popups) {
+            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            visitorDataInfoDtos.add(visitorDataDto);
+
+            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            visitorCntList.add(visitorCnt);
+
+            Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+            isBlockedList.add(idBlocked);
+        }
+
+        // PopupStoreDto 리스트를 생성하여 반환
+        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList, isBlockedList);
+    }
+
+    public PopupStoreDto getPopupStoreDto(Popup popup, Long userId) {
+        if (popup == null) {
+            return null;
+        }
+
+        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+
+        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+
+        Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+
+        // PopupStoreDto 리스트를 생성하여 반환
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked);
+    }
+
+    public List<PopupStoreDto> guestGetPopupStoreDtos(Page<Popup> popups) {
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
@@ -1068,7 +1142,7 @@ public class PopupService {
         return PopupStoreDto.fromEntities(popups.getContent(), visitorDataInfoDtos, visitorCntList);
     }
 
-    public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups) {
+    public List<PopupStoreDto> guestGetPopupStoreDtos(List<Popup> popups) {
         if (popups == null || popups.isEmpty()) {
             return null;
         }
@@ -1089,7 +1163,7 @@ public class PopupService {
         return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList);
     }
 
-    public PopupStoreDto getPopupStoreDto(Popup popup) {
+    public PopupStoreDto guestGetPopupStoreDto(Popup popup) {
         if (popup == null) {
             return null;
         }
@@ -1099,7 +1173,7 @@ public class PopupService {
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, null);
     }
 
 }

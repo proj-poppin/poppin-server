@@ -12,6 +12,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.visit.service.VisitService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -176,7 +177,7 @@ public class PopupController {
     }
 
     @GetMapping("/detail/{popupId}")
-    public ResponseDto<?> readPopup(@PathVariable Long popupId) {
-        return ResponseDto.ok(popupService.readPopupStore(popupId));
+    public ResponseDto<?> readPopup(@PathVariable Long popupId, HttpServletRequest request) {
+        return ResponseDto.ok(popupService.readPopupStore(popupId, request));
     }
 }
