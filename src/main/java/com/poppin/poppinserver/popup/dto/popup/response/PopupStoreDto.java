@@ -50,6 +50,7 @@ public record PopupStoreDto(
         List<String> imageUrls = popup.getPosterImages()
                 .stream()
                 .map(PosterImage::getPosterUrl)
+                .sorted()
                 .toList();
 
         return PopupStoreDto.builder()
@@ -101,7 +102,7 @@ public record PopupStoreDto(
         List<PopupStoreDto> popupDtos = new ArrayList<>();
 
         for (int i = 0; i < popups.size(); i++) {
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), null));
+            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), false));
         }
 
         return popupDtos;
