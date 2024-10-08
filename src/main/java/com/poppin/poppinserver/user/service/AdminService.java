@@ -42,7 +42,7 @@ import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.faq.request.FaqRequestDto;
-import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;
@@ -89,12 +89,12 @@ public class AdminService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
 
-    public List<FaqResponseDto> readFAQs() {
+    public List<AdminFaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
-        List<FaqResponseDto> faqDtoList = new ArrayList<>();
+        List<AdminFaqResponseDto> faqDtoList = new ArrayList<>();
         for (FreqQuestion freqQuestion : freqQuestionList) {
-            faqDtoList.add(FaqResponseDto.builder()
-                    .id(freqQuestion.getId())
+            faqDtoList.add(AdminFaqResponseDto.builder()
+                    .faqId(freqQuestion.getId())
                     .question(freqQuestion.getQuestion())
                     .answer(freqQuestion.getAnswer())
                     .createdAt(freqQuestion.getCreatedAt().toString())
@@ -103,7 +103,7 @@ public class AdminService {
         return faqDtoList;
     }
 
-    public FaqResponseDto createFAQ(Long adminId, FaqRequestDto faqRequestDto) {
+    public AdminFaqResponseDto createFAQ(Long adminId, FaqRequestDto faqRequestDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         FreqQuestion freqQuestion = FreqQuestion.builder()
@@ -113,8 +113,8 @@ public class AdminService {
                 .createdAt(LocalDateTime.now())
                 .build();
         freqQuestionRepository.save(freqQuestion);
-        return FaqResponseDto.builder()
-                .id(freqQuestion.getId())
+        return AdminFaqResponseDto.builder()
+                .faqId(freqQuestion.getId())
                 .question(freqQuestion.getQuestion())
                 .answer(freqQuestion.getAnswer())
                 .createdAt(freqQuestion.getCreatedAt().toString())
@@ -201,27 +201,24 @@ public class AdminService {
             reviewPage = reviewRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);   // 모든 후기
         }
 
-        List<UserReviewDto> userReviewDtos = reviewPage.getContent().stream()
+        List<UserReviewDto> userReviewDtoList = reviewPage.getContent().stream()
                 .map(userReview -> {
                     List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(userReview.getId());
                     Optional<Visit> visitDate = visitRepository.findByUserId(userId, userReview.getPopup().getId());
 
-                    UserReviewDto userReviewDto = UserReviewDto.builder()
-                            .reviewId(userReview.getId())
-                            .popupName(userReview.getPopup().getName())
-                            .createdAt(userReview.getCreatedAt().toString())
-                            .content(userReview.getText())
-                            .visible(userReview.getIsVisible())
-                            .imageUrl(reviewImageListUrl)
-                            .visitedAt(visitDate.isPresent() ? visitDate.get().getCreatedAt().toString() : "")
-                            .build();
+                    UserReviewDto userReviewDto = UserReviewDto.of(userReview.getId(), userReview.getPopup().getName(),
+                            visitDate.isPresent() ?
+                                    visitDate.get().getCreatedAt().toString() : "",
+                            userReview.getCreatedAt().toString(),
+                            userReview.getText(), reviewImageListUrl, userReview.getIsVisible());
+
                     return userReviewDto;
                 })
                 .collect(Collectors.toList());
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(reviewPage);
 
-        return PagingResponseDto.fromEntityAndPageInfo(userReviewDtos, pageInfoDto);
+        return PagingResponseDto.fromEntityAndPageInfo(userReviewDtoList, pageInfoDto);
     }
 
     public UserListDto searchUsers(String text) {

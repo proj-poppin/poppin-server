@@ -2,27 +2,32 @@ package com.poppin.poppinserver.inform.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
-import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInfromDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.inform.service.ManagerInformService;
 import com.poppin.poppinserver.core.type.EAvailableAge;
 import com.poppin.poppinserver.core.type.EInformProgress;
+import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
+import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
+import com.poppin.poppinserver.inform.service.ManagerInformService;
+import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -150,28 +155,28 @@ public class ManagerInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                            @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                            @RequestPart(value = "contents") @Valid UpdateManagerInformDto updateManagerInformDto,
                                             @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(managerInformService.updateManageInform(updateManagerInfromDto, images, adminId));
+        return ResponseDto.ok(managerInformService.updateManageInform(updateManagerInformDto, images, adminId));
     }
 
     //운영자 제보 업로드
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                              @RequestPart(value = "contents") @Valid UpdateManagerInfromDto updateManagerInfromDto,
+                                              @RequestPart(value = "contents") @Valid UpdateManagerInformDto updateManagerInformDto,
                                               @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInfromDto, images, adminId));
+        return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInformDto, images, adminId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -179,6 +184,6 @@ public class ManagerInformController {
     public ResponseDto<?> readManagerInformList(@RequestParam(value = "page") int page,
                                                 @RequestParam(value = "size") int size,
                                                 @RequestParam(value = "prog") EInformProgress progress) {
-        return ResponseDto.ok(managerInformService.reatManagerInformList(page, size, progress));
+        return ResponseDto.ok(managerInformService.readManagerInformList(page, size, progress));
     }
 }
