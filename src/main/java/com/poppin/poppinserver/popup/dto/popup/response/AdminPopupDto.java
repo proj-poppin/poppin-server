@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Builder
-public record PopupDto(
-        String id,
+public record AdminPopupDto(
+        Long id,
         String posterUrl,
         String homepageLink,
         String name,
@@ -39,7 +39,7 @@ public record PopupDto(
         List<String> posterList,
         List<String> keywordList
 ) {
-    public static PopupDto fromEntity(Popup popup) {
+    public static AdminPopupDto fromEntity(Popup popup) {
 
         // 각 nullable 부분들에 대해 예외처리
 
@@ -94,10 +94,8 @@ public record PopupDto(
             entranceFee = "0";
         }
 
-        String popupId = String.valueOf(popup.getId());
-
-        return PopupDto.builder()
-                .id(popupId)
+        return AdminPopupDto.builder()
+                .id(popup.getId())
                 .posterUrl(popup.getPosterUrl())
                 .homepageLink(popup.getHomepageLink())
                 .name(popup.getName())

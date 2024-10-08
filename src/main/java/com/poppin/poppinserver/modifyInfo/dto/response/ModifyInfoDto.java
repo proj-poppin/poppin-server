@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.modifyInfo.dto.response;
 
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
+import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
 import lombok.Builder;
 
