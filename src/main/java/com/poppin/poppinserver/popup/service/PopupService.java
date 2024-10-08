@@ -1179,7 +1179,7 @@ public class PopupService {
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, null);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false);
     }
 
 }
