@@ -10,10 +10,10 @@ import java.util.List;
 @Builder
 public record ReviewFinishDto(
         @NotNull
-        Long reviewId,    /*리뷰 id*/
+        String reviewId,    /*리뷰 id*/
 
         @NotNull
-        Long popupId,     /*팝업 id*/
+        String popupId,     /*팝업 id*/
 
         @NotNull
         String name, /*팝업 메인 글*/
@@ -31,8 +31,8 @@ public record ReviewFinishDto(
     public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
                                              LocalDateTime createdAt, List<String> imageList) {
         return ReviewFinishDto.builder()
-                .reviewId(reviewId)
-                .popupId(popupId)
+                .reviewId(String.valueOf(reviewId))
+                .popupId(String.valueOf(popupId))
                 .name(name)
                 .isCertificated(isCertificated)
                 .createdAt(createdAt)

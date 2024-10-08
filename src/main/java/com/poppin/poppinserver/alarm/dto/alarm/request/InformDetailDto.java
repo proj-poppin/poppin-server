@@ -3,6 +3,6 @@ package com.poppin.poppinserver.alarm.dto.alarm.request;
 public record InformDetailDto(
 
         String fcmToken,
-        Long informId
+        String informId
 ) {
 }

@@ -282,7 +282,7 @@ public class PopupService {
             }
         }
 
-        log.info("delete reveiw data");
+        log.info("delete review data");
 
         reviewRecommendRepository.deleteAllByReviewPopup(popup);
 
@@ -653,7 +653,7 @@ public class PopupService {
             List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
-            List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
+            List<InformAlarm> informAlarms = alarmService.getInformAlarms(Long.valueOf(userId));
 
             List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
 
@@ -1038,7 +1038,7 @@ public class PopupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(pushRequestDto.popupId())
+        Popup popup = popupRepository.findById(Long.valueOf(pushRequestDto.popupId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());

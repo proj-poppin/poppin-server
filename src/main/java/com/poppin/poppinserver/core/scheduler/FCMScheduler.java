@@ -202,17 +202,17 @@ public class FCMScheduler {
                                         info.equals(EPushInfo.REOPEN) ||
                                         info.equals(EPushInfo.KEYWORD)
                         ) {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(),
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(), info.getTitle(),
                                     "[" + popup.getName() + "] " + info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         } else if (
                                 info.equals(EPushInfo.OPEN)
                         ) {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(),
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(),
                                     "[" + popup.getName() + "] " + info.getTitle(), info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         } else {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(popupId, token.getToken(), info.getTitle(),
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(), info.getTitle(),
                                     info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         }

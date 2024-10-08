@@ -2,15 +2,16 @@ package com.poppin.poppinserver.review.dto.response;
 
 import com.poppin.poppinserver.review.domain.Review;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 
 @Builder
 public record ReviewInfoDto(
 
         @NotNull
-        Long reviewId,
+        String reviewId,
 
         @NotNull
         String nickname,
@@ -34,7 +35,7 @@ public record ReviewInfoDto(
         int recommendCnt,
 
         @NotNull
-        Long userId
+        String userId
 ) {
     public static List<ReviewInfoDto> fromEntityList(List<Review> reviews, List<List<String>> imageUrls,
                                                      List<String> profileUrls, List<Integer> reviewCnt) {
@@ -42,8 +43,8 @@ public record ReviewInfoDto(
 
         for (int i = 0; i < reviews.size(); i++) {
             ReviewInfoDto reviewInfoDto = ReviewInfoDto.builder()
-                    .reviewId(reviews.get(i).getId())
-                    .userId(reviews.get(i).getUser().getId())
+                    .reviewId(String.valueOf(reviews.get(i).getId()))
+                    .userId(String.valueOf(reviews.get(i).getUser().getId()))
                     .nickname(reviews.get(i).getNickname())
                     .reviewCnt(reviewCnt.get(i))
                     .text(reviews.get(i).getText())

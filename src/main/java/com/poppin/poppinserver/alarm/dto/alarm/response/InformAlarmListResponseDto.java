@@ -8,7 +8,7 @@ import java.time.LocalDate;
 // 1 depth
 @Builder
 public record InformAlarmListResponseDto(
-        Long id, // 공지사항 id
+        String id, // 공지사항 id
         String title,
         String body,
         LocalDate createdAt,
@@ -19,7 +19,7 @@ public record InformAlarmListResponseDto(
     public static InformAlarmListResponseDto fromEntity(InformAlarm alarm, Boolean isRead) {
 
         return InformAlarmListResponseDto.builder()
-                .id(alarm.getId())
+                .id(String.valueOf(alarm.getId()))
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())

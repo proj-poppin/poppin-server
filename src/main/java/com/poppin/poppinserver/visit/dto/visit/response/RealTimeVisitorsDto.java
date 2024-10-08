@@ -9,17 +9,17 @@ import java.util.Optional;
 @Builder
 public record RealTimeVisitorsDto(
         @NotNull
-        Long userId,
+        String userId,
 
         @NotNull
-        Long popupId,
+        String popupId,
 
         Optional<Integer> visitorsCnt
 ) {
     public static RealTimeVisitorsDto fromEntity(Visit visit, Optional<Integer> realTimeVisitors) {
         return RealTimeVisitorsDto.builder()
-                .userId(visit.getUser().getId())
-                .popupId(visit.getPopup().getId())
+                .userId(String.valueOf(visit.getUser().getId()))
+                .popupId(String.valueOf(visit.getPopup().getId()))
                 .visitorsCnt(realTimeVisitors)
                 .build();
     }

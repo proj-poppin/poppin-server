@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Builder
 public record NoticeDto(
-        Long id,
+        String id,
         String title,
         Optional<String> content,
         String createdAt,
@@ -21,7 +21,7 @@ public record NoticeDto(
         imageUrls.add(informAlarm.getInformAlarmImage().getPosterUrl());
 
         return NoticeDto.builder()
-                .id(informAlarm.getId())
+                .id(String.valueOf(informAlarm.getId()))
                 .title(informAlarm.getTitle())
                 .content(Optional.ofNullable(informAlarm.getBody()))
                 .createdAt(informAlarm.getCreatedAt().toString())

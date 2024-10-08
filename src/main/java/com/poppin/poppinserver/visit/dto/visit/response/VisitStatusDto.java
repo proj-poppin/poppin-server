@@ -6,9 +6,9 @@ import java.time.LocalDate;
 
 @Builder
 public record VisitStatusDto(
-        Long id,
-        Long popupId,
-        Long userId,
+        String id,
+        String popupId,
+        String userId,
         String status,
         String createdAt
 ) {
@@ -21,9 +21,9 @@ public record VisitStatusDto(
 
     ){
         return VisitStatusDto.builder()
-                .id(id)
-                .popupId(popupId)
-                .userId(userId)
+                .id(String.valueOf(id))
+                .popupId(String.valueOf(popupId))
+                .userId(String.valueOf(userId))
                 .status(status)
                 .createdAt(createdAt.toString())
                 .build();
