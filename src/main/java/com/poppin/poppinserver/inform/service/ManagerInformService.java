@@ -4,42 +4,41 @@ import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EInformProgress;
+import com.poppin.poppinserver.core.type.EOperationStatus;
+import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
-import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInfromDto;
+import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
+import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
+import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
-import com.poppin.poppinserver.core.type.EInformProgress;
-import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -232,16 +231,17 @@ public class ManagerInformService {
     } // 운영자 제보 조회
 
     @Transactional
-    public ManagerInformDto updateManageInform(UpdateManagerInfromDto updateManagerInfromDto,
+    public ManagerInformDto updateManageInform(UpdateManagerInformDto updateManagerInformDto,
                                                List<MultipartFile> images,
                                                Long adminId) {
-        ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
+        ManagerInform managerInform = managerInformRepository.findById(
+                        Long.valueOf(updateManagerInformDto.managerInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
+        CreateTasteDto createTasteDto = updateManagerInformDto.taste();
         TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
@@ -259,7 +259,7 @@ public class ManagerInformService {
                 createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
+        CreatePreferedDto createPreferedDto = updateManagerInformDto.prefered();
         PreferedPopup preferedPopup = managerInform.getPopupId().getPreferedPopup();
         preferedPopup.update(createPreferedDto.market(),
                 createPreferedDto.display(),
@@ -297,7 +297,7 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for (String keyword : updateManagerInfromDto.keywords()) {
+        for (String keyword : updateManagerInformDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -306,23 +306,23 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         popup.update(
-                updateManagerInfromDto.homepageLink(),
-                updateManagerInfromDto.name(),
-                updateManagerInfromDto.introduce(),
-                updateManagerInfromDto.address(),
-                updateManagerInfromDto.addressDetail(),
-                updateManagerInfromDto.entranceRequired(),
-                updateManagerInfromDto.entranceFee(),
-                updateManagerInfromDto.resvRequired(),
-                updateManagerInfromDto.availableAge(),
-                updateManagerInfromDto.parkingAvailable(),
-                updateManagerInfromDto.openDate(),
-                updateManagerInfromDto.closeDate(),
-                updateManagerInfromDto.openTime(),
-                updateManagerInfromDto.closeTime(),
-                updateManagerInfromDto.latitude(),
-                updateManagerInfromDto.longitude(),
-                updateManagerInfromDto.operationExcept(),
+                updateManagerInformDto.homepageLink(),
+                updateManagerInformDto.name(),
+                updateManagerInformDto.introduce(),
+                updateManagerInformDto.address(),
+                updateManagerInformDto.addressDetail(),
+                updateManagerInformDto.entranceRequired(),
+                updateManagerInformDto.entranceFee(),
+                updateManagerInformDto.resvRequired(),
+                updateManagerInformDto.availableAge(),
+                updateManagerInformDto.parkingAvailable(),
+                updateManagerInformDto.openDate(),
+                updateManagerInformDto.closeDate(),
+                updateManagerInformDto.openTime(),
+                updateManagerInformDto.closeTime(),
+                updateManagerInformDto.latitude(),
+                updateManagerInformDto.longitude(),
+                updateManagerInformDto.operationExcept(),
                 EOperationStatus.EXECUTING.getStatus(),
                 admin
         );
@@ -331,8 +331,8 @@ public class ManagerInformService {
 
         managerInform.update(
                 EInformProgress.EXECUTING,
-                updateManagerInfromDto.affiliation(),
-                updateManagerInfromDto.informerEmail()
+                updateManagerInformDto.affiliation(),
+                updateManagerInformDto.informerEmail()
         );
         managerInform = managerInformRepository.save(managerInform);
         log.info(managerInform.getProgress().toString());
@@ -341,16 +341,17 @@ public class ManagerInformService {
     } // 운영자 제보 임시저장
 
     @Transactional
-    public ManagerInformDto uploadPopup(UpdateManagerInfromDto updateManagerInfromDto,
+    public ManagerInformDto uploadPopup(UpdateManagerInformDto updateManagerInformDto,
                                         List<MultipartFile> images,
                                         Long adminId) {
-        ManagerInform managerInform = managerInformRepository.findById(updateManagerInfromDto.managerInformId())
+        ManagerInform managerInform = managerInformRepository.findById(
+                        Long.valueOf(updateManagerInformDto.managerInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        CreateTasteDto createTasteDto = updateManagerInfromDto.taste();
+        CreateTasteDto createTasteDto = updateManagerInformDto.taste();
         TastePopup tastePopup = managerInform.getPopupId().getTastePopup();
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
@@ -368,7 +369,7 @@ public class ManagerInformService {
                 createTasteDto.etc());
         tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = updateManagerInfromDto.prefered();
+        CreatePreferedDto createPreferedDto = updateManagerInformDto.prefered();
         PreferedPopup preferedPopup = managerInform.getPopupId().getPreferedPopup();
         preferedPopup.update(createPreferedDto.market(),
                 createPreferedDto.display(),
@@ -406,7 +407,7 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
 
         List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for (String keyword : updateManagerInfromDto.keywords()) {
+        for (String keyword : updateManagerInformDto.keywords()) {
             popupAlarmKeywords.add(PopupAlarmKeyword.builder()
                     .popupId(popup)
                     .keyword(keyword)
@@ -415,53 +416,53 @@ public class ManagerInformService {
         popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
         //날짜 요청 유효성 검증
-        if (updateManagerInfromDto.openDate().isAfter(updateManagerInfromDto.closeDate())) {
+        if (updateManagerInformDto.openDate().isAfter(updateManagerInformDto.closeDate())) {
             throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
         }
 
         //현재 운영상태 정의
         String operationStatus;
-        if (updateManagerInfromDto.openDate().isAfter(LocalDate.now())) {
-            Period period = Period.between(LocalDate.now(), updateManagerInfromDto.openDate());
+        if (updateManagerInformDto.openDate().isAfter(LocalDate.now())) {
+            Period period = Period.between(LocalDate.now(), updateManagerInformDto.openDate());
             operationStatus = EOperationStatus.NOTYET.getStatus();
-        } else if (updateManagerInfromDto.closeDate().isBefore(LocalDate.now())) {
+        } else if (updateManagerInformDto.closeDate().isBefore(LocalDate.now())) {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
         } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
         }
 
         // 입장료 유무 false일 경우, 입장료 무료
-        String entranceFee = updateManagerInfromDto.entranceFee();
-        if (!updateManagerInfromDto.entranceRequired()) {
+        String entranceFee = updateManagerInformDto.entranceFee();
+        if (!updateManagerInformDto.entranceRequired()) {
             entranceFee = "무료";
         }
 
         popup.update(
-                updateManagerInfromDto.homepageLink(),
-                updateManagerInfromDto.name(),
-                updateManagerInfromDto.introduce(),
-                updateManagerInfromDto.address(),
-                updateManagerInfromDto.addressDetail(),
-                updateManagerInfromDto.entranceRequired(),
+                updateManagerInformDto.homepageLink(),
+                updateManagerInformDto.name(),
+                updateManagerInformDto.introduce(),
+                updateManagerInformDto.address(),
+                updateManagerInformDto.addressDetail(),
+                updateManagerInformDto.entranceRequired(),
                 entranceFee,
-                updateManagerInfromDto.resvRequired(),
-                updateManagerInfromDto.availableAge(),
-                updateManagerInfromDto.parkingAvailable(),
-                updateManagerInfromDto.openDate(),
-                updateManagerInfromDto.closeDate(),
-                updateManagerInfromDto.openTime(),
-                updateManagerInfromDto.closeTime(),
-                updateManagerInfromDto.latitude(),
-                updateManagerInfromDto.longitude(),
-                updateManagerInfromDto.operationExcept(),
+                updateManagerInformDto.resvRequired(),
+                updateManagerInformDto.availableAge(),
+                updateManagerInformDto.parkingAvailable(),
+                updateManagerInformDto.openDate(),
+                updateManagerInformDto.closeDate(),
+                updateManagerInformDto.openTime(),
+                updateManagerInformDto.closeTime(),
+                updateManagerInformDto.latitude(),
+                updateManagerInformDto.longitude(),
+                updateManagerInformDto.operationExcept(),
                 operationStatus,
                 admin
         );
 
         managerInform.update(
                 EInformProgress.EXECUTED,
-                updateManagerInfromDto.affiliation(),
-                updateManagerInfromDto.informerEmail()
+                updateManagerInformDto.affiliation(),
+                updateManagerInformDto.informerEmail()
         );
         managerInform = managerInformRepository.save(managerInform);
 
@@ -469,7 +470,7 @@ public class ManagerInformService {
     } // 운영자 제보 업로드 승인
 
     @Transactional
-    public PagingResponseDto reatManagerInformList(int page, int size, EInformProgress progress) {
+    public PagingResponseDto readManagerInformList(int page, int size, EInformProgress progress) {
         Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page, size),
                 progress);
 

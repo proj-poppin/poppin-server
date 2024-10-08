@@ -1,14 +1,16 @@
-package com.poppin.poppinserver.inform.dto.userInform.request;
+package com.poppin.poppinserver.inform.dto.managerInform.request;
 
+import com.poppin.poppinserver.core.type.EAvailableAge;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.core.type.EAvailableAge;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-public record UpdateUserInfromDto(
-        Long userInformId,
+public record UpdateManagerInformDto(
+        String affiliation,
+        String informerEmail,
+        String managerInformId,
         String homepageLink,
         String name,
         String introduce,
@@ -23,9 +25,7 @@ public record UpdateUserInfromDto(
         LocalDate closeDate,
         LocalTime openTime,
         LocalTime closeTime,
-
         Double latitude,
-
         Double longitude,
         String operationExcept,
         CreatePreferedDto prefered,

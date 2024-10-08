@@ -2,20 +2,25 @@ package com.poppin.poppinserver.inform.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInfromDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.inform.service.UserInformService;
 import com.poppin.poppinserver.core.type.EInformProgress;
+import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
+import com.poppin.poppinserver.inform.service.UserInformService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -95,27 +100,27 @@ public class UserInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> saveUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                         @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
+                                         @RequestPart(value = "contents") @Valid UpdateUserInformDto updateUserInformDto,
                                          @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.updateUserInform(updateUserInfromDto, images, adminId));
+        return ResponseDto.ok(userInformService.updateUserInform(updateUserInformDto, images, adminId));
     } // 제보 임시 저장
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> uploadUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestPart(value = "contents") @Valid UpdateUserInfromDto updateUserInfromDto,
+                                           @RequestPart(value = "contents") @Valid UpdateUserInformDto updateUserInformDto,
                                            @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.uploadPopup(updateUserInfromDto, images, adminId));
+        return ResponseDto.ok(userInformService.uploadPopup(updateUserInformDto, images, adminId));
     } // 제보 업로드 승인
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -124,6 +129,6 @@ public class UserInformController {
                                              @RequestParam(value = "size") int size,
                                              @RequestParam(value = "prog") EInformProgress progress,
                                              @UserId Long adminId) {
-        return ResponseDto.ok(userInformService.reatUserInformList(page, size, progress));
+        return ResponseDto.ok(userInformService.readUserInformList(page, size, progress));
     } // 제보 목록 조회
 }
