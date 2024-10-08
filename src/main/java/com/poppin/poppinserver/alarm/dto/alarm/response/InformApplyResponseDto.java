@@ -11,7 +11,7 @@ public record InformApplyResponseDto(
 
         String title,
         String body,
-        Long informId, // 공지사항 id
+        String informId, // 공지사항 id
         LocalDate createdAt,
         String iconUrl,
         List<String> posterUrl
@@ -20,7 +20,7 @@ public record InformApplyResponseDto(
         return InformApplyResponseDto.builder()
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
-                .informId(alarm.getId()) // 공지사항 id
+                .informId(String.valueOf(alarm.getId())) // 공지사항 id
                 .createdAt(alarm.getCreatedAt())
                 .iconUrl(alarm.getIcon())
                 .posterUrl(posterUrl)

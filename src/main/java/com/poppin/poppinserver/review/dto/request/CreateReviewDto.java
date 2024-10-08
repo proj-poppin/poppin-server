@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 public record CreateReviewDto(
 
         @NotNull
-        Long popupId,
+        String popupId,
         @NotNull
         String nickname,
         @NotNull

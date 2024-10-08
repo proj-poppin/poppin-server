@@ -8,8 +8,8 @@ import java.time.LocalDate;
 
 @Builder
 public record PopupAlarmResponseDto(
-        Long alarmId,
-        Long id, // popup id
+        String alarmId,
+        String id, // popup id
         String title,
         String body,
         LocalDate createdAt,
@@ -19,8 +19,8 @@ public record PopupAlarmResponseDto(
     public static PopupAlarmResponseDto fromEntity(PopupAlarm alarm) {
 
         return PopupAlarmResponseDto.builder()
-                .alarmId(alarm.getId())
-                .id(alarm.getPopupId().getId())
+                .alarmId(String.valueOf(alarm.getId()))
+                .id(String.valueOf(alarm.getPopupId().getId()))
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .createdAt(alarm.getCreatedAt())

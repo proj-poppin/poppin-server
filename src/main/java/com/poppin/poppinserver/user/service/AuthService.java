@@ -606,7 +606,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
+        fcmTokenService.verifyFCMToken(Long.valueOf(user.getId()), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);

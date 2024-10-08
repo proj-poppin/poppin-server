@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Builder
 public record AlarmKeywordResponseDto(
-        Long keywordId,
+        String keywordId,
         String keyword,
         boolean isOn
 ) {
@@ -18,7 +18,7 @@ public record AlarmKeywordResponseDto(
 
         for (UserAlarmKeyword userAlarmKeyword : userAlarmKeywords) {
             AlarmKeywordResponseDto alarmKeywordResponseDto = AlarmKeywordResponseDto.builder()
-                    .keywordId(userAlarmKeyword.getId())
+                    .keywordId(String.valueOf(userAlarmKeyword.getId()))
                     .keyword(userAlarmKeyword.getKeyword())
                     .isOn(userAlarmKeyword.getIsOn())
                     .build();

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 // 2 depth
 @Builder
 public record InformAlarmResponseDto(
-        Long id,
+        String id,
         String title,
         String body,
         String posterUrl, // 알림 포스터
@@ -22,7 +22,7 @@ public record InformAlarmResponseDto(
             LocalDate createdAt
     ) {
         return InformAlarmResponseDto.builder().
-                id(id)
+                id(String.valueOf(id))
                 .title(title)
                 .body(body)
                 .posterUrl(posterUrl)

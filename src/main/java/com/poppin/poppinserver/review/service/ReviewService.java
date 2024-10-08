@@ -58,7 +58,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewDto writeReview(Long userId, Long popupId, String text, String visitDate,
-                                 String satisfaction, String congestion, String nickname,
+                                 String satisfaction, String congestion,
                                  List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
@@ -126,7 +126,10 @@ public class ReviewService {
 
 
     /*후기 추천 증가*/
-    public String recommendReview(Long userId, Long reviewId, Long popupId) {
+    public String recommendReview(Long userId, String StrReviewId, String StrPopupId) {
+
+        Long reviewId = Long.valueOf(StrReviewId);
+        Long popupId = Long.valueOf(StrPopupId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));

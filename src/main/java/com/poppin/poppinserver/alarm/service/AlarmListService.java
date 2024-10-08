@@ -136,7 +136,7 @@ public class AlarmListService {
     public InformAlarmResponseDto readInformDetail(InformDetailDto requestDto) {
 
         String fcmToken = requestDto.fcmToken();
-        Long informId = requestDto.informId();
+        Long informId = Long.valueOf(requestDto.informId());
 
         log.info("dto : {}", requestDto);
         log.info("fcmToken : {}", fcmToken);
@@ -162,7 +162,7 @@ public class AlarmListService {
         // InformAlarmResponseDto 객체 만들기
         else {
             InformAlarmResponseDto informAlarmResponseDto = InformAlarmResponseDto.builder()
-                    .id(informAlarm.getId())
+                    .id(String.valueOf(informAlarm.getId()))
                     .title(informAlarm.getTitle())
                     .body(informAlarm.getBody())
                     .posterUrl(img.get().getPosterUrl())

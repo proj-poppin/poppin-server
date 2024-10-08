@@ -7,6 +7,6 @@ public record ApplyTokenRequestDto(
         String fcmToken,
 
         @NotNull
-        Long userId
+        String userId
 ) {
 }

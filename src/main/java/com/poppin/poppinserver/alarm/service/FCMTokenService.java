@@ -78,7 +78,7 @@ public class FCMTokenService {
     public void verifyFCMToken(Long userId, String fcmToken) {
         log.info("verify token : {}", fcmToken);
 
-        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);
+        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(Long.valueOf(userId));
         if (!fcmTokenOptional.isEmpty()) {
             String currentToken = fcmTokenOptional.get().getToken();
             if (!currentToken.equals(fcmToken)) {

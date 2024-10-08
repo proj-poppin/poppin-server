@@ -10,9 +10,9 @@ import java.util.List;
 @Builder
 public record PopupReviewDto(
         String profileUrl,
-        Long reviewId,
+        String reviewId,
         String nickname,
-        Long userId,
+        String userId,
         String text,
         List<String> imageUrls,
         boolean isCertificated,
@@ -25,9 +25,9 @@ public record PopupReviewDto(
                 .toList();
         return PopupReviewDto.builder()
                 .profileUrl(review.getImageUrl())
-                .reviewId(review.getId())
+                .reviewId(String.valueOf(review.getId()))
                 .nickname(review.getNickname())
-                .userId(review.getUser().getId())
+                .userId(String.valueOf(review.getUser().getId()))
                 .text(review.getText())
                 .imageUrls(imageUrls)
                 .isCertificated(review.getIsCertificated())

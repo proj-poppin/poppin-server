@@ -8,7 +8,7 @@ import lombok.Builder;
 public record FCMRequestDto(
 
         @NotNull
-        Long popupId,
+        String popupId,
 
         @NotNull
         String token,
@@ -25,7 +25,7 @@ public record FCMRequestDto(
 ) {
     public static FCMRequestDto fromEntity(Long popupId, String token, String title, String body, EPopupTopic topic) {
         return FCMRequestDto.builder()
-                .popupId(popupId)
+                .popupId(String.valueOf(popupId))
                 .token(token)
                 .title(title)
                 .body(body)

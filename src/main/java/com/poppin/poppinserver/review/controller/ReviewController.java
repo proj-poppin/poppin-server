@@ -47,16 +47,15 @@ public class ReviewController {
             @RequestParam("visitDate") String visitDate,
             @RequestParam("satisfaction") String satisfaction,
             @RequestParam("congestion") String congestion,
-            @RequestParam("nickname") String nickname,
             @RequestPart(value = "images") List<MultipartFile> images) {
 
-        return ResponseDto.ok(reviewService.writeReview(userId, popupId, text, visitDate, satisfaction, congestion, nickname, images));
+        return ResponseDto.ok(reviewService.writeReview(userId, popupId, text, visitDate, satisfaction, congestion, images));
     }
 
     @PostMapping("/add-recommend") // 후기 추천
     public ResponseDto<?> recommendReview(@UserId Long userId,
-                                          @RequestParam("reviewId") Long reviewId,
-                                          @RequestParam("popupId") Long popupId
+                                          @RequestParam("reviewId") String reviewId,
+                                          @RequestParam("popupId") String popupId
     ) {
         return ResponseDto.ok(reviewService.recommendReview(userId, reviewId, popupId));
     }

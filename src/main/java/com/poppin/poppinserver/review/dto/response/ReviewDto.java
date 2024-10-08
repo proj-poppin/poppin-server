@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ReviewDto(
-        Long id,
+        String id,
         String text,
         String congestion,
         String satisfaction,
@@ -21,7 +21,7 @@ public record ReviewDto(
     public static ReviewDto fromEntity(Review review, VisitorData visitorData) {
         VisitorData vd = visitorData;
         return ReviewDto.builder()
-                .id(review.getId())
+                .id(String.valueOf(review.getId()))
                 .text(review.getText())
                 .congestion(vd.getCongestion())
                 .satisfaction(vd.getSatisfaction())

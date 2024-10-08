@@ -33,7 +33,7 @@ public class ReportService {
     public void createReviewReport(Long userId, CreateReviewReportDto createReviewReportDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Review review = reviewRepository.findById(createReviewReportDto.reviewId())
+        Review review = reviewRepository.findById(Long.valueOf(createReviewReportDto.reviewId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
         ReportReview reportReview = ReportReview.builder()
                 .reporterId(user)
@@ -48,7 +48,7 @@ public class ReportService {
     public void createPopupReport(Long userId, CreatePopupReportDto createPopupReportDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(createPopupReportDto.popupId())
+        Popup popup = popupRepository.findById(Long.valueOf(createPopupReportDto.popupId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
         ReportPopup reportPopup = ReportPopup.builder()
                 .reporterId(user)

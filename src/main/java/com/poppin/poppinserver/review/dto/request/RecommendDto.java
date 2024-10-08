@@ -4,8 +4,8 @@ public record RecommendDto(
 
         String fcmToken,
 
-        Long reviewId,
+        String reviewId,
 
-        Long popupId
+        String popupId
 ) {
 }

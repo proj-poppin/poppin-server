@@ -282,7 +282,7 @@ public class PopupService {
             }
         }
 
-        log.info("delete reveiw data");
+        log.info("delete review data");
 
         reviewRecommendRepository.deleteAllByReviewPopup(popup);
 
@@ -655,7 +655,7 @@ public class PopupService {
             List<PopupStoreDto> interestedPopupStores = getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
-            List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
+            List<InformAlarm> informAlarms = alarmService.getInformAlarms(Long.valueOf(userId));
 
             List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
 

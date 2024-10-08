@@ -120,7 +120,7 @@ public class AlarmService {
     }
 
     public List<InformAlarm> getInformAlarms(Long userId) {
-        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
+        FCMToken fcmToken = fcmTokenRepository.findByUserId(Long.valueOf(userId))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_FCM_TOKEN));
 
         List<InformAlarm> informAlarms = informAlarmRepository.findByKeywordOrderByIdDesc(fcmToken.getToken());
