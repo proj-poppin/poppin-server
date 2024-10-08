@@ -5,15 +5,15 @@ import lombok.Builder;
 
 @Builder
 public record BlockedPopupDto(
-        Long blockedPopupId,
-        Long popupId,
-        Long userId
+        String blockedPopupId,
+        String popupId,
+        String userId
 ) {
     static public BlockedPopupDto fromEntity(BlockedPopup blockedPopup) {
         return BlockedPopupDto.builder()
-                .popupId(blockedPopup.getPopupId().getId())
-                .userId(blockedPopup.getUserId().getId())
-                .blockedPopupId(blockedPopup.getId())
+                .popupId(String.valueOf(blockedPopup.getPopupId().getId()))
+                .userId(String.valueOf(blockedPopup.getUserId().getId()))
+                .blockedPopupId(String.valueOf(blockedPopup.getId()))
                 .build();
     }
 }

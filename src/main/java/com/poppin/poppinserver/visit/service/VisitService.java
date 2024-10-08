@@ -56,10 +56,11 @@ public class VisitService {
 
     /*방문하기 버튼 누를 시*/
     public PopupStoreDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) {
+        Long popupId = Long.valueOf(visitorsInfoDto.popupId());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(visitorsInfoDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         /*30분 전 시간*/
@@ -70,7 +71,7 @@ public class VisitService {
             throw new CommonException(ErrorCode.DUPLICATED_REALTIME_VISIT); // 30분 이내 재 방문 방지
         }
 
-        Optional<Visit> visit = visitRepository.findByUserId(userId, visitorsInfoDto.popupId());
+        Optional<Visit> visit = visitRepository.findByUserId(userId, popupId);
 
         //재오픈인경우
         if (visit.isPresent()){

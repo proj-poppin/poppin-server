@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record PushRequestDto(
         @NotNull
-        Long popupId,
+        String popupId,
 
         @NotNull
         String token

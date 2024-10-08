@@ -487,7 +487,8 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
-    public PopupGuestDetailDto readGuestDetail(Long popupId) {
+    public PopupGuestDetailDto readGuestDetail(String strPopupId) {
+        Long popupId = Long.valueOf(strPopupId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -535,7 +536,8 @@ public class PopupService {
     } // 비로그인 상세조회
 
     @Transactional
-    public PopupDetailDto readDetail(Long popupId, Long userId) {
+    public PopupDetailDto readDetail(String strPopupId, Long userId) {
+        Long popupId = Long.valueOf(strPopupId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -837,7 +839,9 @@ public class PopupService {
         return popups.get(randomIndex);
     } // 취향저격 팝업 조회
 
-    public PopupStoreDto readPopupStore(Long popupId, HttpServletRequest request) {
+    public PopupStoreDto readPopupStore(String strPopupId, HttpServletRequest request) {
+        Long popupId = Long.valueOf(strPopupId);
+
         Long userId = headerUtil.parseUserId(request);
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -1035,10 +1039,12 @@ public class PopupService {
     } // 비로그인 베이스 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
+        Long popupId = Long.valueOf(pushRequestDto.popupId());
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(pushRequestDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());

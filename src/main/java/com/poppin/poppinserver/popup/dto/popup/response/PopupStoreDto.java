@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Builder
 public record PopupStoreDto(
-        Long id,
+        String id,
         String homepageLink,
         boolean isInstagram,
         String name,
@@ -45,13 +45,15 @@ public record PopupStoreDto(
         Boolean isBlocked
 ) {
     public static PopupStoreDto fromEntity(Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt, Boolean isBlocked) {
+        String popupId = String.valueOf(popup.getId());
+
         List<String> imageUrls = popup.getPosterImages()
                 .stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
 
         return PopupStoreDto.builder()
-                .id(popup.getId())
+                .id(popupId)
                 .homepageLink(popup.getHomepageLink())
                 .isInstagram(popup.getHomepageLink().contains("instagram"))
                 .name(popup.getName())

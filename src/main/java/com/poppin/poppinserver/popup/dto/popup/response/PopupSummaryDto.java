@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public record PopupSummaryDto(
         @NotNull
-        Long id,
+        String id,
         @NotNull
         String image_url,
         @NotNull
@@ -22,9 +22,11 @@ public record PopupSummaryDto(
         List<PopupSummaryDto> dtoList = new ArrayList<>();
 
         for (Popup popup : popups) {
+            String popupId = String.valueOf(popup.getId());
+
             PopupSummaryDto popupSummaryDto =
                     PopupSummaryDto.builder()
-                            .id(popup.getId())
+                            .id(popupId)
                             .image_url(popup.getPosterUrl())
                             .name(popup.getName())
                             .introduce(popup.getIntroduce())

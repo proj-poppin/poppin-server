@@ -15,7 +15,7 @@ public class BlockedPopupController {
     private final BlockedPopupService blockedPopupService;
 
     @PostMapping("/{blockPostId}")
-    public ResponseDto<?> createdBlockedPopup(@PathVariable Long blockPostId,
+    public ResponseDto<?> createdBlockedPopup(@PathVariable String blockPostId,
                                               @UserId Long userId) {
         return ResponseDto.ok(blockedPopupService.createBlockedPopup(blockPostId, userId));
     }

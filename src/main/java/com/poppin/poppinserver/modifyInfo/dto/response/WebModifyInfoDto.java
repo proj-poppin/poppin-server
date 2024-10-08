@@ -1,15 +1,15 @@
 package com.poppin.poppinserver.modifyInfo.dto.response;
 
-import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
+import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record ModifyInfoDto(
-        String id,
-        String userId, // 작성자 id
+public record WebModifyInfoDto(
+        Long id,
+        Long userId, // 작성자 id
         String userImageUrl, // 작성자 프로필 이미지
         String email, // 작성자 이메일
         String nickname, // 작성자 닉네임
@@ -22,7 +22,7 @@ public record ModifyInfoDto(
         String agentName, // 담당 관리자
         List<String> images
 ) {
-    public static ModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images) {
+    public static WebModifyInfoDto fromEntity(ModifyInfo modifyInfo, List<String> images) {
 
         PopupDto popupDto = null;
         if (modifyInfo != null) {
@@ -34,12 +34,9 @@ public record ModifyInfoDto(
             agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
         }
 
-        String modifyInfoId = String.valueOf(modifyInfo.getId());
-        String userId = String.valueOf(modifyInfo.getUserId());
-
-        return ModifyInfoDto.builder()
-                .id(modifyInfoId)
-                .userId(userId)
+        return WebModifyInfoDto.builder()
+                .id(modifyInfo.getId())
+                .userId(modifyInfo.getId())
                 .userImageUrl(modifyInfo.getUserId().getProfileImageUrl())
                 .email(modifyInfo.getUserId().getEmail())
                 .nickname(modifyInfo.getUserId().getNickname())

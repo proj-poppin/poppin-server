@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Builder
 public record NoticeDto(
-        Long id,
+        String id,
         String title,
         Optional<String> content,
         String createdAt,
@@ -19,9 +19,10 @@ public record NoticeDto(
     public static NoticeDto fromEntity(InformAlarm informAlarm) {
         List<String> imageUrls = new ArrayList<>();
         imageUrls.add(informAlarm.getInformAlarmImage().getPosterUrl());
+        String informAlarmId = String.valueOf(informAlarm.getId());
 
         return NoticeDto.builder()
-                .id(informAlarm.getId())
+                .id(informAlarmId)
                 .title(informAlarm.getTitle())
                 .content(Optional.ofNullable(informAlarm.getBody()))
                 .createdAt(informAlarm.getCreatedAt().toString())
