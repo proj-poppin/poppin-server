@@ -198,7 +198,7 @@ public class FCMSendService {
 
             Message message;
 
-            Popup popup = popupRepository.findById(fcmRequestDto.popupId())
+            Popup popup = popupRepository.findById(Long.valueOf(fcmRequestDto.popupId()))
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
             message = Message.builder()
@@ -209,7 +209,7 @@ public class FCMSendService {
                     .setTopic(String.valueOf(fcmRequestDto.topic()))
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setApnsConfig(apnsConfiguration.apnsConfig(badge))
-                    .putData("id", fcmRequestDto.popupId().toString())
+                    .putData("id", String.valueOf(fcmRequestDto.popupId()))
                     .putData("type", "popup")
                     .build();
 
