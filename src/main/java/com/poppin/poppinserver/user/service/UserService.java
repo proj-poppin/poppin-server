@@ -29,7 +29,7 @@ import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.dto.faq.response.FaqResponseDto;
+import com.poppin.poppinserver.user.dto.faq.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.dto.user.response.UserMypageDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
@@ -269,12 +269,12 @@ public class UserService {
         return popupCertiDtoList;
     }
 
-    public List<FaqResponseDto> readFAQs() {
+    public List<UserFaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
-        List<FaqResponseDto> faqDtoList = new ArrayList<>();
+        List<UserFaqResponseDto> faqDtoList = new ArrayList<>();
         for (FreqQuestion freqQuestion : freqQuestionList) {
-            faqDtoList.add(FaqResponseDto.builder()
-                    .id(freqQuestion.getId())
+            faqDtoList.add(UserFaqResponseDto.builder()
+                    .faqId(String.valueOf(freqQuestion.getId()))
                     .question(freqQuestion.getQuestion())
                     .answer(freqQuestion.getAnswer())
                     .createdAt(freqQuestion.getCreatedAt().toString())
