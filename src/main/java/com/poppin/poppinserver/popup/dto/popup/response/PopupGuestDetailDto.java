@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Builder
 public record PopupGuestDetailDto(
-        Long id,
+        String id,
         String homepageLink,
         Boolean isInstagram,
         String name,
@@ -45,8 +45,10 @@ public record PopupGuestDetailDto(
 
         Boolean isInstagram = popup.getHomepageLink().contains("instagram");
 
+        String popupId = String.valueOf(popup.getId());
+
         return PopupGuestDetailDto.builder()
-                .id(popup.getId())
+                .id(popupId)
                 .homepageLink(popup.getHomepageLink())
                 .isInstagram(isInstagram)
                 .name(popup.getName())

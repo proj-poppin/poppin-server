@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record VisitorsInfoDto(
         @NotNull
-        Long popupId
+        String popupId
 ) {
 
 }

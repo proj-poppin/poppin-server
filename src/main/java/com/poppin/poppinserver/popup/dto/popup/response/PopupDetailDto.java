@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Builder
-public record PopupDetailDto(Long id,
+public record PopupDetailDto(String id,
                              String homepageLink,
                              Boolean isInstagram,
                              String name,
@@ -47,8 +47,10 @@ public record PopupDetailDto(Long id,
 
         Boolean isInstagram = popup.getHomepageLink().contains("instagram");
 
+        String popupId = String.valueOf(popup.getId());
+
         return PopupDetailDto.builder()
-                .id(popup.getId())
+                .id(popupId)
                 .homepageLink(popup.getHomepageLink())
                 .isInstagram(isInstagram)
                 .name(popup.getName())

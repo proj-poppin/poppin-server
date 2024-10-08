@@ -2,6 +2,7 @@ package com.poppin.poppinserver.inform.dto.managerInform.response;
 
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.inform.domain.ManagerInform;
+import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
 import lombok.Builder;
 

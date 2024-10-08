@@ -7,12 +7,12 @@ import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.response.AdminModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoSummaryDto;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
@@ -58,9 +58,9 @@ public class ModifyInfoService {
     private final S3Service s3Service;
 
     @Transactional
-    public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
-                                          List<MultipartFile> images,
-                                          Long userId) {
+    public AdminModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
+                                               List<MultipartFile> images,
+                                               Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
@@ -185,11 +185,11 @@ public class ModifyInfoService {
             modifyImageReposiroty.saveAll(modifyImagesList);
         }
 
-        return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
+        return AdminModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 요청 생성
 
     @Transactional
-    public ModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
+    public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
@@ -203,9 +203,9 @@ public class ModifyInfoService {
             imageList.add(modifyImages.getImageUrl());
         }
 
-        PopupDto popupDto = null;
+        AdminPopupDto adminPopupDto = null;
         if (modifyInfo != null) {
-            popupDto = PopupDto.fromEntity(modifyInfo.getProxyPopup());
+            adminPopupDto = AdminPopupDto.fromEntity(modifyInfo.getProxyPopup());
         }
 
         String agentName = null;
@@ -217,14 +217,14 @@ public class ModifyInfoService {
             agentName = admin.getNickname();
         }
 
-        return ModifyInfoDto.builder()
+        return AdminModifyInfoDto.builder()
                 .id(modifyInfo.getId())
                 .userId(modifyInfo.getId())
                 .userImageUrl(modifyInfo.getUserId().getProfileImageUrl())
                 .email(modifyInfo.getUserId().getEmail())
                 .nickname(modifyInfo.getUserId().getNickname())
-                .popup(popupDto)
-                .popupName(popupDto.name())
+                .popup(adminPopupDto)
+                .popupName(adminPopupDto.name())
                 .createdAt(modifyInfo.getCreatedAt().toString())
                 .content(modifyInfo.getContent())
                 .info(modifyInfo.getInfo())
@@ -247,9 +247,9 @@ public class ModifyInfoService {
     }// 목록 조회
 
     @Transactional
-    public ModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                          List<MultipartFile> images,
-                                          Long adminId) {
+    public AdminModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
+                                               List<MultipartFile> images,
+                                               Long adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
 
@@ -351,13 +351,13 @@ public class ModifyInfoService {
 
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, null);
+        return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 임시 저장
 
     @Transactional
-    public ModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
-                                          List<MultipartFile> images,
-                                          Long adminId) {
+    public AdminModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
+                                               List<MultipartFile> images,
+                                               Long adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
 
@@ -496,7 +496,7 @@ public class ModifyInfoService {
 
         popupRepository.delete(proxyPopup);
 
-        return ModifyInfoDto.fromEntity(modifyInfo, null);
+        return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
 
     @Transactional

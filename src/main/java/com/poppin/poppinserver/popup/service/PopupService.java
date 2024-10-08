@@ -107,7 +107,7 @@ public class PopupService {
 
 
     @Transactional
-    public PopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
+    public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
@@ -227,15 +227,15 @@ public class PopupService {
             }
         }
 
-        return PopupDto.fromEntity(popup);
+        return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
-    public PopupDto readPopup(Long adminId, Long popupId) {
+    public AdminPopupDto readPopup(Long adminId, Long popupId) {
         // 팝업 정보 불러오기
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        return PopupDto.fromEntity(popup);
+        return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
     public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size) {
@@ -346,9 +346,9 @@ public class PopupService {
     } // 전체 팝업 관리 - 팝업 삭제
 
     @Transactional
-    public PopupDto updatePopup(UpdatePopupDto updatePopupDto,
-                                List<MultipartFile> images,
-                                Long adminId) {
+    public AdminPopupDto updatePopup(UpdatePopupDto updatePopupDto,
+                                     List<MultipartFile> images,
+                                     Long adminId) {
         Popup popup = popupRepository.findById(updatePopupDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -465,7 +465,7 @@ public class PopupService {
         popupList.add(popup);
         fcmScheduler.schedulerFcmPopupTopicByType(popupList, EPopupTopic.CHANGE_INFO, EPushInfo.CHANGE_INFO);
 
-        return PopupDto.fromEntity(popup);
+        return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
     public PagingResponseDto searchManageList(String text, int page, int size,
@@ -487,7 +487,8 @@ public class PopupService {
         return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
     } // 전체 팝업 관리 - 전체 팝업 검색
 
-    public PopupGuestDetailDto readGuestDetail(Long popupId) {
+    public PopupGuestDetailDto readGuestDetail(String strPopupId) {
+        Long popupId = Long.valueOf(strPopupId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -535,7 +536,8 @@ public class PopupService {
     } // 비로그인 상세조회
 
     @Transactional
-    public PopupDetailDto readDetail(Long popupId, Long userId) {
+    public PopupDetailDto readDetail(String strPopupId, Long userId) {
+        Long popupId = Long.valueOf(strPopupId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -837,7 +839,9 @@ public class PopupService {
         return popups.get(randomIndex);
     } // 취향저격 팝업 조회
 
-    public PopupStoreDto readPopupStore(Long popupId, HttpServletRequest request) {
+    public PopupStoreDto readPopupStore(String strPopupId, HttpServletRequest request) {
+        Long popupId = Long.valueOf(strPopupId);
+
         Long userId = headerUtil.parseUserId(request);
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -1035,10 +1039,12 @@ public class PopupService {
     } // 비로그인 베이스 팝업 검색
 
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
+        Long popupId = Long.valueOf(pushRequestDto.popupId());
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(Long.valueOf(pushRequestDto.popupId()))
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());

@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Builder
 public record InterestedPopupDto(
-        Long id,
+        String id,
         String image_url,
         String status,
         String name,
@@ -20,11 +20,15 @@ public record InterestedPopupDto(
     public static List<InterestedPopupDto> fromEntityList(Set<Interest> interestSet) {
         List<InterestedPopupDto> dtoList = new ArrayList<>();
 
+
+
         for (Interest intereste : interestSet) {
             Popup popup = intereste.getPopup();
+            String popupId = String.valueOf(popup.getId());
+
             InterestedPopupDto interestedPopupDto =
                     InterestedPopupDto.builder()
-                            .id(popup.getId())
+                            .id(popupId)
                             .image_url(popup.getPosterUrl())
                             .status(popup.getOperationStatus())
                             .name(popup.getName())

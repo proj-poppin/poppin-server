@@ -26,7 +26,9 @@ public class BlockedPopupService {
     private final PopupRepository popupRepository;
     private final InterestRepository interestRepository;
 
-    public BlockedPopupDto createBlockedPopup(Long popupId, Long userId) {
+    public BlockedPopupDto createBlockedPopup(String strPopupId, Long userId) {
+        Long popupId = Long.valueOf(strPopupId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)

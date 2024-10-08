@@ -40,15 +40,16 @@ public class InterestService {
 
     @Transactional
     public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto) {
+        Long popupId = Long.valueOf(requestDto.popupId());
 
-        interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
+        interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .ifPresent(interest -> {
                     throw new CommonException(ErrorCode.DUPLICATED_INTEREST);
                 });
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(requestDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         Interest interest = Interest.builder()
@@ -74,10 +75,12 @@ public class InterestService {
     }
 
     public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) {
-        Interest interest = interestRepository.findByUserIdAndPopupId(userId, requestDto.popupId())
+        Long popupId = Long.valueOf(requestDto.popupId());
+
+        Interest interest = interestRepository.findByUserIdAndPopupId(userId, popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
 
-        Popup popup = popupRepository.findById(requestDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
 

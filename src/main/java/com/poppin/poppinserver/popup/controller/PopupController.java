@@ -91,13 +91,13 @@ public class PopupController {
     } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/guest/detail")
-    public ResponseDto<?> readGuestDetail(@RequestParam("popupId") Long popupId) {
+    public ResponseDto<?> readGuestDetail(@RequestParam("popupId") String popupId) {
 
         return ResponseDto.ok(popupService.readGuestDetail(popupId));
     } // 비로그인 상세조회
 
     @GetMapping("/detail")
-    public ResponseDto<?> readDetail(@RequestParam("popupId") Long popupId, @UserId Long userId) {
+    public ResponseDto<?> readDetail(@RequestParam("popupId") String popupId, @UserId Long userId) {
 
         return ResponseDto.ok(popupService.readDetail(popupId, userId));
     } // 로그인 상세조회
@@ -177,7 +177,7 @@ public class PopupController {
     }
 
     @GetMapping("/detail/{popupId}")
-    public ResponseDto<?> readPopup(@PathVariable Long popupId, HttpServletRequest request) {
+    public ResponseDto<?> readPopup(@PathVariable String popupId, HttpServletRequest request) {
         return ResponseDto.ok(popupService.readPopupStore(popupId, request));
     }
 }
