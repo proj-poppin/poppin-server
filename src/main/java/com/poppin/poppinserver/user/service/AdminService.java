@@ -41,7 +41,7 @@ import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.faq.request.FaqRequestDto;
+import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
@@ -103,13 +103,13 @@ public class AdminService {
         return faqDtoList;
     }
 
-    public AdminFaqResponseDto createFAQ(Long adminId, FaqRequestDto faqRequestDto) {
+    public AdminFaqResponseDto createFAQ(Long adminId, AdminFaqRequestDto adminFaqRequestDto) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         FreqQuestion freqQuestion = FreqQuestion.builder()
                 .adminId(admin)
-                .question(faqRequestDto.question())
-                .answer(faqRequestDto.answer())
+                .question(adminFaqRequestDto.question())
+                .answer(adminFaqRequestDto.answer())
                 .createdAt(LocalDateTime.now())
                 .build();
         freqQuestionRepository.save(freqQuestion);

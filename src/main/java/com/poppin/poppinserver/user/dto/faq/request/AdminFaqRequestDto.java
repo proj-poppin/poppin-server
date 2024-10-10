@@ -5,7 +5,7 @@ import lombok.Builder;
 
 
 @Builder
-public record FaqRequestDto(
+public record AdminFaqRequestDto(
         @NotNull String question,
         @NotNull String answer
 ) {

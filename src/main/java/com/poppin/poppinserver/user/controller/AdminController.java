@@ -7,7 +7,7 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.user.dto.faq.request.FaqRequestDto;
+import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.user.service.AdminService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -49,8 +49,8 @@ public class AdminController {
 
     /* FAQ 생성 */
     @PostMapping("/support/faqs")
-    public ResponseDto<?> createFaq(@UserId Long adminId, @RequestBody FaqRequestDto faqRequestDto) {
-        return ResponseDto.created(adminService.createFAQ(adminId, faqRequestDto));
+    public ResponseDto<?> createFaq(@UserId Long adminId, @RequestBody AdminFaqRequestDto adminFaqRequestDto) {
+        return ResponseDto.created(adminService.createFAQ(adminId, adminFaqRequestDto));
     }
 
     /* FAQ 삭제 */
