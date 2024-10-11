@@ -37,6 +37,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
@@ -54,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    private final ReadUserUseCase readUserUseCase;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final PopupRepository popupRepository;
@@ -78,8 +80,7 @@ public class UserService {
 
     // TODO: 삭제 예정
     public UserMypageDto readUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         return UserMypageDto.builder()
                 .userImageUrl(user.getProfileImageUrl())
@@ -91,8 +92,7 @@ public class UserService {
 
     // TODO: 삭제 예정
     public UserProfileDto readUserProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         return UserProfileDto.builder()
                 .email(user.getEmail())
@@ -103,8 +103,7 @@ public class UserService {
     }
 
     public String createProfileImage(Long userId, MultipartFile profileImage) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
         user.updateProfileImage(profileImageUrl);
         userRepository.save(user);
@@ -113,8 +112,7 @@ public class UserService {
     }
 
     public String updateProfileImage(Long userId, MultipartFile profileImage) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         String profileImageUrl = s3Service.replaceImage(user.getProfileImageUrl(), profileImage, userId);
         user.updateProfileImage(profileImageUrl);
         userRepository.save(user);
@@ -123,16 +121,14 @@ public class UserService {
     }
 
     public void deleteProfileImage(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         s3Service.deleteImage(user.getProfileImageUrl());
         user.deleteProfileImage();
         userRepository.save(user);
     }
 
     public UserProfileDto updateUserNickname(Long userId, UpdateUserInfoDto updateUserInfoDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         if (userRepository.findByNickname(updateUserInfoDto.nickname()).isPresent() && (userId != user.getId())) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
@@ -148,8 +144,7 @@ public class UserService {
     }
 
     public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         user.softDelete();
         userRepository.save(user);
     }

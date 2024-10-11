@@ -11,7 +11,7 @@ import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserService;
-import com.poppin.poppinserver.user.usecase.UserExampleUsecase;
+import com.poppin.poppinserver.user.usecase.UserExampleUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class UserController {
     private final PopupService popupService;
     private final BlockUserService blockUserService;
     private final UserPreferenceSettingService userPreferenceSettingService;
-    private final UserExampleUsecase userExampleUsecase;
+    private final UserExampleUseCase userExampleUsecase;
 
     // TODO: 삭제 예정
     @PostMapping("/popup-taste")
