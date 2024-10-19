@@ -6,6 +6,7 @@ import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.modifyInfo.service.AdminModifyInfoService;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequestMapping("/api/v1/modify-info") // 정보수정요청
 public class ModifyInfoController {
     private final ModifyInfoService modifyInfoService;
+    private final AdminModifyInfoService adminModifyInfoService;
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
@@ -43,7 +45,7 @@ public class ModifyInfoController {
     @GetMapping("")
     public ResponseDto<?> readModifyInfo(@RequestParam("infoId") Long modifyInfoId,
                                          @UserId Long adminId) {
-        return ResponseDto.ok(modifyInfoService.readModifyInfo(modifyInfoId, adminId));
+        return ResponseDto.ok(adminModifyInfoService.readModifyInfo(modifyInfoId, adminId));
     } // 요청 조회
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,7 +53,7 @@ public class ModifyInfoController {
     public ResponseDto<?> readModifyInfoList(@RequestParam("isExec") Boolean isExec,
                                              @RequestParam("page") int page,
                                              @RequestParam("size") int size) {
-        return ResponseDto.ok(modifyInfoService.readModifyInfoList(page, size, isExec));
+        return ResponseDto.ok(adminModifyInfoService.readModifyInfoList(page, size, isExec));
     } // 목록 조회
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,7 +66,7 @@ public class ModifyInfoController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(modifyInfoService.updateModifyInfo(updateModifyInfoDto, images, adminId));
+        return ResponseDto.ok(adminModifyInfoService.updateModifyInfo(updateModifyInfoDto, images, adminId));
     } // 제보 임시 저장
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -77,6 +79,6 @@ public class ModifyInfoController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(modifyInfoService.uploadModifyInfo(updateModifyInfoDto, images, adminId));
+        return ResponseDto.ok(adminModifyInfoService.uploadModifyInfo(updateModifyInfoDto, images, adminId));
     } // 최종 수정 승인
 }

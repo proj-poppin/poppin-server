@@ -2,6 +2,7 @@ package com.poppin.poppinserver.popup.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
+import com.poppin.poppinserver.popup.service.AdminPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequestMapping("/api/v1/popup")
 public class PopupController {
     private final PopupService popupService;
+    private final AdminPopupService adminPopupService;
     private final VisitService visitService;
 
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -41,7 +43,7 @@ public class PopupController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(popupService.createPopup(createPopupDto, images, adminId));
+        return ResponseDto.ok(adminPopupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -49,7 +51,7 @@ public class PopupController {
     public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
                                     @UserId Long adminId) {
         log.info(LocalDateTime.now().toString());
-        return ResponseDto.ok(popupService.readPopup(adminId, popupId));
+        return ResponseDto.ok(adminPopupService.readPopup(adminId, popupId));
     } // 전체팝업관리 - 팝업조회
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -58,14 +60,14 @@ public class PopupController {
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long adminId) {
-        return ResponseDto.ok(popupService.readManageList(adminId, oper, page, size));
+        return ResponseDto.ok(adminPopupService.readManageList(adminId, oper, page, size));
     } // 전체팝업관리 - 전체 팝업 리스트 조회
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<?> removePopup(@RequestParam("id") Long popupId,
                                       @UserId Long adminId) {
-        return ResponseDto.ok(popupService.removePopup(popupId));
+        return ResponseDto.ok(adminPopupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,7 +80,7 @@ public class PopupController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(popupService.updatePopup(updatePopupDto, images, adminId));
+        return ResponseDto.ok(adminPopupService.updatePopup(updatePopupDto, images, adminId));
     } // 전체팝업관리 - 팝업 수정
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -87,7 +89,7 @@ public class PopupController {
                                          @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.searchManageList(text, page, size, oper));
+        return ResponseDto.ok(adminPopupService.searchManageList(text, page, size, oper));
     } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/guest/detail")
