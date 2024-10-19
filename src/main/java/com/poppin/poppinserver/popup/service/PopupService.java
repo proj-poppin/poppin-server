@@ -74,418 +74,20 @@ public class PopupService {
     private final ReviewRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final InterestRepository interestRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
-    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitRepository visitRepository;
-    private final ManagerInformRepository managerInformRepository;
-    private final UserInformRepository userInformRepository;
-    private final ReportPopupRepository reportPopupRepository;
-    private final ReviewRecommendRepository reviewRecommendRepository;
-    private final PopupTopicRepository popupTopicRepository;
     private final BlockedUserRepository blockedUserRepository;
     private final BlockedPopupRepository blockedPopupRepository;
-    private final S3Service s3Service;
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
-    private final ModifyInfoService modifyInfoService;
-    private final FCMTokenService fcmTokenService;
     private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
-    private final FCMScheduler fcmScheduler;
-    private final PopupAlarmRepository popupAlarmRepository;
-    private final VisitorDataRepository visitorDataRepository;
-    private final UserAlarmKeywordRepository userAlarmKeywordRepository;
 
-    private final FCMSendService fcmSendService;
     private final AlarmService alarmService;
     private final HeaderUtil headerUtil;
-
-
-    @Transactional
-    public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        //카테고리별 엔티티 정의
-        CreatePreferedDto createPreferedDto = createPopupDto.prefered();
-        PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createPreferedDto.market())
-                .display(createPreferedDto.display())
-                .experience(createPreferedDto.experience())
-                .wantFree(createPreferedDto.wantFree())
-                .build();
-
-        CreateTasteDto createTasteDto = createPopupDto.taste();
-        TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAni())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alcohol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
-                .build();
-
-        //각 카테고리 저장
-        preferedPopup = preferedPopupRepository.save(preferedPopup);
-        tastePopup = tastePopupRepository.save(tastePopup);
-
-        //날짜 요청 유효성 검증
-        if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
-            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
-        }
-
-        //현재 운영상태 정의
-        String operationStatus;
-        if (createPopupDto.openDate().isAfter(LocalDate.now())) {
-            operationStatus = EOperationStatus.NOTYET.getStatus();
-        } else if (createPopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED.getStatus();
-        } else {
-            operationStatus = EOperationStatus.OPERATING.getStatus();
-        }
-
-        // 입장료 유무 false일 경우, 입장료 무료
-        String entranceFee = createPopupDto.entranceFee();
-        if (!createPopupDto.entranceRequired()) {
-            entranceFee = "무료";
-        }
-
-        // 팝업 스토어 정보 저장
-        Popup popup = Popup.builder()
-                .homepageLink(createPopupDto.homepageLink())
-                .name(createPopupDto.name())
-                .availableAge(createPopupDto.availableAge())
-                .closeDate(createPopupDto.closeDate())
-                .closeTime(createPopupDto.closeTime())
-                .entranceRequired(createPopupDto.entranceRequired())
-                .entranceFee(entranceFee)
-                .resvRequired(createPopupDto.resvRequired())
-                .introduce(createPopupDto.introduce())
-                .address(createPopupDto.address())
-                .addressDetail(createPopupDto.addressDetail())
-                .openDate(createPopupDto.openDate())
-                .openTime(createPopupDto.openTime())
-                .latitude(createPopupDto.latitude())
-                .longitude(createPopupDto.longitude())
-                .operationExcept(createPopupDto.operationExcept())
-                .operationStatus(operationStatus)
-                .parkingAvailable(createPopupDto.parkingAvailable())
-                .preferedPopup(preferedPopup)
-                .tastePopup(tastePopup)
-                .build();
-
-        popup.updateAgent(admin);
-
-        popup = popupRepository.save(popup);
-        log.info(popup.toString());
-
-        // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
-
-        popup = popupRepository.save(popup);
-
-        log.info(popup.getName() + " 팝업생성");
-
-        // 유저 알람 키워드와 매칭하여 알림 발송
-        List<UserAlarmKeyword> allKeywords = userAlarmKeywordRepository.findAll();
-        for (UserAlarmKeyword userAlarmKeyword : allKeywords) {
-            if (userAlarmKeyword.getIsOn() && (popup.getName().contains(userAlarmKeyword.getKeyword()) ||
-                    popup.getAddress().contains(userAlarmKeyword.getKeyword()) ||
-                    popup.getAddressDetail().contains(userAlarmKeyword.getKeyword()))) {
-                AlarmKeywordCreateRequestDto alarmKeywordCreateRequestDto = AlarmKeywordCreateRequestDto.builder()
-                        .title(EPushInfo.KEYWORD_ALARM.getTitle())
-                        .body(EPushInfo.KEYWORD_ALARM.getBody())
-                        .build();
-
-                // 유저에게 FCM 토큰 메시지 발송
-                FCMToken token = fcmTokenRepository.findByToken(userAlarmKeyword.getFcmToken());
-                fcmSendService.sendKeywordAlarmByFCMToken(token, alarmKeywordCreateRequestDto, userAlarmKeyword);
-            }
-        }
-
-        return AdminPopupDto.fromEntity(popup);
-    } // 전체 팝업 관리 - 팝업 생성
-
-    public AdminPopupDto readPopup(Long adminId, Long popupId) {
-        // 팝업 정보 불러오기
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-        return AdminPopupDto.fromEntity(popup);
-    } // 전체 팝업 관리 - 팝업 조회
-
-    public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size) {
-        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
-                oper.getStatus());
-
-        // 각 운영상태별로 팝업 개수 반환
-        Long num = switch (oper) {
-            case NOTYET -> popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
-            case TERMINATED -> popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
-            case OPERATING -> popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
-            default -> 0L;
-        };
-
-        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
-        ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
-
-        return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
-    } // 전체 팝업 관리 - 전체 팝업 조회
-
-    @Transactional
-    public Boolean removePopup(Long popupId) {
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-        // 실시간 방문자 수 관련 데이터
-        log.info("delete visit data");
-        visitRepository.deleteAllByPopup(popup);
-
-        // 후기 관련 데이터
-        // 후기 이미지
-        log.info("delete review image");
-        List<Review> reviews = reviewRepository.findByPopupId(popupId);
-
-        for (Review review : reviews) {
-            visitorDataRepository.deleteAllByReviewId(review.getId());
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
-            List<String> reviewUrls = reviewImages.stream()
-                    .map(ReviewImage::getImageUrl)
-                    .toList();
-            if (reviewUrls.size() != 0) {
-                s3Service.deleteMultipleImages(reviewUrls);
-                reviewImageRepository.deleteAllByReviewId(review.getId());
-            }
-        }
-
-        log.info("delete review data");
-
-        reviewRecommendRepository.deleteAllByReviewPopup(popup);
-
-        reviewRepository.deleteAllByPopup(popup);
-
-        // 알람 관련 데이터(1. 구독 해제, 2. topic 삭제)
-        List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
-
-        for (PopupTopic topic : topicList) {
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.MAGAM);
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.OPEN);
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.CHANGE_INFO);
-        }
-
-        // 관심 추가 데이터
-        log.info("delete interest data");
-        interestRepository.deleteAllByPopupId(popupId);
-
-        // 신고 관련 데이터
-        log.info("delete report data");
-        reportPopupRepository.deleteAllByPopupId(popup);
-
-        // 제보 관련 데이터
-        log.info("delete inform data");
-        // 운영자 제보
-        managerInformRepository.deleteAllByPopupId(popup);
-        // 사용자 제보
-        userInformRepository.deleteAllByPopupId(popup);
-
-        // 정보수정요청 관련 데이터
-        log.info("delete modify info data");
-        modifyInfoService.deleteProxyPopupAndModifyInfoByPopupId(popupId);
-
-        // 알람 키워드
-        log.info("delete alarm data");
-        popupAlarmKeywordRepository.deleteAllByPopupId(popup);
-
-        // 팝업 이미지
-        log.info("delete popup image");
-        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
-        List<String> fileUrls = posterImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
-        if (fileUrls.size() != 0) {
-            s3Service.deleteMultipleImages(fileUrls);
-            posterImageRepository.deleteAllByPopupId(popup);
-        }
-        log.info("delete popup alarm");
-        popupAlarmRepository.deleteAllByPopupId(popup);
-
-        log.info("delete popup topic");
-        popupTopicRepository.deleteAllByPopup(popup);
-
-        log.info("delete blocked popup");
-        blockedPopupRepository.deleteAllByPopupId(popup);
-
-        log.info("delete popup");
-        popupRepository.delete(popup);
-
-        return true;
-    } // 전체 팝업 관리 - 팝업 삭제
-
-    @Transactional
-    public AdminPopupDto updatePopup(UpdatePopupDto updatePopupDto,
-                                     List<MultipartFile> images,
-                                     Long adminId) {
-        Popup popup = popupRepository.findById(updatePopupDto.popupId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        CreateTasteDto createTasteDto = updatePopupDto.taste();
-        TastePopup tastePopup = popup.getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
-        PreferedPopup preferedPopup = popup.getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
-
-        // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
-
-        //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
-
-        // 기존 키워드 삭제 및 다시 저장
-        popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
-
-        List<PopupAlarmKeyword> popupAlarmKeywords = new ArrayList<>();
-        for (String keyword : updatePopupDto.keywords()) {
-            popupAlarmKeywords.add(PopupAlarmKeyword.builder()
-                    .popupId(popup)
-                    .keyword(keyword)
-                    .build());
-        }
-        popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
-
-        //날짜 요청 유효성 검증
-        if (updatePopupDto.openDate().isAfter(updatePopupDto.closeDate())) {
-            throw new CommonException(ErrorCode.INVALID_DATE_PARAMETER);
-        }
-
-        //현재 운영상태 정의
-        String operationStatus;
-        if (updatePopupDto.openDate().isAfter(LocalDate.now())) {
-            operationStatus = EOperationStatus.NOTYET.getStatus();
-        } else if (updatePopupDto.closeDate().isBefore(LocalDate.now())) {
-            operationStatus = EOperationStatus.TERMINATED.getStatus();
-        } else {
-            operationStatus = EOperationStatus.OPERATING.getStatus();
-        }
-
-        // 입장료 유무 false일 경우, 입장료 무료
-        String entranceFee = updatePopupDto.entranceFee();
-        if (!updatePopupDto.entranceRequired()) {
-            entranceFee = "무료";
-        }
-
-        popup.update(
-                updatePopupDto.homepageLink(),
-                updatePopupDto.name(),
-                updatePopupDto.introduce(),
-                updatePopupDto.address(),
-                updatePopupDto.addressDetail(),
-                updatePopupDto.entranceRequired(),
-                entranceFee,
-                updatePopupDto.resvRequired(),
-                updatePopupDto.availableAge(),
-                updatePopupDto.parkingAvailable(),
-                updatePopupDto.openDate(),
-                updatePopupDto.closeDate(),
-                updatePopupDto.openTime(),
-                updatePopupDto.closeTime(),
-                updatePopupDto.latitude(),
-                updatePopupDto.longitude(),
-                updatePopupDto.operationExcept(),
-                operationStatus,
-                admin
-        );
-
-        popupRepository.save(popup);
-
-        // 팝업 정보 변경 시 앱푸시 보내기
-        List<Popup> popupList = new ArrayList<>();
-        popupList.add(popup);
-        fcmScheduler.schedulerFcmPopupTopicByType(popupList, EPopupTopic.CHANGE_INFO, EPushInfo.CHANGE_INFO);
-
-        return AdminPopupDto.fromEntity(popup);
-    } // 전체 팝업 관리 - 팝업 수정
-
-    public PagingResponseDto searchManageList(String text, int page, int size,
-                                              EOperationStatus oper) {
-        // 검색어 토큰화 및 Full Text 와일드 카드 적용
-        String searchText = null;
-        if (text != null && text.trim() != "") {
-            searchText = prepardSearchUtil.prepareSearchText(text);
-        }
-
-        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size),
-                oper.getStatus()); // 운영 상태
-
-        Long num = popupRepository.countByOperationStatus(oper.getStatus());
-
-        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
-        ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);
-
-        return PagingResponseDto.fromEntityAndPageInfo(manageListDto, pageInfoDto);
-    } // 전체 팝업 관리 - 전체 팝업 검색
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
         Long popupId = Long.valueOf(strPopupId);
@@ -867,7 +469,7 @@ public class PopupService {
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
         log.info("taste: " + taste);
-        if (taste.equals("0000000000000")) {
+        if (taste.equals("000")) {
             taste = "111";
         }
         log.info("prepered: " + prepered);
@@ -962,7 +564,7 @@ public class PopupService {
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
         log.info("taste: " + taste);
-        if (taste.equals("0000000000000")) {
+        if (taste.equals("000")) {
             taste = "111";
         }
         log.info("prepered: " + prepered);
@@ -975,7 +577,7 @@ public class PopupService {
         Boolean display = (taste.charAt(1) == '1') ? true : null;
         Boolean experience = (taste.charAt(2) == '1') ? true : null;
 
-        // 팝업 취향 13개
+        // 팝업 취향 14개
         Boolean fashionBeauty = (prepered.charAt(0) == '1') ? true : null;
         Boolean characters = (prepered.charAt(1) == '1') ? true : null;
         Boolean foodBeverage = (prepered.charAt(2) == '1') ? true : null;
@@ -1066,7 +668,6 @@ public class PopupService {
 
         return "재오픈 수요 체크 되었습니다.";
     }
-
 
     public List<PopupStoreDto> getPopupStoreDtos(Page<Popup> popups, Long userId) {
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
