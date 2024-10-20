@@ -30,6 +30,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,10 +48,11 @@ public class UserInformService {
     private final PopupRepository popupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
+
+    private final ReadUserUseCase readUserUseCase;
 
     @Transactional
     public UserInformDto createUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
@@ -57,8 +60,7 @@ public class UserInformService {
                                           Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
                                           Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
                                           List<MultipartFile> images, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(fashionBeauty)

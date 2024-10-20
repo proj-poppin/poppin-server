@@ -28,6 +28,7 @@ import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,6 @@ import java.util.stream.Collectors;
 public class AdminModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
-    private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
@@ -56,13 +56,14 @@ public class AdminModifyInfoService {
 
     private final S3Service s3Service;
 
+    private final ReadUserUseCase readUserUseCase;
+
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
         ModifyInfo modifyInfo = modifyInformRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
-        User user = userRepository.findById(modifyInfo.getUserId().getId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(modifyInfo.getUserId().getId());
 
         List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
 
@@ -80,8 +81,7 @@ public class AdminModifyInfoService {
         if (modifyInfo.getIsExecuted()) {
             agentName = modifyInfo.getOriginPopup().getAgent().getNickname();
         } else {
-            User admin = userRepository.findById(adminId)
-                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+            User admin = readUserUseCase.findUserById(adminId);
             agentName = admin.getNickname();
         }
 
@@ -118,8 +118,7 @@ public class AdminModifyInfoService {
     public AdminModifyInfoDto updateModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
                                                List<MultipartFile> images,
                                                Long adminId) {
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
+        User admin = readUserUseCase.findUserById(adminId);
 
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
@@ -226,8 +225,7 @@ public class AdminModifyInfoService {
     public AdminModifyInfoDto uploadModifyInfo(UpdateModifyInfoDto updateModifyInfoDto,
                                                List<MultipartFile> images,
                                                Long adminId) {
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.ACCESS_DENIED_ERROR));
+        User admin = readUserUseCase.findUserById(adminId);
 
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));

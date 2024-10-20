@@ -30,6 +30,7 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,6 @@ import java.util.stream.Collectors;
 public class ModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
-    private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
@@ -58,12 +58,13 @@ public class ModifyInfoService {
 
     private final S3Service s3Service;
 
+    private final ReadUserUseCase readUserUseCase;
+
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
                                                List<MultipartFile> images,
                                                Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 

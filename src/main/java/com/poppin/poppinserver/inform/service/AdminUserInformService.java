@@ -27,6 +27,7 @@ import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,11 +48,12 @@ public class AdminUserInformService {
     private final UserInformRepository userInformRepository;
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
+
+    private final ReadUserUseCase readUserUseCase;
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
@@ -68,8 +70,7 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User admin = readUserUseCase.findUserById(adminId);
 
         CreateTasteDto createTasteDto = updateUserInformDto.taste();
         TastePopup tastePopup = userInform.getPopupId().getTastePopup();
@@ -171,8 +172,7 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User admin = readUserUseCase.findUserById(adminId);
 
         CreateTasteDto createTasteDto = updateUserInformDto.taste();
         TastePopup tastePopup = userInform.getPopupId().getTastePopup();

@@ -32,6 +32,8 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -48,17 +50,17 @@ public class ManagerInformService {
     private final PopupRepository popupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
+
+    private final ReadUserUseCase readUserUseCase;
 
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
                                                 List<MultipartFile> images,
                                                 Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         CreateTasteDto createTasteDto = createManagerInformDto.taste();
         TastePopup tastePopup = TastePopup.builder()
