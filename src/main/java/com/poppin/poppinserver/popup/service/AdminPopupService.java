@@ -82,16 +82,18 @@ public class AdminPopupService {
     private final ReviewRecommendRepository reviewRecommendRepository;
     private final PopupTopicRepository popupTopicRepository;
     private final BlockedPopupRepository blockedPopupRepository;
-    private final S3Service s3Service;
-    private final ModifyInfoService modifyInfoService;
-    private final FCMTokenService fcmTokenService;
-    private final PrepardSearchUtil prepardSearchUtil;
-    private final FCMScheduler fcmScheduler;
     private final PopupAlarmRepository popupAlarmRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
 
+    private final S3Service s3Service;
+    private final ModifyInfoService modifyInfoService;
+    private final FCMTokenService fcmTokenService;
     private final FCMSendService fcmSendService;
+
+    private final PrepardSearchUtil prepardSearchUtil;
+
+    private final FCMScheduler fcmScheduler;
 
     @Transactional
     public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {

@@ -48,5 +48,5 @@ public class BlockedPopupService {
         blockedPopup = blockedPopupRepository.save(blockedPopup);
 
         return BlockedPopupDto.fromEntity(blockedPopup);
-    }
+    } // 부트스트랩
 }

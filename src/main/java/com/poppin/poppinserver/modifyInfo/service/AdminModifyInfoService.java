@@ -366,6 +366,4 @@ public class AdminModifyInfoService {
 
         return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드
-
-
 }

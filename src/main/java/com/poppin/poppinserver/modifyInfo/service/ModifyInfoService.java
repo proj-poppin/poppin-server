@@ -187,7 +187,7 @@ public class ModifyInfoService {
         }
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
-    } // 요청 생성
+    } // 사용자 정보수정요청 생성
 
     @Transactional
     public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {

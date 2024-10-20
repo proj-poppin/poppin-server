@@ -4,10 +4,13 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
+import com.poppin.poppinserver.popup.service.AdminPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.service.SearchPopupService;
 import com.poppin.poppinserver.review.service.ReviewService;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
+import com.poppin.poppinserver.user.service.AdminService;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserService;
@@ -34,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
     private final ReviewService reviewService;
-    private final PopupService popupService;
+    private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final UserExampleUseCase userExampleUsecase;
@@ -183,7 +186,7 @@ public class UserController {
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,
                                           @UserId Long userId) {
-        return ResponseDto.ok(popupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
+        return ResponseDto.ok(searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/

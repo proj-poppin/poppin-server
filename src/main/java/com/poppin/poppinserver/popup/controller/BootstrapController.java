@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.popup.controller;
 
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.popup.service.BootstrapService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class BootstrapController {
     private final PopupService popupService;
+    private final BootstrapService bootstrapService;
     private final AuthService authService;
 
     // 앱 진입 시 버전 확인
@@ -30,6 +32,6 @@ public class BootstrapController {
 
     @GetMapping("/bootstrap")
     public ResponseDto<?> bootstrap(HttpServletRequest request) {
-        return ResponseDto.ok(popupService.bootstrap(request));
+        return ResponseDto.ok(bootstrapService.bootstrap(request));
     }
 }

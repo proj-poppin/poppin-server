@@ -49,7 +49,6 @@ public class ManagerInformService {
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final UserRepository userRepository;
-    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
