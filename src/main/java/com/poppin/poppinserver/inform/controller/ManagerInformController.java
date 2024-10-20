@@ -8,6 +8,7 @@ import com.poppin.poppinserver.core.type.EAvailableAge;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
+import com.poppin.poppinserver.inform.service.AdminManagerInformService;
 import com.poppin.poppinserver.inform.service.ManagerInformService;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
@@ -35,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/manager-inform")
 public class ManagerInformController {
     private final ManagerInformService managerInformService;
+    private final AdminManagerInformService adminManagerInformService;
 
     //운영자 제보 생성
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -148,7 +150,7 @@ public class ManagerInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("") // 운영자 제보 조회
     public ResponseDto<?> readUserInform(@RequestParam("informId") Long managerInformId) {
-        return ResponseDto.ok(managerInformService.readManageInform(managerInformId));
+        return ResponseDto.ok(adminManagerInformService.readManageInform(managerInformId));
     }
 
     // 운영자 제보 임시저장
@@ -162,7 +164,7 @@ public class ManagerInformController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(managerInformService.updateManageInform(updateManagerInformDto, images, adminId));
+        return ResponseDto.ok(adminManagerInformService.updateManageInform(updateManagerInformDto, images, adminId));
     }
 
     //운영자 제보 업로드
@@ -176,7 +178,7 @@ public class ManagerInformController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(managerInformService.uploadPopup(updateManagerInformDto, images, adminId));
+        return ResponseDto.ok(adminManagerInformService.uploadPopup(updateManagerInformDto, images, adminId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -184,6 +186,6 @@ public class ManagerInformController {
     public ResponseDto<?> readManagerInformList(@RequestParam(value = "page") int page,
                                                 @RequestParam(value = "size") int size,
                                                 @RequestParam(value = "prog") EInformProgress progress) {
-        return ResponseDto.ok(managerInformService.readManagerInformList(page, size, progress));
+        return ResponseDto.ok(adminManagerInformService.readManagerInformList(page, size, progress));
     }
 }

@@ -6,6 +6,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
+import com.poppin.poppinserver.inform.service.AdminUserInformService;
 import com.poppin.poppinserver.inform.service.UserInformService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/user-inform")
 public class UserInformController {
     private final UserInformService userInformService;
+    private final AdminUserInformService adminUserInformService;
 
     //사용자 제보 생성
     @PostMapping(value = "/report", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -94,7 +96,7 @@ public class UserInformController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("")
     public ResponseDto<?> readUserInform(@RequestParam("informId") Long userInformId) {
-        return ResponseDto.ok(userInformService.readUserInform(userInformId));
+        return ResponseDto.ok(adminUserInformService.readUserInform(userInformId));
     } // 제보 조회
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -107,7 +109,7 @@ public class UserInformController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.updateUserInform(updateUserInformDto, images, adminId));
+        return ResponseDto.ok(adminUserInformService.updateUserInform(updateUserInformDto, images, adminId));
     } // 제보 임시 저장
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -120,7 +122,7 @@ public class UserInformController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
-        return ResponseDto.ok(userInformService.uploadPopup(updateUserInformDto, images, adminId));
+        return ResponseDto.ok(adminUserInformService.uploadPopup(updateUserInformDto, images, adminId));
     } // 제보 업로드 승인
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -129,6 +131,6 @@ public class UserInformController {
                                              @RequestParam(value = "size") int size,
                                              @RequestParam(value = "prog") EInformProgress progress,
                                              @UserId Long adminId) {
-        return ResponseDto.ok(userInformService.readUserInformList(page, size, progress));
+        return ResponseDto.ok(adminUserInformService.readUserInformList(page, size, progress));
     } // 제보 목록 조회
 }
