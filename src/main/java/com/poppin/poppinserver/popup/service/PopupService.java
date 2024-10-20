@@ -1,70 +1,36 @@
 package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.alarm.domain.*;
-import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
-import com.poppin.poppinserver.alarm.dto.informAlarm.response.NoticeDto;
 import com.poppin.poppinserver.alarm.repository.*;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
-import com.poppin.poppinserver.core.dto.PageInfoDto;
-import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.scheduler.FCMScheduler;
-import com.poppin.poppinserver.core.type.EOperationStatus;
-import com.poppin.poppinserver.core.type.EPopupSort;
-import com.poppin.poppinserver.core.type.EPopupTopic;
-import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.core.util.HeaderUtil;
-import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.core.util.SelectRandomUtil;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
-import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
+import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.*;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.repository.*;
-import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
-import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
-import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -73,16 +39,18 @@ public class PopupService {
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
-    private final InterestRepository interestRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitRepository visitRepository;
     private final BlockedUserRepository blockedUserRepository;
     private final BlockedPopupRepository blockedPopupRepository;
+
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
+
+    private final ReadUserUseCase readUserUseCase;
+    private final InterestQueryUseCase interestQueryUseCase;
 
     private final HeaderUtil headerUtil;
 
@@ -193,13 +161,12 @@ public class PopupService {
         }
 
         // 관심 여부 확인
-        Boolean isInterested = interestRepository.findByUserIdAndPopupId(userId, popupId).isPresent();
+        Boolean isInterested = interestQueryUseCase.existsInterestByUserIdAndPopupId(userId, popupId);
 
         Optional<Visit> visit = visitRepository.findByUserId(userId, popupId);
 
         // 차단 여부 확인
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
         Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
 
         // 방문 여부 확인
@@ -229,8 +196,7 @@ public class PopupService {
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
         Long popupId = Long.valueOf(pushRequestDto.popupId());
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));

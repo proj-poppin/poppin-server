@@ -51,10 +51,9 @@ public class PopupController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
-    public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
-                                    @UserId Long adminId) {
+    public ResponseDto<?> readPopup(@RequestParam("id") Long popupId) {
         log.info(LocalDateTime.now().toString());
-        return ResponseDto.ok(adminPopupService.readPopup(adminId, popupId));
+        return ResponseDto.ok(adminPopupService.readPopup(popupId));
     } // 전체팝업관리 - 팝업조회
 
     @PreAuthorize("hasRole('ADMIN')")

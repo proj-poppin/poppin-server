@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface InterestRepository extends JpaRepository<Interest, Interest.InterestId> {
     Optional<Interest> findByUserIdAndPopupId(Long userId, Long popupId);
 
+    Boolean existsByUserIdAndPopupId(Long userId, Long popupId);
+
     void deleteAllByPopupId(Long popupId);
 
     @Modifying

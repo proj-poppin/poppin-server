@@ -23,6 +23,7 @@ import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
@@ -40,30 +41,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchPopupService {
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
-    private final InterestRepository interestRepository;
-    private final FCMTokenRepository fcmTokenRepository;
-    private final ReopenDemandRepository reopenDemandRepository;
-    private final ReviewImageRepository reviewImageRepository;
-    private final VisitRepository visitRepository;
-    private final BlockedUserRepository blockedUserRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
-    private final VisitorDataService visitorDataService;
-    private final VisitService visitService;
-    private final SelectRandomUtil selectRandomUtil;
     private final PrepardSearchUtil prepardSearchUtil;
 
-    private final AlarmService alarmService;
-    private final HeaderUtil headerUtil;
     private final PopupService popupService;
+    private final ReadUserUseCase readUserUseCase;
 
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         // 카테고리 요청 코드 길이 유효성 체크
         if (taste.length() < 3 || prepered.length() < 14) {

@@ -6,7 +6,6 @@ import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.repository.*;
-import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
@@ -17,12 +16,10 @@ import com.poppin.poppinserver.core.scheduler.FCMScheduler;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
-import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.interest.usercase.InterestCommandUseCase;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -35,6 +32,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
 import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
@@ -42,12 +40,9 @@ import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,10 +63,8 @@ public class AdminPopupService {
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
-    private final InterestRepository interestRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageRepository reviewImageRepository;
@@ -91,14 +84,17 @@ public class AdminPopupService {
     private final FCMTokenService fcmTokenService;
     private final FCMSendService fcmSendService;
 
+    private final ReadUserUseCase readUserUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
+    private final InterestCommandUseCase interestCommandUseCase;
+
     private final PrepardSearchUtil prepardSearchUtil;
 
     private final FCMScheduler fcmScheduler;
 
     @Transactional
     public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User admin = readUserUseCase.findUserById(adminId);
 
         //카테고리별 엔티티 정의
         CreatePreferedDto createPreferedDto = createPopupDto.prefered();
@@ -219,10 +215,9 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
-    public AdminPopupDto readPopup(Long adminId, Long popupId) {
+    public AdminPopupDto readPopup(Long popupId) {
         // 팝업 정보 불러오기
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
@@ -247,8 +242,7 @@ public class AdminPopupService {
 
     @Transactional
     public Boolean removePopup(Long popupId) {
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         // 실시간 방문자 수 관련 데이터
         log.info("delete visit data");
@@ -288,7 +282,7 @@ public class AdminPopupService {
 
         // 관심 추가 데이터
         log.info("delete interest data");
-        interestRepository.deleteAllByPopupId(popupId);
+        interestCommandUseCase.deleteAllInterestsByPopupId(popupId);
 
         // 신고 관련 데이터
         log.info("delete report data");
@@ -338,11 +332,9 @@ public class AdminPopupService {
     public AdminPopupDto updatePopup(UpdatePopupDto updatePopupDto,
                                      List<MultipartFile> images,
                                      Long adminId) {
-        Popup popup = popupRepository.findById(updatePopupDto.popupId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(updatePopupDto.popupId());
 
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User admin = readUserUseCase.findUserById(adminId);
 
         CreateTasteDto createTasteDto = updatePopupDto.taste();
         TastePopup tastePopup = popup.getTastePopup();

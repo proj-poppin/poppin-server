@@ -42,9 +42,9 @@ public class BootstrapService {
     private final UserRepository userRepository;
 
     private final AlarmService alarmService;
-    private final HeaderUtil headerUtil;
     private final PopupService popupService;
 
+    private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
     
     @Transactional(readOnly = true)

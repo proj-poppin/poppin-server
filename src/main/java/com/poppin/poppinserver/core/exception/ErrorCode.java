@@ -81,6 +81,7 @@ public enum ErrorCode {
     NOT_FOUND_POPUP_REPORT("40420", HttpStatus.NOT_FOUND, "해당 팝업 신고 내역을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW_REPORT("40421", HttpStatus.NOT_FOUND, "해당 리뷰 신고 내역을 찾을 수 없습니다."),
     NOT_FOUND_FCM_TOKEN("40422", HttpStatus.NOT_FOUND, "해당 유저의 fcm 토큰을 찾을 수 없습니다."),
+    NOT_FOUND_INTEREST("40423", HttpStatus.NOT_FOUND, "해당 관심 저장 정보를 찾을 수 없습니다."),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),

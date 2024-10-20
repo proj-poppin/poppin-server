@@ -25,6 +25,7 @@ import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
@@ -49,23 +50,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ListingPopupService {
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final UserRepository userRepository;
-    private final InterestRepository interestRepository;
-    private final FCMTokenRepository fcmTokenRepository;
-    private final ReopenDemandRepository reopenDemandRepository;
-    private final ReviewImageRepository reviewImageRepository;
-    private final VisitRepository visitRepository;
-    private final BlockedUserRepository blockedUserRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
-    private final VisitorDataService visitorDataService;
-    private final VisitService visitService;
-    private final SelectRandomUtil selectRandomUtil;
-    private final PrepardSearchUtil prepardSearchUtil;
 
-    private final AlarmService alarmService;
-    private final HeaderUtil headerUtil;
+    private final ReadUserUseCase readUserUseCase;
+    private final SelectRandomUtil selectRandomUtil;
 
     public List<PopupSummaryDto> readHotList() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -94,8 +81,7 @@ public class ListingPopupService {
 
     @Transactional
     public List<InterestedPopupDto> readInterestedPopups(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         Set<Interest> interest = user.getInterest();
 
@@ -109,8 +95,7 @@ public class ListingPopupService {
         // 5개 선정
         // 관심 테이블에서
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = readUserUseCase.findUserById(userId);
 
         //취향설정이 되지 않은 유저의 경우
         if (user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null) {
