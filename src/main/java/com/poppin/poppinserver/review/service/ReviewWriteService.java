@@ -2,12 +2,9 @@ package com.poppin.poppinserver.review.service;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.ECongestion;
-import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.core.type.ESatisfaction;
 import com.poppin.poppinserver.core.type.EVisitDate;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -15,10 +12,8 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.domain.ReviewRecommend;
 import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
@@ -40,20 +35,17 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class ReviewService {
+public class ReviewWriteService {
 
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewRecommendRepository reviewRecommendRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final VisitRepository visitRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final S3Service s3Service;
     private final UserService userService;
-    private final FCMSendService fcmSendService;
-    private final AlarmService alarmService;
 
 
     @Transactional
@@ -124,47 +116,4 @@ public class ReviewService {
         review.updateReviewUrl(fileUrls.get(0));
     }
 
-
-    /*후기 추천 증가*/
-    public String recommendReview(Long userId, String StrReviewId, String StrPopupId) {
-
-        Long reviewId = Long.valueOf(StrReviewId);
-        Long popupId = Long.valueOf(StrPopupId);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-        Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
-
-        // 예외처리
-        if (review == null) {
-            throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
-        }
-        if (review.getUser().getId().equals(userId)) {
-            throw new CommonException(ErrorCode.REVIEW_RECOMMEND_ERROR);
-        }
-
-        Optional<ReviewRecommend> recommendCnt = reviewRecommendRepository.findByUserAndReview(user, review);
-        if (recommendCnt.isPresent()) {
-            throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지
-        } else {
-            review.addRecommendCnt();
-        }
-
-        ReviewRecommend reviewRecommend = ReviewRecommend.builder()
-                .user(user)
-                .review(review)
-                .build();
-
-        reviewRepository.save(review);
-        reviewRecommendRepository.save(reviewRecommend);
-
-        fcmSendService.sendChoochunByFCMToken(popup, review, EPushInfo.CHOOCHUN); // 알림
-
-        return "정상적으로 반환되었습니다";
-
-    }
 }
