@@ -1,10 +1,10 @@
 package com.poppin.poppinserver.core.security.provider;
 
-import com.poppin.poppinserver.core.security.service.CustomUserDetailsService;
 import com.poppin.poppinserver.core.security.JwtAuthenticationToken;
 import com.poppin.poppinserver.core.security.info.CustomUserDetails;
 import com.poppin.poppinserver.core.security.info.JwtUserInfo;
-import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.core.security.service.CustomUserDetailsService;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

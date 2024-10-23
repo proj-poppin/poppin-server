@@ -1,41 +1,25 @@
 package com.poppin.poppinserver.inform.service;
 
-import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.core.dto.PageInfoDto;
-import com.poppin.poppinserver.core.dto.PagingResponseDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.UserInform;
-import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
-import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryDto;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import java.time.LocalDate;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +36,7 @@ public class UserInformService {
 
     private final S3Service s3Service;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Transactional
     public UserInformDto createUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
@@ -60,7 +44,7 @@ public class UserInformService {
                                           Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
                                           Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
                                           List<MultipartFile> images, Long userId) {
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(fashionBeauty)

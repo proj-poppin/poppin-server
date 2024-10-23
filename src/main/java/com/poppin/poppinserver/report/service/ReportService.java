@@ -13,7 +13,7 @@ import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +25,13 @@ import org.springframework.stereotype.Service;
 public class ReportService {
 
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final PopupRepository popupRepository;
 
     public void createReviewReport(Long userId, CreateReviewReportDto createReviewReportDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Review review = reviewRepository.findById(Long.valueOf(createReviewReportDto.reviewId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
@@ -46,7 +46,7 @@ public class ReportService {
     }
 
     public void createPopupReport(Long userId, CreatePopupReportDto createPopupReportDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(Long.valueOf(createPopupReportDto.popupId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));

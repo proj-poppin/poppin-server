@@ -1,20 +1,18 @@
 package com.poppin.poppinserver.user.repository;
 
-import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserQueryRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isDeleted = false")
     Optional<User> findByEmail(String email);
 
@@ -27,11 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserId(Long id);
 
     Optional<User> findByNickname(String nickname);
-
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE User u SET u.refreshToken = :refreshToken, u.isLogin = :loginStatus WHERE u.id = :id")
-    void updateRefreshTokenAndLoginStatus(Long id, String refreshToken, boolean loginStatus);
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.provider = :eLoginProvider")
     Optional<User> findByIdAndELoginProvider(Long id, ELoginProvider eLoginProvider);

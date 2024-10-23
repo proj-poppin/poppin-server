@@ -2,22 +2,15 @@ package com.poppin.poppinserver.modifyInfo.service;
 
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.core.dto.PageInfoDto;
-import com.poppin.poppinserver.core.dto.PagingResponseDto;
-import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
-import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.response.AdminModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoSummaryDto;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EOperationStatus;
+import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
+import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
@@ -26,23 +19,17 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
-import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -50,6 +37,7 @@ import java.util.stream.Collectors;
 public class ModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
+    private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
@@ -58,13 +46,13 @@ public class ModifyInfoService {
 
     private final S3Service s3Service;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
-                                               List<MultipartFile> images,
-                                               Long userId) {
-        User user = readUserUseCase.findUserById(userId);
+                                          List<MultipartFile> images,
+                                          Long userId) {
+        User user = userQueryUseCase.findUserById(userId);
         Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 

@@ -13,7 +13,6 @@ import com.poppin.poppinserver.alarm.service.FCMTokenService;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.core.util.OAuth2Util;
@@ -25,6 +24,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
@@ -45,7 +45,8 @@ import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDt
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserCommandRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final OAuth2Util oAuth2Util;
@@ -71,10 +72,11 @@ public class AuthService {
     private final InformIsReadRepository informIsReadRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
+    private final UserCommandRepository userCommandRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
-        userRepository.findByEmail(email)
+        userQueryRepository.findByEmail(email)
                 .ifPresent(user -> {
                     throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
                 });
@@ -89,7 +91,7 @@ public class AuthService {
 
     // 유저 닉네임 중복 확인 메서드
     private void checkDuplicatedNickname(String nickname) {
-        userRepository.findByNickname(nickname)
+        userQueryRepository.findByNickname(nickname)
                 .ifPresent(user -> {
                     throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
                 });
@@ -117,7 +119,7 @@ public class AuthService {
         checkDuplicatedNickname(authSignUpRequestDto.nickname());
 
         // 유저 생성, 패스워드 암호화
-        User newUser = userRepository.save(
+        User newUser = userQueryRepository.save(
                 User.toUserEntity(
                         authSignUpRequestDto,
                         bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
@@ -133,7 +135,7 @@ public class AuthService {
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
-        userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 newUser.getId()
@@ -235,7 +237,7 @@ public class AuthService {
         checkDuplicatedNickname(authSignUpRequestDto.nickname());
 
         // 유저 생성, 패스워드 암호화
-        User newUser = userRepository.save(
+        User newUser = userQueryRepository.save(
                 User.toUserEntity(
                         authSignUpRequestDto, bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
                         provider
@@ -247,7 +249,7 @@ public class AuthService {
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
-        userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 newUser.getId()
@@ -406,7 +408,7 @@ public class AuthService {
     }
 
     private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider, String fcmToken) {
-        Optional<User> user = userRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
+        Optional<User> user = userQueryRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // 회원 탈퇴 여부 확인
         if (user.isPresent() && user.get().getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
@@ -420,7 +422,8 @@ public class AuthService {
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
         if (user.isPresent() && user.get().getProvider().equals(provider)) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
-            userRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(), true);
+            userCommandRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(),
+                    true);
             AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
             UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                     user.get().getId()
@@ -509,8 +512,8 @@ public class AuthService {
             return userInfoResponseDto;
         } else {
             // 비밀번호 랜덤 생성 후 암호화해서 DB에 저장
-            User newUser = userRepository.findByEmail(oAuth2UserInfo.email())
-                    .orElseGet(() -> userRepository.save(
+            User newUser = userQueryRepository.findByEmail(oAuth2UserInfo.email())
+                    .orElseGet(() -> userQueryRepository.save(
                             User.toGuestEntity(oAuth2UserInfo,
                                     bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
                                     provider))
@@ -518,7 +521,7 @@ public class AuthService {
             // 유저에게 GUEST 권한 주기
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(newUser.getId(), EUserRole.GUEST);
             String accessToken = jwtTokenDto.accessToken();
-            userRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtTokenDto.refreshToken(), true);
+            userCommandRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtTokenDto.refreshToken(), true);
             return new AccessTokenDto(accessToken);
         }
     }
@@ -526,7 +529,7 @@ public class AuthService {
     // 비밀번호 재설정 메서드
     @Transactional
     public void resetPassword(Long userId, PasswordUpdateRequestDto passwordRequestDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // 비밀번호와 비밀번호 확인 일치 여부 검증
@@ -552,7 +555,7 @@ public class AuthService {
     }
 
     private void validateEmail(EVerificationType verificationType, String email) {
-        boolean userExists = userRepository.findByEmail(email).isPresent();
+        boolean userExists = userQueryRepository.findByEmail(email).isPresent();
 
         if (verificationType.equals(EVerificationType.SIGN_UP) && userExists) {
             // 회원가입 시에 이메일 중복 -> 중복 이메일 Exception 반환
@@ -565,7 +568,7 @@ public class AuthService {
 
 
     public Boolean verifyPassword(Long userId, PasswordVerificationRequestDto passwordVerificationRequestDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (!bCryptPasswordEncoder.matches(passwordVerificationRequestDto.password(), user.getPassword())) {
@@ -579,7 +582,7 @@ public class AuthService {
     public JwtTokenDto refresh(String refreshToken) {
         String token = refineToken(refreshToken);
         Long userId = jwtUtil.getUserIdFromToken(token);
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!user.getRefreshToken().equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
@@ -597,7 +600,7 @@ public class AuthService {
         String email = decoded[0];
         String password = decoded[1];
         String fcmToken = fcmTokenRequestDto.fcmToken();
-        User user = userRepository.findByEmail(email)
+        User user = userQueryRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
@@ -609,7 +612,7 @@ public class AuthService {
         fcmTokenService.verifyFCMToken(Long.valueOf(user.getId()), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-        userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId());
 
@@ -700,7 +703,7 @@ public class AuthService {
 
     @Transactional
     public void resetPasswordNoAuth(PasswordResetRequestDto passwordResetRequestDto) {
-        User user = userRepository.findByEmail(passwordResetRequestDto.email())
+        User user = userQueryRepository.findByEmail(passwordResetRequestDto.email())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!passwordResetRequestDto.password().equals(passwordResetRequestDto.passwordConfirm())) {
             throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
@@ -723,7 +726,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
-        Optional<User> user = userRepository.findByEmail(accountRequestDto.email());
+        Optional<User> user = userQueryRepository.findByEmail(accountRequestDto.email());
         EAccountStatus accountStatus;
         if (user.isPresent()) {
             accountStatus = EAccountStatus.LOGIN;

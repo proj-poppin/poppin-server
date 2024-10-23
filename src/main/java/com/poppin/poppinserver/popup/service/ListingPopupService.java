@@ -1,34 +1,23 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.util.HeaderUtil;
-import com.poppin.poppinserver.core.util.PrepardSearchUtil;
 import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.response.InterestedPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -38,20 +27,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ListingPopupService {
     private final PopupRepository popupRepository;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
     private final SelectRandomUtil selectRandomUtil;
 
     public List<PopupSummaryDto> readHotList() {
@@ -81,7 +63,7 @@ public class ListingPopupService {
 
     @Transactional
     public List<InterestedPopupDto> readInterestedPopups(Long userId) {
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         Set<Interest> interest = user.getInterest();
 
@@ -95,7 +77,7 @@ public class ListingPopupService {
         // 5개 선정
         // 관심 테이블에서
 
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         //취향설정이 되지 않은 유저의 경우
         if (user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null) {

@@ -16,7 +16,6 @@ import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -40,6 +39,7 @@ import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
@@ -48,7 +48,8 @@ import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserCommandRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.time.LocalDateTime;
@@ -72,7 +73,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminService {
     private final FreqQuestionRepository freqQuestionRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final ReviewRepository reviewRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
@@ -88,6 +89,7 @@ public class AdminService {
     private final FCMSendService fcmSendService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
+    private final UserCommandRepository userCommandRepository;
 
     public List<AdminFaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
@@ -104,7 +106,7 @@ public class AdminService {
     }
 
     public AdminFaqResponseDto createFAQ(Long adminId, AdminFaqRequestDto adminFaqRequestDto) {
-        User admin = userRepository.findById(adminId)
+        User admin = userQueryRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         FreqQuestion freqQuestion = FreqQuestion.builder()
                 .adminId(admin)
@@ -131,9 +133,9 @@ public class AdminService {
         Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage;
         if (care) {
-            userPage = userRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
+            userPage = userQueryRepository.findByRequiresSpecialCareOrderByNicknameAsc(true, pageable);
         } else {
-            userPage = userRepository.findAllByOrderByNicknameAsc(pageable);
+            userPage = userQueryRepository.findAllByOrderByNicknameAsc(pageable);
         }
 
         List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
@@ -153,7 +155,7 @@ public class AdminService {
     }
 
     public UserAdministrationDetailDto readUserDetail(Long userId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userQueryRepository.findByUserId(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         UserAdministrationDetailDto userAdministrationDetailDto;
 
@@ -222,7 +224,7 @@ public class AdminService {
     }
 
     public UserListDto searchUsers(String text) {
-        List<User> userList = userRepository.findByNicknameContainingOrEmailContainingOrderByNickname(text, text);
+        List<User> userList = userQueryRepository.findByNicknameContainingOrEmailContainingOrderByNickname(text, text);
         List<UserAdministrationDto> userAdministrationDtoList = new ArrayList<>();
         for (User user : userList) {
             userAdministrationDtoList.add(UserAdministrationDto.builder()
@@ -362,7 +364,7 @@ public class AdminService {
 
     @Transactional
     public void processPopupReport(Long adminId, Long reportId, CreateReportExecContentDto createReportExecContentDto) {
-        User admin = userRepository.findById(adminId)
+        User admin = userQueryRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP_REPORT));
@@ -374,7 +376,7 @@ public class AdminService {
     @Transactional
     public void processReviewReport(Long adminId, Long reportId,
                                     CreateReportExecContentDto createReportExecContentDto) {
-        User admin = userRepository.findById(adminId)
+        User admin = userQueryRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW_REPORT));
@@ -392,7 +394,7 @@ public class AdminService {
         if (reviewAuthor.getReportedCnt() >= 3) {    // 신고 횟수 3회 이상 시 특별 관리 대상으로 변경
             reviewAuthor.requiresSpecialCare();
         }
-        userRepository.save(reviewAuthor);
+        userQueryRepository.save(reviewAuthor);
 
         reportReview.execute(true, admin, LocalDateTime.now(), createReportExecContentDto.content());
         reportReviewRepository.save(reportReview);
@@ -405,7 +407,7 @@ public class AdminService {
             MultipartFile images
     ) {
         // 관리자 여부 확인
-        User admin = userRepository.findById(adminId)
+        User admin = userQueryRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         try {
@@ -457,7 +459,7 @@ public class AdminService {
     }
 
     public void processReviewReportExec(Long adminId, Long reportId) {
-        User admin = userRepository.findById(adminId)
+        User admin = userQueryRepository.findById(adminId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         ReportReview reportReview = reportReviewRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
@@ -494,7 +496,7 @@ public class AdminService {
         String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
         String email = decoded[0];
         String password = decoded[1];
-        User user = userRepository.findByEmail(email)
+        User user = userQueryRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (!user.getRole().equals(EUserRole.ADMIN)) {
@@ -505,7 +507,7 @@ public class AdminService {
         }
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-        userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
 
         return jwtTokenDto;
     }

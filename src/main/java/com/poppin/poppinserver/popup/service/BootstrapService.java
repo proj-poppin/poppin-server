@@ -16,8 +16,14 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -27,30 +33,23 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BootstrapService {
     private final PopupRepository popupRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
 
     private final AlarmService alarmService;
     private final PopupService popupService;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
-    
+
     @Transactional(readOnly = true)
     public BootstrapDto bootstrap(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
-        if (userId != null && !userRepository.existsById(userId)) {
+        if (userId != null && !userQueryRepository.existsById(userId)) {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
 
@@ -59,7 +58,8 @@ public class BootstrapService {
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
 
-        List<Popup> popularTop5Popup = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
+        List<Popup> popularTop5Popup = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay,
+                endOfDay,
                 PageRequest.of(0, 5));
 
         // 새로 오픈 팝업 조회
@@ -75,10 +75,10 @@ public class BootstrapService {
 
             // 취향 저격 팝업 조회
             List<Popup> recommendPopup = getRecommendPopup(userId);
-            List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup,userId);
+            List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
 
             // 관심 저장 팝업 조회
-            User user = userRepository.findById(userId)
+            User user = userQueryRepository.findById(userId)
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
             Set<Interest> interest = user.getInterest();
@@ -125,7 +125,7 @@ public class BootstrapService {
         // 5개 선정
         // 관심 테이블에서
 
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         //취향설정이 되지 않은 유저의 경우

@@ -5,7 +5,7 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.BlockedUser;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BlockUserService {
     private final BlockedUserRepository blockedUserRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
 
     @Transactional
     public void createBlockedUser(Long userId, Long blockUserId) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        User blockedUser = userRepository.findById(blockUserId)
+        User blockedUser = userQueryRepository.findById(blockUserId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (userId.equals(blockUserId)) {

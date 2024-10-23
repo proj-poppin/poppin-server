@@ -2,7 +2,9 @@ package com.poppin.poppinserver.core.security.info;
 
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
+import java.util.ArrayList;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

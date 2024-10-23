@@ -12,7 +12,6 @@ import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryDto;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -20,14 +19,16 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,11 +36,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -53,7 +49,7 @@ public class AdminUserInformService {
 
     private final S3Service s3Service;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
@@ -70,7 +66,7 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = readUserUseCase.findUserById(adminId);
+        User admin = userQueryUseCase.findUserById(adminId);
 
         CreateTasteDto createTasteDto = updateUserInformDto.taste();
         TastePopup tastePopup = userInform.getPopupId().getTastePopup();
@@ -172,7 +168,7 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
-        User admin = readUserUseCase.findUserById(adminId);
+        User admin = userQueryUseCase.findUserById(adminId);
 
         CreateTasteDto createTasteDto = updateUserInformDto.taste();
         TastePopup tastePopup = userInform.getPopupId().getTastePopup();

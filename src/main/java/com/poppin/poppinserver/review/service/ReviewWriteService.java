@@ -16,20 +16,19 @@ import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.service.UserService;
 import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReviewWriteService {
 
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
@@ -53,7 +52,7 @@ public class ReviewWriteService {
                                  String satisfaction, String congestion,
                                  List<MultipartFile> images) {
 
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -63,7 +62,9 @@ public class ReviewWriteService {
 
         // 알림 토큰 추출
         Optional<FCMToken> fcmToken = fcmTokenRepository.findByUserId(userId);
-        if (fcmToken.isEmpty()) throw new CommonException(ErrorCode.REVIEW_FCM_ERROR);
+        if (fcmToken.isEmpty()) {
+            throw new CommonException(ErrorCode.REVIEW_FCM_ERROR);
+        }
 
         String token = fcmToken.get().getToken();
         Review review = createReview(user, token, popup, text, isCertificated);

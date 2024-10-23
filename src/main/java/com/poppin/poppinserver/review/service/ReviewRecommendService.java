@@ -11,13 +11,12 @@ import com.poppin.poppinserver.review.domain.ReviewRecommend;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewRecommendService {
 
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewRecommendRepository reviewRecommendRepository;
@@ -38,7 +37,7 @@ public class ReviewRecommendService {
         Long reviewId = Long.valueOf(StrReviewId);
         Long popupId = Long.valueOf(StrPopupId);
 
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         Popup popup = popupRepository.findById(popupId)

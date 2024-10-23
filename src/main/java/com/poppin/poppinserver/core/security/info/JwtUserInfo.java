@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.core.security.info;
 
-import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import lombok.Builder;
 
 @Builder

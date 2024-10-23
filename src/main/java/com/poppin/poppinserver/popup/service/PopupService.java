@@ -1,15 +1,22 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.alarm.domain.*;
+import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
-import com.poppin.poppinserver.alarm.repository.*;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
-import com.poppin.poppinserver.popup.domain.*;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.domain.PosterImage;
+import com.poppin.poppinserver.popup.domain.ReopenDemand;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
@@ -17,20 +24,21 @@ import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Slf4j
 @Service
@@ -49,7 +57,7 @@ public class PopupService {
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
 
     private final HeaderUtil headerUtil;
@@ -166,7 +174,7 @@ public class PopupService {
         Optional<Visit> visit = visitRepository.findByUserId(userId, popupId);
 
         // 차단 여부 확인
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
         Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
 
         // 방문 여부 확인
@@ -196,7 +204,7 @@ public class PopupService {
     public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
         Long popupId = Long.valueOf(pushRequestDto.popupId());
 
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
@@ -220,6 +228,7 @@ public class PopupService {
 
         return "재오픈 수요 체크 되었습니다.";
     }
+
 
     public List<PopupStoreDto> getPopupStoreDtos(Page<Popup> popups, Long userId) {
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성

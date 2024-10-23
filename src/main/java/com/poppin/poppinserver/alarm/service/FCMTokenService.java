@@ -12,15 +12,14 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -30,7 +29,7 @@ public class FCMTokenService {
     private final FCMTokenRepository fcmTokenRepository;
 
     private final PopupTopicRepository popupTopicRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final ReviewRepository reviewRepository;
     private final FCMSubscribeService fcmSubscribeService;
     private final PopupRepository popupRepository;
@@ -42,7 +41,7 @@ public class FCMTokenService {
         log.info("Applying FCM token: {}", fcmToken);
 
         // 유저 조회
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // FCM 토큰이 이미 존재하는 경우 -> 에러: 회원가입 한 유저는 새로운 FCM 토큰이어야 함.
