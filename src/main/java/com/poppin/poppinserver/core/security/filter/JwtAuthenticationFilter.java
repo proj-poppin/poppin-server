@@ -1,16 +1,17 @@
 package com.poppin.poppinserver.core.security.filter;
 
 import com.poppin.poppinserver.core.constant.Constant;
-import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.core.security.JwtAuthenticationToken;
 import com.poppin.poppinserver.core.security.info.JwtUserInfo;
-import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.core.util.JwtUtil;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,8 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

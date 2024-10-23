@@ -9,7 +9,7 @@ import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ import org.springframework.stereotype.Service;
 public class AlarmSettingService {
 
     private final AlarmSettingRepository alarmSettingRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
 
     public AlarmSettingResponseDto updateAlarmSetting(Long userId, AlarmSettingRequestDto reqDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting alarmSetting = alarmSettingRepository.findByToken(reqDto.fcmToken());
@@ -51,7 +51,7 @@ public class AlarmSettingService {
 
     // TODO: 삭제 예정
     public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         AlarmSetting setting = alarmSettingRepository.findByToken(reqDto.fcmToken());

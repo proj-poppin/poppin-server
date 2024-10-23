@@ -7,25 +7,24 @@ import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AlarmKeywordService {
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
 
     @Transactional(readOnly = true)
     public List<AlarmKeywordResponseDto> readAlarmKeywords(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         Set<UserAlarmKeyword> userAlarmKeywords = user.getUserAlarmKeywords();
         return AlarmKeywordResponseDto.fromEntity(userAlarmKeywords);
@@ -34,7 +33,7 @@ public class AlarmKeywordService {
     @Transactional
     public List<AlarmKeywordResponseDto> createAlarmKeyword(Long userId,
                                                             AlarmKeywordRequestDto alarmKeywordRequestDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         Set<UserAlarmKeyword> userAlarmKeywords = userAlarmKeywordRepository.findAllByUser(user);
@@ -65,7 +64,7 @@ public class AlarmKeywordService {
 
     @Transactional
     public void deleteAlarmKeyword(Long userId, Long keywordId) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findById(keywordId)
@@ -81,7 +80,7 @@ public class AlarmKeywordService {
     // 알람 키워드 상태 변경
     @Transactional
     public List<AlarmKeywordResponseDto> setAlarmKeywordStatus(Long userId, Long keywordId, Boolean isOn) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findById(keywordId)

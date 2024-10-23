@@ -1,32 +1,27 @@
 package com.poppin.poppinserver.interest.service;
 
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
-import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
-import com.poppin.poppinserver.interest.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
+import com.poppin.poppinserver.interest.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
-import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -39,7 +34,7 @@ public class InterestService {
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
 
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
     private final BlockedPopupQueryUseCase blockedPopupQueryUseCase;
@@ -53,7 +48,7 @@ public class InterestService {
                     throw new CommonException(ErrorCode.DUPLICATED_INTEREST);
                 });
 
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
         Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         Interest interest = Interest.builder()

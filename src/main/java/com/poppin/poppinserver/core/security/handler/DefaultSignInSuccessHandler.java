@@ -1,27 +1,26 @@
 package com.poppin.poppinserver.core.security.handler;
 
-import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.core.security.info.CustomUserDetails;
 import com.poppin.poppinserver.core.util.JwtUtil;
+import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
+import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONValue;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 @RequiredArgsConstructor
 @Component
 public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final UserCommandRepository userCommandRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -29,7 +28,7 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
 
-        userRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), jwtTokenDto.refreshToken(), true);
         setSuccessAppResponse(response, jwtTokenDto);
     }
 

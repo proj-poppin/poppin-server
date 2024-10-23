@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.core.type;
+package com.poppin.poppinserver.user.domain.type;
 
 import lombok.RequiredArgsConstructor;
 

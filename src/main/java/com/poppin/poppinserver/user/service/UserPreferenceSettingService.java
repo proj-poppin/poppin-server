@@ -15,7 +15,7 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
-import com.poppin.poppinserver.user.repository.UserRepository;
+import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserPreferenceSettingService {
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
@@ -34,7 +34,7 @@ public class UserPreferenceSettingService {
             Long userId,
             CreateUserTasteDto createUserTasteDto
     ) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (user.getPreferedPopup() != null) {
@@ -80,7 +80,7 @@ public class UserPreferenceSettingService {
         whoWithPopupRepository.save(whoWithPopup);
 
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
-        userRepository.save(user);
+        userQueryRepository.save(user);
 
         return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(preferedPopup))
@@ -91,7 +91,7 @@ public class UserPreferenceSettingService {
 
     // TODO: 삭제 예정
     public UserTasteResponseDto readUserTaste(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         if (user.getPreferedPopup() == null) {
@@ -112,7 +112,7 @@ public class UserPreferenceSettingService {
             user.updatePopupTaste(whoWithPopup);
         }
 
-        userRepository.save(user);
+        userQueryRepository.save(user);
         return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(user.getPreferedPopup()))
                 .taste(TasteDto.fromEntity(user.getTastePopup()))
@@ -122,7 +122,7 @@ public class UserPreferenceSettingService {
 
     @Transactional
     public UserTasteResponseDto updateUserTaste(Long userId, CreateUserTasteDto createUserTasteDto) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
@@ -157,7 +157,7 @@ public class UserPreferenceSettingService {
         whoWithPopupRepository.save(whoWithPopup);
 
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
-        userRepository.save(user);
+        userQueryRepository.save(user);
 
         return UserTasteResponseDto.builder()
                 .preference(PreferedDto.fromEntity(preferedPopup))
@@ -168,7 +168,7 @@ public class UserPreferenceSettingService {
 
     @Transactional
     public UserPreferenceSettingDto readUserPreferenceSettingCreated(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         UserTasteResponseDto userTasteResponseDto = readUserTaste(userId);
@@ -205,7 +205,7 @@ public class UserPreferenceSettingService {
             user.updatePopupTaste(whoWithPopup);
         }
 
-        userRepository.save(user);
+        userQueryRepository.save(user);
 
         if (!preferedPopup.getDisplay() && !preferedPopup.getExperience() &&
                 !preferedPopup.getMarket() && !preferedPopup.getWantFree() &&

@@ -1,40 +1,24 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
-import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.core.util.SelectRandomUtil;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -44,12 +28,12 @@ public class SearchPopupService {
     private final PrepardSearchUtil prepardSearchUtil;
 
     private final PopupService popupService;
-    private final ReadUserUseCase readUserUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                Long userId) {
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         // 카테고리 요청 코드 길이 유효성 체크
         if (taste.length() < 3 || prepered.length() < 14) {

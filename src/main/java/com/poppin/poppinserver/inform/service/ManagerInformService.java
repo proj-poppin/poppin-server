@@ -1,18 +1,11 @@
 package com.poppin.poppinserver.inform.service;
 
-import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.core.dto.PageInfoDto;
-import com.poppin.poppinserver.core.dto.PagingResponseDto;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
-import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
-import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformSummaryDto;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -26,18 +19,11 @@ import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserRepository;
-import java.time.LocalDate;
-import java.time.Period;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.poppin.poppinserver.user.usecase.ReadUserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,17 +36,17 @@ public class ManagerInformService {
     private final PopupRepository popupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
+    private final UserQueryUseCase userQueryUseCase;
+    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
     private final S3Service s3Service;
-
-    private final ReadUserUseCase readUserUseCase;
 
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
                                                 List<MultipartFile> images,
                                                 Long userId) {
-        User user = readUserUseCase.findUserById(userId);
+        User user = userQueryUseCase.findUserById(userId);
 
         CreateTasteDto createTasteDto = createManagerInformDto.taste();
         TastePopup tastePopup = TastePopup.builder()
@@ -221,7 +207,5 @@ public class ManagerInformService {
         managerInform = managerInformRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
-    } // 비로그인 운영자 제보 생성
-
-
+    } //운영자 제보 생성
 }

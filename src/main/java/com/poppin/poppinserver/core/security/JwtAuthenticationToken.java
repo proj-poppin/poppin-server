@@ -1,10 +1,9 @@
 package com.poppin.poppinserver.core.security;
 
-import com.poppin.poppinserver.core.type.EUserRole;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
+import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private Long userId;

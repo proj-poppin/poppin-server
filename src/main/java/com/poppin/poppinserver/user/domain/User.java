@@ -2,12 +2,12 @@ package com.poppin.poppinserver.user.domain;
 
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.core.constant.Constant;
-import com.poppin.poppinserver.core.type.EUserRole;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import jakarta.persistence.CascadeType;

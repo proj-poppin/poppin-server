@@ -9,9 +9,10 @@ import com.poppin.poppinserver.review.service.ReviewWriteService;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
+import com.poppin.poppinserver.user.service.UserDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
+import com.poppin.poppinserver.user.service.UserProfileImageService;
 import com.poppin.poppinserver.user.service.UserService;
-import com.poppin.poppinserver.user.usecase.UserExampleUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,9 @@ public class UserController {
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
     private final UserPreferenceSettingService userPreferenceSettingService;
-    private final UserExampleUseCase userExampleUsecase;
+    private final UserProfileImageService userProfileImageService;
+    private final UserDeleteService userDeleteService;
+
 
     // TODO: 삭제 예정
     @PostMapping("/popup-taste")
@@ -45,7 +48,6 @@ public class UserController {
             @UserId Long userId,
             @RequestBody @Valid CreateUserTasteDto userTasteDto
     ) {
-        userExampleUsecase.test();
         return ResponseDto.created(userPreferenceSettingService.createUserTaste(userId, userTasteDto));
     }
 
@@ -78,18 +80,18 @@ public class UserController {
     @PostMapping("/image")
     public ResponseDto<?> createUserProfileImage(@UserId Long userId,
                                                  @RequestPart(value = "profileImage") MultipartFile profileImage) {
-        return ResponseDto.created(userService.createProfileImage(userId, profileImage));
+        return ResponseDto.created(userProfileImageService.createProfileImage(userId, profileImage));
     }
 
     @PutMapping("/image")
     public ResponseDto<?> updateUserProfileImage(@UserId Long userId,
                                                  @RequestPart(value = "profileImage") MultipartFile profileImage) {
-        return ResponseDto.ok(userService.updateProfileImage(userId, profileImage));
+        return ResponseDto.ok(userProfileImageService.updateProfileImage(userId, profileImage));
     }
 
     @DeleteMapping("/image")
     public ResponseDto<?> deleteUserProfileImage(@UserId Long userId) {
-        userService.deleteProfileImage(userId);
+        userProfileImageService.deleteProfileImage(userId);
         return ResponseDto.ok("프로필 이미지가 삭제되었습니다.");
     }
 
@@ -103,7 +105,7 @@ public class UserController {
 
     @DeleteMapping("/withdrawal")
     public ResponseDto<?> deleteUser(@UserId Long userId) {
-        userService.deleteUser(userId);
+        userDeleteService.deleteUser(userId);
         return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
     }
 
@@ -136,7 +138,7 @@ public class UserController {
     public ResponseDto<?> getCertifiedPopupList(@UserId Long userId) {
         return ResponseDto.ok(userService.getCertifiedPopupList(userId));
     }
-
+// TODO: 삭제 예정
 //    /*마이페이지 - 후기 작성하기 - 방문한 팝업 후기 작성*/
 //    @PostMapping(value = "review/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE,
 //            MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -154,7 +156,7 @@ public class UserController {
 //                reviewService.writeCertifiedReview(userId, token, popupId, text, visitDate, satisfaction, congestion,
 //                        nickname, images));
 //    }
-//
+// TODO: 삭제 예정
 //    /*마이페이지 - 후기 작성하기 - 일반 후기 작성*/
 //    @PostMapping(value = "review/w/uncerti", consumes = {MediaType.APPLICATION_JSON_VALUE,
 //            MediaType.MULTIPART_FORM_DATA_VALUE})
