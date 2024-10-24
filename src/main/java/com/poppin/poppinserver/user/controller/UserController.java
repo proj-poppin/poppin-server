@@ -9,7 +9,7 @@ import com.poppin.poppinserver.review.service.ReviewWriteService;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
-import com.poppin.poppinserver.user.service.UserDeleteService;
+import com.poppin.poppinserver.user.service.UserHardDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserProfileImageService;
 import com.poppin.poppinserver.user.service.UserService;
@@ -39,7 +39,7 @@ public class UserController {
     private final BlockUserService blockUserService;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final UserProfileImageService userProfileImageService;
-    private final UserDeleteService userDeleteService;
+    private final UserHardDeleteService userHardDeleteService;
 
 
     // TODO: 삭제 예정
@@ -105,7 +105,7 @@ public class UserController {
 
     @DeleteMapping("/withdrawal")
     public ResponseDto<?> deleteUser(@UserId Long userId) {
-        userDeleteService.deleteUser(userId);
+        userHardDeleteService.deleteUser(userId);
         return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
     }
 
@@ -185,7 +185,8 @@ public class UserController {
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,
                                           @UserId Long userId) {
-        return ResponseDto.ok(searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
+        return ResponseDto.ok(
+                searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/

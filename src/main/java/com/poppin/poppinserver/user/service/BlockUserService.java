@@ -4,7 +4,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.BlockedUser;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
+import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BlockUserService {
-    private final BlockedUserRepository blockedUserRepository;
+    private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final UserQueryRepository userQueryRepository;
 
     @Transactional
@@ -29,7 +29,7 @@ public class BlockUserService {
             throw new CommonException(ErrorCode.CANNOT_BLOCK_MYSELF);
         }
 
-        Optional<BlockedUser> checkBlockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId,
+        Optional<BlockedUser> checkBlockedUser = blockedUserQueryRepository.findByUserIdAndBlockedUserId(userId,
                 blockUserId);
         if (checkBlockedUser.isPresent()) {
             throw new CommonException(ErrorCode.ALREADY_BLOCKED_USER);
@@ -39,6 +39,6 @@ public class BlockUserService {
                 .userId(user)
                 .blockedUserId(blockedUser)
                 .build();
-        blockedUserRepository.save(createBlockedUser);
+        blockedUserQueryRepository.save(createBlockedUser);
     }
 }

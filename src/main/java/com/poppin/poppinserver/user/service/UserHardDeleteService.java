@@ -17,7 +17,8 @@ import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
+import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
+import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
@@ -30,8 +31,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class UserDeleteService {
-    private final BlockedUserRepository blockedUserRepository;
+public class UserHardDeleteService {
+    private final BlockedUserQueryRepository blockedUserQueryRepository;
+    private final BlockedUserCommandRepository blockedUserCommandRepository;
     private final InterestRepository interestRepository;
     private final ReviewRecommendRepository reviewRecommendRepository;
     private final UserInformRepository userInformRepository;
@@ -150,8 +152,8 @@ public class UserDeleteService {
         유저 차단 목록 삭제
      */
     private void deleteBlockedUsers(Long userId) {
-        blockedUserRepository.deleteAllByUserId(userId);
-        blockedUserRepository.deleteAllByBlockedId(userId);
+        blockedUserCommandRepository.deleteAllByUserId(userId);
+        blockedUserCommandRepository.deleteAllByBlockedId(userId);
     }
 
     /*
