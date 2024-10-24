@@ -169,8 +169,9 @@ public class User {
         this.role = EUserRole.USER;
     }
 
-    public void updateRefreshToken(String refreshToken) {
+    public void updateRefreshTokenAndLoginStatus(String refreshToken) {
         this.refreshToken = refreshToken;
+        this.isLogin = true;
     }
 
     public void updatePassword(String password) {

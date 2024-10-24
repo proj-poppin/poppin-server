@@ -11,6 +11,7 @@ import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
+import com.poppin.poppinserver.user.service.AuthSignUpService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
+    private final AuthSignUpService authSignUpService;
 
     // 계정 상태 반환 API
     @GetMapping("/account/status")
@@ -43,7 +45,7 @@ public class AuthController {
             @RequestBody @Valid AuthSignUpRequestDto authSignUpRequestDto
     ) {
         log.info("authSignUpDto : " + authSignUpRequestDto);
-        return ResponseDto.created(authService.handleSignUp(authSignUpRequestDto));
+        return ResponseDto.created(authSignUpService.handleSignUp(authSignUpRequestDto));
     }
 
 //    @PostMapping("/register")

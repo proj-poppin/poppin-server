@@ -23,7 +23,7 @@ import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
 import com.poppin.poppinserver.review.repository.ReviewImageRepository;
 import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserRepository;
+import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
@@ -51,7 +51,7 @@ public class PopupService {
     private final ReopenDemandRepository reopenDemandRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final VisitRepository visitRepository;
-    private final BlockedUserRepository blockedUserRepository;
+    private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
 
     private final VisitorDataService visitorDataService;
@@ -121,7 +121,7 @@ public class PopupService {
 
         List<Review> reviews = reviewRepository.findAllByPopupIdOrderByRecommendCntDesc(popupId);
 
-        List<Long> blockedUserIds = blockedUserRepository.findBlockedUserIdsByUserId(userId);
+        List<Long> blockedUserIds = blockedUserQueryRepository.findBlockedUserIdsByUserId(userId);
         log.info("Blocked User IDs: " + blockedUserIds.toString());
 
         // 차단된 사용자의 리뷰를 제외한 리스트

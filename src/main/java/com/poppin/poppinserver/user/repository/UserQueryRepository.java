@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -49,4 +50,11 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.requiresSpecialCare = :requiresSpecialCare ORDER BY u.nickname ASC")
     Page<User> findByRequiresSpecialCareOrderByNicknameAsc(boolean requiresSpecialCare, Pageable pageable);
+
+    // 쿼리 최적화를 위한 native query
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE email = :email)", nativeQuery = true)
+    boolean existsByEmailWithNq(@Param("email") String email);
+
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE nickname = :nickname)", nativeQuery = true)
+    boolean existsByNicknameWithNq(@Param("nickname") String nickname);
 }

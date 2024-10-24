@@ -13,7 +13,7 @@ public enum ErrorCode {
     INVALID_ROLE("40002", HttpStatus.BAD_REQUEST, "유효하지 않은 권한입니다."),
     INVALID_PROVIDER("40003", HttpStatus.BAD_REQUEST, "유효하지 않은 제공자입니다."),
     INVALID_HEADER("40004", HttpStatus.BAD_REQUEST, "유효하지 않은 헤더값입니다."),
-    DUPLICATED_SERIAL_ID("40005", HttpStatus.BAD_REQUEST, "해당 아이디로 가입된 계정이 존재합니다."),
+    DUPLICATED_EMAIL("40005", HttpStatus.BAD_REQUEST, "해당 이메일로 가입된 계정이 존재합니다."),
     PASSWORD_NOT_MATCH("40006", HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     DUPLICATED_NICKNAME("40007", HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     MISSING_REQUEST_BODY("40008", HttpStatus.BAD_REQUEST, "요청 바디가 누락되었습니다."),

@@ -28,7 +28,6 @@ import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
@@ -78,7 +77,7 @@ public class AuthService {
     private void checkDuplicatedEmail(String email) {
         userQueryRepository.findByEmail(email)
                 .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
+                    throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
                 });
     }
 
@@ -95,248 +94,6 @@ public class AuthService {
                 .ifPresent(user -> {
                     throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
                 });
-    }
-
-    @Transactional
-    public UserInfoResponseDto handleSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.passwordConfirm() == null) {
-            // 소셜 로그인 로직 처리
-            return socialSignUp(authSignUpRequestDto);
-        } else {
-            // 자체 로그인 로직 처리
-            return authSignUp(authSignUpRequestDto);
-        }
-    }
-
-    private UserInfoResponseDto authSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        // 유저 이메일 중복 확인
-        checkDuplicatedEmail(authSignUpRequestDto.email());
-
-        // 비밀번호와 비밀번호 확인 일치 여부 검증
-        checkPasswordMatch(authSignUpRequestDto.password(), authSignUpRequestDto.passwordConfirm());
-
-        // 유저 닉네임 중복 확인
-        checkDuplicatedNickname(authSignUpRequestDto.nickname());
-
-        // 유저 생성, 패스워드 암호화
-        User newUser = userQueryRepository.save(
-                User.toUserEntity(
-                        authSignUpRequestDto,
-                        bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
-                        ELoginProvider.DEFAULT
-                )
-        );
-
-        // 알람 setting 객체 반환
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
-
-        // FCM 토큰 등록
-        fcmTokenService.applyFCMToken(authSignUpRequestDto.fcmToken(), newUser.getId());
-
-        // 회원 가입 후 바로 로그인 상태로 변경
-        JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
-        userCommandRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
-
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
-                newUser.getId()
-        );
-
-        // 유저가 읽은 공지사항 알람 리스트 조회
-        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
-                authSignUpRequestDto.fcmToken()).stream().map(
-                Object::toString
-        ).toList();
-
-        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
-        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken());
-
-        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
-                .lastCheck(informLastCheckedTime)
-                .checkedNoticeIds(checkedNoticeIds)
-                .build();
-
-        // TODO: 여기부터 수정 필요
-        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
-                null, null, null, null,
-                null, null, null, null, null
-        );
-
-        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(authSignUpRequestDto.fcmToken());
-        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(authSignUpRequestDto.fcmToken());
-
-        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
-                popupAlarm -> NotificationResponseDto.fromProperties(
-                        String.valueOf(popupAlarm.getId()), String.valueOf(newUser.getId()), null,
-                        String.valueOf(ENotificationCategory.POPUP),
-                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
-                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
-                        destinationResponseDto
-                )
-        ).toList();
-
-        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
-                .map(informIsRead -> {
-                    InformAlarm informAlarm = informIsRead.getInformAlarm();
-                    Boolean isRead = informIsRead.getIsRead();
-
-                    return NotificationResponseDto.fromProperties(
-                            String.valueOf(informAlarm.getId()),
-                            String.valueOf(newUser.getId()),
-                            null,
-                            String.valueOf(ENotificationCategory.NOTICE),
-                            informAlarm.getTitle(),
-                            informAlarm.getBody(),
-                            null,
-                            isRead,
-                            String.valueOf(informAlarm.getCreatedAt()),
-                            null,
-                            String.valueOf(informAlarm.getId()),
-                            destinationResponseDto
-                    );
-                }).toList();
-
-        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
-                popupNotificationResponseDtoList,
-                noticeNotificationResponseDtoList
-        );
-
-        List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
-
-        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
-        ).toList();
-
-        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
-                userNotificationResponseDto
-        );
-
-        // TODO: 여기까지 수정 필요
-
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
-                newUser,
-                alarmSetting,
-                jwtToken,
-                userPreferenceSettingDto,
-                userNoticeResponseDto,
-                userActivities
-        );
-
-        return userInfoResponseDto;
-    }
-
-    private UserInfoResponseDto socialSignUp(AuthSignUpRequestDto authSignUpRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
-        // DTO에서 소셜 프로바이더 추출
-        ELoginProvider provider = ELoginProvider.valueOf(authSignUpRequestDto.accountType());
-
-        // 유저 이메일 중복 확인
-        checkDuplicatedEmail(authSignUpRequestDto.email());
-
-        // 유저 닉네임 중복 확인
-        checkDuplicatedNickname(authSignUpRequestDto.nickname());
-
-        // 유저 생성, 패스워드 암호화
-        User newUser = userQueryRepository.save(
-                User.toUserEntity(
-                        authSignUpRequestDto, bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
-                        provider
-                )
-        );
-
-        // 알람 setting 객체 반환
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
-
-        // 회원 가입 후 바로 로그인 상태로 변경
-        JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);
-        userCommandRepository.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
-
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
-                newUser.getId()
-        );
-
-        // 유저가 읽은 공지사항 알람 리스트 조회
-        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
-                authSignUpRequestDto.fcmToken()).stream().map(
-                Object::toString
-        ).toList();
-
-        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
-        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                authSignUpRequestDto.fcmToken());
-
-        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
-                .lastCheck(informLastCheckedTime)
-                .checkedNoticeIds(checkedNoticeIds)
-                .build();
-
-        // TODO: 여기부터 수정 필요
-        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
-                null, null, null, null,
-                null, null, null, null, null
-        );
-
-        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(authSignUpRequestDto.fcmToken());
-        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(authSignUpRequestDto.fcmToken());
-
-        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
-                popupAlarm -> NotificationResponseDto.fromProperties(
-                        String.valueOf(popupAlarm.getId()), String.valueOf(newUser.getId()), null,
-                        String.valueOf(ENotificationCategory.POPUP),
-                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
-                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
-                        destinationResponseDto
-                )
-        ).toList();
-
-        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
-                .map(informIsRead -> {
-                    InformAlarm informAlarm = informIsRead.getInformAlarm();
-                    Boolean isRead = informIsRead.getIsRead();
-
-                    return NotificationResponseDto.fromProperties(
-                            String.valueOf(informAlarm.getId()),
-                            String.valueOf(newUser.getId()),
-                            null,
-                            String.valueOf(ENotificationCategory.NOTICE),
-                            informAlarm.getTitle(),
-                            informAlarm.getBody(),
-                            null,
-                            isRead,
-                            String.valueOf(informAlarm.getCreatedAt()),
-                            null,
-                            String.valueOf(informAlarm.getId()),
-                            destinationResponseDto
-                    );
-                }).toList();
-
-        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
-                popupNotificationResponseDtoList,
-                noticeNotificationResponseDtoList
-        );
-
-        List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
-
-        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
-        ).toList();
-
-        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
-                userNotificationResponseDto
-        );
-
-        // TODO: 여기까지 수정 필요
-
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
-                newUser,
-                alarmSetting,
-                jwtToken,
-                userPreferenceSettingDto,
-                userNoticeResponseDto,
-                userActivities
-        );
-        return userInfoResponseDto;
     }
 
     @Transactional
@@ -559,7 +316,7 @@ public class AuthService {
 
         if (verificationType.equals(EVerificationType.SIGN_UP) && userExists) {
             // 회원가입 시에 이메일 중복 -> 중복 이메일 Exception 반환
-            throw new CommonException(ErrorCode.DUPLICATED_SERIAL_ID);
+            throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
         } else if (verificationType.equals(EVerificationType.PASSWORD_RESET) && !userExists) {
             // 비밀번호 재설정 시에 이메일 없음 -> 이메일 없음 Exception 반환
             throw new CommonException(ErrorCode.NOT_FOUND_USER);
@@ -588,7 +345,7 @@ public class AuthService {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
         JwtTokenDto jwtToken = jwtUtil.generateToken(userId, user.getRole());
-        user.updateRefreshToken(jwtToken.refreshToken());
+        user.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
         return jwtToken;
     }
 
