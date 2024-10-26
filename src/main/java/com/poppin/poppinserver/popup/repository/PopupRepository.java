@@ -60,7 +60,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "AND p.operation_status = 'OPERATING' " +
             "ORDER BY p.open_date DESC, p.id",
             countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE) " +
                     "AND p.operation_status = 'OPERATING' " +
                     "ORDER BY p.open_date DESC, p.id",
             nativeQuery = true)

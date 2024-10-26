@@ -30,6 +30,7 @@ public class BootstrapController {
 
     @GetMapping("/bootstrap")
     public ResponseDto<?> bootstrap(HttpServletRequest request) {
+        log.info("Bootstrap request received");
         return ResponseDto.ok(popupService.bootstrap(request));
     }
 }

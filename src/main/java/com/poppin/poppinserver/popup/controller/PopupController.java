@@ -161,6 +161,7 @@ public class PopupController {
     public ResponseDto<?> readGuestBaseList(@RequestParam("searchName") String searchName,
                                             @RequestParam("page") int page,
                                             @RequestParam("size") int size) {
+        log.info("readGuestBaseList");
         return ResponseDto.ok(popupService.readGuestBaseList(searchName, page, size));
     }
 
