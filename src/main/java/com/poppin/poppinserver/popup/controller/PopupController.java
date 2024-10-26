@@ -127,14 +127,14 @@ public class PopupController {
 
     @GetMapping("/search") // 로그인 팝업 검색
     public ResponseDto<?> readSearchList(@RequestParam("searchName") String searchName,
-                                         @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
                                          @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+                                         @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
                                          @RequestParam("oper") EOperationStatus oper,
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long userId) {
-        return ResponseDto.ok(popupService.readSearchingList(searchName, filteringFourteenCategories, filteringThreeCategories, oper, order, page, size, userId));
+        return ResponseDto.ok(popupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size, userId));
     }
 
     @GetMapping("/search/base") // 로그인 팝업 베이스 검색
@@ -147,13 +147,13 @@ public class PopupController {
 
     @GetMapping("/guest/search") // 비로그인 팝업 검색
     public ResponseDto<?> readGuestSearchList(@RequestParam("searchName") String searchName,
-                                              @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
                                               @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+                                              @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
                                               @RequestParam("oper") EOperationStatus oper,
                                               @RequestParam("order") EPopupSort order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {
-        return ResponseDto.ok(popupService.readGuestSearchingList(searchName, filteringFourteenCategories, filteringThreeCategories, oper, order, page, size));
+        return ResponseDto.ok(popupService.readGuestSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size));
     }
 
     @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색
