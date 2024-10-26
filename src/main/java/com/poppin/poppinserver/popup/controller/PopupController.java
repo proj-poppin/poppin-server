@@ -51,6 +51,7 @@ public class PopupController {
     public ResponseDto<?> readPopup(@RequestParam("id") Long popupId,
                                     @UserId Long adminId) {
         log.info(LocalDateTime.now().toString());
+        log.info("test");
         return ResponseDto.ok(adminPopupService.readPopup(adminId, popupId));
     } // 전체팝업관리 - 팝업조회
 

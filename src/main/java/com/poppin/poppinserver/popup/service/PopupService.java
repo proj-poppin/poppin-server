@@ -507,20 +507,13 @@ public class PopupService {
         // order에 따른 정렬 방식 설정
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
-            switch (order) {
-                case OPEN:
-                    sort = Sort.by(Sort.Direction.DESC, "open_date");
-                    break;
-                case CLOSE:
-                    sort = Sort.by(Sort.Direction.ASC, "close_date");
-                    break;
-                case VIEW:
-                    sort = Sort.by(Sort.Direction.DESC, "view_cnt");
-                    break;
-                case UPLOAD:
-                    sort = Sort.by(Sort.Direction.DESC, "created_at");
-                    break;
-            }
+            sort = switch (order) {
+                case RECENTLY_OPENED -> Sort.by(Sort.Direction.DESC, "open_date");
+                case CLOSING_SOON -> Sort.by(Sort.Direction.ASC, "close_date");
+                case MOST_VIEWED -> Sort.by(Sort.Direction.DESC, "view_cnt");
+                case RECENTLY_UPLOADED -> Sort.by(Sort.Direction.DESC, "created_at");
+                default -> sort;
+            };
         }
 
         Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText,
@@ -603,10 +596,11 @@ public class PopupService {
         Sort sort = Sort.by("id"); // 기본 정렬은 id에 대한 정렬을 설정
         if (order != null) {
             sort = switch (order) {
-                case OPEN -> Sort.by(Sort.Direction.DESC, "open_date");
-                case CLOSE -> Sort.by(Sort.Direction.ASC, "close_date");
-                case VIEW -> Sort.by(Sort.Direction.DESC, "view_cnt");
-                case UPLOAD -> Sort.by(Sort.Direction.DESC, "created_at");
+                case RECENTLY_OPENED -> Sort.by(Sort.Direction.DESC, "open_date");
+                case CLOSING_SOON -> Sort.by(Sort.Direction.ASC, "close_date");
+                case MOST_VIEWED -> Sort.by(Sort.Direction.DESC, "view_cnt");
+                case RECENTLY_UPLOADED -> Sort.by(Sort.Direction.DESC, "created_at");
+                default -> sort;
             };
         }
 
