@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,4 +25,6 @@ public interface BlockedPopupRepository extends JpaRepository<BlockedPopup, Long
     @Query("SELECT CASE WHEN COUNT(bp) > 0 THEN TRUE ELSE FALSE END " +
                   "FROM BlockedPopup bp WHERE bp.popupId.id = :popupId AND bp.userId.id = :userId")
     Boolean existsByPopupIdAndUserId(@Param("popupId") Long popupId, @Param("userId") Long userId);
+
+    List<BlockedPopup> findAllByUserId(Long userId);
 }

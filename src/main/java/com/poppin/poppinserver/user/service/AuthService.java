@@ -21,7 +21,9 @@ import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
@@ -38,11 +40,7 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.UserRepository;
@@ -71,6 +69,7 @@ public class AuthService {
     private final InformIsReadRepository informIsReadRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -210,6 +209,13 @@ public class AuthService {
                 userNotificationResponseDto
         );
 
+        // User Relation Dto
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser.getId()).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -218,7 +224,8 @@ public class AuthService {
                 jwtToken,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
 
         return userInfoResponseDto;
@@ -324,6 +331,13 @@ public class AuthService {
                 userNotificationResponseDto
         );
 
+        // User Relation Dto
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser.getId()).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -332,7 +346,8 @@ public class AuthService {
                 jwtToken,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
         return userInfoResponseDto;
     }
@@ -496,6 +511,13 @@ public class AuthService {
                     userNotificationResponseDto
             );
 
+            // User Relation Dto
+            List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.get().getId()).stream()
+                    .map(blockedPopup -> blockedPopup.getId().toString())
+                    .toList();
+
+            UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+
             // TODO: 여기까지 수정 필요
 
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -504,7 +526,8 @@ public class AuthService {
                     jwtTokenDto,
                     userPreferenceSettingDto,
                     userNoticeResponseDto,
-                    userActivities
+                    userActivities,
+                    userRelationDto
             );
             return userInfoResponseDto;
         } else {
@@ -684,6 +707,13 @@ public class AuthService {
                 userNotificationResponseDto
         );
 
+        // User Relation Dto
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.getId()).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -692,7 +722,8 @@ public class AuthService {
                 jwtTokenDto,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
 
         return userInfoResponseDto;

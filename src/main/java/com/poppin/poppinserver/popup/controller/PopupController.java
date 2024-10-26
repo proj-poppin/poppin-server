@@ -130,7 +130,7 @@ public class PopupController {
     public ResponseDto<?> readSearchList(@RequestParam("searchName") String searchName,
                                          @RequestParam("filteringThreeCategories") String filteringThreeCategories,
                                          @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
-                                         @RequestParam("oper") EOperationStatus oper,
+                                         @RequestParam("operationStatus") EOperationStatus oper,
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
@@ -150,7 +150,7 @@ public class PopupController {
     public ResponseDto<?> readGuestSearchList(@RequestParam("searchName") String searchName,
                                               @RequestParam("filteringThreeCategories") String filteringThreeCategories,
                                               @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
-                                              @RequestParam("oper") EOperationStatus oper,
+                                              @RequestParam("operationStatus") EOperationStatus oper,
                                               @RequestParam("order") EPopupSort order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {
