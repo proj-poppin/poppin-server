@@ -21,7 +21,6 @@ import com.poppin.poppinserver.core.util.PasswordUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
@@ -40,7 +39,12 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.BlockedUserRepository;
@@ -203,7 +207,7 @@ public class AuthService {
         List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
 
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
+                PopupScrapDto::fromInterest
         ).toList();
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -224,7 +228,7 @@ public class AuthService {
 
         // TODO: 여기까지 수정 필요
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+        return UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
@@ -233,8 +237,6 @@ public class AuthService {
                 userActivities,
                 userRelationDto
         );
-
-        return userInfoResponseDto;
     }
 
     private UserInfoResponseDto socialSignUp(AuthSignUpRequestDto authSignUpRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
@@ -329,7 +331,7 @@ public class AuthService {
         List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
 
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
+                PopupScrapDto::fromInterest
         ).toList();
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -350,7 +352,7 @@ public class AuthService {
 
         // TODO: 여기까지 수정 필요
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+        return UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
@@ -359,7 +361,6 @@ public class AuthService {
                 userActivities,
                 userRelationDto
         );
-        return userInfoResponseDto;
     }
 
     @Transactional
@@ -513,7 +514,7 @@ public class AuthService {
             List<Interest> userInterestPopupList = interestRepository.findByUserId(user.get().getId());
 
             List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                    interest -> PopupScrapDto.fromInterest(interest)
+                    PopupScrapDto::fromInterest
             ).toList();
 
             UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -534,7 +535,7 @@ public class AuthService {
 
             // TODO: 여기까지 수정 필요
 
-            UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+            return UserInfoResponseDto.fromUserEntity(
                     user.get(),
                     alarmSetting,
                     jwtTokenDto,
@@ -543,7 +544,6 @@ public class AuthService {
                     userActivities,
                     userRelationDto
             );
-            return userInfoResponseDto;
         } else {
             // 비밀번호 랜덤 생성 후 암호화해서 DB에 저장
             User newUser = userRepository.findByEmail(oAuth2UserInfo.email())
@@ -643,7 +643,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(Long.valueOf(user.getId()), fcmToken);
+        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
@@ -713,7 +713,7 @@ public class AuthService {
         List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
 
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
+                PopupScrapDto::fromInterest
         ).toList();
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -734,7 +734,7 @@ public class AuthService {
 
         // TODO: 여기까지 수정 필요
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+        return UserInfoResponseDto.fromUserEntity(
                 user,
                 alarmSetting,
                 jwtTokenDto,
@@ -743,8 +743,6 @@ public class AuthService {
                 userActivities,
                 userRelationDto
         );
-
-        return userInfoResponseDto;
     }
 
     @Transactional
