@@ -2,8 +2,8 @@ package com.poppin.poppinserver.interest.dto.interest.request;
 
 public record InterestRequestDto(
 
-        String popupId,
+        String popupId
 
-        String fcmToken
+        // String fcmToken
 ) {
 }
