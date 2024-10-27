@@ -1,28 +1,25 @@
 package com.poppin.poppinserver.interest.service;
 
 import com.poppin.poppinserver.alarm.service.FCMTokenService;
-import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
-import com.poppin.poppinserver.interest.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
+import com.poppin.poppinserver.interest.dto.interest.response.InterestDto;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -62,10 +59,10 @@ public class InterestService {
         popup.addInterestCnt();
 
         /*알림 구독*/
-        String fcmToken = requestDto.fcmToken();
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+//        String fcmToken = requestDto.fcmToken();
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+//        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
@@ -83,7 +80,6 @@ public class InterestService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-
         VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
         Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
@@ -93,11 +89,11 @@ public class InterestService {
         interestRepository.delete(interest);
 
         /*FCM 구독취소*/
-        String fcmToken = requestDto.fcmToken();
-
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+//        String fcmToken = requestDto.fcmToken();
+//
+//        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+//        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+//        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
 
         return interestDto;
     }
