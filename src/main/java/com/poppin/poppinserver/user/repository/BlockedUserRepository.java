@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.user.repository;
 
 import com.poppin.poppinserver.user.domain.BlockedUser;
+import com.poppin.poppinserver.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,6 @@ public interface BlockedUserRepository extends JpaRepository<BlockedUser, Long> 
     @Modifying
     @Query("DELETE FROM BlockedUser bu WHERE bu.blockedUserId.id = :userId")
     void deleteAllByBlockedId(@Param("userId") Long userId);
+
+    List<BlockedUser> findAllByUserId(User UserId);
 }

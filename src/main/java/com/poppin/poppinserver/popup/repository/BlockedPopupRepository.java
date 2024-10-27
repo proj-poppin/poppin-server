@@ -26,5 +26,5 @@ public interface BlockedPopupRepository extends JpaRepository<BlockedPopup, Long
                   "FROM BlockedPopup bp WHERE bp.popupId.id = :popupId AND bp.userId.id = :userId")
     Boolean existsByPopupIdAndUserId(@Param("popupId") Long popupId, @Param("userId") Long userId);
 
-    List<BlockedPopup> findAllByUserId(Long userId);
+    List<BlockedPopup> findAllByUserId(User userId);
 }

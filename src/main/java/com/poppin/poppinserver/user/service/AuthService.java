@@ -43,6 +43,7 @@ import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
+import com.poppin.poppinserver.user.repository.BlockedUserRepository;
 import com.poppin.poppinserver.user.repository.UserRepository;
 import java.util.Base64;
 import java.util.List;
@@ -70,6 +71,7 @@ public class AuthService {
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
     private final BlockedPopupRepository blockedPopupRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -210,11 +212,15 @@ public class AuthService {
         );
 
         // User Relation Dto
-        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser.getId()).stream()
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser).stream()
                 .map(blockedPopup -> blockedPopup.getId().toString())
                 .toList();
 
-        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+        List<String> blockedUsers = blockedUserRepository.findAllByUserId(newUser).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
 
         // TODO: 여기까지 수정 필요
 
@@ -332,11 +338,15 @@ public class AuthService {
         );
 
         // User Relation Dto
-        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser.getId()).stream()
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser).stream()
                 .map(blockedPopup -> blockedPopup.getId().toString())
                 .toList();
 
-        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+        List<String> blockedUsers = blockedUserRepository.findAllByUserId(newUser).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
 
         // TODO: 여기까지 수정 필요
 
@@ -512,11 +522,15 @@ public class AuthService {
             );
 
             // User Relation Dto
-            List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.get().getId()).stream()
+            List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.get()).stream()
                     .map(blockedPopup -> blockedPopup.getId().toString())
                     .toList();
 
-            UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+            List<String> blockedUsers = blockedUserRepository.findAllByUserId(user.get()).stream()
+                    .map(blockedUser -> blockedUser.getId().toString())
+                    .toList();
+
+            UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
 
             // TODO: 여기까지 수정 필요
 
@@ -708,11 +722,15 @@ public class AuthService {
         );
 
         // User Relation Dto
-        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.getId()).stream()
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user).stream()
                 .map(blockedPopup -> blockedPopup.getId().toString())
                 .toList();
 
-        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIds(blockedPopups);
+        List<String> blockedUsers = blockedUserRepository.findAllByUserId(user).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
 
         // TODO: 여기까지 수정 필요
 

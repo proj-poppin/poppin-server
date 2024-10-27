@@ -6,11 +6,13 @@ import java.util.List;
 
 @Builder
 public record UserRelationDto(
-        List<String> blockedUserIds
+        List<String> blockedUserIds,
+        List<String> blockedPopupIds
 ) {
-    static public UserRelationDto ofBlockedUserIds(List<String> blockedUserIds) {
+    static public UserRelationDto ofBlockedUserIdsAndPopupIds(List<String> blockedUserIds, List<String> blockedPopupIds) {
         return UserRelationDto.builder()
                 .blockedUserIds(blockedUserIds)
+                .blockedPopupIds(blockedPopupIds)
                 .build();
     }
 }
