@@ -50,6 +50,7 @@ public class AlarmService {
      * @param fcmRequestDto :  FCM Token request dto
      * @return : UnreadAlarmResponseDto
      */
+    //TODO : 삭제 예정
     public AlarmStatusResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto) {
         AlarmStatusResponseDto responseDto;
 

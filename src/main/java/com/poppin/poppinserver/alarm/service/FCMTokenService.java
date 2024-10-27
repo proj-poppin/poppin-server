@@ -9,17 +9,16 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,9 +29,7 @@ public class FCMTokenService {
 
     private final PopupTopicRepository popupTopicRepository;
     private final UserQueryRepository userQueryRepository;
-    private final ReviewRepository reviewRepository;
     private final FCMSubscribeService fcmSubscribeService;
-    private final PopupRepository popupRepository;
 
     /* FCM TOKEN 등록, 회원가입 시 사용하기 */
     @Transactional
@@ -83,6 +80,8 @@ public class FCMTokenService {
             if (!currentToken.equals(fcmToken)) {
                 fcmTokenOptional.get().setToken(fcmToken);
                 fcmTokenRepository.save(fcmTokenOptional.get());
+                // 알림 세팅
+                //
             }
         }
     }

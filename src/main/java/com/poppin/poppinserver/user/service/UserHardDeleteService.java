@@ -13,9 +13,9 @@ import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRecommendRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.repository.*;
+import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
+import com.poppin.poppinserver.review.usecase.ReviewQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
@@ -23,10 +23,11 @@ import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +36,7 @@ public class UserHardDeleteService {
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedUserCommandRepository blockedUserCommandRepository;
     private final InterestRepository interestRepository;
-    private final ReviewRecommendRepository reviewRecommendRepository;
+    private final ReviewRecommendCommandRepository reviewRecommendRepository;
     private final UserInformRepository userInformRepository;
     private final ManagerInformRepository managerInformRepository;
     private final ModifyInformRepository modifyInfoRepository;
@@ -47,10 +48,13 @@ public class UserHardDeleteService {
     private final S3Service s3Service;
     private final VisitRepository visitRepository;
     private final VisitorDataRepository visitorDataRepository;
-    private final ReviewRepository reviewRepository;
-    private final ReviewImageRepository reviewImageRepository;
-    private final UserQueryUseCase userQueryUseCase;
+    private final ReviewCommandRepository reviewRepository;
+    private final ReviewImageCommandRepository reviewImageCommandRepository;
     private final UserQueryRepository userQueryRepository;
+
+    private final UserQueryUseCase userQueryUseCase;
+    private final ReviewQueryUseCase reviewQueryUseCase;
+    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
 
     public void deleteUser(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
@@ -79,19 +83,19 @@ public class UserHardDeleteService {
         유저가 작성한 모든 후기 삭제
      */
     private void deleteUserReviews(Long userId) {
-        List<Review> reviews = reviewRepository.findByUserId(userId);
+        List<Review> reviews = reviewQueryUseCase.findByUserId(userId);
 
         // 후기 이미지 삭제
         for (Review review : reviews) {
             Long reviewId = review.getId();
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(reviewId);
+            List<ReviewImage> reviewImages = reviewImageQueryUseCase.findAllByReviewId(reviewId);
             // S3에서 삭제
             for (ReviewImage reviewImage : reviewImages) {
                 s3Service.deleteImage(reviewImage.getImageUrl());
                 log.info("Deleting image from S3: {}", reviewImage.getImageUrl());
             }
             // DB에서 삭제
-            reviewImageRepository.deleteAllByReviewId(reviewId);
+            reviewImageCommandRepository.deleteAllByReviewId(reviewId);
             log.info("Deleting review images from DB for reviewId: {}", reviewId);
             // 방문자 데이터 삭제
             deleteUserVisitData(reviewId);

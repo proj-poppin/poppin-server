@@ -13,22 +13,23 @@ import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewDto;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.repository.ReviewCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.service.UserService;
 import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,8 +39,8 @@ public class ReviewWriteService {
 
     private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewCommandRepository reviewRepository;
+    private final ReviewImageCommandRepository reviewImageRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final VisitRepository visitRepository;
     private final FCMTokenRepository fcmTokenRepository;

@@ -20,8 +20,8 @@ import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
+import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -31,25 +31,26 @@ import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.service.VisitService;
 import com.poppin.poppinserver.visit.service.VisitorDataService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PopupService {
     private final PopupRepository popupRepository;
-    private final ReviewRepository reviewRepository;
+    private final ReviewQueryRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final VisitRepository visitRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
@@ -78,7 +79,7 @@ public class PopupService {
         List<Integer> reviewCntList = new ArrayList<>();
 
         for (Review review : reviews) {
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            List<ReviewImage> reviewImages = reviewImageQueryUseCase.findAllByReviewId(review.getId());
 
             List<String> imagesList = new ArrayList<>();
             for (ReviewImage reviewImage : reviewImages) {
@@ -139,7 +140,7 @@ public class PopupService {
 
             filteredReviews.add(review);
 
-            List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewId(review.getId());
+            List<ReviewImage> reviewImages = reviewImageQueryUseCase.findAllByReviewId(review.getId());
 
             List<String> imagesList = new ArrayList<>();
             for (ReviewImage reviewImage : reviewImages) {

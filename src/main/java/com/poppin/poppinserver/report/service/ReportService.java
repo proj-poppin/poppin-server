@@ -11,29 +11,31 @@ import com.poppin.poppinserver.report.dto.report.request.CreateReviewReportDto;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.usecase.ReviewQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService {
 
-    private final ReviewRepository reviewRepository;
     private final UserQueryRepository userQueryRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final PopupRepository popupRepository;
 
+    private final ReviewQueryUseCase reviewQueryUseCase;
+
     public void createReviewReport(Long userId, CreateReviewReportDto createReviewReportDto) {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Review review = reviewRepository.findById(Long.valueOf(createReviewReportDto.reviewId()))
+        Review review = reviewQueryUseCase.findById(Long.valueOf(createReviewReportDto.reviewId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
         ReportReview reportReview = ReportReview.builder()
                 .reporterId(user)

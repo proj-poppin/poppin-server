@@ -12,8 +12,8 @@ import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.dto.response.ReviewCertiDto;
 import com.poppin.poppinserver.review.dto.response.ReviewFinishDto;
 import com.poppin.poppinserver.review.dto.response.ReviewUncertiDto;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
+import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.faq.response.UserFaqResponseDto;
@@ -29,11 +29,12 @@ import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -42,11 +43,11 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserQueryUseCase userQueryUseCase;
     private final UserQueryRepository userQueryRepository;
-    private final ReviewRepository reviewRepository;
+    private final ReviewQueryRepository reviewRepository;
     private final PopupRepository popupRepository;
     private final VisitRepository visitRepository;
     private final VisitorDataRepository visitorDataRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final FreqQuestionRepository freqQuestionRepository;
     private final PosterImageRepository posterImageRepository;
 
@@ -140,7 +141,7 @@ public class UserService {
         VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),
                 visitorData.getSatisfaction(), visitorData.getCongestion());
 
-        List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
+        List<String> reviewImageListUrl = reviewImageQueryUseCase.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
         return ReviewCertiDto.fromEntity(
                 popup.getName(),
@@ -171,7 +172,7 @@ public class UserService {
         VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),
                 visitorData.getSatisfaction(), visitorData.getCongestion());
 
-        List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
+        List<String> reviewImageListUrl = reviewImageQueryUseCase.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
 
         return ReviewUncertiDto.fromEntity(
                 popup.getName(),

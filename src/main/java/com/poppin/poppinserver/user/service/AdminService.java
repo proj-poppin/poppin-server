@@ -24,19 +24,12 @@ import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportContentDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupDetailDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewDetailDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.*;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.review.repository.ReviewImageRepository;
-import com.poppin.poppinserver.review.repository.ReviewRepository;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
+import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
@@ -52,12 +45,6 @@ import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,17 +55,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AdminService {
     private final FreqQuestionRepository freqQuestionRepository;
     private final UserQueryRepository userQueryRepository;
-    private final ReviewRepository reviewRepository;
+    private final ReviewQueryRepository reviewRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final VisitRepository visitRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final InformAlarmRepository informAlarmRepository;
@@ -205,7 +199,7 @@ public class AdminService {
 
         List<UserReviewDto> userReviewDtoList = reviewPage.getContent().stream()
                 .map(userReview -> {
-                    List<String> reviewImageListUrl = reviewImageRepository.findUrlAllByReviewId(userReview.getId());
+                    List<String> reviewImageListUrl = reviewImageQueryUseCase.findUrlAllByReviewId(userReview.getId());
                     Optional<Visit> visitDate = visitRepository.findByUserId(userId, userReview.getPopup().getId());
 
                     UserReviewDto userReviewDto = UserReviewDto.of(userReview.getId(), userReview.getPopup().getName(),
@@ -329,7 +323,7 @@ public class AdminService {
                 .reviewContent(review.getText())
                 .reviewCreatedAt(review.getCreatedAt().toString())
                 .isCertificated(review.getIsCertificated())
-                .imageUrl(reviewImageRepository.findUrlAllByReviewId(review.getId()))
+                .imageUrl(reviewImageQueryUseCase.findUrlAllByReviewId(review.getId()))
                 .userProfileImageUrl(review.getUser().getProfileImageUrl())
                 .build();
         ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
