@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum EPopupSort {
-    OPEN("OPEN"),
-    CLOSE("CLOSE"),
-    VIEW("VIEW"),
-    UPLOAD("UPLOAD");
+    RECENTLY_OPENED("RECENTLY_OPENED"),
+    CLOSING_SOON("CLOSING_SOON"),
+    MOST_VIEWED("MOST_VIEWED"),
+    RECENTLY_UPLOADED("RECENTLY_UPLOADED");
 
     private final String sort;
 }
