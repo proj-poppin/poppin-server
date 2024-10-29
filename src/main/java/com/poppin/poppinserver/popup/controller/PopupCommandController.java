@@ -69,7 +69,7 @@ public class PopupCommandController {
         return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
     }
 
-    @PostMapping("/visit") // 팝업 방문하기
+    @PatchMapping("/visit") // 팝업 방문하기
     public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
