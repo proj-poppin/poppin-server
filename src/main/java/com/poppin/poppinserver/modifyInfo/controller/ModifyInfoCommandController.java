@@ -2,10 +2,10 @@ package com.poppin.poppinserver.modifyInfo.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.service.AdminModifyInfoService;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/modify-info") // 정보수정요청
-public class ModifyInfoController {
+public class ModifyInfoCommandController {
     private final ModifyInfoService modifyInfoService;
     private final AdminModifyInfoService adminModifyInfoService;
 
@@ -40,21 +40,6 @@ public class ModifyInfoController {
 
         return ResponseDto.ok(modifyInfoService.createModifyInfo(createModifyInfoDto, images, userId));
     } // 요청 생성
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("")
-    public ResponseDto<?> readModifyInfo(@RequestParam("infoId") Long modifyInfoId,
-                                         @UserId Long adminId) {
-        return ResponseDto.ok(adminModifyInfoService.readModifyInfo(modifyInfoId, adminId));
-    } // 요청 조회
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/list")
-    public ResponseDto<?> readModifyInfoList(@RequestParam("isExec") Boolean isExec,
-                                             @RequestParam("page") int page,
-                                             @RequestParam("size") int size) {
-        return ResponseDto.ok(adminModifyInfoService.readModifyInfoList(page, size, isExec));
-    } // 목록 조회
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})

@@ -5,7 +5,6 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EAvailableAge;
-import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.service.AdminManagerInformService;
@@ -14,27 +13,22 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/manager-inform")
-public class ManagerInformController {
+public class ManagerInformCommandController {
     private final ManagerInformService managerInformService;
     private final AdminManagerInformService adminManagerInformService;
 
@@ -147,12 +141,6 @@ public class ManagerInformController {
         return ResponseDto.ok(managerInformService.createGuestManagerInform(createManagerInformDto, images));
     } // 운영자 제보 생성
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("") // 운영자 제보 조회
-    public ResponseDto<?> readUserInform(@RequestParam("informId") Long managerInformId) {
-        return ResponseDto.ok(adminManagerInformService.readManageInform(managerInformId));
-    }
-
     // 운영자 제보 임시저장
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -179,13 +167,5 @@ public class ManagerInformController {
         }
 
         return ResponseDto.ok(adminManagerInformService.uploadPopup(updateManagerInformDto, images, adminId));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/list")
-    public ResponseDto<?> readManagerInformList(@RequestParam(value = "page") int page,
-                                                @RequestParam(value = "size") int size,
-                                                @RequestParam(value = "prog") EInformProgress progress) {
-        return ResponseDto.ok(adminManagerInformService.readManagerInformList(page, size, progress));
     }
 }

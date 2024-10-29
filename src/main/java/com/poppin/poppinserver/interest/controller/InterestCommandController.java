@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/interest")
-public class InterestController {
+public class InterestCommandController {
     private final InterestService interestService;
 
     @PostMapping("")

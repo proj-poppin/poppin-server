@@ -5,13 +5,18 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.popup.service.BlockedPopupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/popup/block")
-public class BlockedPopupController {
+@ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
+public class BlockedPopupCommandController {
     private final BlockedPopupService blockedPopupService;
 
     @PostMapping("/{blockPostId}")
