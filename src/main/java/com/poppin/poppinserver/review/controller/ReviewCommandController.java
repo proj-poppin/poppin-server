@@ -38,7 +38,7 @@ public class ReviewCommandController {
     }
 
     /*후기 추천*/
-    @PostMapping("/add-recommend")
+    @PostMapping("/recommend")
     public ResponseDto<?> recommendReview(@UserId Long userId,
                                           @RequestParam("reviewId") String reviewId,
                                           @RequestParam("popupId") String popupId
