@@ -12,13 +12,12 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -42,7 +41,7 @@ public class FCMTokenService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
         // FCM 토큰이 이미 존재하는 경우 -> 에러: 회원가입 한 유저는 새로운 FCM 토큰이어야 함.
-        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByFcmToken(fcmToken);
+        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByTokenOpt(fcmToken);
 
         if (fcmTokenOptional.isPresent()) {
             throw new CommonException(ErrorCode.ALREADY_EXIST_FCM_TOKEN);
@@ -75,7 +74,7 @@ public class FCMTokenService {
         log.info("verify token : {}", fcmToken);
 
         Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(Long.valueOf(userId));
-        if (!fcmTokenOptional.isEmpty()) {
+        if (fcmTokenOptional.isPresent()) {
             String currentToken = fcmTokenOptional.get().getToken();
             if (!currentToken.equals(fcmToken)) {
                 fcmTokenOptional.get().setToken(fcmToken);

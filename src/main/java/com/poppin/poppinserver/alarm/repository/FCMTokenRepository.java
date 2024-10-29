@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.alarm.repository;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
+import com.poppin.poppinserver.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +26,8 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
     @Query("SELECT token FROM FCMToken token WHERE token.exp_dtm <= :now")
     List<FCMToken> findExpiredTokenList(LocalDateTime now);
 
-    @Query("DELETE FROM FCMToken token WHERE token.token = :fcmTokenOptional")
-    void delete(Optional<FCMToken> fcmTokenOptional);
-
     @Query("SELECT token FROM FCMToken token WHERE token.user.id = :userId")
     Optional<FCMToken> findByUserId(Long userId);
 
-    @Query("SELECT token FROM FCMToken token WHERE token.token = :fcmToken")
-    Optional<FCMToken> findByFcmToken(@Param("fcmToken") String fcmToken);
+    FCMToken findByUser(User user);
 }
