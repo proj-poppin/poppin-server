@@ -14,15 +14,13 @@ import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.List;
@@ -45,6 +43,8 @@ public class AuthSignUpService {
     private final InformIsReadRepository informIsReadRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
+    private final BlockedUserQueryRepository blockedUserQueryRepository;
 
     // 유저 이메일 중복 확인 메서드
 //    private void checkDuplicatedEmail(String email) {
@@ -188,6 +188,14 @@ public class AuthSignUpService {
                 userNotificationResponseDto
         );
 
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+        List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(newUser).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -196,7 +204,8 @@ public class AuthSignUpService {
                 jwtToken,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
 
         return userInfoResponseDto;
@@ -307,6 +316,14 @@ public class AuthSignUpService {
                 userNotificationResponseDto
         );
 
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(newUser).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+        List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(newUser).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -315,7 +332,8 @@ public class AuthSignUpService {
                 jwtToken,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
         return userInfoResponseDto;
     }

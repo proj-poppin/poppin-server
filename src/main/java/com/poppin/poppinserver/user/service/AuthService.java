@@ -21,6 +21,7 @@ import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
@@ -37,13 +38,10 @@ import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
+import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.util.Base64;
@@ -72,6 +70,8 @@ public class AuthService {
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
     private final UserCommandRepository userCommandRepository;
+    private final BlockedPopupRepository blockedPopupRepository;
+    private final BlockedUserQueryRepository blockedUserQueryRepository;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -256,6 +256,14 @@ public class AuthService {
                     userNotificationResponseDto
             );
 
+            List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user.get()).stream()
+                    .map(blockedPopup -> blockedPopup.getId().toString())
+                    .toList();
+            List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(user.get()).stream()
+                    .map(blockedUser -> blockedUser.getId().toString())
+                    .toList();
+            UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
+
             // TODO: 여기까지 수정 필요
 
             UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -264,7 +272,8 @@ public class AuthService {
                     jwtTokenDto,
                     userPreferenceSettingDto,
                     userNoticeResponseDto,
-                    userActivities
+                    userActivities,
+                    userRelationDto
             );
             return userInfoResponseDto;
         } else {
@@ -444,6 +453,14 @@ public class AuthService {
                 userNotificationResponseDto
         );
 
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+        List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(user).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
+
         // TODO: 여기까지 수정 필요
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
@@ -452,7 +469,8 @@ public class AuthService {
                 jwtTokenDto,
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
-                userActivities
+                userActivities,
+                userRelationDto
         );
 
         return userInfoResponseDto;
