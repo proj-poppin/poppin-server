@@ -18,6 +18,7 @@ import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
@@ -35,12 +36,10 @@ public class ManagerInformService {
     private final ManagerInformRepository managerInformRepository;
     private final PopupRepository popupRepository;
     private final TastePopupRepository tastePopupRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final UserQueryUseCase userQueryUseCase;
-    private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
 
-    private final S3Service s3Service;
+    private final UserQueryUseCase userQueryUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
 
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
@@ -100,18 +99,8 @@ public class ManagerInformService {
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
         popup = popupRepository.save(popup);
 
@@ -182,18 +171,8 @@ public class ManagerInformService {
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
         popup = popupRepository.save(popup);
 

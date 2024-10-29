@@ -37,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
-    private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;

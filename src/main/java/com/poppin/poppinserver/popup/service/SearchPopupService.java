@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SearchPopupService {
     private final PopupRepository popupRepository;
+
     private final PrepardSearchUtil prepardSearchUtil;
 
     private final PopupService popupService;

@@ -22,6 +22,12 @@ public class UserQueryService implements UserQueryUseCase {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
     }
 
+    // User PK로 유저 존재 여부 조회 메서드
+    @Override
+    public Boolean existsById(Long userId) {
+        return userQueryRepository.existsById(userId);
+    }
+
     // 유저 이메일 중복 확인 메서드
     @Override
     public void checkDuplicatedEmail(String email) {

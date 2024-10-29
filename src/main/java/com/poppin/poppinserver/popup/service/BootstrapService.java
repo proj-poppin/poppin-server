@@ -17,6 +17,7 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,12 +39,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BootstrapService {
     private final PopupRepository popupRepository;
-    private final UserQueryRepository userQueryRepository;
 
     private final AlarmService alarmService;
     private final PopupService popupService;
 
-
+    private final UserQueryUseCase userQueryUseCase;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
@@ -51,7 +51,7 @@ public class BootstrapService {
     @Transactional(readOnly = true)
     public BootstrapDto bootstrap(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
-        if (userId != null && !userQueryRepository.existsById(userId)) {
+        if (userId != null && !userQueryUseCase.existsById(userId)) {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
 
@@ -80,8 +80,7 @@ public class BootstrapService {
             List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
 
             // 관심 저장 팝업 조회
-            User user = userQueryRepository.findById(userId)
-                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+            User user = userQueryUseCase.findUserById(userId);
 
             Set<Interest> interest = user.getInterest();
             List<Popup> interestedPopup = interest.stream()
@@ -127,8 +126,7 @@ public class BootstrapService {
         // 5개 선정
         // 관심 테이블에서
 
-        User user = userQueryRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = userQueryUseCase.findUserById(userId);
 
         //취향설정이 되지 않은 유저의 경우
         if (user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null) {

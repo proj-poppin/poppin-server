@@ -46,11 +46,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PopupService {
     private final PopupRepository popupRepository;
+
     private final ReviewQueryRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
-    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final VisitRepository visitRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
@@ -58,6 +58,7 @@ public class PopupService {
     private final VisitorDataService visitorDataService;
     private final VisitService visitService;
 
+    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final UserQueryUseCase userQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
 

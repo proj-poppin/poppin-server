@@ -23,6 +23,7 @@ import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
@@ -43,13 +44,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminUserInformService {
     private final UserInformRepository userInformRepository;
     private final TastePopupRepository tastePopupRepository;
-    private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final PreferedPopupRepository preferedPopupRepository;
+    private final PosterImageRepository posterImageRepository;
 
     private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
@@ -107,18 +109,8 @@ public class AdminUserInformService {
         posterImageRepository.deleteAllByPopupId(popup);
 
         //새로운 이미지 추가
-        List<String> newUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : newUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(newUrls.get(0));
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
@@ -209,18 +201,8 @@ public class AdminUserInformService {
         posterImageRepository.deleteAllByPopupId(popup);
 
         //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
