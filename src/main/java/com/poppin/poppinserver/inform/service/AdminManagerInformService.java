@@ -43,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminManagerInformService {
+    // 주석
     private final ManagerInformRepository managerInformRepository;
     private final PopupRepository popupRepository;
     private final TastePopupRepository tastePopupRepository;
