@@ -4,22 +4,25 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
-import com.poppin.poppinserver.popup.service.*;
-import com.poppin.poppinserver.visit.service.VisitService;
+import com.poppin.poppinserver.popup.service.AdminPopupService;
+import com.poppin.poppinserver.popup.service.ListingPopupService;
+import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.service.SearchPopupService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/popup")
-@ConditionalOnProperty(name = "app.write.enabled", havingValue = "false")
 public class PopupQueryController {
     private final PopupService popupService;
     private final ListingPopupService listingPopupService;
@@ -42,9 +45,6 @@ public class PopupQueryController {
                                          @UserId Long adminId) {
         return ResponseDto.ok(adminPopupService.readManageList(adminId, oper, page, size));
     } // 전체팝업관리 - 전체 팝업 리스트 조회
-
-
-
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -98,7 +98,9 @@ public class PopupQueryController {
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @UserId Long userId) {
-        return ResponseDto.ok(searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size, userId));
+        return ResponseDto.ok(
+                searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories,
+                        oper, order, page, size, userId));
     }
 
     @GetMapping("/search/base") // 로그인 팝업 베이스 검색
@@ -117,7 +119,8 @@ public class PopupQueryController {
                                               @RequestParam("order") EPopupSort order,
                                               @RequestParam("page") int page,
                                               @RequestParam("size") int size) {
-        return ResponseDto.ok(searchPopupService.readGuestSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size));
+        return ResponseDto.ok(searchPopupService.readGuestSearchingList(searchName, filteringThreeCategories,
+                filteringFourteenCategories, oper, order, page, size));
     }
 
     @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색
