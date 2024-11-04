@@ -24,7 +24,14 @@ import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.*;
+import com.poppin.poppinserver.report.dto.report.response.ReportContentDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -45,6 +52,13 @@ import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -54,13 +68,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -504,5 +511,27 @@ public class AdminService {
         userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
 
         return jwtTokenDto;
+    }
+
+    @Transactional
+    public JwtTokenDto refresh(@NotNull String refreshToken) {
+        String token = refineToken(refreshToken);
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userQueryRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        if (!user.getRefreshToken().equals(token)) {
+            throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
+        }
+        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
+        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        return jwtTokenDto;
+    }
+
+    private String refineToken(String accessToken) {
+        if (accessToken.startsWith(Constant.BEARER_PREFIX)) {
+            return accessToken.substring(Constant.BEARER_PREFIX.length());
+        } else {
+            return accessToken;
+        }
     }
 }
