@@ -108,8 +108,7 @@ public class VisitService {
         Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
 
-        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked);
-        return popupStoreDto;
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked);
     }
 
     public void changeVisitStatus(Long popupId) {
