@@ -97,10 +97,10 @@ public class PopupQueryController {
                                          @RequestParam("order") EPopupSort order,
                                          @RequestParam("page") int page,
                                          @RequestParam("size") int size,
-                                         @UserId Long userId) {
+                                         HttpServletRequest request) {
         return ResponseDto.ok(
                 searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories,
-                        oper, order, page, size, userId));
+                        oper, order, page, size, request));
     }
 
     @GetMapping("/search/base") // 로그인 팝업 베이스 검색

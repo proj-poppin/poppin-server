@@ -6,6 +6,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
+import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
@@ -13,6 +14,8 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,11 +33,13 @@ public class SearchPopupService {
 
     private final PopupService popupService;
     private final UserQueryUseCase userQueryUseCase;
+    private final HeaderUtil headerUtil;
 
     public PagingResponseDto readSearchingList(String text, String taste, String prepered,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
-                                               Long userId) {
-        User user = userQueryUseCase.findUserById(userId);
+                                               HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
+
 
         // 카테고리 요청 코드 길이 유효성 체크
         if (taste.length() < 3 || prepered.length() < 14) {
@@ -90,18 +95,37 @@ public class SearchPopupService {
             };
         }
 
-        Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText,
-                PageRequest.of(page, size, sort),
-                market, display, experience, // 팝업 형태 3개
-                fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
-                webtoonAni, interiorThings, movie,
-                musical, sports, game,
-                itTech, kpop, alcohol,
-                animalPlant, etc,
-                oper.getStatus(), userId); // 운영 상태
+        List<PopupStoreDto> popupStoreDtos = null;
+        PageInfoDto pageInfoDto = null;
+        if (userId != null) {
+            User user = userQueryUseCase.findUserById(userId);
 
-        List<PopupStoreDto> popupStoreDtos = popupService.getPopupStoreDtos(popups, userId);
-        PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
+            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText,
+                    PageRequest.of(page, size, sort),
+                    market, display, experience, // 팝업 형태 3개
+                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                    webtoonAni, interiorThings, movie,
+                    musical, sports, game,
+                    itTech, kpop, alcohol,
+                    animalPlant, etc,
+                    oper.getStatus(), userId); // 운영 상태
+
+            popupStoreDtos = popupService.getPopupStoreDtos(popups, userId);
+            pageInfoDto = PageInfoDto.fromPageInfo(popups);
+        } else {
+            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
+                    market, display, experience, // 팝업 형태 3개
+                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                    webtoonAni, interiorThings, movie,
+                    musical, sports, game,
+                    itTech, kpop, alcohol,
+                    animalPlant, etc,
+                    oper.getStatus()); // 운영 상태
+
+            popupStoreDtos = popupService.guestGetPopupStoreDtos(popups);
+            pageInfoDto = PageInfoDto.fromPageInfo(popups);
+        }
+
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 로그인 팝업 검색

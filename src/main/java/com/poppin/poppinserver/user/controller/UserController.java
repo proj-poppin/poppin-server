@@ -12,6 +12,7 @@ import com.poppin.poppinserver.user.service.UserHardDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserProfileImageService;
 import com.poppin.poppinserver.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -182,9 +183,9 @@ public class UserController {
                                           @RequestParam("order") EPopupSort order,
                                           @RequestParam("page") int page,
                                           @RequestParam("size") int size,
-                                          @UserId Long userId) {
+                                          HttpServletRequest request) {
         return ResponseDto.ok(
-                searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, userId));
+                searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, request));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/
