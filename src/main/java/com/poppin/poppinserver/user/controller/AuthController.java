@@ -4,6 +4,7 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
@@ -55,12 +56,21 @@ public class AuthController {
 //        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
 //    }
 
+    // base64 인코딩 로그인
+//    @PostMapping("/sign-in")
+//    public ResponseDto<?> authSignIn(
+//            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader,
+//            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+//    ) {
+//        return ResponseDto.ok(authService.authSignIn(authorizationHeader, fcmTokenRequestDto));
+//    }
+
+    // body로 email, password 로그인
     @PostMapping("/sign-in")
-    public ResponseDto<?> authSignIn(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader,
-            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+    public ResponseDto<?> authLogin(
+            @RequestBody @Valid AuthLoginRequestDto authLoginRequestDto
     ) {
-        return ResponseDto.ok(authService.authSignIn(authorizationHeader, fcmTokenRequestDto));
+        return ResponseDto.ok(authService.authLogin(authLoginRequestDto));
     }
 
     @PostMapping("/login/{provider}")
