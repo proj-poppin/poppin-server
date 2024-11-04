@@ -85,8 +85,10 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseDto<?> refresh(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken) {
-        return ResponseDto.ok(authService.refresh(refreshToken));
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken,
+            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
+    ) {
+        return ResponseDto.ok(authService.refresh(refreshToken, fcmTokenRequestDto));
     }
 
     @PutMapping("/reset-password")
