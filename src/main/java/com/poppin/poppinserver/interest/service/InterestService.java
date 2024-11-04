@@ -75,6 +75,7 @@ public class InterestService {
         return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
     }
 
+    @Transactional
     public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) {
         Long popupId = Long.valueOf(requestDto.popupId());
 

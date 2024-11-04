@@ -19,7 +19,12 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -180,7 +185,7 @@ public class AuthSignUpService {
         List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
 
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
+                PopupScrapDto::fromInterest
         ).toList();
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -198,7 +203,7 @@ public class AuthSignUpService {
 
         // TODO: 여기까지 수정 필요
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+        return UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
@@ -207,8 +212,6 @@ public class AuthSignUpService {
                 userActivities,
                 userRelationDto
         );
-
-        return userInfoResponseDto;
     }
 
     // 소셜 회원가입
@@ -308,7 +311,7 @@ public class AuthSignUpService {
         List<Interest> userInterestPopupList = interestRepository.findByUserId(newUser.getId());
 
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                interest -> PopupScrapDto.fromInterest(interest)
+                PopupScrapDto::fromInterest
         ).toList();
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -326,7 +329,7 @@ public class AuthSignUpService {
 
         // TODO: 여기까지 수정 필요
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
+        return UserInfoResponseDto.fromUserEntity(
                 newUser,
                 alarmSetting,
                 jwtToken,
@@ -335,7 +338,6 @@ public class AuthSignUpService {
                 userActivities,
                 userRelationDto
         );
-        return userInfoResponseDto;
     }
 
 }

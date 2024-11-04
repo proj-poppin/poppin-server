@@ -18,15 +18,14 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -47,6 +46,7 @@ public class AlarmService {
 
     /**
      * 홈 화면 진입 시 읽지 않은 공지 여부 판단
+     *
      * @param fcmRequestDto :  FCM Token request dto
      * @return : UnreadAlarmResponseDto
      */
@@ -121,12 +121,13 @@ public class AlarmService {
     }
 
     public List<InformAlarm> getInformAlarms(Long userId) {
-        FCMToken fcmToken = fcmTokenRepository.findByUserId(Long.valueOf(userId))
+        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_FCM_TOKEN));
 
         List<InformAlarm> informAlarms = informAlarmRepository.findByKeywordOrderByIdDesc(fcmToken.getToken());
         return informAlarms;
     }
+
     private URL getUrlForTopic(EPopupTopic topic) {
         URL url = s3Client.getUrl(alarmBucket, topic.getImgName());
         log.info("Generated URL for topic {}: {}", topic, url);

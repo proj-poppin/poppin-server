@@ -16,7 +16,6 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
@@ -90,7 +89,7 @@ public class BootstrapService {
             List<PopupStoreDto> interestedPopupStores = popupService.getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
-            List<InformAlarm> informAlarms = alarmService.getInformAlarms(Long.valueOf(userId));
+            List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
 
             List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
 

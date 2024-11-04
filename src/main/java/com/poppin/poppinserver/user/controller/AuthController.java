@@ -45,7 +45,6 @@ public class AuthController {
     public ResponseDto<?> authSignUp(
             @RequestBody @Valid AuthSignUpRequestDto authSignUpRequestDto
     ) {
-        log.info("authSignUpDto : " + authSignUpRequestDto);
         return ResponseDto.created(authSignUpService.handleSignUp(authSignUpRequestDto));
     }
 
@@ -79,7 +78,7 @@ public class AuthController {
             @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     ) {
-        log.info("accessToken : " + accessToken);   // 'bearer ' 제거 필요
+        log.info("accessToken : {}", accessToken);   // 'bearer ' 제거 필요
         return ResponseDto.ok(authService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
     }
 
