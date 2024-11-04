@@ -53,8 +53,8 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
     // 쿼리 최적화를 위한 native query
     @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE email = :email)", nativeQuery = true)
-    boolean existsByEmailWithNq(@Param("email") String email);
+    Integer existsByEmailWithNq(@Param("email") String email);
 
     @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE nickname = :nickname)", nativeQuery = true)
-    boolean existsByNicknameWithNq(@Param("nickname") String nickname);
+    Integer existsByNicknameWithNq(@Param("nickname") String nickname);
 }

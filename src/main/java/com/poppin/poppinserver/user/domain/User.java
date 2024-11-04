@@ -8,7 +8,6 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
-import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -139,18 +138,19 @@ public class User {
         this.reportedCnt = 0;
     }
 
-    public static User toUserEntity(AuthSignUpRequestDto authSignUpRequestDto, String encodedPassword,
-                                    ELoginProvider eLoginProvider) {
-        return User.builder()
-                .email(authSignUpRequestDto.email())
-                .password(encodedPassword)
-                .nickname(authSignUpRequestDto.nickname())
-                .eLoginProvider(eLoginProvider)
-                .role(EUserRole.USER)
-                .agreedToPrivacyPolicy(authSignUpRequestDto.agreedToPrivacyPolicy())
-                .agreedToServiceTerms(authSignUpRequestDto.agreedToServiceTerms())
-                .build();
-    }
+    // TODO: 삭제 예정
+//    public static User toUserEntity(AuthSignUpRequestDto authSignUpRequestDto, String encodedPassword,
+//                                    ELoginProvider eLoginProvider) {
+//        return User.builder()
+//                .email(authSignUpRequestDto.email())
+//                .password(encodedPassword)
+//                .nickname(authSignUpRequestDto.nickname())
+//                .eLoginProvider(eLoginProvider)
+//                .role(EUserRole.USER)
+//                .agreedToPrivacyPolicy(authSignUpRequestDto.agreedToPrivacyPolicy())
+//                .agreedToServiceTerms(authSignUpRequestDto.agreedToServiceTerms())
+//                .build();
+//    }
 
     public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword,
                                      ELoginProvider eLoginProvider) {

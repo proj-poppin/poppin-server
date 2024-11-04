@@ -31,7 +31,7 @@ public class UserQueryService implements UserQueryUseCase {
     // 유저 이메일 중복 확인 메서드
     @Override
     public void checkDuplicatedEmail(String email) {
-        if (userQueryRepository.existsByEmailWithNq(email)) {
+        if (userQueryRepository.existsByEmailWithNq(email) > 0) {
             throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
         }
     }
@@ -47,7 +47,7 @@ public class UserQueryService implements UserQueryUseCase {
     // 유저 닉네임 중복 확인 메서드
     @Override
     public void checkDuplicatedNickname(String nickname) {
-        if (userQueryRepository.existsByNicknameWithNq(nickname)) {
+        if (userQueryRepository.existsByNicknameWithNq(nickname) > 0) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
     }
