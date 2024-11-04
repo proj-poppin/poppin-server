@@ -5,7 +5,6 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
-import com.poppin.poppinserver.review.service.ReviewWriteService;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
@@ -34,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final ReviewWriteService reviewWriteService;
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
     private final UserPreferenceSettingService userPreferenceSettingService;
