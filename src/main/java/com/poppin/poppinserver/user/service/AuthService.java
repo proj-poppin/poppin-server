@@ -351,19 +351,118 @@ public class AuthService {
         return Boolean.TRUE;
     }
 
-    // 토큰 재발급 메서드
+    // 토큰 재발급 메서드 (자동 로그인)
     @Transactional
-    public JwtTokenDto refresh(String refreshToken) {
+    public UserInfoResponseDto refresh(String refreshToken, FcmTokenRequestDto fcmTokenRequestDto) {
         String token = refineToken(refreshToken);
+        String fcmToken = fcmTokenRequestDto.fcmToken();
+
         Long userId = jwtUtil.getUserIdFromToken(token);
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         if (!user.getRefreshToken().equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
-        JwtTokenDto jwtToken = jwtUtil.generateToken(userId, user.getRole());
-        user.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
-        return jwtToken;
+
+        JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+
+        // FCM 토큰 검증
+        fcmTokenService.verifyFCMToken(Long.valueOf(user.getId()), fcmToken);
+        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+                user.getId());
+
+        // 유저가 읽은 공지사항 알람 리스트 조회
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
+                fcmToken).stream().map(
+                Object::toString
+        ).toList();
+
+        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
+                fcmToken);
+
+        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
+                .lastCheck(informLastCheckedTime)
+                .checkedNoticeIds(checkedNoticeIds)
+                .build();
+
+        // TODO: 여기부터 수정 필요
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(fcmToken);
+        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(fcmToken);
+
+        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                popupAlarm -> NotificationResponseDto.fromProperties(
+                        String.valueOf(popupAlarm.getId()), String.valueOf(user.getId()), null,
+                        String.valueOf(ENotificationCategory.POPUP),
+                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                        destinationResponseDto
+                )
+        ).toList();
+
+        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                .map(informIsRead -> {
+                    InformAlarm informAlarm = informIsRead.getInformAlarm();
+                    Boolean isRead = informIsRead.getIsRead();
+
+                    return NotificationResponseDto.fromProperties(
+                            String.valueOf(informAlarm.getId()),
+                            String.valueOf(user.getId()),
+                            null,
+                            String.valueOf(ENotificationCategory.NOTICE),
+                            informAlarm.getTitle(),
+                            informAlarm.getBody(),
+                            null,
+                            isRead,
+                            String.valueOf(informAlarm.getCreatedAt()),
+                            null,
+                            String.valueOf(informAlarm.getId()),
+                            destinationResponseDto
+                    );
+                }).toList();
+
+        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
+                popupNotificationResponseDtoList,
+                noticeNotificationResponseDtoList
+        );
+
+        List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
+
+        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                PopupScrapDto::fromInterest
+        ).toList();
+
+        UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userNotificationResponseDto
+        );
+
+        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user).stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+        List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(user).stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
+        UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
+
+        // TODO: 여기까지 수정 필요
+
+        return UserInfoResponseDto.fromUserEntity(
+                user,
+                alarmSetting,
+                jwtTokenDto,
+                userPreferenceSettingDto,
+                userNoticeResponseDto,
+                userActivities,
+                userRelationDto
+        );
     }
 
     // 헤더에 BASIC으로 로그인

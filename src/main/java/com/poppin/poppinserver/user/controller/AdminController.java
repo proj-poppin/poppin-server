@@ -41,6 +41,14 @@ public class AdminController {
         return ResponseDto.ok(adminService.authSignIn(authorizationHeader));
     }
 
+    /* 관리자용 토큰 재발급 */
+    @PostMapping("/refresh")
+    public ResponseDto<?> refresh(
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken
+    ) {
+        return ResponseDto.ok(adminService.refresh(refreshToken));
+    }
+
     /* FAQ 조회 */
     @GetMapping("/support/faqs")
     public ResponseDto<?> readFaqs() {
