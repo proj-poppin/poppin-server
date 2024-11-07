@@ -11,6 +11,7 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
+import com.poppin.poppinserver.user.service.AuthLoginService;
 import com.poppin.poppinserver.user.service.AuthService;
 import com.poppin.poppinserver.user.service.AuthSignUpService;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     private final AuthSignUpService authSignUpService;
+    private final AuthLoginService authLoginService;
 
     // 계정 상태 반환 API
     @GetMapping("/account/status")
@@ -79,7 +81,7 @@ public class AuthController {
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     ) {
         log.info("accessToken : {}", accessToken);   // 'bearer ' 제거 필요
-        return ResponseDto.ok(authService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
+        return ResponseDto.ok(authLoginService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
     }
 
     @PostMapping("/refresh")
