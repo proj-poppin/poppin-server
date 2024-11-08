@@ -36,7 +36,6 @@ public record PopupDto(
         String operationStatus,
         PreferedDto prefered,
         TasteDto taste,
-        List<String> posterList,
         List<String> keywordList
 ) {
     public static PopupDto fromEntity(Popup popup) {
@@ -69,11 +68,6 @@ public record PopupDto(
         }
 
         TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
-
-        List<String> posterList = new ArrayList<>();
-        for (PosterImage posterImage : popup.getPosterImages()) {
-            posterList.add(posterImage.getPosterUrl());
-        }
 
         List<String> keywordList = new ArrayList<>();
         for (PopupAlarmKeyword popupAlarmKeyword : popup.getPopupAlarmKeywords()) {
@@ -123,7 +117,6 @@ public record PopupDto(
                 .operationStatus(popup.getOperationStatus())
                 .prefered(preferedDto)
                 .taste(tasteDto)
-                .posterList(posterList)
                 .keywordList(keywordList)
                 .build();
     }
