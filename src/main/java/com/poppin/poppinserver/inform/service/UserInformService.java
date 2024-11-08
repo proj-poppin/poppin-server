@@ -49,6 +49,9 @@ public class UserInformService {
         User user = userQueryUseCase.findUserById(userId);
 
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        if (prepered.isEmpty()) {
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
+        }
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(prepered.contains("fashionBeauty"))

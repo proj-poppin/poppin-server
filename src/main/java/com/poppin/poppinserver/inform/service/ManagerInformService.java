@@ -134,6 +134,9 @@ public class ManagerInformService {
 
         List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        if (prepered.isEmpty() || taste.isEmpty()) {
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
+        }
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(prepered.contains("fashionBeauty"))
