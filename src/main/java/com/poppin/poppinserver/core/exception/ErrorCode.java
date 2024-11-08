@@ -40,6 +40,7 @@ public enum ErrorCode {
     DUPLICATED_ALARM_KEYWORD("40029", HttpStatus.BAD_REQUEST, "이미 등록된 알람 키워드입니다."),
     NOT_FOUND_ALARM_KEYWORD("40030", HttpStatus.BAD_REQUEST, "존재하지 않는 알람 키워드입니다."),
     ALREADY_EXIST_FCM_TOKEN("40031", HttpStatus.BAD_REQUEST, "중복된 FCM 토큰입니다."),
+    INVALID_CATEGORY_STRING("40032", HttpStatus.BAD_REQUEST, "유효한 카테고리를 하나 이상 요청해야 합니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),

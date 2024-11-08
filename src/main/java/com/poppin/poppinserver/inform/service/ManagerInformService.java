@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.inform.service;
 
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.ManagerInform;
@@ -52,6 +54,9 @@ public class ManagerInformService {
 
         List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        if (prepered.isEmpty() || taste.isEmpty()) {
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
+        }
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(prepered.contains("fashionBeauty"))
@@ -72,7 +77,6 @@ public class ManagerInformService {
         tastePopupRepository.save(tastePopup);
 
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(taste.contains("wantFree"))
                 .market(taste.contains("market"))
                 .experience(taste.contains("experience"))
                 .display(taste.contains("display"))
@@ -150,7 +154,6 @@ public class ManagerInformService {
         tastePopupRepository.save(tastePopup);
 
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(taste.contains("wantFree"))
                 .market(taste.contains("market"))
                 .experience(taste.contains("experience"))
                 .display(taste.contains("display"))

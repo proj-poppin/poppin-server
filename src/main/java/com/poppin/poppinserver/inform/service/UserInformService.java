@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.inform.service;
 
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.UserInform;
@@ -108,8 +110,9 @@ public class UserInformService {
         log.info("createUserInform");
         log.info("filteringFourteenCategories: {}", filteringFourteenCategories);
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
-        log.info("prepered: {}", prepered.get(0));
-        log.info("contains: {}", prepered.contains("fashionBeauty"));
+        if (prepered.isEmpty()) {
+            throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
+        }
 
         TastePopup tastePopup = TastePopup.builder()
                 .fasionBeauty(prepered.contains("fashionBeauty"))
