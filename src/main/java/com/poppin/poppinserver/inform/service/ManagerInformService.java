@@ -22,6 +22,7 @@ import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,35 +44,38 @@ public class ManagerInformService {
 
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
+                                                String filteringThreeCategories,
+                                                String filteringFourteenCategories,
                                                 List<MultipartFile> images,
                                                 Long userId) {
         User user = userQueryUseCase.findUserById(userId);
 
-        CreateTasteDto createTasteDto = createManagerInformDto.taste();
+        List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAni())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alcohol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
+                .fasionBeauty(prepered.contains("fashionBeauty"))
+                .characters(prepered.contains("characters"))
+                .foodBeverage(prepered.contains("foodBeverage"))
+                .webtoonAni(prepered.contains("webtoonAni"))
+                .interiorThings(prepered.contains("interiorThings"))
+                .movie(prepered.contains("movie"))
+                .musical(prepered.contains("musical"))
+                .sports(prepered.contains("sports"))
+                .game(prepered.contains("game"))
+                .itTech(prepered.contains("itTech"))
+                .kpop(prepered.contains("kpop"))
+                .alcohol(prepered.contains("alcohol"))
+                .animalPlant(prepered.contains("animalPlant"))
+                .etc(prepered.contains("etc"))
                 .build();
         tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = createManagerInformDto.prefered();
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(createPreferedDto.wantFree())
-                .market(createPreferedDto.market())
-                .experience(createPreferedDto.experience())
-                .display(createPreferedDto.display())
+                .wantFree(taste.contains("wantFree"))
+                .market(taste.contains("market"))
+                .experience(taste.contains("experience"))
+                .display(taste.contains("display"))
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
@@ -92,6 +96,8 @@ public class ManagerInformService {
                 .operationExcept(createManagerInformDto.operationExcept())
                 .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .parkingAvailable(createManagerInformDto.parkingAvailable())
+                .latitude(createManagerInformDto.latitude())
+                .longitude(createManagerInformDto.longitude())
                 .preferedPopup(preferedPopup)
                 .tastePopup(tastePopup)
                 .build();
@@ -118,32 +124,36 @@ public class ManagerInformService {
 
     @Transactional
     public ManagerInformDto createGuestManagerInform(CreateManagerInformDto createManagerInformDto,
+                                                     String filteringThreeCategories,
+                                                     String filteringFourteenCategories,
                                                      List<MultipartFile> images) {
-        CreateTasteDto createTasteDto = createManagerInformDto.taste();
+
+        List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAni())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alcohol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
+                .fasionBeauty(prepered.contains("fashionBeauty"))
+                .characters(prepered.contains("characters"))
+                .foodBeverage(prepered.contains("foodBeverage"))
+                .webtoonAni(prepered.contains("webtoonAni"))
+                .interiorThings(prepered.contains("interiorThings"))
+                .movie(prepered.contains("movie"))
+                .musical(prepered.contains("musical"))
+                .sports(prepered.contains("sports"))
+                .game(prepered.contains("game"))
+                .itTech(prepered.contains("itTech"))
+                .kpop(prepered.contains("kpop"))
+                .alcohol(prepered.contains("alcohol"))
+                .animalPlant(prepered.contains("animalPlant"))
+                .etc(prepered.contains("etc"))
                 .build();
         tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = createManagerInformDto.prefered();
         PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(createPreferedDto.wantFree())
-                .market(createPreferedDto.market())
-                .experience(createPreferedDto.experience())
-                .display(createPreferedDto.display())
+                .wantFree(taste.contains("wantFree"))
+                .market(taste.contains("market"))
+                .experience(taste.contains("experience"))
+                .display(taste.contains("display"))
                 .build();
         preferedPopupRepository.save(preferedPopup);
 
@@ -164,6 +174,8 @@ public class ManagerInformService {
                 .operationExcept(createManagerInformDto.operationExcept())
                 .operationStatus(EOperationStatus.EXECUTING.getStatus())
                 .parkingAvailable(createManagerInformDto.parkingAvailable())
+                .latitude(createManagerInformDto.latitude())
+                .longitude(createManagerInformDto.longitude())
                 .preferedPopup(preferedPopup)
                 .tastePopup(tastePopup)
                 .build();

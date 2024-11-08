@@ -27,8 +27,7 @@ public record CreateManagerInformDto(
         LocalDate closeDate,
         LocalTime openTime,
         LocalTime closeTime,
-        String operationExcept,
-        CreatePreferedDto prefered,
-        CreateTasteDto taste
-) {
+        Double latitude,
+        Double longitude,
+        String operationExcept){
 }

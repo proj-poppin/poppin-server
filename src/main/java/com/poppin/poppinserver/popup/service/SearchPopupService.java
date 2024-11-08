@@ -13,6 +13,9 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,47 +38,44 @@ public class SearchPopupService {
     private final UserQueryUseCase userQueryUseCase;
     private final HeaderUtil headerUtil;
 
-    public PagingResponseDto readSearchingList(String text, String taste, String prepered,
+    public PagingResponseDto readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
 
-
-        // 카테고리 요청 코드 길이 유효성 체크
-        if (taste.length() < 3 || prepered.length() < 14) {
-            throw new CommonException(ErrorCode.INVALID_CATEGORY_REQUEST);
-        }
+        List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
         log.info("taste: " + taste);
-        if (taste.equals("000")) {
-            taste = "111";
+        if (taste.isEmpty()) {
+            taste = List.of("market", "display", "experience");
         }
         log.info("prepered: " + prepered);
-        if (prepered.equals("00000000000000")) {
-            prepered = "11111111111111";
+        if (prepered.isEmpty()) {
+            prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
 
         // 팝업 형태 3개
-        Boolean market = (taste.charAt(0) == '1') ? true : null;
-        Boolean display = (taste.charAt(1) == '1') ? true : null;
-        Boolean experience = (taste.charAt(2) == '1') ? true : null;
+        Boolean market = taste.contains("market") ? true : null;
+        Boolean display = taste.contains("display") ? true : null;
+        Boolean experience = taste.contains("experience") ? true : null;
 
         // 팝업 취향 14개
-        Boolean fashionBeauty = (prepered.charAt(0) == '1') ? true : null;
-        Boolean characters = (prepered.charAt(1) == '1') ? true : null;
-        Boolean foodBeverage = (prepered.charAt(2) == '1') ? true : null;
-        Boolean webtoonAni = (prepered.charAt(3) == '1') ? true : null;
-        Boolean interiorThings = (prepered.charAt(4) == '1') ? true : null;
-        Boolean movie = (prepered.charAt(5) == '1') ? true : null;
-        Boolean musical = (prepered.charAt(6) == '1') ? true : null;
-        Boolean sports = (prepered.charAt(7) == '1') ? true : null;
-        Boolean game = (prepered.charAt(8) == '1') ? true : null;
-        Boolean itTech = (prepered.charAt(9) == '1') ? true : null;
-        Boolean kpop = (prepered.charAt(10) == '1') ? true : null;
-        Boolean alcohol = (prepered.charAt(11) == '1') ? true : null;
-        Boolean animalPlant = (prepered.charAt(12) == '1') ? true : null;
-        Boolean etc = (prepered.charAt(13) == '1') ? true : null;
+        Boolean fashionBeauty = prepered.contains("fashionBeauty") ? true : null;
+        Boolean characters = prepered.contains("characters") ? true : null;
+        Boolean foodBeverage = prepered.contains("foodBeverage") ? true : null;
+        Boolean webtoonAni = prepered.contains("webtoonAni") ? true : null;
+        Boolean interiorThings = prepered.contains("interiorThings") ? true : null;
+        Boolean movie = prepered.contains("movie") ? true : null;
+        Boolean musical = prepered.contains("musical") ? true : null;
+        Boolean sports = prepered.contains("sports") ? true : null;
+        Boolean game = prepered.contains("game") ? true : null;
+        Boolean itTech = prepered.contains("itTech") ? true : null;
+        Boolean kpop = prepered.contains("kpop") ? true : null;
+        Boolean alcohol = prepered.contains("alcohol") ? true : null;
+        Boolean animalPlant = prepered.contains("animalPlant") ? true : null;
+        Boolean etc = prepered.contains("etc") ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;

@@ -18,6 +18,7 @@ import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,28 +40,29 @@ public class UserInformService {
     private final PosterImageCommandUseCase posterImageCommandUseCase;
 
     @Transactional
-    public UserInformDto createUserInform(String name, String contactLink, Boolean fashionBeauty, Boolean characters,
-                                          Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
-                                          Boolean movie, Boolean musical, Boolean sports, Boolean game, Boolean itTech,
-                                          Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
+    public UserInformDto createUserInform(String name, String contactLink, String filteringFourteenCategories,
                                           List<MultipartFile> images, Long userId) {
+        log.info("createUserInform");
+        log.info("filteringFourteenCategories: {}", filteringFourteenCategories);
         User user = userQueryUseCase.findUserById(userId);
 
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(fashionBeauty)
-                .characters(characters)
-                .foodBeverage(foodBeverage)
-                .webtoonAni(webtoonAni)
-                .interiorThings(interiorThings)
-                .movie(movie)
-                .musical(musical)
-                .sports(sports)
-                .game(game)
-                .itTech(itTech)
-                .kpop(kpop)
-                .alcohol(alcohol)
-                .animalPlant(animalPlant)
-                .etc(etc)
+                .fasionBeauty(prepered.contains("fashionBeauty"))
+                .characters(prepered.contains("characters"))
+                .foodBeverage(prepered.contains("foodBeverage"))
+                .webtoonAni(prepered.contains("webtoonAni"))
+                .interiorThings(prepered.contains("interiorThings"))
+                .movie(prepered.contains("movie"))
+                .musical(prepered.contains("musical"))
+                .sports(prepered.contains("sports"))
+                .game(prepered.contains("game"))
+                .itTech(prepered.contains("itTech"))
+                .kpop(prepered.contains("kpop"))
+                .alcohol(prepered.contains("alcohol"))
+                .animalPlant(prepered.contains("animalPlant"))
+                .etc(prepered.contains("etc"))
                 .build();
         tastePopupRepository.save(tastePopup);
 
@@ -100,29 +102,30 @@ public class UserInformService {
     } // 제보 생성
 
     @Transactional
-    public UserInformDto createGuestUserInform(String name, String contactLink, Boolean fashionBeauty,
-                                               Boolean characters,
-                                               Boolean foodBeverage, Boolean webtoonAni, Boolean interiorThings,
-                                               Boolean movie, Boolean musical, Boolean sports, Boolean game,
-                                               Boolean itTech,
-                                               Boolean kpop, Boolean alcohol, Boolean animalPlant, Boolean etc,
+    public UserInformDto createGuestUserInform(String name, String contactLink, String filteringFourteenCategories,
                                                List<MultipartFile> images) {
 
+        log.info("createUserInform");
+        log.info("filteringFourteenCategories: {}", filteringFourteenCategories);
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        log.info("prepered: {}", prepered.get(0));
+        log.info("contains: {}", prepered.contains("fashionBeauty"));
+
         TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(fashionBeauty)
-                .characters(characters)
-                .foodBeverage(foodBeverage)
-                .webtoonAni(webtoonAni)
-                .interiorThings(interiorThings)
-                .movie(movie)
-                .musical(musical)
-                .sports(sports)
-                .game(game)
-                .itTech(itTech)
-                .kpop(kpop)
-                .alcohol(alcohol)
-                .animalPlant(animalPlant)
-                .etc(etc)
+                .fasionBeauty(prepered.contains("fashionBeauty"))
+                .characters(prepered.contains("characters"))
+                .foodBeverage(prepered.contains("foodBeverage"))
+                .webtoonAni(prepered.contains("webtoonAni"))
+                .interiorThings(prepered.contains("interiorThings"))
+                .movie(prepered.contains("movie"))
+                .musical(prepered.contains("musical"))
+                .sports(prepered.contains("sports"))
+                .game(prepered.contains("game"))
+                .itTech(prepered.contains("itTech"))
+                .kpop(prepered.contains("kpop"))
+                .alcohol(prepered.contains("alcohol"))
+                .animalPlant(prepered.contains("animalPlant"))
+                .etc(prepered.contains("etc"))
                 .build();
         tastePopupRepository.save(tastePopup);
 
