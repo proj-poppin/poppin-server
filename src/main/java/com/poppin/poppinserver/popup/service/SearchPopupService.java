@@ -17,6 +17,7 @@ import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +48,15 @@ public class SearchPopupService {
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
-        log.info("taste: " + taste);
-        if (taste.isEmpty()) {
+        log.info("taste: " + taste.size());
+        if (Objects.equals(taste.get(0), "")) {
+            log.info("isEmpty");
             taste = List.of("market", "display", "experience");
         }
-        log.info("prepered: " + prepered);
-        if (prepered.isEmpty()) {
+
+        log.info("prepered: " + prepered.size());
+        if (Objects.equals(prepered.get(0), "")) {
+            log.info("isEmpty");
             prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
 

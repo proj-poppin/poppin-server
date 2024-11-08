@@ -132,6 +132,9 @@ public class ManagerInformService {
                                                      String filteringFourteenCategories,
                                                      List<MultipartFile> images) {
 
+        log.info("createGuestManagerInform");
+        log.info("filteringThreeCategories : {}", filteringThreeCategories);
+        log.info("filteringFourteenCategories : {}", filteringFourteenCategories);
         List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
         if (prepered.isEmpty() || taste.isEmpty()) {
