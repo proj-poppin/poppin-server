@@ -33,7 +33,7 @@ public class FCMScheduler {
     private final FCMSendService fcmSendService;
 
 
-    @Scheduled(cron = "0 */05 * * * *")
+    @Scheduled(cron = "0 0 */3 * * *")
     private void reopenPopup() {
 
         /**
@@ -76,7 +76,7 @@ public class FCMScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */05 * * * *")
+    @Scheduled(cron = "0 0 */3 * * *")
     private void openPopup() {
         /**
          * 오픈 팝업 알림
@@ -137,7 +137,7 @@ public class FCMScheduler {
     /**
      * 후기 요청 1. 팝업 방문하기 버튼 누르고 3시간이 지난 유저들에 한해 앱 푸시 알림 발송
      */
-    @Scheduled(cron = "0 */05 * * * *")
+    @Scheduled(cron = "0 0 */3 * * *")
     private void hoogi() {
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
