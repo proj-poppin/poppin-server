@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class ReviewWriteService {
+public class ReviewCommandService {
 
     private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;

@@ -206,6 +206,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     Long countByOperationStatus(String operationStatus);
 
+    @Query("SELECT p.id FROM Popup p JOIN Visit v on p.id = v.popup.id WHERE  v.user.id = :userId ")
+    List<Long> findVisitedPopupByUserId(@Param("userId") Long userId);
+
 
     /**
      * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

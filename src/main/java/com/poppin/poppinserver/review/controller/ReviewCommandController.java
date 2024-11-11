@@ -3,7 +3,7 @@ package com.poppin.poppinserver.review.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.review.service.ReviewRecommendService;
-import com.poppin.poppinserver.review.service.ReviewWriteService;
+import com.poppin.poppinserver.review.service.ReviewCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/reviews")
 public class ReviewCommandController {
 
-    private final ReviewWriteService reviewWriteService;
+    private final ReviewCommandService reviewCommandService;
     private final ReviewRecommendService reviewRecommendService;
 
     /*후기 작성하기*/
@@ -34,7 +34,7 @@ public class ReviewCommandController {
             @RequestParam("congestion") String congestion,
             @RequestPart(value = "images") List<MultipartFile> images) {
 
-        return ResponseDto.ok(reviewWriteService.writeReview(userId, popupId, text, visitDate, satisfaction, congestion, images));
+        return ResponseDto.ok(reviewCommandService.writeReview(userId, popupId, text, visitDate, satisfaction, congestion, images));
     }
 
     /*후기 추천*/

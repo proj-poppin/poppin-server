@@ -9,15 +9,12 @@ import com.poppin.poppinserver.popup.service.ListingPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @Slf4j
@@ -139,5 +136,10 @@ public class PopupQueryController {
     @GetMapping("/detail/{popupId}")
     public ResponseDto<?> readPopup(@PathVariable String popupId, HttpServletRequest request) {
         return ResponseDto.ok(popupService.readPopupStore(popupId, request));
+    }
+
+    @GetMapping("/visited")
+    public ResponseDto<?> getVisitedPopup(@UserId Long userId) {
+        return ResponseDto.ok(popupService.getVisitedPopup(userId));
     }
 }

@@ -346,4 +346,10 @@ public class PopupService {
         return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false);
     }
 
+    public List<Long> getVisitedPopup(Long userId) {
+        List<Long> visitedPopupIdList = popupRepository.findVisitedPopupByUserId(userId);
+        System.out.println("Visited Popup IDs: " + visitedPopupIdList); // 디버깅을 위해 출력
+
+        return  visitedPopupIdList;
+    }
 }
