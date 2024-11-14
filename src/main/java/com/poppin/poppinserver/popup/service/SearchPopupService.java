@@ -36,29 +36,25 @@ public class SearchPopupService {
     private final UserQueryUseCase userQueryUseCase;
     private final HeaderUtil headerUtil;
 
-    public PagingResponseDto readSearchingList(String text, String filteringThreeCategories,
-                                               String filteringFourteenCategories,
+    public PagingResponseDto readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
 
-        List<String> taste = Arrays.stream(filteringThreeCategories.split("")).toList();
-        List<String> prefered = Arrays.stream(filteringFourteenCategories.split("")).toList();
+        List<String> taste = Arrays.stream(filteringThreeCategories.split(",")).toList();
+        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
-        log.info("taste: {}", taste.size());
-        if (Objects.equals(taste.get(0), "") || taste.stream().allMatch("0"::equals) || taste.stream()
-                .allMatch("1"::equals)) {
+        log.info("taste: " + taste.size());
+        if (Objects.equals(taste.get(0), "")) {
             log.info("isEmpty");
             taste = List.of("market", "display", "experience");
         }
 
-        log.info("prefered: {}", prefered.size());
-        if (Objects.equals(prefered.get(0), "") || prefered.stream().allMatch("0"::equals) || prefered.stream()
-                .allMatch("1"::equals)) {
+        log.info("prepered: " + prepered.size());
+        if (Objects.equals(prepered.get(0), "")) {
             log.info("isEmpty");
-            prefered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie",
-                    "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
+            prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
 
         // 팝업 형태 3개
@@ -67,20 +63,20 @@ public class SearchPopupService {
         Boolean experience = taste.contains("experience") ? true : null;
 
         // 팝업 취향 14개
-        Boolean fashionBeauty = prefered.contains("fashionBeauty") ? true : null;
-        Boolean characters = prefered.contains("characters") ? true : null;
-        Boolean foodBeverage = prefered.contains("foodBeverage") ? true : null;
-        Boolean webtoonAni = prefered.contains("webtoonAni") ? true : null;
-        Boolean interiorThings = prefered.contains("interiorThings") ? true : null;
-        Boolean movie = prefered.contains("movie") ? true : null;
-        Boolean musical = prefered.contains("musical") ? true : null;
-        Boolean sports = prefered.contains("sports") ? true : null;
-        Boolean game = prefered.contains("game") ? true : null;
-        Boolean itTech = prefered.contains("itTech") ? true : null;
-        Boolean kpop = prefered.contains("kpop") ? true : null;
-        Boolean alcohol = prefered.contains("alcohol") ? true : null;
-        Boolean animalPlant = prefered.contains("animalPlant") ? true : null;
-        Boolean etc = prefered.contains("etc") ? true : null;
+        Boolean fashionBeauty = prepered.contains("fashionBeauty") ? true : null;
+        Boolean characters = prepered.contains("characters") ? true : null;
+        Boolean foodBeverage = prepered.contains("foodBeverage") ? true : null;
+        Boolean webtoonAni = prepered.contains("webtoonAni") ? true : null;
+        Boolean interiorThings = prepered.contains("interiorThings") ? true : null;
+        Boolean movie = prepered.contains("movie") ? true : null;
+        Boolean musical = prepered.contains("musical") ? true : null;
+        Boolean sports = prepered.contains("sports") ? true : null;
+        Boolean game = prepered.contains("game") ? true : null;
+        Boolean itTech = prepered.contains("itTech") ? true : null;
+        Boolean kpop = prepered.contains("kpop") ? true : null;
+        Boolean alcohol = prepered.contains("alcohol") ? true : null;
+        Boolean animalPlant = prepered.contains("animalPlant") ? true : null;
+        Boolean etc = prepered.contains("etc") ? true : null;
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
@@ -108,7 +104,7 @@ public class SearchPopupService {
             Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(searchText,
                     PageRequest.of(page, size, sort),
                     market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                    fashionBeauty, characters, foodBeverage, // 팝업 취향 14개
                     webtoonAni, interiorThings, movie,
                     musical, sports, game,
                     itTech, kpop, alcohol,
@@ -118,10 +114,9 @@ public class SearchPopupService {
             popupStoreDtos = popupService.getPopupStoreDtos(popups, userId);
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         } else {
-            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText,
-                    PageRequest.of(page, size, sort),
+            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(searchText, PageRequest.of(page, size, sort),
                     market, display, experience, // 팝업 형태 3개
-                    fashionBeauty, characters, foodBeverage, // 팝업 취향 13개
+                    fashionBeauty, characters, foodBeverage, // 팝업 취향 14개
                     webtoonAni, interiorThings, movie,
                     musical, sports, game,
                     itTech, kpop, alcohol,
@@ -131,6 +126,7 @@ public class SearchPopupService {
             popupStoreDtos = popupService.guestGetPopupStoreDtos(popups);
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         }
+
 
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 로그인 팝업 검색
