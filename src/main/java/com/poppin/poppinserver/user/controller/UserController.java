@@ -131,13 +131,13 @@ public class UserController {
         return ResponseDto.ok(userService.getUncertifiedReview(userId, reviewId, popupId));
     }
 
-    // TODO: 삭제 예정
+    //TODO: 삭제 예정
     /*마이페이지 - 후기 작성하기 - 방문한 팝업 조회*/
-    @GetMapping("popup/v/certi")
-    public ResponseDto<?> getCertifiedPopupList(@UserId Long userId) {
-        return ResponseDto.ok(userService.getCertifiedPopupList(userId));
-    }
-// TODO: 삭제 예정
+//    @GetMapping("popup/v/certi")
+//    public ResponseDto<?> getCertifiedPopupList(@UserId Long userId) {
+//        return ResponseDto.ok(userService.getCertifiedPopupList(userId));
+//    }
+      //TODO: 삭제 예정
 //    /*마이페이지 - 후기 작성하기 - 방문한 팝업 후기 작성*/
 //    @PostMapping(value = "review/w/certi", consumes = {MediaType.APPLICATION_JSON_VALUE,
 //            MediaType.MULTIPART_FORM_DATA_VALUE})

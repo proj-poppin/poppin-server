@@ -49,13 +49,13 @@ public class ReviewCommandService {
 
 
     @Transactional
-    public ReviewDto writeReview(Long userId, Long popupId, String text, String visitDate,
+    public ReviewDto writeReview(Long userId, String popupId, String text, String visitDate,
                                  String satisfaction, String congestion,
                                  List<MultipartFile> images) {
 
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupRepository.findById(Long.valueOf(popupId))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 방문 내역 확인 및 리뷰 생성

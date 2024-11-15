@@ -202,7 +202,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     Popup findByReviewId(@Param("reviewId") Long reviewId);
 
     @Query("SELECT p FROM Popup p WHERE p.id = :vdPopupId")
-    Popup findTopByPopupId(Long vdPopupId);
+    Popup findVisitedPopupId(Long vdPopupId);
 
     Long countByOperationStatus(String operationStatus);
 

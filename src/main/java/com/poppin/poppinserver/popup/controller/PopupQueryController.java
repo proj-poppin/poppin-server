@@ -139,7 +139,7 @@ public class PopupQueryController {
     }
 
     @GetMapping("/visited")
-    public ResponseDto<?> getVisitedPopup(@UserId Long userId) {
-        return ResponseDto.ok(popupService.getVisitedPopup(userId));
+    public ResponseDto<?> getVisitedPopupList(@UserId Long userId) {
+        return ResponseDto.ok(popupService.getVisitedPopupList(userId));
     }
 }

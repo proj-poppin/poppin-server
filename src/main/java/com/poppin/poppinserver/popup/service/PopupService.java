@@ -10,9 +10,7 @@ import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.ReopenDemand;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
@@ -346,10 +344,26 @@ public class PopupService {
         return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false);
     }
 
-    public List<Long> getVisitedPopup(Long userId) {
-        List<Long> visitedPopupIdList = popupRepository.findVisitedPopupByUserId(userId);
-        System.out.println("Visited Popup IDs: " + visitedPopupIdList); // 디버깅을 위해 출력
+    public List<VisitedPopupDto> getVisitedPopupList(Long userId) {
 
-        return  visitedPopupIdList;
+        List<Visit> visitList = visitRepository.findAllByUserId(userId);
+        if (visitList.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+        }
+
+        List<VisitedPopupDto> visitedPopupList = new ArrayList<>();
+
+        for (Visit visit : visitList) {
+            Long visitPopupId = visit.getPopup().getId();
+            Popup popup = popupRepository.findVisitedPopupId(visitPopupId);
+            VisitedPopupDto visitedPopupDto = VisitedPopupDto.fromEntity(
+                    popup.getId().toString(),
+                    popup.getName(),
+                    popup.getPosterUrl(),
+                    visit.getCreatedAt()
+            );
+            visitedPopupList.add(visitedPopupDto);
+        }
+        return visitedPopupList;
     }
 }

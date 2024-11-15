@@ -27,7 +27,7 @@ public class ReviewCommandController {
     @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<?> writeReview(
             @UserId Long userId,
-            @RequestParam("popupId") Long popupId,
+            @RequestParam("popupId") String popupId,
             @RequestParam("text") String text,
             @RequestParam("visitDate") String visitDate,
             @RequestParam("satisfaction") String satisfaction,

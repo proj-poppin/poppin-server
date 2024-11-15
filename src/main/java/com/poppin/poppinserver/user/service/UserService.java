@@ -5,7 +5,6 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.RandomNicknameUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupCertiDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -186,26 +185,27 @@ public class UserService {
         );
     }
 
-    public List<PopupCertiDto> getCertifiedPopupList(Long userId) {
-        /* 1. userId로 visit 리스트 뽑기
-         *  2. visit 리스트의 popupid 와 popup의 id 일치하는 popup 뽑기
-         */
-        List<Visit> visitList = visitRepository.findAllByUserId(userId);
-        if (visitList.isEmpty()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
-        }
-
-        List<PopupCertiDto> popupCertiDtoList = new ArrayList<>();
-
-        for (Visit visit : visitList) {
-            Long vdPopupId = visit.getPopup().getId();
-            Popup popup = popupRepository.findTopByPopupId(vdPopupId);
-            PopupCertiDto popupCertiDto = PopupCertiDto.fromEntity(popup.getName(), popup.getPosterUrl(),
-                    visit.getCreatedAt());
-            popupCertiDtoList.add(popupCertiDto);
-        }
-        return popupCertiDtoList;
-    }
+    //TODO: 삭제 예정
+//    public List<PopupCertiDto> getCertifiedPopupList(Long userId) {
+//        /* 1. userId로 visit 리스트 뽑기
+//         *  2. visit 리스트의 popupid 와 popup의 id 일치하는 popup 뽑기
+//         */
+//        List<Visit> visitList = visitRepository.findAllByUserId(userId);
+//        if (visitList.isEmpty()) {
+//            throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
+//        }
+//
+//        List<PopupCertiDto> popupCertiDtoList = new ArrayList<>();
+//
+//        for (Visit visit : visitList) {
+//            Long vdPopupId = visit.getPopup().getId();
+//            Popup popup = popupRepository.findTopByPopupId(vdPopupId);
+//            PopupCertiDto popupCertiDto = PopupCertiDto.fromEntity(popup.getName(), popup.getPosterUrl(),
+//                    visit.getCreatedAt());
+//            popupCertiDtoList.add(popupCertiDto);
+//        }
+//        return popupCertiDtoList;
+//    }
 
     public List<UserFaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
