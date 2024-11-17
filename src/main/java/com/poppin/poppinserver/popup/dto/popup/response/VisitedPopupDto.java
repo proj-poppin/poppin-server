@@ -1,32 +1,45 @@
 package com.poppin.poppinserver.popup.dto.popup.response;
 
+import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.popup.domain.PosterImage;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record VisitedPopupDto(
 
         @NotNull
-        String popupId,
+        String id,
 
         @NotNull
         String name,
 
         @NotNull
-        String posterUrl,
+        List<String> imageUrls,
 
         @NotNull
-        LocalDateTime visitDate
+        String openDate,
+
+        @NotNull
+        String closeDate
 
 ) {
-    public static VisitedPopupDto fromEntity(String id, String name, String posterUrl, LocalDateTime visitDate) {
+    public static VisitedPopupDto fromEntity(Popup popup) {
+
+        List<String> imageUrls = popup.getPosterImages()
+                .stream()
+                .map(PosterImage::getPosterUrl)
+                .sorted()
+                .toList();
+
         return VisitedPopupDto.builder()
-                .popupId(id)
-                .name(name)
-                .posterUrl(posterUrl)
-                .visitDate(visitDate)
+                .id(popup.getId().toString())
+                .name(popup.getName())
+                .imageUrls(imageUrls)
+                .openDate(popup.getOpenDate().toString())
+                .closeDate(popup.getCloseDate().toString())
                 .build();
     }
 }

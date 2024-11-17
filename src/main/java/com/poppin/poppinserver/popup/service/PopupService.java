@@ -356,12 +356,7 @@ public class PopupService {
         for (Visit visit : visitList) {
             Long visitPopupId = visit.getPopup().getId();
             Popup popup = popupRepository.findVisitedPopupId(visitPopupId);
-            VisitedPopupDto visitedPopupDto = VisitedPopupDto.fromEntity(
-                    popup.getId().toString(),
-                    popup.getName(),
-                    popup.getPosterUrl(),
-                    visit.getCreatedAt()
-            );
+            VisitedPopupDto visitedPopupDto = VisitedPopupDto.fromEntity(popup);
             visitedPopupList.add(visitedPopupDto);
         }
         return visitedPopupList;
