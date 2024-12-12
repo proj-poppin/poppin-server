@@ -1,6 +1,9 @@
 package com.poppin.poppinserver.alarm.service;
 
-import com.google.firebase.messaging.*;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
@@ -8,7 +11,10 @@ import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequest
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.alarm.dto.popupAlarm.request.PopupAlarmDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.alarm.usecase.AlarmCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.AlarmListQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.config.APNsConfiguration;
 import com.poppin.poppinserver.core.config.AndroidConfiguration;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -24,32 +30,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class FCMSendService {
-
+public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     private final FirebaseMessaging firebaseMessaging;
     private final APNsConfiguration apnsConfiguration;
     private final AndroidConfiguration androidConfiguration;
+
+    //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
     private final PopupRepository popupRepository;
-    private final FCMTokenRepository fcmTokenRepository;
-    private final AlarmService alarmService;
-    private final AlarmListService alarmListService;
 
-    //공지사항
-    public void sendInformationByFCMToken(List<FCMToken> tokenList,
-                                          InformAlarmCreateRequestDto requestDto,
-                                          InformAlarm informAlarm) {
+    private final TokenQueryUseCase tokenQueryUseCase;
+    private final AlarmListQueryUseCase alarmListQueryUseCase;
+    private final AlarmCommandUseCase alarmCommandUseCase;
 
+    @Override
+    public void sendInformationAlarm(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
         for (FCMToken token : tokenList) {
 
-            int badge = alarmListService.countUnreadAlarms(token.getToken());
+            int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
 
             log.info("token : " + token.getToken());
             Message message = Message.builder()
@@ -67,25 +70,25 @@ public class FCMSendService {
                 String result = firebaseMessaging.send(message);
                 log.info("Successfully sent message: " + result);
                 refreshToken(token); // 토큰일자 갱신
+
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
             }
         }
     }
 
-    //인기팝업, 재오픈 팝업 알림 전송 메서드
-    public void sendAlarmByFCMToken(List<Popup> popupList, EPushInfo info) {
-
+    @Override
+    public void sendScheduledPopupAlarm(List<Popup> popupList, EPushInfo info) {
         List<Long> popupIdList = new ArrayList<>();
         for (Popup p : popupList) {
             popupIdList.add(p.getId());
         }
 
-        List<FCMToken> tokenList = fcmTokenRepository.findAll();
+        List<FCMToken> tokenList = tokenQueryUseCase.findAll();
 
         for (FCMToken token : tokenList) {
             log.info("token : " + token.getToken());
-            int badge = alarmListService.countUnreadAlarms(token.getToken());
+            int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
             Message message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(info.getTitle())
@@ -115,8 +118,7 @@ public class FCMSendService {
                             info.getBody(),
                             topic
                     );
-                    // 등록&로그 메서드
-                    logAlarmStatus(popupAlarmDto);
+                    alarmCommandUseCase.insertPopupAlarm(popupAlarmDto);
                 }
 
             } catch (FirebaseMessagingException e) {
@@ -125,9 +127,9 @@ public class FCMSendService {
         }
     }
 
-    //후기 추천 앱푸시 메서드
-    public void sendChoochunByFCMToken(Popup popup, Review review, EPushInfo info) {
-        int badge = alarmListService.countUnreadAlarms(review.getToken());
+    @Override
+    public void sendChoochunAlarm(Popup popup, Review review, EPushInfo info) {
+        int badge = alarmListQueryUseCase.countUnreadAlarms(review.getToken());
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
@@ -145,7 +147,7 @@ public class FCMSendService {
             String result = firebaseMessaging.send(message);
             log.info("Successfully sent message: " + result);
 
-            FCMToken token = fcmTokenRepository.findByToken(review.getToken());
+            FCMToken token = tokenQueryUseCase.findByToken(review.getToken());
             refreshToken(token);
 
         } catch (FirebaseMessagingException e) {
@@ -159,16 +161,15 @@ public class FCMSendService {
                 info.getBody(),
                 EPopupTopic.CHOOCHUN
         );
-        // 등록&로그 메서드
-        logAlarmStatus(popupAlarmDto);
+
+        alarmCommandUseCase.insertPopupAlarm(popupAlarmDto);
     }
 
-    // 키워드 알림 전송
-    public void sendKeywordAlarmByFCMToken(FCMToken token, AlarmKeywordCreateRequestDto requestDto,
-                                           UserAlarmKeyword userAlarmKeyword) {
+    @Override
+    public void sendKeywordAlarm(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
 
-        int badge = alarmListService.countUnreadAlarms(token.getToken());
+        int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(requestDto.title())
@@ -189,15 +190,14 @@ public class FCMSendService {
         }
     }
 
-    // FCM 토픽 메시지 전송 메서드
-    public void sendFCMTopicMessage(List<FCMRequestDto> fcmRequestDtoList) {
-
+    @Override
+    public void sendPopupTopicAlarm(List<FCMRequestDto> fcmRequestDtoList) {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
-            int badge = alarmListService.countUnreadAlarms(fcmRequestDto.token());
+            int badge = alarmListQueryUseCase.countUnreadAlarms(fcmRequestDto.token());
 
             Message message;
-
+            //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
             Popup popup = popupRepository.findById(Long.valueOf(fcmRequestDto.popupId()))
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
@@ -219,66 +219,14 @@ public class FCMSendService {
                 String result = firebaseMessaging.send(message);
                 log.debug("Successfully sent message: " + result);
 
-                FCMToken token = fcmTokenRepository.findByToken(fcmRequestDto.token());
+                FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
                 refreshToken(token); // 토큰 갱신
 
-                // 팝업 알림 등록
-                PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
-                        popup,
-                        fcmRequestDto.token(),
-                        fcmRequestDto.title(),
-                        fcmRequestDto.body(),
-                        fcmRequestDto.topic()
-                );
-                logAlarmStatus(popupAlarmDto);
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
             }
         }
-
     }
 
-    // 여러기기 FCM 동시 전송 메서드
-    public void sendMultiDeviceMessage(List<FCMRequestDto> fcmRequestDtoList) throws FirebaseMessagingException {
-        List<String> tokenList = null;
-        for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
-            tokenList = IntStream.rangeClosed(1, 1000)
-                    .mapToObj(index -> fcmRequestDto.token())
-                    .collect(Collectors.toList());
-        }
-        MulticastMessage message = MulticastMessage.builder()
-                .setNotification(Notification.builder()
-                        .setTitle(fcmRequestDtoList.get(0).title())
-                        .setBody(fcmRequestDtoList.get(0).body())
-                        .build()
-                )
-                .addAllTokens(tokenList)
-                .build();
-        if (message != null) {
-            BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
 
-            if (response.getFailureCount() > 0) {
-                List<SendResponse> responses = response.getResponses();
-                List<String> failedTokens = new ArrayList<>();
-                for (int i = 0; i < responses.size(); i++) {
-                    if (!responses.get(i).isSuccessful()) {
-                        failedTokens.add(tokenList.get(i));
-                    }
-                }
-                log.error(" List of tokens that caused failures: " + failedTokens);
-            } else {
-                log.info(" List of tokens send messages SUCCESSFULLY");
-            }
-        }
-    }
-
-    // 팝업 알림 리스트 생성 & 로그 남기는 메서드
-    private void logAlarmStatus(PopupAlarmDto popupAlarmDto) {
-        String flag = alarmService.insertPopupAlarm(popupAlarmDto);
-        if (flag.equals("1")) {
-            log.info(popupAlarmDto.fcmToken() + " alarm success");
-        } else {
-            log.error(popupAlarmDto.fcmToken() + " alarm fail");
-        }
-    }
 }

@@ -2,7 +2,7 @@ package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
@@ -10,7 +10,10 @@ import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.ReopenDemand;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.dto.popup.response.VisitedPopupDto;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
@@ -25,9 +28,8 @@ import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
+import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
+import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,19 +49,16 @@ public class PopupService {
 
     private final ReviewQueryRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
-    private final FCMTokenRepository fcmTokenRepository;
     private final ReopenDemandRepository reopenDemandRepository;
-    private final VisitRepository visitRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
-
-    private final VisitorDataService visitorDataService;
-    private final VisitService visitService;
 
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final UserQueryUseCase userQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
-
+    private final TokenQueryUseCase tokenQueryUseCase;
+    private final VisitQueryUseCase visitQueryUseCase;
+    private final VisitorDataQueryUseCase visitorDataQueryUseCase;
     private final HeaderUtil headerUtil;
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
@@ -93,9 +92,9 @@ public class PopupService {
         List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(reviews, reviewImagesList, profileImagesList,
                 reviewCntList);
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
+        VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popupId); // 방문자 데이터
 
-        Optional<Integer> visitors = visitService.showRealTimeVisitors(popupId); // 실시간 방문자
+        Optional<Integer> visitors = visitQueryUseCase.getRealTimeVisitors(popupId); // 실시간 방문자
 
         popupRepository.save(popup);
 
@@ -154,9 +153,9 @@ public class PopupService {
         List<ReviewInfoDto> reviewInfoList = ReviewInfoDto.fromEntityList(filteredReviews, reviewImagesList,
                 profileImagesList, reviewCntList);
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popupId); // 방문자 데이터
+        VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popupId); // 방문자 데이터
 
-        Optional<Integer> visitors = visitService.showRealTimeVisitors(popupId); // 실시간 방문자
+        Optional<Integer> visitors = visitQueryUseCase.getRealTimeVisitors(popupId); // 실시간 방문자
 
         popupRepository.save(popup);
 
@@ -171,14 +170,14 @@ public class PopupService {
         // 관심 여부 확인
         Boolean isInterested = interestQueryUseCase.existsInterestByUserIdAndPopupId(userId, popupId);
 
-        Optional<Visit> visit = visitRepository.findByUserId(userId, popupId);
+        Optional<Visit> visit = visitQueryUseCase.findByUserId(userId, popupId);
 
         // 차단 여부 확인
         User user = userQueryUseCase.findUserById(userId);
         Boolean isBlocked = blockedPopupRepository.findByPopupIdAndUserId(popup, user).isPresent();
 
         // 방문 여부 확인
-        if (!visit.isEmpty()) {
+        if (!visit.equals(null)) {
             return PopupDetailDto.fromEntity(popup, imageList, isInterested, reviewInfoList, visitorDataDto, visitors,
                     true, isBlocked); // 이미 방문함
         } else {
@@ -209,7 +208,7 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        FCMToken token = fcmTokenRepository.findByToken(pushRequestDto.token());
+        FCMToken token = tokenQueryUseCase.findByToken(pushRequestDto.token());
         if (token == null) {
             throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
         }
@@ -238,10 +237,10 @@ public class PopupService {
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups.getContent()) {
-            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
             visitorDataInfoDtos.add(visitorDataDto);
 
-            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
 
             Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
@@ -263,10 +262,10 @@ public class PopupService {
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
-            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
             visitorDataInfoDtos.add(visitorDataDto);
 
-            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
 
             Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
@@ -282,9 +281,9 @@ public class PopupService {
             return null;
         }
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+        VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
 
-        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
 
@@ -299,10 +298,10 @@ public class PopupService {
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups.getContent()) {
-            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
             visitorDataInfoDtos.add(visitorDataDto);
 
-            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
         }
 
@@ -320,10 +319,10 @@ public class PopupService {
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
-            VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+            VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
             visitorDataInfoDtos.add(visitorDataDto);
 
-            Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
         }
 
@@ -336,9 +335,9 @@ public class PopupService {
             return null;
         }
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
+        VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
 
-        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         // PopupStoreDto 리스트를 생성하여 반환
         return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false);
@@ -346,7 +345,7 @@ public class PopupService {
 
     public List<VisitedPopupDto> getVisitedPopupList(Long userId) {
 
-        List<Visit> visitList = visitRepository.findAllByUserId(userId);
+        List<Visit> visitList = visitQueryUseCase.findAllByUserId(userId);
         if (visitList.isEmpty()) {
             throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
         }

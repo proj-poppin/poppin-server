@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.interest.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
@@ -16,12 +17,12 @@ public class InterestCommandController {
     private final InterestService interestService;
 
     @PostMapping("")
-    public ResponseDto<?> addInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) {
+    public ResponseDto<?> addInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) throws FirebaseMessagingException {
         return ResponseDto.ok(interestService.userAddInterest(userId, interestRequestDto));
     }
 
     @DeleteMapping("")
-    public ResponseDto<?> removeInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) {
+    public ResponseDto<?> removeInterest(@UserId Long userId, @RequestBody InterestRequestDto interestRequestDto) throws FirebaseMessagingException {
         return ResponseDto.ok(interestService.removeInterest(userId, interestRequestDto));
     }
 }

@@ -1,13 +1,15 @@
 package com.poppin.poppinserver.popup.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
 import com.poppin.poppinserver.alarm.repository.*;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -36,7 +38,10 @@ import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.repository.*;
+import com.poppin.poppinserver.review.repository.ReviewCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
+import com.poppin.poppinserver.review.repository.ReviewRecommendCommandRepository;
 import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -82,14 +87,16 @@ public class AdminPopupService {
 
     private final S3Service s3Service;
     private final ModifyInfoService modifyInfoService;
-    private final FCMTokenService fcmTokenService;
-    private final FCMSendService fcmSendService;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
     private final InterestCommandUseCase interestCommandUseCase;
 
     private final PrepardSearchUtil prepardSearchUtil;
+
+    private final TokenQueryUseCase tokenQueryUseCase;
+    private final TopicCommandUseCase topicCommandUseCase;
+    private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
     private final FCMScheduler fcmScheduler;
 
@@ -209,7 +216,7 @@ public class AdminPopupService {
 
                 // 유저에게 FCM 토큰 메시지 발송
                 FCMToken token = fcmTokenRepository.findByToken(userAlarmKeyword.getFcmToken());
-                fcmSendService.sendKeywordAlarmByFCMToken(token, alarmKeywordCreateRequestDto, userAlarmKeyword);
+                sendAlarmCommandUseCase.sendKeywordAlarm(token, alarmKeywordCreateRequestDto, userAlarmKeyword);
             }
         }
 
@@ -242,7 +249,7 @@ public class AdminPopupService {
     } // 전체 팝업 관리 - 전체 팝업 조회
 
     @Transactional
-    public Boolean removePopup(Long popupId) {
+    public Boolean removePopup(Long popupId) throws FirebaseMessagingException {
         Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         // 실시간 방문자 수 관련 데이터
@@ -276,9 +283,10 @@ public class AdminPopupService {
         List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
 
         for (PopupTopic topic : topicList) {
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.MAGAM);
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.OPEN);
-            fcmTokenService.fcmRemovePopupTopic(topic.getTokenId().getToken(), popup, EPopupTopic.CHANGE_INFO);
+            FCMToken fcmToken = tokenQueryUseCase.findByToken(topic.getTokenId().getToken());
+            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
+            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
+            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
         }
 
         // 관심 추가 데이터

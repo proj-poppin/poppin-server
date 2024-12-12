@@ -6,7 +6,7 @@ import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -30,7 +30,7 @@ public class FCMScheduler {
     private final PopupRepository popupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
-    private final FCMSendService fcmSendService;
+    private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
 
     @Scheduled(cron = "0 0 */3 * * *")
@@ -50,7 +50,7 @@ public class FCMScheduler {
         if (reopenPopup.isEmpty()) {
             log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
         } else {
-            fcmSendService.sendAlarmByFCMToken(reopenPopup, EPushInfo.REOPEN);
+            sendAlarmCommandUseCase.sendScheduledPopupAlarm(reopenPopup, EPushInfo.REOPEN);
         }
     }
 
@@ -130,7 +130,7 @@ public class FCMScheduler {
             for (Popup p : hotPopup){
                 log.info("hot popup name {}", p.getName());
             }
-            fcmSendService.sendAlarmByFCMToken(hotPopup, EPushInfo.HOTPOPUP);
+            sendAlarmCommandUseCase.sendScheduledPopupAlarm(hotPopup, EPushInfo.HOTPOPUP);
         }
     }
 
@@ -223,7 +223,7 @@ public class FCMScheduler {
         if (fcmRequestDtoList == null) {
             log.info("tokens doesn't have existed on : " + topic);
         } else {
-            fcmSendService.sendFCMTopicMessage(fcmRequestDtoList);
+            sendAlarmCommandUseCase.sendPopupTopicAlarm(fcmRequestDtoList);
         }
     }
 }

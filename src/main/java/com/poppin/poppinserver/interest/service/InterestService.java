@@ -1,7 +1,9 @@
 package com.poppin.poppinserver.interest.service;
 
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.poppin.poppinserver.alarm.domain.FCMToken;
+import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
@@ -16,13 +18,14 @@ import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
-import com.poppin.poppinserver.visit.service.VisitService;
-import com.poppin.poppinserver.visit.service.VisitorDataService;
-import java.util.Optional;
+import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
+import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 @Service
@@ -31,18 +34,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class InterestService {
     private final InterestRepository interestRepository;
 
-    private final FCMTokenService fcmTokenService;
-    private final VisitorDataService visitorDataService;
-    private final VisitService visitService;
-
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
     private final BlockedPopupQueryUseCase blockedPopupQueryUseCase;
-    private final FCMTokenRepository fcmTokenRepository;
+    private final VisitQueryUseCase visitQueryUseCase;
+    private final VisitorDataQueryUseCase visitorDataQueryUseCase;
+    private final TokenQueryUseCase tokenQueryUseCase;
+    private final TopicCommandUseCase topicCommandUseCase;
 
     @Transactional
-    public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto) {
+    public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(requestDto.popupId());
 
         interestRepository.findByUserIdAndPopupId(userId, popupId)
@@ -63,39 +65,45 @@ public class InterestService {
         popup.addInterestCnt();
 
         /*알림 구독*/
-        String fcmToken = fcmTokenRepository.findByUser(user).getToken();
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmAddPopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+        String fcmToken = tokenQueryUseCase.findByUser(user).getToken();
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
-        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
+        FCMToken token = tokenQueryUseCase.findByToken(fcmToken);
+        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.MAGAM);
+        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.OPEN);
+        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.CHANGE_INFO);
+
+        VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
+
+        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
 
         return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
     }
 
     @Transactional
-    public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) {
+    public InterestDto removeInterest(Long userId, InterestRequestDto requestDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(requestDto.popupId());
 
         Interest interest = interestQueryUseCase.findInterestByUserIdAndPopupId(userId, popupId);
         User user = userQueryUseCase.findUserById(userId);
         Popup popup = popupQueryUseCase.findPopupById(popupId);
 
-        VisitorDataInfoDto visitorDataDto = visitorDataService.getVisitorData(popup.getId()); // 방문자 데이터
-        Optional<Integer> visitorCnt = visitService.showRealTimeVisitors(popup.getId()); // 실시간 방문자
+        VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
+
+
+        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
 
         InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
 
         interestRepository.delete(interest);
 
-        /*FCM 구독취소*/
-        String fcmToken = fcmTokenRepository.findByUser(user).getToken();
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-        fcmTokenService.fcmRemovePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+        String fcmToken = tokenQueryUseCase.findByUser(user).getToken();
+
+        FCMToken token = tokenQueryUseCase.findByToken(fcmToken);
+        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.MAGAM);
+        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.OPEN);
+        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.CHANGE_INFO);
 
         return interestDto;
     }

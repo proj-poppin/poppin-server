@@ -159,6 +159,7 @@ public class UserService {
     public ReviewUncertiDto getUncertifiedReview(Long userId, Long reviewId, Long popupId) {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP)); /*여기서 인증된 후기의 popupId로 조회한다*/
 

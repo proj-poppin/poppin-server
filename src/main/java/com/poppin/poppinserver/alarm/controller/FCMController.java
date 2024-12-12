@@ -1,12 +1,20 @@
 package com.poppin.poppinserver.alarm.controller;
 
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.poppin.poppinserver.alarm.domain.FCMToken;
+import com.poppin.poppinserver.alarm.domain.PopupTopic;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.TopicQueryUseCase;
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -15,30 +23,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class FCMController {
 
     //TODO: 삭제 예정
-      private final FCMTokenService fcmTokenService;
-//    private final FCMTestUtil FCMTestUtil;
-//
-//    @PostMapping("/token/test")
-//    public void sendNotificationByTokenTest(@Valid @RequestBody PushDto pushDto) {
-//        FCMTestUtil.sendNotificationByTokenTest(pushDto);
-//    }
-//
-//    @PostMapping("topic/test")
-//    public void sendAndroidNotificationByTopicTest(@Valid @RequestBody PushDto pushDto)
-//            throws FirebaseMessagingException {
-//        FCMTestUtil.sendNotificationByTopicTest(pushDto);
-//    }
+      private final FCMTokenRepository fcmTokenRepository;
 
-    //TODO: 삭제 예정
-//    /* 알림 허용 시 데이터 저장 */
-//    @PostMapping("/apply/FCMtoken")
-//    public ResponseDto<?> addFCMTokenUsers(@RequestBody ApplyTokenRequestDto applyTokenRequestDto) {
-//        return ResponseDto.ok(fcmTokenService.fcmApplyToken(applyTokenRequestDto));
-//    }
+      private final TopicQueryUseCase topicQueryUseCase;
+      private final TopicCommandUseCase topicCommandUseCase;
+
 
     // 데이터베이스 초기화 시 토큰 팝업 구독 해제
     @PostMapping("/reset/topic")
-    public ResponseDto<?> resetPopupTopic() {
-        return ResponseDto.ok(fcmTokenService.resetPopupTopic());
+    public ResponseDto<?> resetPopupTopic() throws FirebaseMessagingException {
+        List<FCMToken> fcmTokenList = fcmTokenRepository.findAll();
+        for (FCMToken token : fcmTokenList) {
+            List<PopupTopic> topics = topicQueryUseCase.findPopupTopicByToken(token);
+            if (!topics.isEmpty()) {
+                for (PopupTopic topic : topics) {
+
+                    topicCommandUseCase.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.MAGAM);
+                    topicCommandUseCase.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.OPEN);
+                    topicCommandUseCase.unsubscribePopupTopic(token, topic.getPopup(), EPopupTopic.CHANGE_INFO);
+                }
+            }
+        }
+        return ResponseDto.ok("finish");
     }
 }

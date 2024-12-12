@@ -172,21 +172,4 @@ public class AlarmListService {
         }
     }
 
-
-    // 공지사항 읽음 여부 테이블에 유저 정보와 함께 저장
-    public void insertInformIsRead(FCMToken token, InformAlarm informAlarm) {
-        InformIsRead informIsRead = new InformIsRead(informAlarm, token);
-        informIsReadRepository.save(informIsRead);
-    }
-
-    public int countUnreadAlarms(String fcmToken) {
-        int resultCount;
-
-        int unreadInformAlarms = informIsReadRepository.unreadInforms(fcmToken);
-        int unreadPopupAlarms = popupAlarmRepository.UnreadPopupAlarms(fcmToken);
-
-        resultCount = unreadInformAlarms + unreadPopupAlarms;
-
-        return resultCount;
-    }
 }

@@ -17,7 +17,7 @@ public record VisitedPopupDto(
         String name,
 
         @NotNull
-        List<String> imageUrls,
+        String mainImageUrl,
 
         @NotNull
         String openDate,
@@ -37,7 +37,7 @@ public record VisitedPopupDto(
         return VisitedPopupDto.builder()
                 .id(popup.getId().toString())
                 .name(popup.getName())
-                .imageUrls(imageUrls)
+                .mainImageUrl(imageUrls.get(0)) // 메인 이미지
                 .openDate(popup.getOpenDate().toString())
                 .closeDate(popup.getCloseDate().toString())
                 .build();

@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.review.service;
 
-import com.poppin.poppinserver.alarm.service.FCMSendService;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPushInfo;
@@ -31,7 +31,8 @@ public class ReviewRecommendService {
     private final ReviewQueryRepository reviewRepository;
     private final ReviewRecommendCommandRepository reviewRecommendCommandRepository;
     private final ReviewRecommendQueryRepository reviewRecommendQueryRepository;
-    private final FCMSendService fcmSendService;
+
+    private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
 
     /*후기 추천 증가*/
@@ -71,7 +72,7 @@ public class ReviewRecommendService {
         reviewRepository.save(review);
         reviewRecommendCommandRepository.save(reviewRecommend);
 
-        fcmSendService.sendChoochunByFCMToken(popup, review, EPushInfo.CHOOCHUN); // 알림
+        sendAlarmCommandUseCase.sendChoochunAlarm(popup, review, EPushInfo.CHOOCHUN); // 알림
 
         return "정상적으로 반환되었습니다";
 

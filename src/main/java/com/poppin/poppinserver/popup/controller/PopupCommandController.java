@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.popup.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
@@ -12,21 +13,14 @@ import com.poppin.poppinserver.popup.service.AdminPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.visit.service.VisitService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -53,7 +47,7 @@ public class PopupCommandController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<?> removePopup(@RequestParam("id") Long popupId,
-                                      @UserId Long adminId) {
+                                      @UserId Long adminId) throws FirebaseMessagingException {
         return ResponseDto.ok(adminPopupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
@@ -76,7 +70,7 @@ public class PopupCommandController {
     }
 
     @PatchMapping("/visit") // 팝업 방문하기
-    public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) {
+    public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 

@@ -9,7 +9,7 @@ import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
 import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
@@ -23,35 +23,24 @@ import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
-import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.*;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
-import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +52,6 @@ public class AuthService {
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserPreferenceSettingService userPreferenceSettingService;
-    private final FCMTokenService fcmTokenService;
     private final InformIsReadRepository informIsReadRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final InterestRepository interestRepository;
@@ -71,6 +59,7 @@ public class AuthService {
     private final BlockedPopupRepository blockedPopupRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final UserQueryUseCase userQueryUseCase;
+    private final TokenCommandUseCase tokenCommandUseCase;
 
     // 유저 이메일 중복 확인 메서드
     private void checkDuplicatedEmail(String email) {
@@ -195,7 +184,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
+        tokenCommandUseCase.verifyToken(user.getId(), fcmToken);
         userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
         UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
                 user.getId());
@@ -310,7 +299,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
+        tokenCommandUseCase.verifyToken(user.getId(), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
@@ -427,7 +416,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        fcmTokenService.verifyFCMToken(user.getId(), fcmToken);
+        tokenCommandUseCase.verifyToken(user.getId(), fcmToken);
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);

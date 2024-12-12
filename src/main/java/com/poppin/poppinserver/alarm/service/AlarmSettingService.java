@@ -21,9 +21,13 @@ import org.springframework.stereotype.Service;
 public class AlarmSettingService {
 
     private final AlarmSettingRepository alarmSettingRepository;
+
+    //TODO: @조원준 유스케이스 변경 부탁드립니다.
     private final UserQueryRepository userQueryRepository;
 
     public AlarmSettingResponseDto updateAlarmSetting(Long userId, AlarmSettingRequestDto reqDto) {
+
+        //TODO: @조원준 유스케이스 변경 부탁드립니다.
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 

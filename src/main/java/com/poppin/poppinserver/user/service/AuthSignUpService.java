@@ -9,7 +9,7 @@ import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
 import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
@@ -19,20 +19,16 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
-import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +38,6 @@ public class AuthSignUpService {
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandUseCase userCommandUseCase;
     private final UserAlarmSettingService userAlarmSettingService;
-    private final FCMTokenService fcmTokenService;
     private final JwtUtil jwtUtil;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final InformIsReadRepository informIsReadRepository;
@@ -50,6 +45,8 @@ public class AuthSignUpService {
     private final InterestRepository interestRepository;
     private final BlockedPopupRepository blockedPopupRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
+
+    private final TokenCommandUseCase tokenCommandUseCase;
 
     // 유저 이메일 중복 확인 메서드
 //    private void checkDuplicatedEmail(String email) {
@@ -109,7 +106,7 @@ public class AuthSignUpService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
 
         // FCM 토큰 등록
-        fcmTokenService.applyFCMToken(authSignUpRequestDto.fcmToken(), newUser.getId());
+        tokenCommandUseCase.applyToken(authSignUpRequestDto.fcmToken(), newUser.getId());
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);

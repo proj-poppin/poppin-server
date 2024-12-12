@@ -3,7 +3,7 @@ package com.poppin.poppinserver.core.scheduler;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.service.FCMTokenService;
+import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ public class FCMTokenManagementScheduler {
 
     private final FCMTokenRepository fcmTokenRepository;
 
-    private final FCMTokenService fcmTokenService;
+    private final TokenCommandUseCase tokenCommandUseCase;
 
     // 3. alarm 테이블 수정
     // 만기 토큰 삭제 스케줄러
@@ -36,7 +36,7 @@ public class FCMTokenManagementScheduler {
         List<FCMToken> expiredTokenList = fcmTokenRepository.findExpiredTokenList(now);
 
         for (FCMToken token : expiredTokenList) {
-            fcmTokenService.fcmRemoveToken(token);
+            tokenCommandUseCase.removeToken(token);
         }
     }
 }

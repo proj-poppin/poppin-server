@@ -5,12 +5,11 @@ import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.InformAlarmImage;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.InformAlarmImageRepository;
-import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
-import com.poppin.poppinserver.alarm.service.AlarmListService;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.FCMSendService;
+import com.poppin.poppinserver.alarm.usecase.AlarmCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.AlarmListQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
+import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.PageInfoDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
@@ -24,14 +23,7 @@ import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportContentDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupDetailDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewDetailDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
-import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.*;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -51,14 +43,8 @@ import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
+import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -69,6 +55,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -78,19 +71,22 @@ public class AdminService {
     private final ReviewQueryRepository reviewRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
-    private final VisitRepository visitRepository;
+
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final PopupRepository popupRepository;
-    private final FCMTokenRepository fcmTokenRepository;
-    private final InformAlarmRepository informAlarmRepository;
+
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final S3Service s3Service;
-    private final AlarmService alarmService;
-    private final AlarmListService alarmListService;
-    private final FCMSendService fcmSendService;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final UserCommandRepository userCommandRepository;
+
+    private final TokenQueryUseCase tokenQueryUseCase;
+    private final AlarmCommandUseCase alarmCommandUseCase;
+    private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
+    private final AlarmListQueryUseCase alarmListQueryUseCase;
+    private final VisitQueryUseCase visitQueryUseCase;
 
     public List<AdminFaqResponseDto> readFAQs() {
         List<FreqQuestion> freqQuestionList = freqQuestionRepository.findAllByOrderByCreatedAtDesc();
@@ -207,10 +203,10 @@ public class AdminService {
         List<UserReviewDto> userReviewDtoList = reviewPage.getContent().stream()
                 .map(userReview -> {
                     List<String> reviewImageListUrl = reviewImageQueryUseCase.findUrlAllByReviewId(userReview.getId());
-                    Optional<Visit> visitDate = visitRepository.findByUserId(userId, userReview.getPopup().getId());
+                    Optional<Visit> visitDate = visitQueryUseCase.findByUserId(userId, userReview.getPopup().getId());
 
                     UserReviewDto userReviewDto = UserReviewDto.of(userReview.getId(), userReview.getPopup().getName(),
-                            visitDate.isPresent() ?
+                            !visitDate.isEmpty() ?
                                     visitDate.get().getCreatedAt().toString() : "",
                             userReview.getCreatedAt().toString(),
                             userReview.getText(), reviewImageListUrl, userReview.getIsVisible());
@@ -416,17 +412,12 @@ public class AdminService {
             // Alarm 객체 저장
             log.info("INFORM ALARM Entity Saving");
 
-            InformAlarm informAlarm = alarmService.insertInformAlarm(requestDto);
-            if (informAlarm.equals(null)) {
-                throw new CommonException(ErrorCode.INFO_ALARM_ERROR);
-            } else {
-                informAlarmRepository.save(informAlarm);
-            }
+            InformAlarm informAlarm = alarmCommandUseCase.insertInformAlarm(requestDto);
 
             // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
-            List<FCMToken> tokenList = fcmTokenRepository.findAll();
+            List<FCMToken> tokenList = tokenQueryUseCase.findAll();
             for (FCMToken token : tokenList) {
-                alarmListService.insertInformIsRead(token, informAlarm);
+                alarmCommandUseCase.insertInformIsRead(token, informAlarm);
             }
 
             // 이미지 저장
@@ -445,7 +436,7 @@ public class AdminService {
             // 저장 성공
             if (informAlarm != null) {
                 // 앱 푸시 발송
-                fcmSendService.sendInformationByFCMToken(tokenList, requestDto, informAlarm);
+                sendAlarmCommandUseCase.sendInformationAlarm(tokenList, requestDto, informAlarm);
                 // 푸시 성공
                 InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm,
                         fileUrls);

@@ -2,7 +2,7 @@ package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.dto.informAlarm.response.NoticeDto;
-import com.poppin.poppinserver.alarm.service.AlarmService;
+import com.poppin.poppinserver.alarm.usecase.AlarmQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
@@ -18,12 +18,6 @@ import com.poppin.poppinserver.popup.repository.specification.PopupSpecification
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -33,16 +27,23 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BootstrapService {
     private final PopupRepository popupRepository;
 
-    private final AlarmService alarmService;
     private final PopupService popupService;
 
     private final UserQueryUseCase userQueryUseCase;
+    private final AlarmQueryUseCase alarmQueryUseCase;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
@@ -89,7 +90,7 @@ public class BootstrapService {
             List<PopupStoreDto> interestedPopupStores = popupService.getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
-            List<InformAlarm> informAlarms = alarmService.getInformAlarms(userId);
+            List<InformAlarm> informAlarms = alarmQueryUseCase.getInformAlarms(userId);
 
             List<NoticeDto> notice = NoticeDto.fromEntities(informAlarms);
 

@@ -4,10 +4,11 @@ import com.poppin.poppinserver.core.type.ESatisfaction;
 import com.poppin.poppinserver.core.type.EVisitDate;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +18,12 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class VisitorDataService {
+public class VisitorDataQueryService implements VisitorDataQueryUseCase {
 
     private final VisitorDataRepository visitorDataRepository;
 
-    public VisitorDataInfoDto getVisitorData(Long popupId) {
-
+    @Override
+    public VisitorDataInfoDto findVisitorData(Long popupId) {
         Map<String, Object> weekdayAm = checkAndInitialize(
                 visitorDataRepository.findCongestionRatioByPopupId(popupId, EVisitDate.fromValue("평일 오전").toString()));
         Map<String, Object> weekdayPm = checkAndInitialize(
@@ -40,7 +41,8 @@ public class VisitorDataService {
         return visitorDataDto;
     }
 
-    private Map<String, Object> checkAndInitialize(Map<String, Object> result) {
+    @Override
+    public Map<String, Object> checkAndInitialize(Map<String, Object> result) {
         if (result == null) {
             result = new HashMap<>();
             result.put("congestionRate", "여유");  // 기본 값 설정
@@ -55,4 +57,6 @@ public class VisitorDataService {
         }
         return result;
     }
+
+
 }
