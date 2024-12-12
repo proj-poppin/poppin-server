@@ -230,7 +230,7 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 조회
 
-    public PagingResponseDto readManageList(Long adminId, EOperationStatus oper, int page, int size) {
+    public PagingResponseDto<ManageListDto> readManageList(Long adminId, EOperationStatus oper, int page, int size) {
         Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
                 oper.getStatus());
 
@@ -458,7 +458,7 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 수정
 
-    public PagingResponseDto searchManageList(String text, int page, int size,
+    public PagingResponseDto<ManageListDto> searchManageList(String text, int page, int size,
                                               EOperationStatus oper) {
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;

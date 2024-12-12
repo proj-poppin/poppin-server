@@ -3,6 +3,7 @@ package com.poppin.poppinserver.user.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
+import com.poppin.poppinserver.user.controller.swagger.SwaggerAuthController;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
@@ -11,6 +12,9 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
+import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.service.AuthLoginService;
 import com.poppin.poppinserver.user.service.AuthService;
 import com.poppin.poppinserver.user.service.AuthSignUpService;
@@ -31,20 +35,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements SwaggerAuthController {
     private final AuthService authService;
     private final AuthSignUpService authSignUpService;
     private final AuthLoginService authLoginService;
 
     // 계정 상태 반환 API
     @GetMapping("/account/status")
-    public ResponseDto<?> getAccountStatus(@RequestBody @Valid AccountRequestDto accountRequestDto) {
+    public ResponseDto<AccountStatusResponseDto> getAccountStatus(@RequestBody @Valid AccountRequestDto accountRequestDto) {
         return ResponseDto.ok(authService.getAccountStatus(accountRequestDto));
     }
 
     // 자체 회원가입 API
     @PostMapping("/sign-up")
-    public ResponseDto<?> authSignUp(
+    public ResponseDto<UserInfoResponseDto> authSignUp(
             @RequestBody @Valid AuthSignUpRequestDto authSignUpRequestDto
     ) {
         return ResponseDto.created(authSignUpService.handleSignUp(authSignUpRequestDto));
@@ -68,7 +72,7 @@ public class AuthController {
 
     // body로 email, password 로그인
     @PostMapping("/sign-in")
-    public ResponseDto<?> authLogin(
+    public ResponseDto<UserInfoResponseDto> authLogin(
             @RequestBody @Valid AuthLoginRequestDto authLoginRequestDto
     ) {
         return ResponseDto.ok(authService.authLogin(authLoginRequestDto));
@@ -85,7 +89,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseDto<?> refresh(
+    public ResponseDto<UserInfoResponseDto> refresh(
             @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken,
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     ) {
@@ -93,26 +97,26 @@ public class AuthController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseDto<?> resetPassword(@UserId Long userId,
+    public ResponseDto<String> resetPassword(@UserId Long userId,
                                         @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto) {
         authService.resetPassword(userId, passwordRequestDto);
         return ResponseDto.ok("비밀번호 변경 성공");
     }
 
     @PostMapping("/reset-password/no-auth")
-    public ResponseDto<?> resetPasswordNoAuth(@RequestBody @Valid PasswordResetRequestDto passwordResetRequestDto) {
+    public ResponseDto<String> resetPasswordNoAuth(@RequestBody @Valid PasswordResetRequestDto passwordResetRequestDto) {
         authService.resetPasswordNoAuth(passwordResetRequestDto);
         return ResponseDto.ok("비밀번호가 재설정되었습니다.");
     }
 
     @PostMapping("/verification/password")
-    public ResponseDto<?> verifyPassword(@UserId Long userId,
+    public ResponseDto<Boolean> verifyPassword(@UserId Long userId,
                                          @RequestBody @Valid PasswordVerificationRequestDto passwordVerificationRequestDto) {
         return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationRequestDto));
     }
 
     @PostMapping("/email/verification")
-    public ResponseDto<?> sendEmailVerificationCode(
+    public ResponseDto<AuthCodeResponseDto> sendEmailVerificationCode(
             @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {
         return ResponseDto.ok(authService.sendEmailVerificationCode(emailVerificationRequestDto));
     }

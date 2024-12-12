@@ -1,12 +1,19 @@
 package com.poppin.poppinserver.user.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
+import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
+import com.poppin.poppinserver.user.controller.swagger.SwaggerUserController;
+import com.poppin.poppinserver.user.dto.faq.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
+import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
@@ -28,11 +35,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 @Slf4j
-public class UserController {
+public class UserController implements SwaggerUserController {
     private final UserService userService;
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
@@ -57,7 +66,7 @@ public class UserController {
     }
 
     @PutMapping("/popup-taste")
-    public ResponseDto<?> updateUserTaste(
+    public ResponseDto<UserTasteResponseDto> updateUserTaste(
             @UserId Long userId,
             @RequestBody @Valid CreateUserTasteDto userTasteDto
     ) {
@@ -77,25 +86,25 @@ public class UserController {
     }
 
     @PostMapping("/image")
-    public ResponseDto<?> createUserProfileImage(@UserId Long userId,
+    public ResponseDto<String> createUserProfileImage(@UserId Long userId,
                                                  @RequestPart(value = "profileImage") MultipartFile profileImage) {
         return ResponseDto.created(userProfileImageService.createProfileImage(userId, profileImage));
     }
 
     @PutMapping("/image")
-    public ResponseDto<?> updateUserProfileImage(@UserId Long userId,
+    public ResponseDto<String> updateUserProfileImage(@UserId Long userId,
                                                  @RequestPart(value = "profileImage") MultipartFile profileImage) {
         return ResponseDto.ok(userProfileImageService.updateProfileImage(userId, profileImage));
     }
 
     @DeleteMapping("/image")
-    public ResponseDto<?> deleteUserProfileImage(@UserId Long userId) {
+    public ResponseDto<String> deleteUserProfileImage(@UserId Long userId) {
         userProfileImageService.deleteProfileImage(userId);
         return ResponseDto.ok("프로필 이미지가 삭제되었습니다.");
     }
 
     @PutMapping("/settings")
-    public ResponseDto<?> updateUserNickname(
+    public ResponseDto<UserProfileDto> updateUserNickname(
             @UserId Long userId,
             @RequestBody UpdateUserInfoDto updateUserInfoDto
     ) {
@@ -103,7 +112,7 @@ public class UserController {
     }
 
     @DeleteMapping("/withdrawal")
-    public ResponseDto<?> deleteUser(@UserId Long userId) {
+    public ResponseDto<String> deleteUser(@UserId Long userId) {
         userHardDeleteService.deleteUser(userId);
         return ResponseDto.ok("회원 탈퇴가 완료되었습니다.");
     }
@@ -176,27 +185,27 @@ public class UserController {
 
     /*마이페이지 - 일반후기 팝업 검색*/
     @GetMapping("/popup/search")
-    public ResponseDto<?> searchPopupName(@RequestParam("text") String text,
-                                          @RequestParam("taste") String taste,
-                                          @RequestParam("prepered") String prepered,
-                                          @RequestParam("oper") EOperationStatus oper,
-                                          @RequestParam("order") EPopupSort order,
-                                          @RequestParam("page") int page,
-                                          @RequestParam("size") int size,
-                                          HttpServletRequest request) {
+    public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> searchPopupName(@RequestParam("text") String text,
+                                                                               @RequestParam("taste") String taste,
+                                                                               @RequestParam("prepered") String prepered,
+                                                                               @RequestParam("oper") EOperationStatus oper,
+                                                                               @RequestParam("order") EPopupSort order,
+                                                                               @RequestParam("page") int page,
+                                                                               @RequestParam("size") int size,
+                                                                               HttpServletRequest request) {
         return ResponseDto.ok(
                 searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, request));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/
     @GetMapping("/support/faqs")
-    public ResponseDto<?> readFAQs() {
+    public ResponseDto<List<UserFaqResponseDto>> readFAQs() {
         return ResponseDto.ok(userService.readFAQs());
     }
 
     /*마이페이지 - 한글 닉네임 랜덤 생성*/
     @GetMapping("/random-nickname")
-    public ResponseDto<?> generateRandomNickname() {
+    public ResponseDto<UserNicknameResponseDto> generateRandomNickname() {
         return ResponseDto.ok(userService.generateRandomNickname());
     }
 
@@ -207,7 +216,7 @@ public class UserController {
 //    }
 
     @PostMapping("/block/{blockUserId}")
-    public ResponseDto<?> createBlockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
+    public ResponseDto<String> createBlockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
         blockUserService.createBlockedUser(userId, blockUserId);
         return ResponseDto.ok("차단 완료되었습니다.");
     }

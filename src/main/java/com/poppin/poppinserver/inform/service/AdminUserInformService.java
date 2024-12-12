@@ -266,7 +266,7 @@ public class AdminUserInformService {
     } // 제보 최종 업로그
 
     @Transactional
-    public PagingResponseDto readUserInformList(int page,
+    public PagingResponseDto<List<UserInformSummaryDto>> readUserInformList(int page,
                                                 int size,
                                                 EInformProgress progress) {
         Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);

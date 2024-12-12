@@ -6,9 +6,12 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.popup.controller.swagger.SwaggerPopupCommandController;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
+import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.service.AdminPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.visit.service.VisitService;
@@ -22,20 +25,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+// 팝업
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/popup")
-public class PopupCommandController {
+public class PopupCommandController implements SwaggerPopupCommandController {
     private final PopupService popupService;
 
     private final AdminPopupService adminPopupService;
     private final VisitService visitService;
 
     @PostMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<?> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
-                                      @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
-                                      @UserId Long adminId) {
+    public ResponseDto<AdminPopupDto> createPopup(@RequestPart(value = "images") List<MultipartFile> images,
+                                                  @RequestPart(value = "contents") @Valid CreatePopupDto createPopupDto,
+                                                  @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -46,14 +50,14 @@ public class PopupCommandController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
-    public ResponseDto<?> removePopup(@RequestParam("id") Long popupId,
+    public ResponseDto<Boolean> removePopup(@RequestParam("id") Long popupId,
                                       @UserId Long adminId) throws FirebaseMessagingException {
         return ResponseDto.ok(adminPopupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<?> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
+    public ResponseDto<AdminPopupDto> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
                                               @RequestPart(value = "contents") @Valid UpdatePopupDto updatePopupDto,
                                               @UserId Long adminId) {
 
@@ -65,12 +69,12 @@ public class PopupCommandController {
     } // 전체팝업관리 - 팝업 수정
 
     @PostMapping("/reopen") // 재오픈 수요
-    public ResponseDto<?> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto) {
+    public ResponseDto<String> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto) {
         return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
     }
 
     @PatchMapping("/visit") // 팝업 방문하기
-    public ResponseDto<?> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
+    public ResponseDto<PopupStoreDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 

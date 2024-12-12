@@ -36,7 +36,7 @@ public class SearchPopupService {
     private final UserQueryUseCase userQueryUseCase;
     private final HeaderUtil headerUtil;
 
-    public PagingResponseDto readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
+    public PagingResponseDto<List<PopupStoreDto>> readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
                                                EOperationStatus oper, EPopupSort order, int page, int size,
                                                HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);

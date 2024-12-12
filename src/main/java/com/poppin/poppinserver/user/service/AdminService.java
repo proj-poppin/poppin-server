@@ -190,7 +190,7 @@ public class AdminService {
                 .build();
     }
 
-    public PagingResponseDto readUserReviews(Long userId, int page, int size, Boolean hidden) {
+    public PagingResponseDto<List<UserReviewDto>> readUserReviews(Long userId, int page, int size, Boolean hidden) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviewPage;
         if (hidden) {
@@ -239,7 +239,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponseDto readReviewReports(int page, int size, Boolean isExec) {
+    public PagingResponseDto<List<ReportedReviewListResponseDto>> readReviewReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
@@ -258,7 +258,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponseDto readPopupReports(int page, int size, Boolean isExec) {
+    public PagingResponseDto<List<ReportedPopupListResponseDto>> readPopupReports(int page, int size, Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportPopup> reportPopups = reportPopupRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 

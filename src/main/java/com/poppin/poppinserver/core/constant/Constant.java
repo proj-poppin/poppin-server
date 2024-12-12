@@ -64,7 +64,15 @@ public class Constant {
 
             "/api/v1/bootstrap",                                             // 부트스트랩
             "/api/v1/app/start",                                             // 앱 시작 시 버전 확인
-            "/api/v1/popup/detail/**"
+            "/api/v1/popup/detail/**",
+
+            //스웨거
+            "/swagger",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/api-docs",
+            "/api-docs/**",
+            "/v3/api-docs/**"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

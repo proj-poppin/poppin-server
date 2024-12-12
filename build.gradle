@@ -71,6 +71,9 @@ dependencies {
 	// OpenFeign
 	 implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
 	// ETC
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

@@ -101,7 +101,7 @@ public class AdminModifyInfoService {
     } // 조회
 
     @Transactional
-    public PagingResponseDto readModifyInfoList(int page, int size, Boolean isExec) {
+    public PagingResponseDto<List<ModifyInfoSummaryDto>> readModifyInfoList(int page, int size, Boolean isExec) {
         Page<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByIsExecuted(PageRequest.of(page, size),
                 isExec);
 

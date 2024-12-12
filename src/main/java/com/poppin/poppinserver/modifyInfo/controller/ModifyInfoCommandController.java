@@ -4,8 +4,11 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.modifyInfo.controller.swagger.SwaggerModifyInfoCommandController;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.response.AdminModifyInfoDto;
+import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.service.AdminModifyInfoService;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import jakarta.validation.Valid;
@@ -22,15 +25,15 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/modify-info") // 정보수정요청
-public class ModifyInfoCommandController {
+public class ModifyInfoCommandController implements SwaggerModifyInfoCommandController {
     private final ModifyInfoService modifyInfoService;
     private final AdminModifyInfoService adminModifyInfoService;
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<?> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                           @RequestParam(value = "popupId") String popupId,
-                                           @RequestParam(value = "content") String content,
-                                           @UserId Long userId) {
+    public ResponseDto<ModifyInfoDto> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
+                                                       @RequestParam(value = "popupId") String popupId,
+                                                       @RequestParam(value = "content") String content,
+                                                       @UserId Long userId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -43,9 +46,9 @@ public class ModifyInfoCommandController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<?> saveModifyInfo(@RequestPart(value = "images") List<MultipartFile> images,
-                                         @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
-                                         @UserId Long adminId) {
+    public ResponseDto<AdminModifyInfoDto> saveModifyInfo(@RequestPart(value = "images") List<MultipartFile> images,
+                                                          @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
+                                                          @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -56,7 +59,7 @@ public class ModifyInfoCommandController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<?> modifyConfirm(@RequestPart(value = "images") List<MultipartFile> images,
+    public ResponseDto<AdminModifyInfoDto> modifyConfirm(@RequestPart(value = "images") List<MultipartFile> images,
                                         @RequestPart(value = "contents") @Valid UpdateModifyInfoDto updateModifyInfoDto,
                                         @UserId Long adminId) {
 

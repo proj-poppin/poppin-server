@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.alarm.controller;
 
+import com.poppin.poppinserver.alarm.controller.swagger.SwaggerAlarmController;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformDetailDto;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alarm")
-public class AlarmController {
+public class AlarmController implements SwaggerAlarmController {
 
     private final AlarmService alarmService;
     private final AlarmListService alarmListService;
