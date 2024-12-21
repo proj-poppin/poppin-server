@@ -52,7 +52,7 @@ public class UserCommandService implements UserCommandUseCase {
             return userCommandRepository.save(
                     User.builder()
                             .email(appleUserId)
-                            .password(PasswordUtil.generateRandomPassword())
+                            .password(bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()))
                             .nickname(authSignUpRequestDto.nickname())
                             .eLoginProvider(ELoginProvider.APPLE)
                             .role(EUserRole.USER)
@@ -64,7 +64,7 @@ public class UserCommandService implements UserCommandUseCase {
         return userCommandRepository.save(
                 User.builder()
                         .email(email)
-                        .password(PasswordUtil.generateRandomPassword())
+                        .password(bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()))
                         .nickname(nickname)
                         .eLoginProvider(ELoginProvider.valueOf(accountType))
                         .role(EUserRole.USER)

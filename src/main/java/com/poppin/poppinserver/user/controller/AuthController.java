@@ -48,10 +48,10 @@ public class AuthController implements SwaggerAuthController {
         return ResponseDto.ok(authService.getAccountStatus(accountRequestDto));
     }
 
-    // 계정 상태 반환 API
+    // 계정 상태 반환 API - Apple
     @PostMapping("/account/status/apple")
     public ResponseDto<AccountStatusResponseDto> getAppleAccountStatus(
-            @RequestBody AppleUserIdRequestDto appleUserIdRequestDto
+            @RequestBody @Valid AppleUserIdRequestDto appleUserIdRequestDto
     ) {
         return ResponseDto.ok(authService.getAppleAccountStatus(appleUserIdRequestDto));
     }
@@ -96,6 +96,13 @@ public class AuthController implements SwaggerAuthController {
     ) {
         log.info("accessToken : {}", accessToken);   // 'bearer ' 제거 필요
         return ResponseDto.ok(authLoginService.authSocialLogin(accessToken, provider, fcmTokenRequestDto));
+    }
+
+    @PostMapping("/login/apple")
+    public ResponseDto<?> appleSocialLogin(
+            @RequestBody @Valid AppleUserIdRequestDto appleUserIdRequestDto
+    ) {
+        return ResponseDto.ok(authLoginService.appleSocialLogin(appleUserIdRequestDto));
     }
 
     @PostMapping("/refresh")
