@@ -42,11 +42,25 @@ public class UserCommandService implements UserCommandUseCase {
 
     @Override
     public User createUserBySocialSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
+        String appleUserId = authSignUpRequestDto.appleUserId();
         String email = authSignUpRequestDto.email();
         String nickname = authSignUpRequestDto.nickname();
         String accountType = authSignUpRequestDto.accountType();
         Boolean agreedToPrivacyPolicy = authSignUpRequestDto.agreedToPrivacyPolicy();
         Boolean agreedToServiceTerms = authSignUpRequestDto.agreedToServiceTerms();
+        if (appleUserId != null) {
+            return userCommandRepository.save(
+                    User.builder()
+                            .email(appleUserId)
+                            .password(PasswordUtil.generateRandomPassword())
+                            .nickname(authSignUpRequestDto.nickname())
+                            .eLoginProvider(ELoginProvider.APPLE)
+                            .role(EUserRole.USER)
+                            .agreedToPrivacyPolicy(agreedToPrivacyPolicy)
+                            .agreedToServiceTerms(agreedToServiceTerms)
+                            .build()
+            );
+        }
         return userCommandRepository.save(
                 User.builder()
                         .email(email)

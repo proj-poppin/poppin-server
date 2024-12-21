@@ -93,11 +93,9 @@ public class AuthLoginService {
     }
 
     private String refineToken(String accessToken) {
-        if (accessToken.startsWith(Constant.BEARER_PREFIX)) {
-            return accessToken.substring(Constant.BEARER_PREFIX.length());
-        } else {
-            return accessToken;
-        }
+        return accessToken.startsWith(Constant.BEARER_PREFIX)
+                ? accessToken.substring(Constant.BEARER_PREFIX.length())
+                : accessToken;
     }
 
     private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider, String fcmToken) {
@@ -113,7 +111,7 @@ public class AuthLoginService {
         }
 
         // USER 권한 + 이메일 정보가 DB에 존재 -> 팝핀 토큰 발급 및 로그인 상태 변경
-        if (user.isPresent() && user.get().getProvider().equals(provider)) {
+        if (user.isPresent()) {
             JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.get().getId(), EUserRole.USER);
             userCommandRepository.updateRefreshTokenAndLoginStatus(user.get().getId(), jwtTokenDto.refreshToken(),
                     true);

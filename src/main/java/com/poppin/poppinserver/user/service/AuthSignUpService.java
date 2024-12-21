@@ -19,16 +19,20 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +76,7 @@ public class AuthSignUpService {
 //    }
 
     public UserInfoResponseDto handleSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.passwordConfirm() == null) {
+        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.password().isEmpty()) {
             // 소셜 로그인 로직 처리
             return socialSignUp(authSignUpRequestDto);
         } else {
@@ -233,6 +237,9 @@ public class AuthSignUpService {
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
+
+        // FCM 토큰 등록
+        tokenCommandUseCase.applyToken(authSignUpRequestDto.fcmToken(), newUser.getId());
 
         // 회원 가입 후 바로 로그인 상태로 변경
         JwtTokenDto jwtToken = jwtUtil.generateToken(newUser.getId(), EUserRole.USER);

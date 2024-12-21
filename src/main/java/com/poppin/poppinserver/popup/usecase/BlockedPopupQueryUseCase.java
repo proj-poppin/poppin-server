@@ -4,5 +4,5 @@ import com.poppin.poppinserver.core.annotation.UseCase;
 
 @UseCase
 public interface BlockedPopupQueryUseCase {
-    public Boolean existBlockedPopupByUserIdAndPopupId(Long userId, Long popupId);
+    Boolean existBlockedPopupByUserIdAndPopupId(Long userId, Long popupId);
 }
