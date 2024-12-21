@@ -6,12 +6,11 @@ import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,10 +34,13 @@ public class TokenQueryService implements TokenQueryUseCase {
     }
 
     @Override
-    public FCMToken verifyToken(String token) {
-        return fcmTokenRepository.findByTokenOpt(token)
-                .orElseThrow(() -> new CommonException(ErrorCode.ALREADY_EXIST_FCM_TOKEN));
+    public void verifyToken(String token) {
+        fcmTokenRepository.findByTokenOpt(token)
+                .ifPresent(fcmToken -> {
+                    throw new CommonException(ErrorCode.DUPLICATED_TOKEN);
+                });
     }
+
 
     @Override
     public FCMToken findByUser(User user) {
