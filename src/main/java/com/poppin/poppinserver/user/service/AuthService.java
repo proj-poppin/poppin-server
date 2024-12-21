@@ -23,24 +23,36 @@ import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -543,6 +555,18 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
         Optional<User> user = userQueryRepository.findByEmail(accountRequestDto.email());
+        EAccountStatus accountStatus;
+        if (user.isPresent()) {
+            accountStatus = EAccountStatus.LOGIN;
+        } else {
+            accountStatus = EAccountStatus.SIGNUP;
+        }
+        return AccountStatusResponseDto.fromEnum(accountStatus);
+    }
+
+    @Transactional(readOnly = true)
+    public AccountStatusResponseDto getAppleAccountStatus(AppleUserIdRequestDto appleUserIdRequestDto) {
+        Optional<User> user = userQueryRepository.findByEmail(appleUserIdRequestDto.appleUserId());
         EAccountStatus accountStatus;
         if (user.isPresent()) {
             accountStatus = EAccountStatus.LOGIN;

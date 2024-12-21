@@ -40,6 +40,10 @@ public class Constant {
             "/api/v1/auth/login/google",
             "/api/v1/auth/login/apple",
 
+            // 계정 상태 확인
+            "/api/v1/auth/account/status",
+            "/api/v1/auth/account/status/apple",
+
             // 이메일 인증
             "/api/v1/auth/email/verification",
             "/api/v1/auth/email/verification/password",
