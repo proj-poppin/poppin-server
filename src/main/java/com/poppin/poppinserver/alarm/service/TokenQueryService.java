@@ -37,7 +37,7 @@ public class TokenQueryService implements TokenQueryUseCase {
     public void verifyToken(String token) {
         fcmTokenRepository.findByTokenOpt(token)
                 .ifPresent(fcmToken -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_TOKEN);
+                    throw new CommonException(ErrorCode.ALREADY_EXIST_FCM_TOKEN);
                 });
     }
 

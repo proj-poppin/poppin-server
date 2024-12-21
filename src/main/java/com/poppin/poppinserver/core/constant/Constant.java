@@ -35,6 +35,7 @@ public class Constant {
 
             // 로그인
             "/api/v1/auth/sign-in",
+            "/api/v1/auth/login/**",
             "/api/v1/auth/login/kakao",
             "/api/v1/auth/login/naver",
             "/api/v1/auth/login/google",

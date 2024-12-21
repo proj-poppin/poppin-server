@@ -22,6 +22,7 @@ import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
+import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
@@ -68,7 +69,7 @@ public class AuthLoginService {
     public Object authSocialLogin(String token, String provider, FcmTokenRequestDto fcmTokenRequestDto) {
         String accessToken = refineToken(token);
         String loginProvider = provider.toUpperCase();
-        log.info("loginProvider : " + loginProvider);
+        log.info("loginProvider : {}", loginProvider);
         OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
 
         return processUserLogin(
@@ -78,6 +79,23 @@ public class AuthLoginService {
         );
     }
 
+    public Object appleSocialLogin(AppleUserIdRequestDto appleUserIdRequestDto) {
+        User user = userQueryRepository.findByEmail(appleUserIdRequestDto.appleUserId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        OAuth2UserInfo oAuth2UserInfoDto = new OAuth2UserInfo(
+                appleUserIdRequestDto.appleUserId(),
+                user.getEmail()
+        );
+
+        return processUserLogin(
+                oAuth2UserInfoDto,
+                ELoginProvider.APPLE,
+                appleUserIdRequestDto.fcmToken()
+        );
+    }
+
+
     private OAuth2UserInfo getOAuth2UserInfo(String provider, String accessToken) {
         if (provider.equals(ELoginProvider.KAKAO.toString())) {
             return oAuth2Util.getKakaoUserInfo(accessToken);
@@ -85,8 +103,6 @@ public class AuthLoginService {
             return oAuth2Util.getNaverUserInfo(accessToken);
         } else if (provider.equals(ELoginProvider.GOOGLE.toString())) {
             return oAuth2Util.getGoogleUserInfo(accessToken);
-        } else if (provider.equals(ELoginProvider.APPLE.toString())) {
-            return appleOAuthService.getAppleUserInfo(accessToken);
         } else {
             throw new CommonException(ErrorCode.INVALID_OAUTH2_PROVIDER);
         }
@@ -99,10 +115,12 @@ public class AuthLoginService {
     }
 
     private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, ELoginProvider provider, String fcmToken) {
+
         Optional<User> user = userQueryRepository.findByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
         // 회원 탈퇴 여부 확인
         if (user.isPresent() && user.get().getIsDeleted()) {
             throw new CommonException(ErrorCode.DELETED_USER_ERROR);
+
         }
 
         // 이미 가입된 계정이 있는지 확인
@@ -225,6 +243,4 @@ public class AuthLoginService {
             return new AccessTokenDto(accessToken);
         }
     }
-
-
 }
