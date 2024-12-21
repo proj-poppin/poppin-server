@@ -1,7 +1,15 @@
 package com.poppin.poppinserver.user.controller.swagger;
 
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordResetRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordUpdateRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.PasswordVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
@@ -12,15 +20,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "인증", description = "인증 관련 API")
 public interface SwaggerAuthController {
 
     @Operation(summary = "계정 상태 조회", description = "계정 상태를 반환합니다.")
-    @GetMapping("/account/status")
+    @PostMapping("/account/status")
     ResponseDto<AccountStatusResponseDto> getAccountStatus(
             @RequestBody AccountRequestDto accountRequestDto
+    );
+
+    @Operation(summary = "애플 계정 상태 조회", description = "애플 계정 상태를 반환합니다.")
+    @PostMapping("/account/status/apple")
+    ResponseDto<AccountStatusResponseDto> getAppleAccountStatus(
+            @RequestBody AppleUserIdRequestDto appleUserIdRequestDto
     );
 
     @Operation(summary = "회원가입", description = "자체 회원가입 API")
