@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,25 +34,25 @@ public interface SwaggerAuthController {
     @Operation(summary = "계정 상태 조회", description = "계정 상태를 반환합니다.")
     @PostMapping("/account/status")
     ResponseDto<AccountStatusResponseDto> getAccountStatus(
-            @RequestBody AccountRequestDto accountRequestDto
+            @RequestBody @Valid AccountRequestDto accountRequestDto
     );
 
     @Operation(summary = "애플 계정 상태 조회", description = "애플 계정 상태를 반환합니다.")
     @PostMapping("/account/status/apple")
     ResponseDto<AccountStatusResponseDto> getAppleAccountStatus(
-            @RequestBody AppleUserIdRequestDto appleUserIdRequestDto
+            @RequestBody @Valid AppleUserIdRequestDto appleUserIdRequestDto
     );
 
     @Operation(summary = "회원가입", description = "자체 회원가입 API")
     @PostMapping("/sign-up")
     ResponseDto<UserInfoResponseDto> authSignUp(
-            @RequestBody AuthSignUpRequestDto authSignUpRequestDto
+            @RequestBody @Valid AuthSignUpRequestDto authSignUpRequestDto
     );
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 사용한 로그인 API")
     @PostMapping("/sign-in")
     ResponseDto<UserInfoResponseDto> authLogin(
-            @RequestBody AuthLoginRequestDto authLoginRequestDto
+            @RequestBody @Valid AuthLoginRequestDto authLoginRequestDto
     );
 
     @Operation(summary = "소셜 로그인", description = "소셜 로그인 API")
@@ -65,40 +67,40 @@ public interface SwaggerAuthController {
     @PostMapping("/login/{provider}")
     ResponseDto<?> authSocialLogin(
             @PathVariable String provider,
-            @RequestHeader("Authorization") String accessToken,
-            @RequestBody FcmTokenRequestDto fcmTokenRequestDto
+            @NotNull @RequestHeader("Authorization") String accessToken,
+            @Valid @RequestBody FcmTokenRequestDto fcmTokenRequestDto
     );
 
     @Operation(summary = "토큰 갱신", description = "Refresh Token을 사용하여 Access Token을 갱신합니다.")
     @PostMapping("/refresh")
     ResponseDto<UserInfoResponseDto> refresh(
-            @RequestHeader("Authorization") String refreshToken,
-            @RequestBody FcmTokenRequestDto fcmTokenRequestDto
+            @NotNull @RequestHeader("Authorization") String refreshToken,
+            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     );
 
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     @PutMapping("/reset-password")
     ResponseDto<String> resetPassword(
             @Parameter(hidden = true) Long userId,
-            @RequestBody PasswordUpdateRequestDto passwordRequestDto
+            @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto
     );
 
     @Operation(summary = "비회원 비밀번호 재설정", description = "인증 없이 비밀번호를 재설정합니다.")
     @PostMapping("/reset-password/no-auth")
     ResponseDto<String> resetPasswordNoAuth(
-            @RequestBody PasswordResetRequestDto passwordResetRequestDto
+            @RequestBody @Valid PasswordResetRequestDto passwordResetRequestDto
     );
 
     @Operation(summary = "비밀번호 검증", description = "사용자의 비밀번호를 검증합니다.")
     @PostMapping("/verification/password")
     ResponseDto<Boolean> verifyPassword(
             @Parameter(hidden = true) Long userId,
-            @RequestBody PasswordVerificationRequestDto passwordVerificationRequestDto
+            @RequestBody @Valid PasswordVerificationRequestDto passwordVerificationRequestDto
     );
 
     @Operation(summary = "이메일 인증 코드 전송", description = "이메일 인증 코드를 전송합니다.")
     @PostMapping("/email/verification")
     ResponseDto<AuthCodeResponseDto> sendEmailVerificationCode(
-            @RequestBody EmailVerificationRequestDto emailVerificationRequestDto
+            @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto
     );
 }
