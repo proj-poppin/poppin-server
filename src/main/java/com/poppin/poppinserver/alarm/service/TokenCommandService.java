@@ -11,12 +11,13 @@ import com.poppin.poppinserver.alarm.usecase.TopicQueryUseCase;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -44,8 +45,9 @@ public class TokenCommandService implements TokenCommandUseCase {
         fcmTokenRepository.save(fcmTokenEntity);
     }
 
+    // FIXME : Token Command, Token Query에 둘다 있음. 하나로 공통화 해야 함
     @Override
-    public void verifyToken(Long userId, String token) {
+    public void refreshToken(Long userId, String token) {
         log.info("verify token : {}", token);
 
         Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(Long.valueOf(userId));
