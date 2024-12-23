@@ -26,14 +26,13 @@ import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccessTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
+import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
-import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
-import com.poppin.poppinserver.user.oauth.apple.AppleOAuthService;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
@@ -51,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AuthLoginService {
     private final OAuth2Util oAuth2Util;
-    private final AppleOAuthService appleOAuthService;
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandRepository userCommandRepository;
     private final UserAlarmSettingService userAlarmSettingService;

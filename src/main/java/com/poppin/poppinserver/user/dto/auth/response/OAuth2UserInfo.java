@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.oauth;
+package com.poppin.poppinserver.user.dto.auth.response;
 
 
 public record OAuth2UserInfo(

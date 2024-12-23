@@ -1,9 +1,7 @@
-package com.poppin.poppinserver.user.oauth.apple;
+package com.poppin.poppinserver.legacy.oauth.apple;
 
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import org.springframework.stereotype.Component;
-
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +11,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ApplePublicKeyGenerator {

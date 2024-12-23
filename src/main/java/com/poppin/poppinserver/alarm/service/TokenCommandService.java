@@ -50,7 +50,7 @@ public class TokenCommandService implements TokenCommandUseCase {
     public void refreshToken(Long userId, String token) {
         log.info("verify token : {}", token);
 
-        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(Long.valueOf(userId));
+        Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);
         if (fcmTokenOptional.isPresent()) {
             String currentToken = fcmTokenOptional.get().getToken();
             if (!currentToken.equals(token)) {

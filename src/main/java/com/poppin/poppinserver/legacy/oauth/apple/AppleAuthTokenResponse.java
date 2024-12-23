@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.oauth.apple;
+package com.poppin.poppinserver.legacy.oauth.apple;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

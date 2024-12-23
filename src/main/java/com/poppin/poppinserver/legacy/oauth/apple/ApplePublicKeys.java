@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.oauth.apple;
+package com.poppin.poppinserver.legacy.oauth.apple;
 
 import java.util.List;
 

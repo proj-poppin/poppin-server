@@ -8,7 +8,7 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
-import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
+import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

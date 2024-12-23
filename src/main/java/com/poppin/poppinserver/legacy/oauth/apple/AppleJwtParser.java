@@ -1,15 +1,18 @@
-package com.poppin.poppinserver.user.oauth.apple;
+package com.poppin.poppinserver.legacy.oauth.apple;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import io.jsonwebtoken.*;
-import org.springframework.stereotype.Component;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AppleJwtParser {
