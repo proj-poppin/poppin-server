@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.oauth.kakao;
+package com.poppin.poppinserver.legacy.oauth.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

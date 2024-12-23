@@ -3,7 +3,7 @@ package com.poppin.poppinserver.core.util;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 import com.poppin.poppinserver.core.constant.Constant;
-import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
+import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

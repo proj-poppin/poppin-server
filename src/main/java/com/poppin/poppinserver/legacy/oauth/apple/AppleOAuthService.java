@@ -1,14 +1,13 @@
-package com.poppin.poppinserver.user.oauth.apple;
+package com.poppin.poppinserver.legacy.oauth.apple;
 
-import com.poppin.poppinserver.user.oauth.OAuth2UserInfo;
+import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import io.jsonwebtoken.Claims;
+import java.security.PublicKey;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.security.PublicKey;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
