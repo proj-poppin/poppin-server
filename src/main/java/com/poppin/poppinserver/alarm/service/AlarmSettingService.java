@@ -1,8 +1,6 @@
 package com.poppin.poppinserver.alarm.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
-import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarm.response.SettingResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.response.AlarmSettingResponseDto;
 import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
@@ -47,17 +45,4 @@ public class AlarmSettingService {
 
         return AlarmSettingResponseDto.fromEntity(newAlarmSetting);
     }
-
-
-    // TODO: 삭제 예정
-    public SettingResponseDto readAlarmSetting(Long userId, AlarmTokenRequestDto reqDto) {
-        User user = userQueryUseCase.findUserById(userId);
-
-        AlarmSetting setting = alarmSettingRepository.findByToken(reqDto.fcmToken());
-
-        SettingResponseDto resDto = SettingResponseDto.fromEntity(setting);
-
-        return resDto;
-    }
-
 }

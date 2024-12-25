@@ -25,7 +25,4 @@ public class VisitController implements SwaggerVisitController {
     public ResponseDto<?> getRealTimeVisitorsCnt(@RequestParam("popupId") Long popupId) {
         return ResponseDto.ok(visitService.showRealTimeVisitors(popupId));
     }
-
-
-
 }
