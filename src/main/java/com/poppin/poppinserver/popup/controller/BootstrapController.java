@@ -4,7 +4,6 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.popup.controller.swagger.SwaggerBootstrapController;
 import com.poppin.poppinserver.popup.dto.popup.response.BootstrapDto;
 import com.poppin.poppinserver.popup.service.BootstrapService;
-import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class BootstrapController implements SwaggerBootstrapController {
-    private final PopupService popupService;
     private final BootstrapService bootstrapService;
     private final AuthService authService;
 

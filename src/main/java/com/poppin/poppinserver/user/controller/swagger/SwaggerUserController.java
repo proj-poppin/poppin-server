@@ -15,26 +15,32 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "사용자", description = "사용자 관련 API")
 public interface SwaggerUserController {
 
-    @Operation(summary = "사용자 취향 생성", description = "사용자의 취향을 생성합니다.")
-    @PostMapping("/popup-taste")
-    ResponseDto<?> createUserTaste(
-            @Parameter(hidden = true) Long userId,
-            @RequestBody CreateUserTasteDto userTasteDto
-    );
+//    @Operation(summary = "사용자 취향 생성", description = "사용자의 취향을 생성합니다.")
+//    @PostMapping("/popup-taste")
+//    ResponseDto<?> createUserTaste(
+//            @Parameter(hidden = true) Long userId,
+//            @RequestBody CreateUserTasteDto userTasteDto
+//    );
 
-    @Operation(summary = "사용자 취향 조회", description = "사용자의 취향을 조회합니다.")
-    @GetMapping("/popup-taste")
-    ResponseDto<?> readUserTaste(
-            @Parameter(hidden = true) Long userId
-    );
+//    @Operation(summary = "사용자 취향 조회", description = "사용자의 취향을 조회합니다.")
+//    @GetMapping("/popup-taste")
+//    ResponseDto<?> readUserTaste(
+//            @Parameter(hidden = true) Long userId
+//    );
 
     @Operation(summary = "사용자 취향 수정", description = "사용자의 취향을 수정합니다.")
     @PutMapping("/popup-taste")
