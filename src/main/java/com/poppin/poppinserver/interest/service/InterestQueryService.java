@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -26,4 +27,10 @@ public class InterestQueryService implements InterestQueryUseCase {
     public Boolean existsInterestByUserIdAndPopupId(Long userId, Long popupId) {
         return interestRepository.existsByUserIdAndPopupId(userId, popupId);
     }
+
+    @Override
+    public LocalDateTime findCreatedAtByUserIdAndPopupId(Long userId, Long popupId) {
+        return interestRepository.findCreatedAtByUserIdAndPopupId(userId, popupId);
+    }
+
 }

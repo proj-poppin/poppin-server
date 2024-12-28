@@ -1,6 +1,8 @@
 package com.poppin.poppinserver.interest.repository;
 
 import com.poppin.poppinserver.interest.domain.Interest;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +25,7 @@ public interface InterestRepository extends JpaRepository<Interest, Interest.Int
 
     @Query("SELECT i FROM Interest i WHERE i.user.id = :userId")
     List<Interest> findByUserId(Long userId);
+
+    @Query("SELECT i.createdAt FROM Interest i WHERE i.id.userId = :userId AND i.id.popupId = :popupId")
+    LocalDateTime findCreatedAtByUserIdAndPopupId(@Param("userId") Long userId, @Param("popupId") Long popupId);
 }

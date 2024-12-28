@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -76,8 +77,9 @@ public class InterestService {
 
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
+        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
+        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
     }
 
     @Transactional
@@ -90,11 +92,11 @@ public class InterestService {
 
         VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
 
-
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
+        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked);
+        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
 
         interestRepository.delete(interest);
 

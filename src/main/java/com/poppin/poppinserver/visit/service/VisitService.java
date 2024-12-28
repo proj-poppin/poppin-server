@@ -7,6 +7,7 @@ import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
+import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
@@ -41,6 +42,7 @@ public class VisitService {
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;
     private final TokenQueryUseCase tokenQueryUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
+    private final InterestQueryUseCase interestQueryUseCase;
 
     /* 실시간 방문자 조회 */
     public Optional<Integer> showRealTimeVisitors(Long popupId) {
@@ -106,8 +108,9 @@ public class VisitService {
         VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId());
         Optional<Integer> visitorCnt = showRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(userId, popup.getId());
+        LocalDateTime interestCreatedAt = interestQueryUseCase.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
     }
 
     public void changeVisitStatus(Long popupId) {

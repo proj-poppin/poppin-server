@@ -6,6 +6,7 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.response.InterestedPopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +38,7 @@ public class ListingPopupService {
 
     private final UserQueryUseCase userQueryUseCase;
     private final SelectRandomUtil selectRandomUtil;
+    private final PopupService popupService;
 
     public List<PopupSummaryDto> readHotList() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -62,12 +66,16 @@ public class ListingPopupService {
     } // 종료 임박 팝업 조회
 
     @Transactional
-    public List<InterestedPopupDto> readInterestedPopups(Long userId) {
+    public List<PopupStoreDto> readInterestedPopups(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
 
         Set<Interest> interest = user.getInterest();
 
-        return InterestedPopupDto.fromEntityList(interest);
+        List<Popup> interestedPopup = interest.stream()
+                .map(Interest::getPopup)
+                .toList();
+
+        return popupService.getPopupStoreDtos(interestedPopup, userId);
     } // 관심 팝업 목록 조회
 
     @Transactional

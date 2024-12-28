@@ -86,7 +86,7 @@ public class PopupQueryController implements SwaggerPopupQueryController {
     }
 
     @GetMapping("/interested-list") // 관심 팝업 목록 조회
-    public ResponseDto<List<InterestedPopupDto>> readInterestedList(@UserId Long userId) {
+    public ResponseDto<List<PopupStoreDto>> readInterestedList(@UserId Long userId) {
         log.info("Controller userId: {}", userId);
         return ResponseDto.ok(listingPopupService.readInterestedPopups(userId));
     }

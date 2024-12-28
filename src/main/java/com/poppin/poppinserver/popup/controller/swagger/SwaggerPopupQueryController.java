@@ -54,7 +54,7 @@ public interface SwaggerPopupQueryController {
 
     @Operation(summary = "관심 팝업 목록 조회", description = "사용자가 등록한 관심 팝업 목록을 조회합니다.")
     @GetMapping("/interested-list")
-    ResponseDto<List<InterestedPopupDto>> readInterestedList(
+    ResponseDto<List<PopupStoreDto>> readInterestedList(
             @Parameter(hidden = true) Long userId
     );
 

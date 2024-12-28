@@ -6,6 +6,7 @@ import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
+import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -37,6 +38,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +62,7 @@ public class PopupService {
     private final VisitQueryUseCase visitQueryUseCase;
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;
     private final HeaderUtil headerUtil;
+    private final InterestRepository interestRepository;
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
         Long popupId = Long.valueOf(strPopupId);
@@ -259,6 +262,7 @@ public class PopupService {
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
         List<Boolean> isBlockedList = new ArrayList<>();
+        List<LocalDateTime> interestCreatedAtList = new ArrayList<>();
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
@@ -270,10 +274,13 @@ public class PopupService {
 
             Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
             isBlockedList.add(idBlocked);
+
+            LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+            interestCreatedAtList.add(interestCreatedAt);
         }
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList, isBlockedList);
+        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList, isBlockedList, interestCreatedAtList);
     }
 
     public PopupStoreDto getPopupStoreDto(Popup popup, Long userId) {
@@ -287,8 +294,10 @@ public class PopupService {
 
         Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
 
+        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked, interestCreatedAt);
     }
 
     public List<PopupStoreDto> guestGetPopupStoreDtos(Page<Popup> popups) {
@@ -340,7 +349,7 @@ public class PopupService {
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false, null);
     }
 
     public List<VisitedPopupDto> getVisitedPopupList(Long userId) {
