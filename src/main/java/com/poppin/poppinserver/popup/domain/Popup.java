@@ -118,7 +118,7 @@ public class Popup {
     private Set<Interest> interest = new HashSet<>();
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
-    private Set<PosterImage> posterImages = new HashSet<>();
+    private List<PosterImage> posterImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "popupId", fetch = FetchType.EAGER)
     private Set<PopupAlarmKeyword> popupAlarmKeywords = new HashSet<>();
