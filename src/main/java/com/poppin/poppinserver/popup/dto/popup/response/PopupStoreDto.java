@@ -52,7 +52,6 @@ public record PopupStoreDto(
         List<String> imageUrls = popup.getPosterImages()
                 .stream()
                 .map(PosterImage::getPosterUrl)
-                .sorted()
                 .toList();
 
         return PopupStoreDto.builder()
