@@ -47,9 +47,10 @@ public class PopupCommandController implements SwaggerPopupCommandController {
         return ResponseDto.ok(adminPopupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 
-    @Override
-    public ResponseDto<String> reopenPopup(String popupId) {
-        return ResponseDto.ok(adminPopupService.reopenPopup(popupId));
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping(value = "/admin")
+    public ResponseDto<String> reopenPopup(@UserId Long adminId, @RequestParam("popupId") String popupId) {
+        return ResponseDto.ok(adminPopupService.reopenPopup(adminId, popupId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,7 +79,7 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     }
 
     @PostMapping("/reopen") // 재오픈 신청
-    public ResponseDto<String> reopen(@UserId Long userId,  @RequestBody String popupId) throws FirebaseMessagingException {
+    public ResponseDto<String> reopen(@UserId Long userId,  @RequestParam("popupId") String popupId) throws FirebaseMessagingException {
         return ResponseDto.ok(popupService.reopenDemand(userId, popupId));
     }
 

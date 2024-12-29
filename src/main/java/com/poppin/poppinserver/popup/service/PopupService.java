@@ -212,6 +212,10 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
+        if (!popup.getOperationStatus().equals("TERMINATED")){ // 운영 종료 상태인지 확인
+            throw new CommonException(ErrorCode.SERVER_ERROR);
+        }
+
         FCMToken token = tokenQueryUseCase.findTokenByUserId(user.getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
 
