@@ -146,5 +146,5 @@ public class PopupQueryController implements SwaggerPopupQueryController {
     @GetMapping("/visited")
     public ResponseDto<List<VisitedPopupDto>> getVisitedPopupList(@UserId Long userId) {
         return ResponseDto.ok(popupService.getVisitedPopupList(userId));
-    }
+    } // 마이 페이지 > 후기 작성하기 > 팝업 리스트
 }

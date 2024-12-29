@@ -42,6 +42,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -359,14 +360,19 @@ public class PopupService {
             throw new CommonException(ErrorCode.NOT_FOUND_VISIT);
         }
 
-        List<VisitedPopupDto> visitedPopupList = new ArrayList<>();
+        List<Long> visitedPopupIds = visitList.stream()
+                .map(visit -> visit.getPopup().getId())
+                .collect(Collectors.toList());
 
-        for (Visit visit : visitList) {
-            Long visitPopupId = visit.getPopup().getId();
-            Popup popup = popupRepository.findVisitedPopupId(visitPopupId);
-            VisitedPopupDto visitedPopupDto = VisitedPopupDto.fromEntity(popup);
-            visitedPopupList.add(visitedPopupDto);
+        List<Popup> unreviewedPopups = popupRepository.findUnreviewedPopups(visitedPopupIds);
+
+
+        if (unreviewedPopups.isEmpty()) {
+            return null; // 데이터가 없을 시 빈 값을 반환
         }
-        return visitedPopupList;
+
+        return unreviewedPopups.stream()
+                .map(VisitedPopupDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

@@ -201,8 +201,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p JOIN Review  r ON  p.id = r.popup.id where p.id = :reviewId order by p.createdAt asc ")
     Popup findByReviewId(@Param("reviewId") Long reviewId);
 
-    @Query("SELECT p FROM Popup p WHERE p.id = :vdPopupId")
-    Popup findVisitedPopupId(Long vdPopupId);
+    @Query("SELECT p FROM Popup p " +
+            "WHERE p.id IN :popupIds " +
+        " AND NOT EXISTS (SELECT r FROM Review r WHERE r.popup.id = p.id)")
+    List<Popup> findUnreviewedPopups(@Param("popupIds") List<Long> popupIds);
 
     Long countByOperationStatus(String operationStatus);
 
