@@ -15,6 +15,7 @@ import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.repository.ReviewCommandRepository;
 import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.service.UserService;
@@ -39,7 +40,8 @@ public class ReviewCommandService {
 
     private final UserQueryRepository userQueryRepository;
     private final PopupRepository popupRepository;
-    private final ReviewCommandRepository reviewRepository;
+    private final ReviewCommandRepository reviewCommandRepository;
+    private final ReviewQueryRepository reviewQueryRepository;
     private final ReviewImageCommandRepository reviewImageRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final VisitRepository visitRepository;
@@ -55,8 +57,12 @@ public class ReviewCommandService {
 
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
         Popup popup = popupRepository.findById(Long.valueOf(popupId))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        Review writtenReview = reviewQueryRepository.findByUserIdAndPopupId(userId, Long.valueOf(popupId));
+        if (writtenReview != null) throw new CommonException(ErrorCode.DUPLICATED_REVIEW);
 
         // 방문 내역 확인 및 리뷰 생성
         boolean isCertificated = visitRepository.findByUserId(userId, popup.getId()).isPresent();
@@ -97,17 +103,13 @@ public class ReviewCommandService {
                 .text(text)
                 .isCertificated(isCertificated)
                 .build();
-        return reviewRepository.save(review);
+        return reviewCommandRepository.save(review);
     }
 
     private void handleReviewImages(List<MultipartFile> images, Review review) {
         if (images.isEmpty() || "empty".equals(images.get(0).getOriginalFilename())) {
             return;
         }
-
-        log.info("images 객체 : {}", images);
-        log.info("images 사이즈 : {}", images.size());
-        log.info("images 첫번째 요소 파일 명: {}", images.get(0).getOriginalFilename());
 
         List<String> fileUrls = s3Service.uploadReviewImage(images, review.getId());
         List<ReviewImage> posterImages = fileUrls.stream()
