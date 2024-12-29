@@ -202,8 +202,13 @@ public class FCMScheduler {
                                         info.equals(EPushInfo.REOPEN) ||
                                         info.equals(EPushInfo.KEYWORD)
                         ) {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(), info.getTitle(),
-                                    "[" + popup.getName() + "] " + info.getBody(), topic);
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(
+                                    String.valueOf(popupId),
+                                    token.getToken(),
+                                    info.getTitle(),
+                                    "[" + popup.getName() + "] " + info.getBody(),
+                                    topic
+                            );
                             fcmRequestDtoList.add(fcmRequestDto);
                         } else if (
                                 info.equals(EPushInfo.OPEN)

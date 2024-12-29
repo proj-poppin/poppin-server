@@ -47,6 +47,11 @@ public class PopupCommandController implements SwaggerPopupCommandController {
         return ResponseDto.ok(adminPopupService.createPopup(createPopupDto, images, adminId));
     } // 전체팝업관리 - 팝업생성
 
+    @Override
+    public ResponseDto<String> reopenPopup(String popupId) {
+        return ResponseDto.ok(adminPopupService.reopenPopup(popupId));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<Boolean> removePopup(@RequestParam("id") Long popupId,

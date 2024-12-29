@@ -223,6 +223,20 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
+    public String reopenPopup(String strPopupId) {
+        Long popupId = Long.valueOf(strPopupId);
+        List<Popup> popupList = new ArrayList<>();
+
+        Popup popup = popupRepository.findById(popupId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        popupList.add(popup);
+
+        fcmScheduler.schedulerFcmPopupTopicByType(popupList, EPopupTopic.REOPEN, EPushInfo.REOPEN);
+
+        return "팝업이 재오픈 되었습니다";
+    }
+
     public AdminPopupDto readPopup(Long popupId) {
         // 팝업 정보 불러오기
         Popup popup = popupQueryUseCase.findPopupById(popupId);
