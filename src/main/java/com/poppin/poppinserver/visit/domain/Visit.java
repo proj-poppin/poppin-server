@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Table(name = "visit")
 public class Visit {
 
-    /*방문하기 누른 사람들 데이터*/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,20 +31,13 @@ public class Visit {
     private Popup popup;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt; /*방문한 날짜*/
-
-    @Column(name = "status", nullable = false)
-    private String status;
+    private LocalDateTime createdAt;
 
     @Builder
     public Visit(User user, Popup popup, String status) {
         this.user = user;
         this.popup = popup;
         this.createdAt = LocalDateTime.now();
-        this.status = status;
     }
 
-    public void changeStatus(String status){
-        this.status = status;
-    }
 }
