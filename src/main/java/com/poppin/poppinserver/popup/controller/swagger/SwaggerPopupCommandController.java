@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.popup.controller.swagger;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
+import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
@@ -11,7 +11,6 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,17 +42,15 @@ public interface SwaggerPopupCommandController {
             @Parameter(hidden = true) Long adminId
     );
 
-    @Operation(summary = "재오픈 요청", description = "사용자가 재오픈 요청을 보냅니다.")
-    @PostMapping("/reopen")
-    ResponseDto<String> reopenDemand(
-            @Parameter(hidden = true) Long userId,
-            @RequestBody PushRequestDto pushRequestDto
-    );
-
     @Operation(summary = "팝업 방문", description = "사용자가 특정 팝업을 방문합니다.")
     @PatchMapping("/visit")
     ResponseDto<PopupStoreDto> visit(
             @Parameter(hidden = true) Long userId,
             @RequestBody VisitorsInfoDto visitorsInfoDto
     ) throws FirebaseMessagingException;
+
+    @Operation(summary = "재오픈 요청", description = "사용자가 재오픈 요청을 보냅니다.")
+    @PostMapping("/reopen") // 재오픈 신청
+    public ResponseDto<String> reopen(@UserId Long userId, @RequestBody String popupId) throws FirebaseMessagingException;
+
 }

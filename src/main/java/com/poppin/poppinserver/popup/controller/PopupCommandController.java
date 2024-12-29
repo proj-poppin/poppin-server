@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.popup.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -68,15 +67,14 @@ public class PopupCommandController implements SwaggerPopupCommandController {
         return ResponseDto.ok(adminPopupService.updatePopup(updatePopupDto, images, adminId));
     } // 전체팝업관리 - 팝업 수정
 
-    @PostMapping("/reopen") // 재오픈 수요
-    public ResponseDto<String> reopenDemand(@UserId Long userId, @RequestBody PushRequestDto pushRequestDto) {
-        return ResponseDto.ok(popupService.reopenDemand(userId, pushRequestDto));
-    }
-
     @PatchMapping("/visit") // 팝업 방문하기
     public ResponseDto<PopupStoreDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 
+    @PostMapping("/reopen") // 재오픈 신청
+    public ResponseDto<String> reopen(@UserId Long userId,  @RequestBody String popupId) throws FirebaseMessagingException {
+        return ResponseDto.ok(popupService.reopenDemand(userId, popupId));
+    }
 
 }

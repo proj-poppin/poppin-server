@@ -1,16 +1,17 @@
 package com.poppin.poppinserver.popup.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
-import com.poppin.poppinserver.alarm.dto.fcm.request.PushRequestDto;
 import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.domain.ReopenDemand;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
@@ -18,7 +19,6 @@ import com.poppin.poppinserver.popup.dto.popup.response.VisitedPopupDto;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.ReopenDemandRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
@@ -52,18 +52,18 @@ public class PopupService {
 
     private final ReviewQueryRepository reviewRepository;
     private final PosterImageRepository posterImageRepository;
-    private final ReopenDemandRepository reopenDemandRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
+    private final HeaderUtil headerUtil;
+    private final InterestRepository interestRepository;
 
+    private final TopicCommandUseCase topicCommandUseCase;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final UserQueryUseCase userQueryUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
     private final TokenQueryUseCase tokenQueryUseCase;
     private final VisitQueryUseCase visitQueryUseCase;
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;
-    private final HeaderUtil headerUtil;
-    private final InterestRepository interestRepository;
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
         Long popupId = Long.valueOf(strPopupId);
@@ -204,31 +204,23 @@ public class PopupService {
         }
     } // 팝업 상세조회
 
-    public String reopenDemand(Long userId, PushRequestDto pushRequestDto) {
-        Long popupId = Long.valueOf(pushRequestDto.popupId());
+    public String reopenDemand(Long userId, String SpopupId) throws FirebaseMessagingException {
+        Long popupId = Long.valueOf(SpopupId);
 
         User user = userQueryUseCase.findUserById(userId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        FCMToken token = tokenQueryUseCase.findByToken(pushRequestDto.token());
-        if (token == null) {
-            throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
-        }
-
-        ReopenDemand reopenDemand = new ReopenDemand(user, popup, pushRequestDto.token(), token.getMod_dtm(),
-                token.getExp_dtm());
-        reopenDemandRepository.save(reopenDemand);
+        FCMToken token = tokenQueryUseCase.findTokenByUserId(user.getId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
 
         popup.addreopenDemandCnt(); // 재오픈 수요 + 1
         popupRepository.save(popup);
 
         /* 재오픈 체크 시 재오픈 토픽에 등록 */
-        log.info("재오픈 수요 체크 시 FCM TOPIC 등록");
-//        String pushToken = pushRequestDto.token();
-//        fcmService.fcmAddTopic(pushToken, popup, EPopupTopic.REOPEN);
-
+        log.info("재오픈 신청 시 FCM TOPIC 등록");
+        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.REOPEN);
         return "재오픈 수요 체크 되었습니다.";
     }
 
