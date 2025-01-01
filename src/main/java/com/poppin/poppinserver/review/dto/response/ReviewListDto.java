@@ -8,7 +8,7 @@ import java.util.List;
 
 /*마이페이지 - 작성 완료 후기 생성 dto*/
 @Builder
-public record ReviewFinishDto(
+public record ReviewListDto(
         @NotNull
         String reviewId,    /*리뷰 id*/
 
@@ -28,9 +28,9 @@ public record ReviewFinishDto(
         List<String> imageList /*팝업 이미지*/
 
 ) {
-    public static ReviewFinishDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
-                                             LocalDateTime createdAt, List<String> imageList) {
-        return ReviewFinishDto.builder()
+    public static ReviewListDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
+                                           LocalDateTime createdAt, List<String> imageList) {
+        return ReviewListDto.builder()
                 .reviewId(String.valueOf(reviewId))
                 .popupId(String.valueOf(popupId))
                 .name(name)

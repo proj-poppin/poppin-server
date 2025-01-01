@@ -9,7 +9,7 @@ import java.util.List;
 
 /*마이페이지 인증후기 조회*/
 @Builder
-public record ReviewCertiDto(
+public record CertifiedReviewDto(
 
         @NotNull
         String introduce,
@@ -21,7 +21,7 @@ public record ReviewCertiDto(
         Boolean isCertificated,
 
         @NotNull
-        String nickname, /*user nickname*/
+        String nickname,
 
         @NotNull
         LocalDateTime visitDate, /*visitor class createdAt*/
@@ -33,14 +33,14 @@ public record ReviewCertiDto(
         VisitorDataRvDto visitorData,
 
         @NotNull
-        String text, /*글*/
+        String text,
 
         @NotNull
-        List<String> imageUrl /*사진 리스트*/ /*후기 테이블도 리스트화 해야 합니다.*/
+        List<String> images /*사진 리스트*/
 
 ) {
 
-    public static ReviewCertiDto fromEntity(
+    public static CertifiedReviewDto fromEntity(
             String introduce,
             String posterUrl,
             Boolean isCertificated,
@@ -49,9 +49,9 @@ public record ReviewCertiDto(
             LocalDateTime createDate,
             VisitorDataRvDto visitorDataRvDto,
             String text,
-            List<String> imageUrl
+            List<String> images
     ) {
-        return ReviewCertiDto.builder()
+        return CertifiedReviewDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)
@@ -60,7 +60,7 @@ public record ReviewCertiDto(
                 .createDate(createDate)
                 .visitorData(visitorDataRvDto)
                 .text(text)
-                .imageUrl(imageUrl)
+                .images(images)
                 .build();
     }
 

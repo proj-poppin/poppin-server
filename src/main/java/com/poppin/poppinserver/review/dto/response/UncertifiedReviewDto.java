@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record ReviewUncertiDto(
+public record UncertifiedReviewDto(
         @NotNull
         String introduce,
 
@@ -35,7 +35,7 @@ public record ReviewUncertiDto(
 
 ) {
 
-    public static ReviewUncertiDto fromEntity(
+    public static UncertifiedReviewDto fromEntity(
             String introduce,
             String posterUrl,
             Boolean isCertificated,
@@ -45,7 +45,7 @@ public record ReviewUncertiDto(
             String text,
             List<String> imageUrl
     ) {
-        return ReviewUncertiDto.builder()
+        return UncertifiedReviewDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)
