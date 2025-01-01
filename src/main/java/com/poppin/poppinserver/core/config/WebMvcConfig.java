@@ -3,7 +3,6 @@ package com.poppin.poppinserver.core.config;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.interceptor.pre.UserIdArgumentResolver;
 import com.poppin.poppinserver.core.interceptor.pre.UserIdInterceptor;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -11,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @EnableWebMvc
@@ -36,7 +37,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5173", "https://www.bubble-poppin.com",
-                        "http://3.36.136.115") // vite 로컬 주소, 운영 환경, 개발 환경
+                        "http://43.202.82.111") // vite 로컬 주소, 운영 환경, 개발 환경
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     }
 }

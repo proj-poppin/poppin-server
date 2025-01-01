@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.user.controller.swagger;
 
+import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
@@ -74,7 +75,7 @@ public interface SwaggerAuthController {
     @Operation(summary = "토큰 갱신", description = "Refresh Token을 사용하여 Access Token을 갱신합니다.")
     @PostMapping("/refresh")
     ResponseDto<UserInfoResponseDto> refresh(
-            @NotNull @RequestHeader("Authorization") String refreshToken,
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken,
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     );
 

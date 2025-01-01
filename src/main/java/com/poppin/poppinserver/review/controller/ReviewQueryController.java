@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.review.controller;
 
+import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.review.controller.swagger.SwaggerReviewQueryController;
 import com.poppin.poppinserver.review.dto.response.ReviewListDto;
@@ -21,7 +22,7 @@ public class ReviewQueryController implements SwaggerReviewQueryController {
     private final ReviewService reviewService;
 
     @GetMapping( "/read")
-    public ResponseDto<List<ReviewListDto>> readReviewList(Long userId) {
+    public ResponseDto<List<ReviewListDto>> readReviewList(@UserId Long userId) {
         return ResponseDto.ok(reviewService.readReviewList(userId));
     }
 }

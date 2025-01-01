@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /*마이페이지 - 작성 완료 후기 생성 dto*/
 @Builder
@@ -25,18 +24,18 @@ public record ReviewListDto(
         LocalDateTime createdAt, /*후기 생성 일자*/
 
         @NotNull
-        List<String> imageList /*팝업 이미지*/
+        String imageUrl /*팝업 이미지, 하나만*/
 
 ) {
     public static ReviewListDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
-                                           LocalDateTime createdAt, List<String> imageList) {
+                                           LocalDateTime createdAt, String imageUrl) {
         return ReviewListDto.builder()
                 .reviewId(String.valueOf(reviewId))
                 .popupId(String.valueOf(popupId))
                 .name(name)
                 .isCertificated(isCertificated)
                 .createdAt(createdAt)
-                .imageList(imageList)
+                .imageUrl(imageUrl)
                 .build();
     }
 }

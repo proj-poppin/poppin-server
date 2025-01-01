@@ -198,8 +198,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p from Popup p WHERE p.operationStatus = 'NOTYET' OR p.operationStatus = 'OPERATING'")
     List<Popup> findAllByOpStatusIsNotyetOrOperating();
 
-    @Query("SELECT p FROM Popup p JOIN Review  r ON  p.id = r.popup.id where p.id = :reviewId order by p.createdAt asc ")
-    Popup findByReviewId(@Param("reviewId") Long reviewId);
+
 
     @Query("SELECT p FROM Popup p " +
             "WHERE p.id IN :popupIds " +

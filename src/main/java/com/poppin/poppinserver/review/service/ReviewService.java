@@ -12,8 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,55 +28,35 @@ public class ReviewService {
     private final PosterImageRepository posterImageRepository;
 
 
-    public List<ReviewListDto> readReviewList(Long userId){
-        List<ReviewListDto> reviewListDtoList = new ArrayList<>();
-        List<Review> reviewList = reviewQueryRepository.findByUserId(userId);
+    public List<ReviewListDto> readReviewList(Long userId) {
 
-        for (Review review : reviewList){
-            // 팝업 정보
-            Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
+        List<Review> reviewList = reviewQueryRepository.findByUserIdWithPopup(userId);
 
-            // 팝업 이미지 정보
-            List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
-            List<String> imageList = new ArrayList<>();
-            if (!posterImages.isEmpty())
-            {
-                for(PosterImage posterImage : posterImages){
-                    imageList.add(posterImage.getPosterUrl());
-                }
-            }else{
-                imageList.add(null);
-            }
+        List<Long> popupIds = reviewList.stream()
+                .map(review -> review.getPopup().getId())
+                .collect(Collectors.toList());
 
-            ReviewListDto reviewListDto = ReviewListDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt(),imageList);
-            reviewListDtoList.add(reviewListDto);
-        }
-        return reviewListDtoList;
+        Map<Long, String> popupImageMap = posterImageRepository.findAllByPopupIds(popupIds).stream()
+                .collect(Collectors.toMap(
+                        posterImage -> posterImage.getPopupId().getId(),
+                        PosterImage::getPosterUrl,
+                        (existing, replacement) -> existing
+                ));
+
+        return reviewList.stream()
+                .map(review -> {
+                    Popup popup = review.getPopup();
+                    String imageUrl = popupImageMap.getOrDefault(popup.getId(), null);
+                    return ReviewListDto.fromEntity(
+                            review.getId(),
+                            popup.getId(),
+                            popup.getName(),
+                            review.getIsCertificated(),
+                            review.getCreatedAt(),
+                            imageUrl
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
-    public List<?> readReview(Long userId){
-        List<ReviewListDto> reviewListDtoList = new ArrayList<>();
-        List<Review> reviewList = reviewQueryRepository.findByUserId(userId);
-
-        for (Review review : reviewList){
-            // 팝업 정보
-            Popup popup = popupRepository.findByReviewId(review.getPopup().getId());
-
-            // 팝업 이미지 정보
-            List<PosterImage> posterImages  = posterImageRepository.findAllByPopupId(popup);
-            List<String> imageList = new ArrayList<>();
-            if (!posterImages.isEmpty())
-            {
-                for(PosterImage posterImage : posterImages){
-                    imageList.add(posterImage.getPosterUrl());
-                }
-            }else{
-                imageList.add(null);
-            }
-
-            ReviewListDto reviewListDto = ReviewListDto.fromEntity(review.getId(), popup.getId(), popup.getName(), review.getIsCertificated(),review.getCreatedAt(),imageList);
-            reviewListDtoList.add(reviewListDto);
-        }
-        return reviewListDtoList;
-    }
 }
