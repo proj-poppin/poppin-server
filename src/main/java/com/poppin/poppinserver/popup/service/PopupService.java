@@ -360,7 +360,8 @@ public class PopupService {
                 .map(visit -> visit.getPopup().getId())
                 .collect(Collectors.toList());
 
-        List<Popup> unreviewedPopups = popupRepository.findUnreviewedPopups(visitedPopupIds);
+        log.info("visited popup ids: {}" , visitedPopupIds);
+        List<Popup> unreviewedPopups = popupRepository.findUnreviewedPopups(visitedPopupIds, userId);
 
 
         if (unreviewedPopups.isEmpty()) {
