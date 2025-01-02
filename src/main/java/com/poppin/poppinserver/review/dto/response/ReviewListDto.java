@@ -18,7 +18,7 @@ public record ReviewListDto(
         String name, /*팝업 메인 글*/
 
         @NotNull
-        Boolean isCertificated, /*인증 후기 여부*/
+        Boolean isCertified, /*인증 후기 여부*/
 
         @NotNull
         LocalDateTime createdAt, /*후기 생성 일자*/
@@ -27,13 +27,13 @@ public record ReviewListDto(
         String imageUrl /*팝업 이미지, 하나만*/
 
 ) {
-    public static ReviewListDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertificated,
+    public static ReviewListDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertified,
                                            LocalDateTime createdAt, String imageUrl) {
         return ReviewListDto.builder()
                 .reviewId(String.valueOf(reviewId))
                 .popupId(String.valueOf(popupId))
                 .name(name)
-                .isCertificated(isCertificated)
+                .isCertified(isCertified)
                 .createdAt(createdAt)
                 .imageUrl(imageUrl)
                 .build();
