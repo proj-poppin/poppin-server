@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.dto.faq.response;
+package com.poppin.poppinserver.admin.dto.response;
 
 import lombok.Builder;
 

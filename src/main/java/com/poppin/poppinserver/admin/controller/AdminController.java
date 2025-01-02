@@ -1,5 +1,9 @@
-package com.poppin.poppinserver.user.controller;
+package com.poppin.poppinserver.admin.controller;
 
+import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
+import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
+import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
+import com.poppin.poppinserver.admin.service.AdminService;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.core.annotation.UserId;
@@ -14,15 +18,10 @@ import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
 import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
-import com.poppin.poppinserver.user.controller.swagger.SwaggerAdminController;
-import com.poppin.poppinserver.user.dto.admin.AdminInfoResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
-import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
-import com.poppin.poppinserver.user.service.AdminService;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

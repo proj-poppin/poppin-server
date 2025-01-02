@@ -1,5 +1,8 @@
-package com.poppin.poppinserver.user.service;
+package com.poppin.poppinserver.admin.service;
 
+import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
+import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
+import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.InformAlarmImage;
@@ -39,10 +42,7 @@ import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
-import com.poppin.poppinserver.user.dto.admin.AdminInfoResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
-import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;

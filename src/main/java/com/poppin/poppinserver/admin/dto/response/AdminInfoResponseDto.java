@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.dto.admin;
+package com.poppin.poppinserver.admin.dto.response;
 
 import com.poppin.poppinserver.user.domain.User;
 import lombok.AccessLevel;

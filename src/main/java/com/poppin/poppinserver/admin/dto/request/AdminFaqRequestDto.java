@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.user.dto.faq.request;
+package com.poppin.poppinserver.admin.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
