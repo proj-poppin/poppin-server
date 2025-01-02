@@ -65,7 +65,7 @@ public class ReviewCommandService {
         if (writtenReview != null) throw new CommonException(ErrorCode.DUPLICATED_REVIEW);
 
         // 방문 내역 확인 및 리뷰 생성
-        boolean isCertificated = visitRepository.findByUserId(userId, popup.getId()).isPresent();
+        boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
 
         // 알림 토큰 추출
         Optional<FCMToken> fcmToken = fcmTokenRepository.findByUserId(userId);
@@ -74,7 +74,7 @@ public class ReviewCommandService {
         }
 
         String token = fcmToken.get().getToken();
-        Review review = createReview(user, token, popup, text, isCertificated);
+        Review review = createReview(user, token, popup, text, isCertified);
 
         // 이미지 처리
         handleReviewImages(images, review);
@@ -95,13 +95,13 @@ public class ReviewCommandService {
         return ReviewWriteDto.fromEntity(review, visitorData);
     }
 
-    private Review createReview(User user, String token, Popup popup, String text, boolean isCertificated) {
+    private Review createReview(User user, String token, Popup popup, String text, boolean isCertified) {
         Review review = Review.builder()
                 .user(user)
                 .token(token)
                 .popup(popup)
                 .text(text)
-                .isCertificated(isCertificated)
+                .isCertified(isCertified)
                 .build();
         return reviewCommandRepository.save(review);
     }

@@ -325,7 +325,7 @@ public class AdminService {
                 .reviewCnt(review.getUser().getReviewCnt())
                 .reviewContent(review.getText())
                 .reviewCreatedAt(review.getCreatedAt().toString())
-                .isCertificated(review.getIsCertificated())
+                .isCertificated(review.getIsCertified())
                 .imageUrl(reviewImageQueryUseCase.findUrlAllByReviewId(review.getId()))
                 .userProfileImageUrl(review.getUser().getProfileImageUrl())
                 .build();

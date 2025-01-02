@@ -50,7 +50,7 @@ public record ReviewInfoDto(
                     .text(reviews.get(i).getText())
                     .imageUrls(imageUrls.get(i))
                     .profileUrl(profileUrls.get(i))
-                    .isCertificated(reviews.get(i).getIsCertificated())
+                    .isCertificated(reviews.get(i).getIsCertified())
                     .recommendCnt(reviews.get(i).getRecommendCnt())
                     .build();
 

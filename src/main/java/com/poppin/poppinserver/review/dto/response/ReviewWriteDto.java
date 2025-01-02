@@ -27,7 +27,7 @@ public record ReviewWriteDto(
                 .satisfaction(vd.getSatisfaction())
                 .visitDate(vd.getVisitDate())
                 .createdAt(review.getCreatedAt())
-                .isCertificated(review.getIsCertificated())
+                .isCertificated(review.getIsCertified())
                 .recommendCnt(review.getRecommendCnt())
                 .build();
     }

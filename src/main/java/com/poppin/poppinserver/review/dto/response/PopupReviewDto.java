@@ -30,7 +30,7 @@ public record PopupReviewDto(
                 .userId(String.valueOf(review.getUser().getId()))
                 .text(review.getText())
                 .imageUrls(imageUrls)
-                .isCertificated(review.getIsCertificated())
+                .isCertificated(review.getIsCertified())
                 .recommendCnt(review.getRecommendCnt())
                 .build();
     }
