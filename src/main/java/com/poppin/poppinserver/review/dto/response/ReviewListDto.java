@@ -21,7 +21,7 @@ public record ReviewListDto(
         Boolean isCertified, /*인증 후기 여부*/
 
         @NotNull
-        LocalDateTime createdAt, /*후기 생성 일자*/
+        String createdAt, /*후기 생성 일자*/
 
         @NotNull
         String imageUrl /*팝업 이미지, 하나만*/
@@ -34,7 +34,7 @@ public record ReviewListDto(
                 .popupId(String.valueOf(popupId))
                 .name(name)
                 .isCertified(isCertified)
-                .createdAt(createdAt)
+                .createdAt(createdAt.toString())
                 .imageUrl(imageUrl)
                 .build();
     }
