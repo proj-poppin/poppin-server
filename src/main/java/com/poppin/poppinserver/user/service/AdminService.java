@@ -23,7 +23,14 @@ import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.*;
+import com.poppin.poppinserver.report.dto.report.response.ReportContentDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewDetailDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -32,6 +39,7 @@ import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
+import com.poppin.poppinserver.user.dto.admin.AdminInfoResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
@@ -45,6 +53,12 @@ import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -54,13 +68,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -239,7 +246,8 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponseDto<List<ReportedReviewListResponseDto>> readReviewReports(int page, int size, Boolean isExec) {
+    public PagingResponseDto<List<ReportedReviewListResponseDto>> readReviewReports(int page, int size,
+                                                                                    Boolean isExec) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReportReview> reportReviews = reportReviewRepository.findAllByOrderByReportedAtDesc(pageable, isExec);
 
@@ -524,5 +532,11 @@ public class AdminService {
         } else {
             return accessToken;
         }
+    }
+
+    public AdminInfoResponseDto readAdminInfo(Long adminId) {
+        User admin = userQueryRepository.findById(adminId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        return AdminInfoResponseDto.fromEntity(admin);
     }
 }

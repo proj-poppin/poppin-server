@@ -9,8 +9,13 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.*;
+import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.user.controller.swagger.SwaggerAdminController;
+import com.poppin.poppinserver.user.dto.admin.AdminInfoResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
@@ -19,6 +24,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.user.service.AdminService;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,8 +39,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 
 @RestController
@@ -68,7 +72,8 @@ public class AdminController implements SwaggerAdminController {
 
     /* FAQ 생성 */
     @PostMapping("/support/faqs")
-    public ResponseDto<AdminFaqResponseDto> createFaq(@UserId Long adminId, @RequestBody AdminFaqRequestDto adminFaqRequestDto) {
+    public ResponseDto<AdminFaqResponseDto> createFaq(@UserId Long adminId,
+                                                      @RequestBody AdminFaqRequestDto adminFaqRequestDto) {
         return ResponseDto.created(adminService.createFAQ(adminId, adminFaqRequestDto));
     }
 
@@ -110,9 +115,10 @@ public class AdminController implements SwaggerAdminController {
 
     /* 후기 신고 목록 조회 */
     @GetMapping("/reports/reviews")
-    public ResponseDto<PagingResponseDto<List<ReportedReviewListResponseDto>>> readReviewReports(@RequestParam(required = false, defaultValue = "0") int page,
-                                                                                                 @RequestParam(required = false, defaultValue = "19") int size,
-                                                                                                 @RequestParam("isExec") Boolean isExec) {
+    public ResponseDto<PagingResponseDto<List<ReportedReviewListResponseDto>>> readReviewReports(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "19") int size,
+            @RequestParam("isExec") Boolean isExec) {
         return ResponseDto.ok(adminService.readReviewReports(page, size, isExec));
     }
 
@@ -125,8 +131,8 @@ public class AdminController implements SwaggerAdminController {
     /* 후기 신고 처리 생성 */
     @PostMapping("/reports/reviews/{reportId}")
     public ResponseDto<String> processReviewReport(@UserId Long adminId,
-                                              @PathVariable Long reportId,
-                                              @RequestBody CreateReportExecContentDto createReportExecContentDto) {
+                                                   @PathVariable Long reportId,
+                                                   @RequestBody CreateReportExecContentDto createReportExecContentDto) {
         adminService.processReviewReport(adminId, reportId, createReportExecContentDto);
         return ResponseDto.created("후기 신고 처리가 완료되었습니다.");
     }
@@ -134,7 +140,7 @@ public class AdminController implements SwaggerAdminController {
     /* 후기 신고 처리 - 변경 사항 없음 */
     @PostMapping("/reports/reviews/{reportId}/exec")
     public ResponseDto<String> processReviewReportExec(@UserId Long adminId,
-                                                  @PathVariable Long reportId) {
+                                                       @PathVariable Long reportId) {
         adminService.processReviewReportExec(adminId, reportId);
         return ResponseDto.created("변경 사항 없이 처리되었습니다.");
     }
@@ -147,9 +153,10 @@ public class AdminController implements SwaggerAdminController {
 
     /* 팝업 신고 목록 조회 */
     @GetMapping("/reports/popups")
-    public ResponseDto<PagingResponseDto<List<ReportedPopupListResponseDto>>> readPopupReports(@RequestParam(required = false, defaultValue = "0") int page,
-                                                                                               @RequestParam(required = false, defaultValue = "19") int size,
-                                                                                               @RequestParam("isExec") Boolean isExec) {
+    public ResponseDto<PagingResponseDto<List<ReportedPopupListResponseDto>>> readPopupReports(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "19") int size,
+            @RequestParam("isExec") Boolean isExec) {
         return ResponseDto.ok(adminService.readPopupReports(page, size, isExec));
     }
 
@@ -168,8 +175,8 @@ public class AdminController implements SwaggerAdminController {
     /* 팝업 신고 처리 생성 */
     @PostMapping("/reports/popups/{reportId}")
     public ResponseDto<String> processPopupReport(@UserId Long adminId,
-                                             @PathVariable Long reportId,
-                                             @RequestBody CreateReportExecContentDto createReportExecContentDto) {
+                                                  @PathVariable Long reportId,
+                                                  @RequestBody CreateReportExecContentDto createReportExecContentDto) {
         adminService.processPopupReport(adminId, reportId, createReportExecContentDto);
         return ResponseDto.created("팝업 신고 처리가 완료되었습니다.");
     }
@@ -185,6 +192,13 @@ public class AdminController implements SwaggerAdminController {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
         return ResponseDto.ok(adminService.createInformation(adminId, requestDto, images));
+    }
+
+    @GetMapping("/info")
+    public ResponseDto<AdminInfoResponseDto> readAdminInfo(
+            @UserId Long adminId
+    ) {
+        return ResponseDto.ok(adminService.readAdminInfo(adminId));
     }
 
 }
