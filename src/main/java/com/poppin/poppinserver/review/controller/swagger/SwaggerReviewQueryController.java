@@ -20,6 +20,7 @@ public interface SwaggerReviewQueryController {
             @Parameter(hidden = true) Long userId
     );
 
+    @Operation(summary = "작성 완료 후기 조회", description = "팝업스토어에 대해 작성 완료한 후기를 제공 합니다")
     @GetMapping("/read")
     ResponseDto<ReviewDto> readReview(
             @Parameter(hidden = true) Long userId,
