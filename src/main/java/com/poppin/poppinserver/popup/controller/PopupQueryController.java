@@ -1,24 +1,32 @@
 package com.poppin.poppinserver.popup.controller;
 
+import com.poppin.poppinserver.admin.service.AdminPopupService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.controller.swagger.SwaggerPopupQueryController;
-import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.service.AdminPopupService;
+import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
+import com.poppin.poppinserver.popup.dto.popup.response.VisitedPopupDto;
 import com.poppin.poppinserver.popup.service.ListingPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 //팝업 조회
 @RestController
@@ -52,9 +60,9 @@ public class PopupQueryController implements SwaggerPopupQueryController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/search")
     public ResponseDto<PagingResponseDto<ManageListDto>> readManageList(@RequestParam("text") String text,
-                                         @RequestParam("oper") EOperationStatus oper,
-                                         @RequestParam("page") int page,
-                                         @RequestParam("size") int size) {
+                                                                        @RequestParam("oper") EOperationStatus oper,
+                                                                        @RequestParam("page") int page,
+                                                                        @RequestParam("size") int size) {
         return ResponseDto.ok(adminPopupService.searchManageList(text, page, size, oper));
     } // 전체팝업관리 - 전체 팝업 검색
 
@@ -92,14 +100,15 @@ public class PopupQueryController implements SwaggerPopupQueryController {
     }
 
     @GetMapping("/search") // 로그인 팝업 검색
-    public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> readSearchList(@RequestParam("searchName") String searchName,
-                                         @RequestParam("filteringThreeCategories") String filteringThreeCategories,
-                                         @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
-                                         @RequestParam("operationStatus") EOperationStatus oper,
-                                         @RequestParam("order") EPopupSort order,
-                                         @RequestParam("page") int page,
-                                         @RequestParam("size") int size,
-                                         HttpServletRequest request) {
+    public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> readSearchList(
+            @RequestParam("searchName") String searchName,
+            @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+            @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
+            @RequestParam("operationStatus") EOperationStatus oper,
+            @RequestParam("order") EPopupSort order,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            HttpServletRequest request) {
         return ResponseDto.ok(
                 searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories,
                         oper, order, page, size, request));

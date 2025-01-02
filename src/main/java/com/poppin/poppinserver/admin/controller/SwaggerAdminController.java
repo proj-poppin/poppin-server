@@ -1,15 +1,20 @@
-package com.poppin.poppinserver.user.controller.swagger;
+package com.poppin.poppinserver.admin.controller;
 
+import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
+import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
+import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
-import com.poppin.poppinserver.report.dto.report.response.*;
+import com.poppin.poppinserver.report.dto.report.response.ReportExecContentResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListResponseDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
+import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.faq.request.AdminFaqRequestDto;
-import com.poppin.poppinserver.user.dto.faq.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
 import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
@@ -17,19 +22,25 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "사용자(관리자)", description = "관리자 전용 유저 관련 기능을 제공합니다.")
 public interface SwaggerAdminController {
 
     @Operation(summary = "관리자 로그인", description = "관리자 계정을 사용하여 로그인을 수행합니다.")
     @PostMapping("/sign-in")
-    ResponseDto<JwtTokenDto> authSignIn(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader);
+    ResponseDto<JwtTokenDto> authSignIn(
+            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader);
 
     @Operation(summary = "관리자 토큰 재발급", description = "관리자의 Refresh Token을 사용하여 새로운 Access Token을 발급받습니다.")
     @PostMapping("/refresh")
@@ -131,10 +142,17 @@ public interface SwaggerAdminController {
     );
 
     @Operation(summary = "정보 생성", description = "관리자가 새로운 정보를 생성합니다.")
-    @PostMapping(value = "/info/create", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/info/create", consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseDto<InformApplyResponseDto> createInformation(
             @Parameter(hidden = true) Long adminId,
             @RequestPart("contents") InformAlarmCreateRequestDto requestDto,
             @RequestPart("images") MultipartFile images
+    );
+
+    @Operation(summary = "관리자 계정 정보", description = "관리자의 계정 정보를 가져옵니다.")
+    @GetMapping(value = "/info")
+    ResponseDto<AdminInfoResponseDto> readAdminInfo(
+            @Parameter(hidden = true) Long adminId
     );
 }

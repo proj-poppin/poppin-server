@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.popup.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.poppin.poppinserver.admin.service.AdminPopupService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -11,18 +12,24 @@ import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.service.AdminPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.visit.service.VisitService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 // 팝업
 @RestController
@@ -56,15 +63,15 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<Boolean> removePopup(@RequestParam("id") Long popupId,
-                                      @UserId Long adminId) throws FirebaseMessagingException {
+                                            @UserId Long adminId) throws FirebaseMessagingException {
         return ResponseDto.ok(adminPopupService.removePopup(popupId));
     } // 전체팝업관리 - 팝업 삭제
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/admin", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<AdminPopupDto> uploadManagerInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                              @RequestPart(value = "contents") @Valid UpdatePopupDto updatePopupDto,
-                                              @UserId Long adminId) {
+                                                          @RequestPart(value = "contents") @Valid UpdatePopupDto updatePopupDto,
+                                                          @UserId Long adminId) {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
@@ -74,12 +81,14 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     } // 전체팝업관리 - 팝업 수정
 
     @PatchMapping("/visit") // 팝업 방문하기
-    public ResponseDto<PopupStoreDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
+    public ResponseDto<PopupStoreDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto)
+            throws FirebaseMessagingException {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 
     @PostMapping("/reopen") // 재오픈 신청
-    public ResponseDto<String> reopen(@UserId Long userId,  @RequestParam("popupId") String popupId) throws FirebaseMessagingException {
+    public ResponseDto<String> reopen(@UserId Long userId, @RequestParam("popupId") String popupId)
+            throws FirebaseMessagingException {
         return ResponseDto.ok(popupService.reopenDemand(userId, popupId));
     }
 
