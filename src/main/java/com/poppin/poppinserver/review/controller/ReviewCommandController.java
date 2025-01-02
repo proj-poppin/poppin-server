@@ -3,7 +3,7 @@ package com.poppin.poppinserver.review.controller;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.review.controller.swagger.SwaggerReviewCommandController;
-import com.poppin.poppinserver.review.dto.response.ReviewDto;
+import com.poppin.poppinserver.review.dto.response.ReviewWriteDto;
 import com.poppin.poppinserver.review.service.ReviewCommandService;
 import com.poppin.poppinserver.review.service.ReviewRecommendService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class ReviewCommandController implements SwaggerReviewCommandController {
     private final ReviewRecommendService reviewRecommendService;
 
     @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseDto<ReviewDto> writeReview(
+    public ResponseDto<ReviewWriteDto> writeReview(
             @UserId Long userId,
             @RequestParam("popupId") String popupId,
             @RequestParam("text") String text,

@@ -25,4 +25,9 @@ public class ReviewQueryController implements SwaggerReviewQueryController {
     public ResponseDto<List<ReviewListDto>> readReviewList(@UserId Long userId) {
         return ResponseDto.ok(reviewService.readReviewList(userId));
     }
+
+//    @GetMapping("/read")
+//    public ResponseDto<?> getCertifiedReview(@UserId Long userId, @RequestParam(value = "reviewId") String reviewId){
+//        return ResponseDto.ok(reviewService.readReview(userId, reviewId));
+//    }
 }

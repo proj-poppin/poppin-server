@@ -1,12 +1,23 @@
 package com.poppin.poppinserver.review.service;
 
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.dto.response.ReviewListDto;
+import com.poppin.poppinserver.review.repository.ReviewImageQueryRepository;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
+import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.domain.VisitorData;
+import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
+import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +36,12 @@ public class ReviewService {
     private final ReviewQueryRepository reviewQueryRepository;
 
     private final PopupRepository popupRepository;
+    private final VisitRepository visitRepository;
+    private final VisitorDataRepository visitorDataRepository;
     private final PosterImageRepository posterImageRepository;
+    private final ReviewImageQueryRepository reviewImageQueryRepository;
+
+    private final UserQueryUseCase userQueryUseCase;
 
 
     public List<ReviewListDto> readReviewList(Long userId) {
@@ -51,12 +67,46 @@ public class ReviewService {
                             review.getId(),
                             popup.getId(),
                             popup.getName(),
-                            review.getIsCertificated(),
+                            review.getIsCertified(),
                             review.getCreatedAt(),
                             imageUrl
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+
+    public ReviewDto readReview(Long userId, String strReviewId){
+
+        Long reviewId = Long.valueOf(strReviewId);
+
+        User user = userQueryUseCase.findUserById(userId);
+
+        Review review = reviewQueryRepository.findById(reviewId)
+                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
+
+        Popup popup = popupRepository.findById(review.getPopup().getId())
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
+        Visit visit = visitRepository.findByUserIdAndPopupId(userId, popup.getId());
+        if (visit == null) throw new CommonException(ErrorCode.NOT_FOUND_REALTIMEVISIT);
+
+        VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popup.getId());
+        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),visitorData.getSatisfaction(),visitorData.getCongestion());
+
+        List<String> reviewImageListUrl = reviewImageQueryRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
+
+        return ReviewDto.fromEntity(
+                popup.getName(),
+                popup.getPosterUrl(),
+                review.getIsCertified(),
+                user.getNickname(),
+                visit.getCreatedAt(),
+                review.getCreatedAt(),
+                visitorDataRvDto,
+                review.getText(),
+                reviewImageListUrl
+        );
     }
 
 }

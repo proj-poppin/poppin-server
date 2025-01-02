@@ -1,11 +1,10 @@
 package com.poppin.poppinserver.review.controller.swagger;
 
 import com.poppin.poppinserver.core.dto.ResponseDto;
-import com.poppin.poppinserver.review.dto.response.ReviewDto;
+import com.poppin.poppinserver.review.dto.response.ReviewWriteDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -18,7 +17,7 @@ public interface SwaggerReviewCommandController {
 
     @Operation(summary = "후기 작성", description = "사용자가 후기를 작성합니다.")
     @PostMapping(value = "/write", consumes = {"application/json", "multipart/form-data"})
-    ResponseDto<ReviewDto> writeReview(
+    ResponseDto<ReviewWriteDto> writeReview(
             @Parameter(hidden = true) Long userId,
             @RequestParam("popupId") String popupId,
             @RequestParam("text") String text,

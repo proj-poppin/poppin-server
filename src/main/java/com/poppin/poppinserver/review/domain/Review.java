@@ -47,8 +47,8 @@ public class Review {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "is_certificated", nullable = false)
-    private Boolean isCertificated;
+    @Column(name = "is_certified", nullable = false)
+    private Boolean isCertified;
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible;
@@ -60,7 +60,7 @@ public class Review {
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    public Review(User user, String token, Popup popup, String imageUrl, String text, boolean isCertificated) {
+    public Review(User user, String token, Popup popup, String imageUrl, String text, boolean isCertified) {
         this.user = user;
         this.token = token;
         this.nickname = user.getNickname();
@@ -68,7 +68,7 @@ public class Review {
         this.imageUrl = imageUrl;
         this.text = text;
         this.createdAt = LocalDateTime.now();
-        this.isCertificated = isCertificated;
+        this.isCertified = isCertified;
         this.isVisible = true; // 후기 첫 생성 시엔 true, 이 후 신고 받아 숨김처리 시 false
         this.recommendCnt = 0;
     }

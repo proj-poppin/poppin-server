@@ -12,7 +12,7 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.dto.response.ReviewDto;
+import com.poppin.poppinserver.review.dto.response.ReviewWriteDto;
 import com.poppin.poppinserver.review.repository.ReviewCommandRepository;
 import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
@@ -51,9 +51,9 @@ public class ReviewCommandService {
 
 
     @Transactional
-    public ReviewDto writeReview(Long userId, String popupId, String text, String visitDate,
-                                 String satisfaction, String congestion,
-                                 List<MultipartFile> images) {
+    public ReviewWriteDto writeReview(Long userId, String popupId, String text, String visitDate,
+                                      String satisfaction, String congestion,
+                                      List<MultipartFile> images) {
 
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -92,7 +92,7 @@ public class ReviewCommandService {
         // 사용자 리뷰 카운트 증가
         userService.addReviewCnt(user);
 
-        return ReviewDto.fromEntity(review, visitorData);
+        return ReviewWriteDto.fromEntity(review, visitorData);
     }
 
     private Review createReview(User user, String token, Popup popup, String text, boolean isCertificated) {
