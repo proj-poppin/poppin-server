@@ -24,7 +24,7 @@ public record ReviewDto(
         String nickname,
 
         @NotNull
-        LocalDateTime visitedAt, /*visitor class createdAt*/
+        String visitedAt, /*visitor class createdAt*/
 
         @NotNull
         String createdAt, /*review class createdAt*/
@@ -56,7 +56,7 @@ public record ReviewDto(
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)
                 .nickname(nickname)
-                .visitedAt(visitDate)
+                .visitedAt(visitDate.toString())
                 .createdAt(createDate.toString())
                 .visitorData(visitorDataRvDto)
                 .text(text)
