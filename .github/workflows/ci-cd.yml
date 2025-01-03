@@ -63,6 +63,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp Dockerrun.aws.json deploy/Dockerrun.aws.json
+          cp platform/nginx/nginx.conf deploy/.platform/nginx/nginx.conf
           sed -i "s|\${ECR_REGISTRY}|${{ secrets.ECR_REGISTRY }}|g" deploy/Dockerrun.aws.json || echo "ECR_REGISTRY substitution failed"
           sed -i "s|\${ECR_REPOSITORY}|${{ secrets.ECR_REPOSITORY }}|g" deploy/Dockerrun.aws.json
           sed -i "s|\${IMAGE_TAG}|${{ github.sha }}|g" deploy/Dockerrun.aws.json
