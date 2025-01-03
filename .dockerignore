@@ -1,9 +1,3 @@
-# Ignore Maven/Gradle build files
-target/
-.gradle/
-.mvn/
-build/
-
 # Ignore IDE configuration
 *.iml
 .idea/
