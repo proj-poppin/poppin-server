@@ -1,102 +1,78 @@
-name: Poppin proj. CI/CD Script
+name: Deploy to AWS Elastic Beanstalk
 
 on:
-  push:
-    branches:
-      - prd
   pull_request:
     branches:
-      - prd
-
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_PRD_PROPERTIES: ${{ secrets.AWS_PROD_PROPERTIES }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  FIREBASE_KEY_JSON: ${{ secrets.FIREBASE_KEY }}
+      - dev
+  push:
+    branches:
+      - dev
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.BASTION_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} "exit"
-
-      - name: Start SSH Tunnel(prd)
-        if: github.ref == 'refs/heads/prd'
-        run: |
-          ssh -v -o StrictHostKeyChecking=no -f -N -L ${{ secrets.RDS_PORT }}:${{ secrets.RDS_HOST }}:${{ secrets.RDS_PORT }} ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Create firebase directory
-        run: mkdir -p src/main/resources/firebase
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-cache-${{ runner.os }}-
 
-      - name: Add firebase_key.json
-        run: echo "$FIREBASE_KEY_JSON" > src/main/resources/firebase/firebase_key.json
-
-      - name: Add application-prd.yml
-        if: github.ref == 'refs/heads/prd'
-        run: echo "$AWS_PRD_PROPERTIES" > src/main/resources/application.yml
-
-      - name: Clean Gradle cache
-        run: rm -rf ~/.gradle/caches/
-
-      - name: Clean build directory
-        run: ./gradlew clean
-
-      - name: Build with Gradle
-        run: ./gradlew build --warning-mode all
-
-      - name: List files in build directory
-        run: |
-          echo "Root directory:"
-          ls -al
-          echo "Build directory:"
-          ls -al build
-          echo "Libs directory:"
-          ls -al build/libs
+      - name: Build the project
+        run: ./gradlew clean build -x test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
 
-      - name: Upload JAR to S3 (prd)
-        if: github.ref == 'refs/heads/prd'
+      - name: Login to Amazon ECR Public
+        env:
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         run: |
-          ZIP_FILE="deploy-${{ github.sha }}.zip"
-          zip -r $ZIP_FILE build/libs/poppin-server-0.0.1-SNAPSHOT.jar appspec.yml scripts/
-          aws s3 cp $ZIP_FILE s3://${{ secrets.AWS_S3_BUCKET_NAME }}/$ZIP_FILE
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-      - name: Verify ZIP contents
+      - name: Build, tag, and push image to Amazon ECR Public
+        env:
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          ZIP_FILE="deploy-${{ github.sha }}.zip"
-          unzip -l $ZIP_FILE
+          docker build . -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Trigger CodeDeploy (prd)
-        if: github.ref == 'refs/heads/prd'
+      - name: Prepare deployment package
         run: |
-          aws deploy create-deployment \
-          --application-name ${{ secrets.AWS_CODEDEPLOY_APPLICATION_NAME }} \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=${{ secrets.AWS_S3_BUCKET_NAME }},bundleType=zip,key=deploy-${{ github.sha }}.zip
+          mkdir -p deploy
+          cp Dockerrun.aws.json deploy/Dockerrun.aws.json
+          sed -i "s|\${ECR_REGISTRY}|$ECR_REGISTRY|g" deploy/Dockerrun.aws.json || echo "ECR_REGISTRY substitution failed"
+          sed -i "s|\${ECR_REPOSITORY}|${{ secrets.ECR_REPOSITORY }}|g" deploy/Dockerrun.aws.json
+          sed -i "s|\${IMAGE_TAG}|${{ github.sha }}|g" deploy/Dockerrun.aws.json
+          cd deploy && zip -r deploy.zip .
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME }}
+          environment_name: ${{ secrets.EB_ENV_NAME_DOCKER }}
+          version_label: docker-${{ github.sha }}-${{ github.run_number }}-${{ github.event.push.timestamp }}
+          region: ap-northeast-2
+          deployment_package: deploy/deploy.zip
+          wait_for_environment_recovery: 300
