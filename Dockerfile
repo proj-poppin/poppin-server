@@ -5,7 +5,7 @@ ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS \
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+COPY build/libs/*.jar app.jar
 
 EXPOSE 8080
 
