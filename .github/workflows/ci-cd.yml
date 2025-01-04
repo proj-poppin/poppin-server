@@ -93,10 +93,10 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v14
         with:
-          aws_access_key: $AWS_ACCESS_KEY_ID
-          aws_secret_key: $AWS_SECRET_ACCESS_KEY
-          application_name: $EB_APP_NAME
-          environment_name: $EB_ENV_NAME_DOCKER
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME }}
+          environment_name: ${{ secrets.EB_ENV_NAME_DOCKER }}
           version_label: docker-${{ github.sha }}-${{ github.run_number }}-${{ github.event.push.timestamp }}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
