@@ -13,7 +13,6 @@ import com.poppin.poppinserver.review.repository.ReviewImageQueryRepository;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
@@ -76,37 +75,41 @@ public class ReviewService {
     }
 
 
-    public ReviewDto readReview(Long userId, String strReviewId){
+    public ReviewDto readReview(Long userId, String strReviewId) {
 
         Long reviewId = Long.valueOf(strReviewId);
 
         User user = userQueryUseCase.findUserById(userId);
 
         Review review = reviewQueryRepository.findById(reviewId)
-                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
 
         Popup popup = popupRepository.findById(review.getPopup().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        Visit visit = visitRepository.findByUserIdAndPopupId(userId, popup.getId());
-        if (visit == null) throw new CommonException(ErrorCode.NOT_FOUND_REALTIMEVISIT);
+        boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
+
+        String visitCreatedAt = isCertified
+                ? visitRepository.findByUserId(userId, popup.getId()).get().getCreatedAt().toString()
+                : null;
 
         VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popup.getId());
-        VisitorDataRvDto visitorDataRvDto = VisitorDataRvDto.fromEntity(visitorData.getVisitDate(),visitorData.getSatisfaction(),visitorData.getCongestion());
+        VisitorDataRvDto visitorDataRvDto = visitorData != null
+                ? VisitorDataRvDto.fromEntity(visitorData.getVisitDate(), visitorData.getSatisfaction(), visitorData.getCongestion())
+                : null;
 
-        List<String> reviewImageListUrl = reviewImageQueryRepository.findUrlAllByReviewId(reviewId); /*url을 모두 받기*/
+        List<String> reviewImageListUrl = reviewImageQueryRepository.findUrlAllByReviewId(reviewId);
 
         return ReviewDto.fromEntity(
                 popup.getName(),
                 popup.getPosterUrl(),
-                review.getIsCertified(),
+                isCertified,
                 user.getNickname(),
-                visit.getCreatedAt(),
-                review.getCreatedAt(),
+                visitCreatedAt,
+                review.getCreatedAt().toString(),
                 visitorDataRvDto,
                 review.getText(),
                 reviewImageListUrl
         );
     }
-
 }

@@ -4,7 +4,6 @@ import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataRvDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /*마이페이지 후기 조회*/
@@ -24,10 +23,10 @@ public record ReviewDto(
         String nickname,
 
         @NotNull
-        LocalDateTime visitDate, /*visitor class createdAt*/
+        String visitedAt, /*visitor class createdAt*/
 
         @NotNull
-        LocalDateTime createDate, /*review class createdAt*/
+        String createdAt, /*review class createdAt*/
 
         @NotNull
         VisitorDataRvDto visitorData,
@@ -45,8 +44,8 @@ public record ReviewDto(
             String posterUrl,
             Boolean isCertificated,
             String nickname,
-            LocalDateTime visitDate,
-            LocalDateTime createDate,
+            String visitDate,
+            String createDate,
             VisitorDataRvDto visitorDataRvDto,
             String text,
             List<String> images
@@ -56,8 +55,8 @@ public record ReviewDto(
                 .posterUrl(posterUrl)
                 .isCertificated(isCertificated)
                 .nickname(nickname)
-                .visitDate(visitDate)
-                .createDate(createDate)
+                .visitedAt(visitDate)
+                .createdAt(createDate)
                 .visitorData(visitorDataRvDto)
                 .text(text)
                 .images(images)
