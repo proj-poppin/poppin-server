@@ -4,6 +4,10 @@
     "Name": "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}",
     "Update": "true"
   },
+  "ContainerProperties": {
+    "Cpu": 1024,
+    "Memory": 512
+  },
   "Ports": [
     {
       "ContainerPort": "8080"
