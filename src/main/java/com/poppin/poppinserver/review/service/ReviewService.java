@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,7 +68,7 @@ public class ReviewService {
                             popup.getId(),
                             popup.getName(),
                             review.getIsCertified(),
-                            review.getCreatedAt(),
+                            review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                             imageUrl
                     );
                 })
@@ -90,7 +91,7 @@ public class ReviewService {
         boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
 
         String visitCreatedAt = isCertified
-                ? visitRepository.findByUserId(userId, popup.getId()).get().getCreatedAt().toString()
+                ? visitRepository.findByUserId(userId, popup.getId()).get().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 : null;
 
         VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popup.getId());
@@ -106,7 +107,7 @@ public class ReviewService {
                 isCertified,
                 user.getNickname(),
                 visitCreatedAt,
-                review.getCreatedAt().toString(),
+                review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 visitorDataRvDto,
                 review.getText(),
                 reviewImageListUrl
