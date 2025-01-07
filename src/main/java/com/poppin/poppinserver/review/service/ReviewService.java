@@ -102,6 +102,7 @@ public class ReviewService {
         List<String> reviewImageListUrl = reviewImageQueryRepository.findUrlAllByReviewId(reviewId);
 
         return ReviewDto.fromEntity(
+                user.getProfileImageUrl(),
                 popup.getName(),
                 popup.getPosterUrl(),
                 isCertified,

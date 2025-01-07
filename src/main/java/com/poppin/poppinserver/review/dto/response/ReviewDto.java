@@ -11,6 +11,9 @@ import java.util.List;
 public record ReviewDto(
 
         @NotNull
+        String profile,
+
+        @NotNull
         String introduce,
 
         @NotNull
@@ -40,6 +43,7 @@ public record ReviewDto(
 ) {
 
     public static ReviewDto fromEntity(
+            String profile,
             String introduce,
             String posterUrl,
             Boolean isCertified,
@@ -51,6 +55,7 @@ public record ReviewDto(
             List<String> images
     ) {
         return ReviewDto.builder()
+                .profile(profile)
                 .introduce(introduce)
                 .posterUrl(posterUrl)
                 .isCertified(isCertified)
