@@ -17,7 +17,7 @@ public record ReviewDto(
         String posterUrl,
 
         @NotNull
-        Boolean isCertificated,
+        Boolean isCertified,
 
         @NotNull
         String nickname,
@@ -42,7 +42,7 @@ public record ReviewDto(
     public static ReviewDto fromEntity(
             String introduce,
             String posterUrl,
-            Boolean isCertificated,
+            Boolean isCertified,
             String nickname,
             String visitDate,
             String createDate,
@@ -53,7 +53,7 @@ public record ReviewDto(
         return ReviewDto.builder()
                 .introduce(introduce)
                 .posterUrl(posterUrl)
-                .isCertificated(isCertificated)
+                .isCertified(isCertified)
                 .nickname(nickname)
                 .visitedAt(visitDate)
                 .createdAt(createDate)

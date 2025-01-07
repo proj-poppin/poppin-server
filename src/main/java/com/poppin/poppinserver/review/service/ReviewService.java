@@ -68,7 +68,7 @@ public class ReviewService {
                             popup.getId(),
                             popup.getName(),
                             review.getIsCertified(),
-                            review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                            review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                             imageUrl
                     );
                 })
@@ -91,7 +91,7 @@ public class ReviewService {
         boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
 
         String visitCreatedAt = isCertified
-                ? visitRepository.findByUserId(userId, popup.getId()).get().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                ? visitRepository.findByUserId(userId, popup.getId()).get().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 : null;
 
         VisitorData visitorData = visitorDataRepository.findByReviewIdAndPopupId(reviewId, popup.getId());
@@ -107,7 +107,7 @@ public class ReviewService {
                 isCertified,
                 user.getNickname(),
                 visitCreatedAt,
-                review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 visitorDataRvDto,
                 review.getText(),
                 reviewImageListUrl
