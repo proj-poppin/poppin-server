@@ -9,10 +9,8 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import com.poppin.poppinserver.user.controller.swagger.SwaggerUserController;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
@@ -24,8 +22,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,16 +56,22 @@ public class UserController implements SwaggerUserController {
         return ResponseDto.ok(userPreferenceSettingService.updateUserTaste(userId, userTasteDto));
     }
 
-    @PostMapping("/image")
-    public ResponseDto<String> createUserProfileImage(@UserId Long userId,
-                                                      @RequestPart(value = "profileImage") MultipartFile profileImage) {
-        return ResponseDto.created(userProfileImageService.createProfileImage(userId, profileImage));
-    }
+//    @PostMapping("/image")
+//    public ResponseDto<String> createUserProfileImage(@UserId Long userId,
+//                                                      @RequestPart(value = "profileImage") MultipartFile profileImage) {
+//        return ResponseDto.created(userProfileImageService.createProfileImage(userId, profileImage));
+//    }
 
-    @PutMapping("/image")
-    public ResponseDto<String> updateUserProfileImage(@UserId Long userId,
-                                                      @RequestPart(value = "profileImage") MultipartFile profileImage) {
-        return ResponseDto.ok(userProfileImageService.updateProfileImage(userId, profileImage));
+    @PatchMapping(value = "/profile", consumes = {
+            MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE
+    })
+    public ResponseDto<String> updateUserProfile(
+            @UserId Long userId,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestParam(value = "nickname") String nickname
+    ) {
+        log.info("profileImage: {}", profileImage);
+        return ResponseDto.ok(userProfileImageService.updateProfile(userId, profileImage, nickname));
     }
 
     @DeleteMapping("/image")
@@ -74,13 +80,13 @@ public class UserController implements SwaggerUserController {
         return ResponseDto.ok("프로필 이미지가 삭제되었습니다.");
     }
 
-    @PutMapping("/settings")
-    public ResponseDto<UserProfileDto> updateUserNickname(
-            @UserId Long userId,
-            @RequestBody UpdateUserInfoDto updateUserInfoDto
-    ) {
-        return ResponseDto.ok(userService.updateUserNickname(userId, updateUserInfoDto));
-    }
+//    @PutMapping("/settings")
+//    public ResponseDto<UserProfileDto> updateUserNickname(
+//            @UserId Long userId,
+//            @RequestBody UpdateUserInfoDto updateUserInfoDto
+//    ) {
+//        return ResponseDto.ok(userService.updateUserNickname(userId, updateUserInfoDto));
+//    }
 
     @DeleteMapping("/withdrawal")
     public ResponseDto<String> deleteUser(@UserId Long userId) {
