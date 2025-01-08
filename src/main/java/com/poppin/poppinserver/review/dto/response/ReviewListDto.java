@@ -3,8 +3,6 @@ package com.poppin.poppinserver.review.dto.response;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
-
 /*마이페이지 - 작성 완료 후기 생성 dto*/
 @Builder
 public record ReviewListDto(
@@ -28,13 +26,13 @@ public record ReviewListDto(
 
 ) {
     public static ReviewListDto fromEntity(Long reviewId, Long popupId, String name, Boolean isCertified,
-                                           LocalDateTime createdAt, String imageUrl) {
+                                           String createdAt, String imageUrl) {
         return ReviewListDto.builder()
                 .reviewId(String.valueOf(reviewId))
                 .popupId(String.valueOf(popupId))
                 .name(name)
                 .isCertified(isCertified)
-                .createdAt(createdAt.toString())
+                .createdAt(createdAt)
                 .imageUrl(imageUrl)
                 .build();
     }
