@@ -6,10 +6,8 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.request.UpdateUserInfoDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -49,18 +48,19 @@ public interface SwaggerUserController {
             @RequestBody CreateUserTasteDto userTasteDto
     );
 
-    @Operation(summary = "사용자 프로필 이미지 생성", description = "사용자 프로필 이미지를 생성합니다.")
-    @PostMapping("/image")
-    ResponseDto<String> createUserProfileImage(
-            @Parameter(hidden = true) Long userId,
-            @RequestPart(value = "profileImage") MultipartFile profileImage
-    );
+//    @Operation(summary = "사용자 프로필 이미지 생성", description = "사용자 프로필 이미지를 생성합니다.")
+//    @PostMapping("/image")
+//    ResponseDto<String> createUserProfileImage(
+//            @Parameter(hidden = true) Long userId,
+//            @RequestPart(value = "profileImage") MultipartFile profileImage
+//    );
 
-    @Operation(summary = "사용자 프로필 이미지 수정", description = "사용자 프로필 이미지를 수정합니다.")
-    @PutMapping("/image")
-    ResponseDto<String> updateUserProfileImage(
+    @Operation(summary = "사용자 프로필 수정", description = "사용자 프로필을 수정합니다.")
+    @PatchMapping(value = "/profile", consumes = {"application/json", "multipart/form-data"})
+    ResponseDto<String> updateUserProfile(
             @Parameter(hidden = true) Long userId,
-            @RequestPart(value = "profileImage") MultipartFile profileImage
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestParam(value = "nickname") String nickname
     );
 
     @Operation(summary = "사용자 프로필 이미지 삭제", description = "사용자 프로필 이미지를 삭제합니다.")
@@ -69,12 +69,12 @@ public interface SwaggerUserController {
             @Parameter(hidden = true) Long userId
     );
 
-    @Operation(summary = "사용자 닉네임 수정", description = "사용자의 닉네임을 수정합니다.")
-    @PutMapping("/settings")
-    ResponseDto<UserProfileDto> updateUserNickname(
-            @Parameter(hidden = true) Long userId,
-            @RequestBody UpdateUserInfoDto updateUserInfoDto
-    );
+//    @Operation(summary = "사용자 닉네임 수정", description = "사용자의 닉네임을 수정합니다.")
+//    @PutMapping("/settings")
+//    ResponseDto<UserProfileDto> updateUserNickname(
+//            @Parameter(hidden = true) Long userId,
+//            @RequestBody UpdateUserInfoDto updateUserInfoDto
+//    );
 
     @Operation(summary = "회원 탈퇴", description = "사용자가 회원 탈퇴를 진행합니다.")
     @DeleteMapping("/withdrawal")

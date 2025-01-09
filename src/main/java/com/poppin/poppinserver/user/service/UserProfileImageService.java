@@ -15,19 +15,30 @@ public class UserProfileImageService {
     private final UserQueryRepository userQueryRepository;
     private final S3Service s3Service;
 
-    public String createProfileImage(Long userId, MultipartFile profileImage) {
-        User user = userQueryUseCase.findUserById(userId);
-        String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
-        user.updateProfileImage(profileImageUrl);
-        userQueryRepository.save(user);
+//    public String createProfileImage(Long userId, MultipartFile profileImage) {
+//        User user = userQueryUseCase.findUserById(userId);
+//        String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
+//        user.updateProfileImage(profileImageUrl);
+//        userQueryRepository.save(user);
+//
+//        return user.getProfileImageUrl();
+//    }
 
-        return user.getProfileImageUrl();
-    }
-
-    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+    public String updateProfile(Long userId, MultipartFile profileImage, String nickname) {
         User user = userQueryUseCase.findUserById(userId);
-        String profileImageUrl = s3Service.replaceImage(user.getProfileImageUrl(), profileImage, userId);
-        user.updateProfileImage(profileImageUrl);
+        String userProfileImageUrl = user.getProfileImageUrl();
+
+        if (profileImage != null && userProfileImageUrl != null) {
+            String profileImageUrl = s3Service.replaceImage(user.getProfileImageUrl(), profileImage, userId);
+            user.updateProfileImage(profileImageUrl);
+        }
+
+        if (profileImage != null && userProfileImageUrl == null) {
+            String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
+            user.updateProfileImage(profileImageUrl);
+        }
+
+        user.updateUserNickname(nickname);
         userQueryRepository.save(user);
 
         return user.getProfileImageUrl();
