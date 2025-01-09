@@ -20,12 +20,13 @@ import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Service
@@ -77,8 +78,9 @@ public class InterestService {
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
         LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+        Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
 
-        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
+        return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, isVisited, interestCreatedAt);
     }
 
     @Transactional
@@ -93,9 +95,10 @@ public class InterestService {
 
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
+        Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
         LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
+        InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, isVisited, interestCreatedAt);
 
         interestRepository.delete(interest);
 

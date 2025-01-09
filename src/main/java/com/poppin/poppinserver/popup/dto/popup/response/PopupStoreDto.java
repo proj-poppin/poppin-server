@@ -16,6 +16,8 @@ public record PopupStoreDto(
         String id,
         String homepageLink,
         boolean isInstagram,
+        //TODO: PopupVisitSchema로 분리 요망
+        boolean isVisited,
         String name,
         String introduce,
         String address,
@@ -46,7 +48,7 @@ public record PopupStoreDto(
         Boolean isBlocked,
         String interestCreatedAt
 ) {
-    public static PopupStoreDto fromEntity(Popup popup, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt, Boolean isBlocked, LocalDateTime interestCreatedAt) {
+    public static PopupStoreDto fromEntity(Popup popup, Boolean isVisited, VisitorDataInfoDto visitorDataDto, Optional<Integer> visitorCnt, Boolean isBlocked, LocalDateTime interestCreatedAt) {
         String popupId = String.valueOf(popup.getId());
 
         List<String> imageUrls = popup.getPosterImages()
@@ -58,6 +60,7 @@ public record PopupStoreDto(
                 .id(popupId)
                 .homepageLink(popup.getHomepageLink())
                 .isInstagram(popup.getHomepageLink().contains("instagram"))
+                .isVisited(isVisited)
                 .name(popup.getName())
                 .introduce(popup.getIntroduce())
                 .address(popup.getAddress())
@@ -90,31 +93,31 @@ public record PopupStoreDto(
                 .build();
     }
 
-    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked, List<LocalDateTime> interestCreatedAtList) {
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<Boolean> isVisited, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked, List<LocalDateTime> interestCreatedAtList) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
 
         for (int i = 0; i < popups.size(); i++) {
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i), interestCreatedAtList.get(i)));
+            popupDtos.add(fromEntity(popups.get(i), isVisited.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i), interestCreatedAtList.get(i)));
         }
 
         return popupDtos;
     }
 
-    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked) {
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<Boolean> isVisited, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
 
         for (int i = 0; i < popups.size(); i++) {
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i), null));
+            popupDtos.add(fromEntity(popups.get(i), isVisited.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i), null));
         }
 
         return popupDtos;
     }
 
-    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt) {
+    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<Boolean> isVisited, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
 
         for (int i = 0; i < popups.size(); i++) {
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), false, null));
+            popupDtos.add(fromEntity(popups.get(i), isVisited.get(i), visitorDataDto.get(i), visitorCnt.get(i), false, null));
         }
 
         return popupDtos;

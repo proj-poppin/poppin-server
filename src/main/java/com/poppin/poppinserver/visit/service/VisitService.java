@@ -92,7 +92,7 @@ public class VisitService {
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(userId, popup.getId());
         LocalDateTime interestCreatedAt = interestQueryUseCase.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
+        return PopupStoreDto.fromEntity(popup, true, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
     }
 
 }
