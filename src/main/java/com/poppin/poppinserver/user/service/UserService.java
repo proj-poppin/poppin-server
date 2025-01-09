@@ -12,12 +12,13 @@ import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
 import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -68,4 +69,10 @@ public class UserService {
         user.addReviewCnt();
         userQueryRepository.save(user);
     }
+
+    public void addVisitedPopupCnt(User user) {
+        user.addVisitedPopupCnt();
+        userQueryRepository.save(user);
+    }
+
 }
