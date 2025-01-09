@@ -13,6 +13,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
+import com.poppin.poppinserver.user.service.UserFaqService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserProfileImageService;
@@ -47,6 +48,7 @@ public class UserController implements SwaggerUserController {
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final UserProfileImageService userProfileImageService;
     private final UserHardDeleteService userHardDeleteService;
+    private final UserFaqService userFaqService;
 
     @PutMapping("/popup-taste")
     public ResponseDto<UserTasteResponseDto> updateUserTaste(
@@ -112,7 +114,7 @@ public class UserController implements SwaggerUserController {
     /*마이페이지 - 자주 묻는 질문 조회*/
     @GetMapping("/support/faqs")
     public ResponseDto<List<UserFaqResponseDto>> readFAQs() {
-        return ResponseDto.ok(userService.readFAQs());
+        return ResponseDto.ok(userFaqService.readFAQs());
     }
 
     /*마이페이지 - 한글 닉네임 랜덤 생성*/

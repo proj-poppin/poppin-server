@@ -1,12 +1,12 @@
 package com.poppin.poppinserver.admin.service;
 
+import com.poppin.poppinserver.admin.domain.FreqQuestion;
 import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
+import com.poppin.poppinserver.admin.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.user.domain.FreqQuestion;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

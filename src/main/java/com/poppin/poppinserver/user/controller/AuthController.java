@@ -19,6 +19,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
 import com.poppin.poppinserver.user.service.AuthLoginService;
 import com.poppin.poppinserver.user.service.AuthService;
 import com.poppin.poppinserver.user.service.AuthSignUpService;
+import com.poppin.poppinserver.user.service.UserPasswordService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class AuthController implements SwaggerAuthController {
     private final AuthService authService;
     private final AuthSignUpService authSignUpService;
     private final AuthLoginService authLoginService;
+    private final UserPasswordService userPasswordService;
 
     // 계정 상태 반환 API
     @PostMapping("/account/status")
@@ -64,6 +66,7 @@ public class AuthController implements SwaggerAuthController {
         return ResponseDto.created(authSignUpService.handleSignUp(authSignUpRequestDto));
     }
 
+    // TODO: 삭제 예정 - 소셜 회원가입 방식 변경
 //    @PostMapping("/register")
 //    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
 //                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
@@ -71,6 +74,7 @@ public class AuthController implements SwaggerAuthController {
 //        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
 //    }
 
+    // TODO: body 로그인에서 base64 인코딩 로그인으로 전환 예정
     // base64 인코딩 로그인
 //    @PostMapping("/sign-in")
 //    public ResponseDto<?> authSignIn(
@@ -113,24 +117,28 @@ public class AuthController implements SwaggerAuthController {
         return ResponseDto.ok(authService.refresh(refreshToken, fcmTokenRequestDto));
     }
 
-    @PutMapping("/reset-password")
-    public ResponseDto<String> resetPassword(@UserId Long userId,
-                                             @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto) {
-        authService.resetPassword(userId, passwordRequestDto);
-        return ResponseDto.ok("비밀번호 변경 성공");
-    }
-
     @PostMapping("/reset-password/no-auth")
     public ResponseDto<String> resetPasswordNoAuth(
             @RequestBody @Valid PasswordResetRequestDto passwordResetRequestDto) {
-        authService.resetPasswordNoAuth(passwordResetRequestDto);
+        userPasswordService.resetPasswordNoAuth(passwordResetRequestDto);
         return ResponseDto.ok("비밀번호가 재설정되었습니다.");
     }
 
     @PostMapping("/verification/password")
-    public ResponseDto<Boolean> verifyPassword(@UserId Long userId,
-                                               @RequestBody @Valid PasswordVerificationRequestDto passwordVerificationRequestDto) {
-        return ResponseDto.ok(authService.verifyPassword(userId, passwordVerificationRequestDto));
+    public ResponseDto<Boolean> verifyPassword(
+            @UserId Long userId,
+            @RequestBody @Valid PasswordVerificationRequestDto passwordVerificationRequestDto
+    ) {
+        return ResponseDto.ok(userPasswordService.verifyPassword(userId, passwordVerificationRequestDto));
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseDto<Boolean> resetPassword(
+            @UserId Long userId,
+            @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto
+    ) {
+        userPasswordService.resetPassword(userId, passwordRequestDto);
+        return ResponseDto.ok(Boolean.TRUE);
     }
 
     @PostMapping("/email/verification")
@@ -139,6 +147,7 @@ public class AuthController implements SwaggerAuthController {
         return ResponseDto.ok(authService.sendEmailVerificationCode(emailVerificationRequestDto));
     }
 
+    //TODO: 삭제 예정 - API 통합
     //    @PostMapping("/email/verification/password")
 //    public ResponseDto<?> sendPasswordResetVerificationEmail(
 //            @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {

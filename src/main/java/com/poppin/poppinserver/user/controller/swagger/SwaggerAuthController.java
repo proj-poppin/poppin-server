@@ -81,7 +81,7 @@ public interface SwaggerAuthController {
 
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     @PutMapping("/reset-password")
-    ResponseDto<String> resetPassword(
+    ResponseDto<Boolean> resetPassword(
             @Parameter(hidden = true) Long userId,
             @RequestBody @Valid PasswordUpdateRequestDto passwordRequestDto
     );

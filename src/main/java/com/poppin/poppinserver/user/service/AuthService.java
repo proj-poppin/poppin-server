@@ -23,24 +23,33 @@ import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -116,19 +125,6 @@ public class AuthService {
 //        return userInfoResponseDto;
 //    }
 
-    // 비밀번호 재설정 메서드
-    @Transactional
-    public void resetPassword(Long userId, PasswordUpdateRequestDto passwordRequestDto) {
-        User user = userQueryRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        // 비밀번호와 비밀번호 확인 일치 여부 검증
-        checkPasswordMatch(passwordRequestDto.password(), passwordRequestDto.passwordConfirm());
-
-        // 기존 쓰던 비밀번호로 설정해도 무방
-        user.updatePassword(bCryptPasswordEncoder.encode(passwordRequestDto.password()));
-    }
-
     // 이메일 확인 코드 전송 메서드
     public AuthCodeResponseDto sendEmailVerificationCode(EmailVerificationRequestDto emailVerificationRequestDto) {
         EVerificationType verificationType = EVerificationType.valueOf(
@@ -156,16 +152,6 @@ public class AuthService {
         }
     }
 
-
-    public Boolean verifyPassword(Long userId, PasswordVerificationRequestDto passwordVerificationRequestDto) {
-        User user = userQueryRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-        if (!bCryptPasswordEncoder.matches(passwordVerificationRequestDto.password(), user.getPassword())) {
-            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
-        return Boolean.TRUE;
-    }
 
     // 토큰 재발급 메서드 (자동 로그인)
     @Transactional
@@ -515,16 +501,6 @@ public class AuthService {
         );
 
         return userInfoResponseDto;
-    }
-
-    @Transactional
-    public void resetPasswordNoAuth(PasswordResetRequestDto passwordResetRequestDto) {
-        User user = userQueryRepository.findByEmail(passwordResetRequestDto.email())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        if (!passwordResetRequestDto.password().equals(passwordResetRequestDto.passwordConfirm())) {
-            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
-        user.updatePassword(bCryptPasswordEncoder.encode(passwordResetRequestDto.password()));
     }
 
     // OS와 앱 버전 확인 메서드
