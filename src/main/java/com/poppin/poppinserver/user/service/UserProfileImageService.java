@@ -15,6 +15,7 @@ public class UserProfileImageService {
     private final UserQueryRepository userQueryRepository;
     private final S3Service s3Service;
 
+    // TODO: 삭제 예정
 //    public String createProfileImage(Long userId, MultipartFile profileImage) {
 //        User user = userQueryUseCase.findUserById(userId);
 //        String profileImageUrl = s3Service.uploadUserProfile(profileImage, userId);
