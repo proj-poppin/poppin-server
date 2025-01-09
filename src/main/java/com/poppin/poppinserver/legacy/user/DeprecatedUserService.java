@@ -14,7 +14,7 @@
 //import com.poppin.poppinserver.user.domain.User;
 //import com.poppin.poppinserver.user.dto.user.response.UserMypageDto;
 //import com.poppin.poppinserver.user.dto.user.response.UserProfileDto;
-//import com.poppin.poppinserver.user.repository.FreqQuestionRepository;
+//import com.poppin.poppinserver.admin.repository.FreqQuestionRepository;
 //import com.poppin.poppinserver.user.repository.UserQueryRepository;
 //import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 //import com.poppin.poppinserver.visit.domain.Visit;
