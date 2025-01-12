@@ -7,7 +7,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,9 +49,9 @@ public interface SwaggerPopupCommandController {
             @Parameter(hidden = true) Long adminId
     );
 
-    @Operation(summary = "팝업 방문", description = "사용자가 특정 팝업을 방문합니다.")
+    @Operation(summary = "팝업 방문", description = "사용자가 팝업을 방문합니다.")
     @PatchMapping("/visit")
-    ResponseDto<PopupStoreDto> visit(
+    ResponseDto<VisitResponseDto> visit(
             @Parameter(hidden = true) Long userId,
             @RequestBody VisitorsInfoDto visitorsInfoDto
     ) throws FirebaseMessagingException;

@@ -234,7 +234,6 @@ public class PopupService {
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
         List<Boolean> isBlockedList = new ArrayList<>();
-        List<Boolean> isVisitedList = new ArrayList<>();
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups.getContent()) {
@@ -246,13 +245,10 @@ public class PopupService {
 
             Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
             isBlockedList.add(idBlocked);
-
-            Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
-            isVisitedList.add(isVisited);
         }
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntities(popups.getContent(), isVisitedList, visitorDataInfoDtos, visitorCntList, isBlockedList);
+        return PopupStoreDto.fromEntities(popups.getContent(), visitorDataInfoDtos, visitorCntList, isBlockedList);
     }
 
     public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups, Long userId) {
@@ -264,7 +260,6 @@ public class PopupService {
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
         List<Boolean> isBlockedList = new ArrayList<>();
         List<LocalDateTime> interestCreatedAtList = new ArrayList<>();
-        List<Boolean> isVisitedList = new ArrayList<>();
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
@@ -279,21 +274,16 @@ public class PopupService {
 
             LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
             interestCreatedAtList.add(interestCreatedAt);
-
-            Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
-            isVisitedList.add(isVisited);
         }
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntities(popups, isVisitedList, visitorDataInfoDtos, visitorCntList, isBlockedList, interestCreatedAtList);
+        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList, isBlockedList, interestCreatedAtList);
     }
 
     public PopupStoreDto getPopupStoreDto(Popup popup, Long userId) {
         if (popup == null) {
             return null;
         }
-
-        Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
 
         VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
 
@@ -304,14 +294,13 @@ public class PopupService {
         LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, isVisited, visitorDataDto, visitorCnt, idBlocked, interestCreatedAt);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked, interestCreatedAt);
     }
 
     public List<PopupStoreDto> guestGetPopupStoreDtos(Page<Popup> popups) {
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
-        List<Boolean> isVisitedList = new ArrayList<>();
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups.getContent()) {
@@ -321,11 +310,10 @@ public class PopupService {
             Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
 
-            isVisitedList.add(false); // 게스트이기 때문에 무조건 false
         }
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntities(popups.getContent(), isVisitedList, visitorDataInfoDtos, visitorCntList);
+        return PopupStoreDto.fromEntities(popups.getContent(), visitorDataInfoDtos, visitorCntList);
     }
 
     public List<PopupStoreDto> guestGetPopupStoreDtos(List<Popup> popups) {
@@ -335,7 +323,6 @@ public class PopupService {
         // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
         List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
         List<Optional<Integer>> visitorCntList = new ArrayList<>();
-        List<Boolean> isVisitedList = new ArrayList<>();
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
@@ -344,12 +331,10 @@ public class PopupService {
 
             Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
             visitorCntList.add(visitorCnt);
-
-            isVisitedList.add(false);
         }
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntities(popups, isVisitedList, visitorDataInfoDtos, visitorCntList);
+        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList);
     }
 
     public PopupStoreDto guestGetPopupStoreDto(Popup popup) {
@@ -362,7 +347,7 @@ public class PopupService {
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
 
         // PopupStoreDto 리스트를 생성하여 반환
-        return PopupStoreDto.fromEntity(popup, false, visitorDataDto, visitorCnt, false, null);
+        return PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, false, null);
     }
 
     public List<VisitedPopupDto> getVisitedPopupList(Long userId) {

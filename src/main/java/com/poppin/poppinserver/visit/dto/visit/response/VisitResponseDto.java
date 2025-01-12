@@ -5,16 +5,16 @@ import lombok.Builder;
 
 @Builder
 public record VisitResponseDto(
-        PopupStoreDto popupStoreDto,
-        VisitStatusDto visitStatusDto
+        PopupStoreDto updatedPopupStore,
+        VisitDto newPopupVisit
 ) {
    public static VisitResponseDto fromEntity(
            PopupStoreDto popupStoreDto,
-           VisitStatusDto visitStatusDto
+           VisitDto visitDto
    ){
        return VisitResponseDto.builder()
-               .popupStoreDto(popupStoreDto)
-               .visitStatusDto(visitStatusDto)
+               .updatedPopupStore(popupStoreDto)
+               .newPopupVisit(visitDto)
                .build();
    }
 }
