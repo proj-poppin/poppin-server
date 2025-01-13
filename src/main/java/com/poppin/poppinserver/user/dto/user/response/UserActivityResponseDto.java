@@ -1,18 +1,17 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
-import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
-import java.util.List;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import lombok.Builder;
 
 @Builder
 public record UserActivityResponseDto(
-        List<PopupScrapDto> scrappedPopups,
+        PopupActivityResponseDto popupActivities,
         UserNotificationResponseDto notifications
 ) {
-    public static UserActivityResponseDto fromProperties(List<PopupScrapDto> scrappedPopups,
+    public static UserActivityResponseDto fromProperties(PopupActivityResponseDto popupActivities,
                                                          UserNotificationResponseDto notifications) {
         return UserActivityResponseDto.builder()
-                .scrappedPopups(scrappedPopups)
+                .popupActivities(popupActivities)
                 .notifications(notifications)
                 .build();
     }

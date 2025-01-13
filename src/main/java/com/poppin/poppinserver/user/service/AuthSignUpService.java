@@ -13,8 +13,12 @@ import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.domain.Waiting;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.WaitingRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
@@ -28,6 +32,9 @@ import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +56,9 @@ public class AuthSignUpService {
     private final InterestRepository interestRepository;
     private final BlockedPopupRepository blockedPopupRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
-
     private final TokenCommandUseCase tokenCommandUseCase;
+    private final VisitRepository visitRepository;
+    private final WaitingRepository waitingRepository;
 
     // 유저 이메일 중복 확인 메서드
 //    private void checkDuplicatedEmail(String email) {
@@ -119,7 +127,9 @@ public class AuthSignUpService {
         newUser.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
         //userCommandUseCase.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+        boolean isPreferenceSettingCreated = userPreferenceSettingService
+                .readUserPreferenceSettingCreated(newUser.getId());
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreference(
                 newUser.getId()
         );
 
@@ -189,8 +199,28 @@ public class AuthSignUpService {
                 PopupScrapDto::fromInterest
         ).toList();
 
+        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(newUser.getId());
+
+        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
+                .map(
+                        v -> VisitDto.fromEntity(
+                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
+                        )
+                ).toList();
+
+        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(newUser.getId());
+        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
+                .map(
+                        pw -> PopupWaitingDto.fromEntity(
+                                pw.getId(), pw.getPopup().getId()
+                        )
+                ).toList();
+
+        PopupActivityResponseDto popupActivityResponseDto = PopupActivityResponseDto
+                .fromProperties(popupScrapDtoList, userVisitedPopupDtoList, userWaitingPopupDtoList);
+
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
+                popupActivityResponseDto,
                 userNotificationResponseDto
         );
 
@@ -211,7 +241,8 @@ public class AuthSignUpService {
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
                 userActivities,
-                userRelationDto
+                userRelationDto,
+                isPreferenceSettingCreated
         );
     }
 
@@ -248,7 +279,9 @@ public class AuthSignUpService {
         // 리프레시 토큰 업데이트 및 로그인 상태 변경
         newUser.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+        boolean isPreferenceSettingCreated = userPreferenceSettingService
+                .readUserPreferenceSettingCreated(newUser.getId());
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreference(
                 newUser.getId()
         );
 
@@ -318,8 +351,28 @@ public class AuthSignUpService {
                 PopupScrapDto::fromInterest
         ).toList();
 
+        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(newUser.getId());
+
+        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
+                .map(
+                        v -> VisitDto.fromEntity(
+                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
+                        )
+                ).toList();
+
+        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(newUser.getId());
+        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
+                .map(
+                        pw -> PopupWaitingDto.fromEntity(
+                                pw.getId(), pw.getPopup().getId()
+                        )
+                ).toList();
+
+        PopupActivityResponseDto popupActivityResponseDto = PopupActivityResponseDto
+                .fromProperties(popupScrapDtoList, userVisitedPopupDtoList, userWaitingPopupDtoList);
+
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
+                popupActivityResponseDto,
                 userNotificationResponseDto
         );
 
@@ -340,7 +393,8 @@ public class AuthSignUpService {
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
                 userActivities,
-                userRelationDto
+                userRelationDto,
+                isPreferenceSettingCreated
         );
     }
 
