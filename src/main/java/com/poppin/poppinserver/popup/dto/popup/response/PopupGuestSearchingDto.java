@@ -1,10 +1,9 @@
 package com.poppin.poppinserver.popup.dto.popup.response;
 
 import com.poppin.poppinserver.popup.domain.Popup;
-import lombok.Builder;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record PopupGuestSearchingDto(
@@ -18,7 +17,7 @@ public record PopupGuestSearchingDto(
         String openDate,
         String closeDate,
         String operationStatus,
-        PreferedDto prefered,
+        PreferredDto prefered,
         TasteDto taste
 ) {
     public static List<PopupGuestSearchingDto> fromEntityList(List<Popup> popups) {
@@ -26,7 +25,7 @@ public record PopupGuestSearchingDto(
 
         for (Popup popup : popups) {
 
-            PreferedDto preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+            PreferredDto preferredDto = PreferredDto.fromEntity(popup.getPreferedPopup());
             TasteDto tasteDto = TasteDto.fromEntity(popup.getTastePopup());
 
             PopupGuestSearchingDto popupGuestSearchingDto =
@@ -42,7 +41,7 @@ public record PopupGuestSearchingDto(
                             .closeDate(popup.getCloseDate().toString())
                             .operationStatus(popup.getOperationStatus())
                             .taste(tasteDto)
-                            .prefered(preferedDto)
+                            .prefered(preferredDto)
                             .build();
 
             dtoList.add(popupGuestSearchingDto);
