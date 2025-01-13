@@ -13,7 +13,8 @@ public record UserInfoResponseDto(
         UserPreferenceSettingDto userPreferenceSetting,
         UserNoticeResponseDto userNotice,
         UserActivityResponseDto userActivities,
-        UserRelationDto userRelation
+        UserRelationDto userRelation,
+        boolean isPreferenceSettingCreated
 ) {
     public static UserInfoResponseDto fromUserEntity(
             User user,
@@ -22,17 +23,15 @@ public record UserInfoResponseDto(
             UserPreferenceSettingDto userPreferenceSettingDto,
             UserNoticeResponseDto userNoticeResponseDto,
             UserActivityResponseDto userActivities,
-            UserRelationDto userRelation
+            UserRelationDto userRelation,
+            boolean isPreferenceSettingCreated
     ) {
         return UserInfoResponseDto.builder()
                 .userNotificationSetting(UserNotificationSettingResponseDto.fromEntity(alarmSetting))
                 .jwtToken(jwtTokenDto)
                 .user(UserSchemaResponseDto.fromUserEntity(user))
-                .userPreferenceSetting(
-                        UserPreferenceSettingDto.fromUserPreferenceInfo(
-                                userPreferenceSettingDto.isPreferenceSettingCreated(),
-                                userPreferenceSettingDto.userTasteResponseDto())
-                )
+                .userPreferenceSetting(userPreferenceSettingDto)
+                .isPreferenceSettingCreated(isPreferenceSettingCreated)
                 .userNotice(userNoticeResponseDto)
                 .userActivities(userActivities)
                 .userRelation(userRelation)
