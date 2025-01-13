@@ -51,10 +51,7 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.requiresSpecialCare = :requiresSpecialCare ORDER BY u.nickname ASC")
     Page<User> findByRequiresSpecialCareOrderByNicknameAsc(boolean requiresSpecialCare, Pageable pageable);
 
-    // 쿼리 최적화를 위한 native query
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE email = :email)", nativeQuery = true)
-    Integer existsByEmailWithNq(@Param("email") String email);
-
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM users WHERE nickname = :nickname)", nativeQuery = true)
-    Integer existsByNicknameWithNq(@Param("nickname") String nickname);
+    boolean existsByEmail(@Param("email") String email);
+    
+    boolean existsByNickname(@Param("nickname") String nickname);
 }

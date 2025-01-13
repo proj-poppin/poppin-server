@@ -36,6 +36,7 @@ import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,37 +61,19 @@ public class AuthSignUpService {
     private final VisitRepository visitRepository;
     private final WaitingRepository waitingRepository;
 
-    // 유저 이메일 중복 확인 메서드
-//    private void checkDuplicatedEmail(String email) {
-//        userQueryRepository.findByEmail(email)
-//                .ifPresent(user -> {
-//                    throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
-//                });
-//    }
-
-    // 유저 비밀번호 및 비밀번호 확인 일치 여부 검증 메서드
-//    private void checkPasswordMatch(String password, String passwordConfirm) {
-//        if (!password.equals(passwordConfirm)) {
-//            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-//        }
-//    }
-
-    // 유저 닉네임 중복 확인 메서드
-//    private void checkDuplicatedNickname(String nickname) {
-//        userQueryRepository.findByNickname(nickname)
-//                .ifPresent(user -> {
-//                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
-//                });
-//    }
-
     public UserInfoResponseDto handleSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.password().isEmpty()) {
-            // 소셜 로그인 로직 처리
-            return socialSignUp(authSignUpRequestDto);
-        } else {
-            // 자체 로그인 로직 처리
-            return defaultSignUp(authSignUpRequestDto);
-        }
+//        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.password().isEmpty()) {
+//            // 소셜 로그인 로직 처리
+//            return socialSignUp(authSignUpRequestDto);
+//        } else {
+//            // 자체 로그인 로직 처리
+//            return defaultSignUp(authSignUpRequestDto);
+//        }
+
+        return Optional.ofNullable(authSignUpRequestDto.password())
+                .filter(password -> !password.isEmpty())
+                .map(password -> defaultSignUp(authSignUpRequestDto))
+                .orElseGet(() -> socialSignUp(authSignUpRequestDto));
     }
 
     // 자체 회원가입
@@ -106,13 +89,6 @@ public class AuthSignUpService {
 
         // 유저 생성, 패스워드 암호화
         User newUser = userCommandUseCase.createUserByDefaultSignUp(authSignUpRequestDto);
-//        User newUser = userQueryRepository.save(
-//                User.toUserEntity(
-//                        authSignUpRequestDto,
-//                        bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
-//                        ELoginProvider.DEFAULT
-//                )
-//        );
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
@@ -259,12 +235,6 @@ public class AuthSignUpService {
 
         // 유저 생성, 패스워드 암호화
         User newUser = userCommandUseCase.createUserBySocialSignUp(authSignUpRequestDto);
-//        userQueryRepository.save(
-//                User.toUserEntity(
-//                        authSignUpRequestDto, bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
-//                        provider
-//                )
-//        );
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());

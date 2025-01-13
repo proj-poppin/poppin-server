@@ -1,16 +1,22 @@
 package com.poppin.poppinserver.user.service;
 
+import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
 import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
+import com.poppin.poppinserver.popup.service.BootstrapService;
+import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,8 @@ public class UserPreferenceSettingService {
     private final PreferedPopupRepository preferedPopupRepository;
     private final TastePopupRepository tastePopupRepository;
     private final WhoWithPopupRepository whoWithPopupRepository;
+    private final BootstrapService bootstrapService;
+    private final PopupService popupService;
 
     public UserPreferenceSettingDto readUserPreference(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
@@ -54,7 +62,7 @@ public class UserPreferenceSettingService {
     }
 
     @Transactional
-    public UserPreferenceSettingDto updateUserPreference(Long userId, CreateUserTasteDto createUserTasteDto) {
+    public UserPreferenceUpdateResponseDto updateUserPreference(Long userId, CreateUserTasteDto createUserTasteDto) {
         User user = userQueryUseCase.findUserById(userId);
 
         if (!readUserPreferenceSettingCreated(user.getId())) {
@@ -95,7 +103,16 @@ public class UserPreferenceSettingService {
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
         userCommandRepository.save(user);
 
-        return UserPreferenceSettingDto.fromEntity(preferedPopup, tastePopup, whoWithPopup);
+        UserPreferenceSettingDto userPreferenceSettingDto = UserPreferenceSettingDto
+                .fromEntity(
+                        preferedPopup, tastePopup, whoWithPopup
+                );
+
+        // 취향 저격 팝업 조회
+        List<Popup> recommendPopup = bootstrapService.getRecommendPopup(userId);
+        List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
+
+        return UserPreferenceUpdateResponseDto.fromDtos(userPreferenceSettingDto, recommendedPopupStores);
     }
 
     @Transactional
