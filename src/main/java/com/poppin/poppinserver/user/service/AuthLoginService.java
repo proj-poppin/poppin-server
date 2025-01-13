@@ -43,7 +43,6 @@ import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
-import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
@@ -61,7 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AuthLoginService {
     private final OAuth2Util oAuth2Util;
-    private final UserQueryUseCase userQueryUseCase;
     private final UserCommandRepository userCommandRepository;
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserPreferenceSettingService userPreferenceSettingService;

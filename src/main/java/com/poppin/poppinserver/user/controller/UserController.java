@@ -11,7 +11,7 @@ import com.poppin.poppinserver.user.controller.swagger.SwaggerUserController;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserFaqService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
@@ -51,7 +51,7 @@ public class UserController implements SwaggerUserController {
     private final UserFaqService userFaqService;
 
     @PutMapping("/popup-taste")
-    public ResponseDto<UserPreferenceSettingDto> updateUserTaste(
+    public ResponseDto<UserPreferenceUpdateResponseDto> updateUserTaste(
             @UserId Long userId,
             @RequestBody @Valid CreateUserTasteDto userTasteDto
     ) {
