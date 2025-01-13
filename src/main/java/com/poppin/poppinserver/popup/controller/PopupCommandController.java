@@ -79,10 +79,10 @@ public class PopupCommandController implements SwaggerPopupCommandController {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 
-    @PostMapping("/reopen") // 재오픈 신청
-    public ResponseDto<String> reopen(@UserId Long userId, @RequestParam("popupId") String popupId)
+    @PostMapping("/waiting") // 재오픈 신청
+    public ResponseDto<String> waiting(@UserId Long userId, @RequestParam("popupId") String popupId)
             throws FirebaseMessagingException {
-        return ResponseDto.ok(popupService.reopenDemand(userId, popupId));
+        return ResponseDto.ok(popupService.waiting(userId, popupId));
     }
 
 }

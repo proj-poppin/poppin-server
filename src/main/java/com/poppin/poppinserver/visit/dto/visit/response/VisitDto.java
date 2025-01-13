@@ -7,14 +7,12 @@ public record VisitDto(
         String id,
         String popupId,
         String userId,
-        String status,
         String createdAt
 ) {
     public static VisitDto fromEntity(
             Long id,
             Long popupId,
             Long userId,
-            String status,
             String createdAt
 
     ){
@@ -22,7 +20,6 @@ public record VisitDto(
                 .id(String.valueOf(id))
                 .popupId(String.valueOf(popupId))
                 .userId(String.valueOf(userId))
-                .status(status)
                 .createdAt(createdAt)
                 .build();
     }

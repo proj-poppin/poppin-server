@@ -7,7 +7,6 @@ import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
-import com.poppin.poppinserver.core.type.EVisitStatus;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
@@ -102,7 +101,7 @@ public class VisitService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String date = visit.getCreatedAt().format(formatter);
-        VisitDto visitDto = VisitDto.fromEntity(visit.getId(), popup.getId(), user.getId(), EVisitStatus.VC.getValue().toString(), date);
+        VisitDto visitDto = VisitDto.fromEntity(visit.getId(), popup.getId(), user.getId(), date);
 
         return VisitResponseDto.fromEntity(popupStoreDto, visitDto);
     }

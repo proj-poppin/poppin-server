@@ -57,7 +57,7 @@ public interface SwaggerPopupCommandController {
     ) throws FirebaseMessagingException;
 
     @Operation(summary = "재오픈 요청", description = "사용자가 재오픈 요청을 보냅니다.")
-    @PostMapping("/reopen") // 재오픈 신청
-    ResponseDto<String> reopen(@UserId Long userId, @RequestBody String popupId) throws FirebaseMessagingException;
+    @PostMapping("/waiting") // 재오픈 신청
+    ResponseDto<String> waiting(@UserId Long userId, @RequestBody String popupId) throws FirebaseMessagingException;
 
 }

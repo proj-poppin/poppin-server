@@ -204,7 +204,7 @@ public class PopupService {
         }
     } // 팝업 상세조회
 
-    public String reopenDemand(Long userId, String SpopupId) throws FirebaseMessagingException {
+    public String waiting(Long userId, String SpopupId) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(SpopupId);
 
         User user = userQueryUseCase.findUserById(userId);
