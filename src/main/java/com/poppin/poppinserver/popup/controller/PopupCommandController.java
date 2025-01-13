@@ -11,25 +11,19 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
 import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import com.poppin.poppinserver.visit.service.VisitService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 // 팝업
 @RestController
@@ -81,15 +75,15 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     } // 전체팝업관리 - 팝업 수정
 
     @PatchMapping("/visit") // 팝업 방문하기
-    public ResponseDto<PopupStoreDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto)
+    public ResponseDto<VisitedPopupDto> visit(@UserId Long userId, @RequestBody VisitorsInfoDto visitorsInfoDto)
             throws FirebaseMessagingException {
         return ResponseDto.ok(visitService.visit(userId, visitorsInfoDto));
     }
 
-    @PostMapping("/reopen") // 재오픈 신청
-    public ResponseDto<String> reopen(@UserId Long userId, @RequestParam("popupId") String popupId)
+    @PostMapping("/waiting") // 재오픈 신청
+    public ResponseDto<PopupWaitingDto> waiting(@UserId Long userId, @RequestParam("popupId") String popupId)
             throws FirebaseMessagingException {
-        return ResponseDto.ok(popupService.reopenDemand(userId, popupId));
+        return ResponseDto.ok(popupService.waiting(userId, popupId));
     }
 
 }

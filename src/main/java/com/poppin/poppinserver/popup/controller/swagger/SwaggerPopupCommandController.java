@@ -7,7 +7,8 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,15 +50,15 @@ public interface SwaggerPopupCommandController {
             @Parameter(hidden = true) Long adminId
     );
 
-    @Operation(summary = "팝업 방문", description = "사용자가 특정 팝업을 방문합니다.")
+    @Operation(summary = "팝업 방문", description = "사용자가 팝업을 방문합니다.")
     @PatchMapping("/visit")
-    ResponseDto<PopupStoreDto> visit(
+    ResponseDto<VisitedPopupDto> visit(
             @Parameter(hidden = true) Long userId,
             @RequestBody VisitorsInfoDto visitorsInfoDto
     ) throws FirebaseMessagingException;
 
     @Operation(summary = "재오픈 요청", description = "사용자가 재오픈 요청을 보냅니다.")
-    @PostMapping("/reopen") // 재오픈 신청
-    ResponseDto<String> reopen(@UserId Long userId, @RequestBody String popupId) throws FirebaseMessagingException;
+    @PostMapping("/waiting") // 재오픈 신청
+    ResponseDto<PopupWaitingDto> waiting(@UserId Long userId, @RequestBody String popupId) throws FirebaseMessagingException;
 
 }

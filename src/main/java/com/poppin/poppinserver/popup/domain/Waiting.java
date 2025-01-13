@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "reopen_demand_user")
-public class ReopenDemand {
+@Table(name = "waiting")
+public class Waiting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,27 +29,14 @@ public class ReopenDemand {
     @JoinColumn(name = "popup_id", referencedColumnName = "id", nullable = false)
     private Popup popup;
 
-    @Column(name = "fcm_token", nullable = false)
-    private String token;
-
-    @Column(name = "modify_date", nullable = false)
-    private LocalDateTime mod_dtm; // 토큰 갱신일
-
-    @Column(name = "expired_date", nullable = false)
-    private LocalDateTime exp_dtm; // 토큰 만료일
-
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
 
     @Builder
-    public ReopenDemand(User user, Popup popup, String token, LocalDateTime mod_dtm, LocalDateTime exp_dtm) {
+    public Waiting(User user, Popup popup) {
         this.user = user;
         this.popup = popup;
-        this.token = token;
-        this.mod_dtm = mod_dtm;
-        this.exp_dtm = exp_dtm;
         this.createdAt = LocalDateTime.now();
     }
 }

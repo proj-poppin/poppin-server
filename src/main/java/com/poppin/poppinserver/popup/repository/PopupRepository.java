@@ -211,19 +211,15 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     Long countByOperationStatus(String operationStatus);
 
-    @Query("SELECT p.id FROM Popup p JOIN Visit v on p.id = v.popup.id WHERE  v.user.id = :userId ")
-    List<Long> findVisitedPopupByUserId(@Param("userId") Long userId);
-
 
     /**
      * 배치 스케줄러 용 메서드 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * -
      */
     @Query("SELECT p FROM Popup p " +
-            "JOIN ReopenDemand rd ON p.id = rd.popup.id " +
-            "JOIN FCMToken ft ON rd.token = ft.token " +
-            "WHERE p.openDate < :nowDate " +
-            "AND ft.token = rd.token")
+            "JOIN Waiting w ON p.id = w.popup.id " +
+            "WHERE p.openDate < :nowDate "
+            )
     List<Popup> findReopenPopupWithDemand(@Param("nowDate") LocalDate nowDate);
 
 

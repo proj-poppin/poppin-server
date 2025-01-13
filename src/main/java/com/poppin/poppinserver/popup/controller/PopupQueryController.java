@@ -7,26 +7,18 @@ import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.controller.swagger.SwaggerPopupQueryController;
-import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
-import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
-import com.poppin.poppinserver.popup.dto.popup.response.VisitedPopupDto;
+import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.service.ListingPopupService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 //팝업 조회
 @RestController
@@ -152,8 +144,8 @@ public class PopupQueryController implements SwaggerPopupQueryController {
         return ResponseDto.ok(popupService.readPopupStore(popupId, request));
     }
 
-    @GetMapping("/visited")
+    @GetMapping("/visited") // 마이 페이지 > 후기 작성하기 > 팝업 리스트
     public ResponseDto<List<VisitedPopupDto>> getVisitedPopupList(@UserId Long userId) {
         return ResponseDto.ok(popupService.getVisitedPopupList(userId));
-    } // 마이 페이지 > 후기 작성하기 > 팝업 리스트
+    }
 }

@@ -16,6 +16,8 @@ import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -59,7 +62,7 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public PopupStoreDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
+    public VisitedPopupDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(visitorsInfoDto.popupId());
 
         User user = userQueryUseCase.findUserById(userId);
@@ -79,12 +82,14 @@ public class VisitService {
             topicCommandUseCase.subscribePopupTopic(token.get(), popup, EPopupTopic.HOOGI);
         }
 
-        Visit visitor = Visit.builder()
-                .user(user)
-                .popup(popup)
-                .build();
 
-        visitRepository.save(visitor);
+        Visit visit = visitRepository.save(
+                Visit.builder()
+                        .user(user)
+                        .popup(popup)
+                        .build()
+        );
+
         user.addVisitedPopupCnt();
 
         VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId());
@@ -92,7 +97,13 @@ public class VisitService {
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(userId, popup.getId());
         LocalDateTime interestCreatedAt = interestQueryUseCase.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
-        return PopupStoreDto.fromEntity(popup, true, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, isBlocked, interestCreatedAt);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = visit.getCreatedAt().format(formatter);
+        VisitDto visitDto = VisitDto.fromEntity(visit.getId(), popup.getId(), user.getId(), date);
+
+        return VisitedPopupDto.fromEntity(popupStoreDto, visitDto);
     }
 
 }
