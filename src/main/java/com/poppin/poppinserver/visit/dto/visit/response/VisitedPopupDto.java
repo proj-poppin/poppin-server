@@ -4,15 +4,15 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import lombok.Builder;
 
 @Builder
-public record VisitResponseDto(
+public record VisitedPopupDto(
         PopupStoreDto updatedPopupStore,
         VisitDto newPopupVisit
 ) {
-   public static VisitResponseDto fromEntity(
+   public static VisitedPopupDto fromEntity(
            PopupStoreDto popupStoreDto,
            VisitDto visitDto
    ){
-       return VisitResponseDto.builder()
+       return VisitedPopupDto.builder()
                .updatedPopupStore(popupStoreDto)
                .newPopupVisit(visitDto)
                .build();

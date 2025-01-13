@@ -17,7 +17,7 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
-import com.poppin.poppinserver.visit.dto.visit.response.VisitResponseDto;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
@@ -62,7 +62,7 @@ public class VisitService {
     }
 
     /*방문하기 버튼 누를 시*/
-    public VisitResponseDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
+    public VisitedPopupDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(visitorsInfoDto.popupId());
 
         User user = userQueryUseCase.findUserById(userId);
@@ -103,7 +103,7 @@ public class VisitService {
         String date = visit.getCreatedAt().format(formatter);
         VisitDto visitDto = VisitDto.fromEntity(visit.getId(), popup.getId(), user.getId(), date);
 
-        return VisitResponseDto.fromEntity(popupStoreDto, visitDto);
+        return VisitedPopupDto.fromEntity(popupStoreDto, visitDto);
     }
 
 }

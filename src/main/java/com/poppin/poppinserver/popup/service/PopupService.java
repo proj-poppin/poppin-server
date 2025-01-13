@@ -12,13 +12,12 @@ import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.dto.popup.response.VisitedPopupDto;
+import com.poppin.poppinserver.popup.domain.Waiting;
+import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.usecase.WaitingCommandUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
@@ -57,6 +56,7 @@ public class PopupService {
     private final HeaderUtil headerUtil;
     private final InterestRepository interestRepository;
 
+    private final WaitingCommandUseCase waitingCommandUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final UserQueryUseCase userQueryUseCase;
@@ -204,7 +204,8 @@ public class PopupService {
         }
     } // 팝업 상세조회
 
-    public String waiting(Long userId, String SpopupId) throws FirebaseMessagingException {
+    // 재오픈 신청
+    public PopupWaitingDto waiting(Long userId, String SpopupId) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(SpopupId);
 
         User user = userQueryUseCase.findUserById(userId);
@@ -219,13 +220,21 @@ public class PopupService {
         FCMToken token = tokenQueryUseCase.findTokenByUserId(user.getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TOKEN));
 
-        popup.addreopenDemandCnt(); // 재오픈 수요 + 1
+
+        // Waiting 저장
+        Waiting waiting = waitingCommandUseCase.save(new Waiting(user, popup));
+
+        // Popup 업데이트 및 저장
+        popup.addreopenDemandCnt();
         popupRepository.save(popup);
 
-        /* 재오픈 체크 시 재오픈 토픽에 등록 */
+        // 재오픈 토픽 등록
         log.info("재오픈 신청 시 FCM TOPIC 등록");
         topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.REOPEN);
-        return "재오픈 수요 체크 되었습니다.";
+
+        // DTO 반환
+        return PopupWaitingDto.fromEntity(waiting.getId(), popupId);
+
     }
 
 

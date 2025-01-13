@@ -220,7 +220,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
      * -
      */
     @Query("SELECT p FROM Popup p " +
-            "JOIN ReopenDemand rd ON p.id = rd.popup.id " +
+            "JOIN Waiting rd ON p.id = rd.popup.id " +
             "JOIN FCMToken ft ON rd.token = ft.token " +
             "WHERE p.openDate < :nowDate " +
             "AND ft.token = rd.token")

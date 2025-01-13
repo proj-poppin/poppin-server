@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ReviewImageQuerySerivce implements ReviewImageQueryUseCase {
+public class ReviewImageQueryService implements ReviewImageQueryUseCase {
 
     private final ReviewImageQueryRepository reviewImageQueryRepository;
 
