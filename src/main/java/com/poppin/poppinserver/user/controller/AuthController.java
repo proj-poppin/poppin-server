@@ -89,7 +89,7 @@ public class AuthController implements SwaggerAuthController {
     public ResponseDto<UserInfoResponseDto> authLogin(
             @RequestBody @Valid AuthLoginRequestDto authLoginRequestDto
     ) {
-        return ResponseDto.ok(authService.authLogin(authLoginRequestDto));
+        return ResponseDto.ok(authLoginService.authLogin(authLoginRequestDto));
     }
 
     @PostMapping("/login/{provider}")
