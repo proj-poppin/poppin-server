@@ -13,6 +13,9 @@ public interface UserQueryUseCase {
     // 유저 이메일로 조회 메서드
     User findUserByEmail(String email);
 
+    // 유저 이메일로 조회 메서드 (Optional)
+    Optional<User> findUserByEmailOptional(String email);
+
     // 유저 존재 확인 메서드
     Boolean existsById(Long userId);
 
@@ -26,7 +29,7 @@ public interface UserQueryUseCase {
     void checkDuplicatedNickname(String nickname);
 
     // 유저 이메일과 권한으로 조회 메서드
-    Optional<User> findUserByEmailAndRole(String email, EUserRole role);
+    User findUserByEmailAndRole(String email, EUserRole role);
 
     // 유저 로그인 시 비밀번호 일치 여부 확인 메서드
     // void checkPasswordMatchForLogin(String inputPassword, String userPassword);

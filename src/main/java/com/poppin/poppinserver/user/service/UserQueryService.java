@@ -24,11 +24,16 @@ public class UserQueryService implements UserQueryUseCase {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
     }
 
-    // User PK로 유저 조회 메서드
+    // 이메일로 유저 조회 메서드
     @Override
     public User findUserByEmail(String email) {
         return userQueryRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+    }
+
+    @Override
+    public Optional<User> findUserByEmailOptional(String email) {
+        return userQueryRepository.findByEmail(email);
     }
 
     // User PK로 유저 존재 여부 조회 메서드
@@ -63,7 +68,7 @@ public class UserQueryService implements UserQueryUseCase {
 
     // 유저 이메일과 권한으로 조회 메서드
     @Override
-    public Optional<User> findUserByEmailAndRole(String email, EUserRole role) {
+    public User findUserByEmailAndRole(String email, EUserRole role) {
         return userQueryRepository.findByEmailAndRole(email, role);
     }
 }
