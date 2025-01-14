@@ -58,7 +58,6 @@ public class PopupService {
     private final BlockedPopupRepository blockedPopupRepository;
     private final HeaderUtil headerUtil;
     private final InterestRepository interestRepository;
-    private final VisitRepository visitRepository;
 
     private final WaitingCommandUseCase waitingCommandUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
@@ -69,42 +68,42 @@ public class PopupService {
     private final VisitQueryUseCase visitQueryUseCase;
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;
 
-    @Transactional
-    public String test() {
-        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
-
-        for (Popup popup : popups) {
-            //현재 운영상태 수정
-            if (popup.getOpenDate().isAfter(LocalDate.now())) { // 오픈 전
-                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
-                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
-                popup.updateOpStatus(String.valueOf(EOperationStatus.NOTYET));
-                log.info("status: " + EOperationStatus.NOTYET.getStatus());
-                log.info("to: " + popup.getOperationStatus().toString());
-            } else if (popup.getCloseDate().isBefore(LocalDate.now())) { // 운영 종료
-                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
-
-                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
-                popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());
-                log.info("status: " + EOperationStatus.TERMINATED.getStatus());
-                log.info("to: " + popup.getOperationStatus().toString());
-
-                List<Visit> visits = visitRepository.findByPopupId(popup.getId());
-                for (Visit visit : visits) visitRepository.delete(visit);
-            } else { // 운영중
-                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
-
-                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
-                popup.updateOpStatus(EOperationStatus.OPERATING.getStatus());
-                log.info("status: " + EOperationStatus.OPERATING.getStatus());
-                log.info("to: " + popup.getOperationStatus().toString());
-
-            }
-        }
-
-        popupRepository.saveAll(popups);
-        return "asdf";
-    }
+//    @Transactional
+//    public String test() {
+//        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
+//
+//        for (Popup popup : popups) {
+//            //현재 운영상태 수정
+//            if (popup.getOpenDate().isAfter(LocalDate.now())) { // 오픈 전
+//                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+//                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+//                popup.updateOpStatus(String.valueOf(EOperationStatus.NOTYET));
+//                log.info("status: " + EOperationStatus.NOTYET.getStatus());
+//                log.info("to: " + popup.getOperationStatus().toString());
+//            } else if (popup.getCloseDate().isBefore(LocalDate.now())) { // 운영 종료
+//                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+//
+//                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+//                popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());
+//                log.info("status: " + EOperationStatus.TERMINATED.getStatus());
+//                log.info("to: " + popup.getOperationStatus().toString());
+//
+//                List<Visit> visits = visitRepository.findByPopupId(popup.getId());
+//                for (Visit visit : visits) visitRepository.delete(visit);
+//            } else { // 운영중
+//                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+//
+//                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+//                popup.updateOpStatus(EOperationStatus.OPERATING.getStatus());
+//                log.info("status: " + EOperationStatus.OPERATING.getStatus());
+//                log.info("to: " + popup.getOperationStatus().toString());
+//
+//            }
+//        }
+//
+//        popupRepository.saveAll(popups);
+//        return "asdf";
+//    }
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
         Long popupId = Long.valueOf(strPopupId);
