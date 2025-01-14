@@ -234,17 +234,7 @@ public class PopupService {
         topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.REOPEN);
 
 
-        VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
-
-        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
-
-        Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
-
-        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
-
-        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked, interestCreatedAt);
-
-
+        PopupStoreDto popupStoreDto = getPopupStoreDto(popup,user.getId());
         PopupWaitingDto popupWaitingDto = PopupWaitingDto.fromEntity(waiting.getId(), popupId);
 
         // DTO 반환
