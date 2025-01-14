@@ -25,4 +25,5 @@ public class PopupQueryService implements PopupQueryUseCase {
     public Boolean existsPopupById(Long popupId) {
         return popupRepository.existsById(popupId);
     }
+
 }

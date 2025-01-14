@@ -32,6 +32,14 @@ public class PopupQueryController implements SwaggerPopupQueryController {
 
     private final AdminPopupService adminPopupService;
 
+    @GetMapping("/test")
+    public ResponseDto<String> test() {
+        log.info("time: " + LocalDateTime.now().toString());
+        popupService.test();
+
+        return ResponseDto.ok("success");
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public ResponseDto<AdminPopupDto> readPopup(@RequestParam("id") Long popupId) {

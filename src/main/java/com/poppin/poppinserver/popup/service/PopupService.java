@@ -6,6 +6,7 @@ import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
@@ -28,6 +29,7 @@ import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,7 @@ public class PopupService {
     private final BlockedPopupRepository blockedPopupRepository;
     private final HeaderUtil headerUtil;
     private final InterestRepository interestRepository;
+    private final VisitRepository visitRepository;
 
     private final WaitingCommandUseCase waitingCommandUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
@@ -64,6 +68,43 @@ public class PopupService {
     private final TokenQueryUseCase tokenQueryUseCase;
     private final VisitQueryUseCase visitQueryUseCase;
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;
+
+    @Transactional
+    public String test() {
+        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
+
+        for (Popup popup : popups) {
+            //현재 운영상태 수정
+            if (popup.getOpenDate().isAfter(LocalDate.now())) { // 오픈 전
+                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+                popup.updateOpStatus(String.valueOf(EOperationStatus.NOTYET));
+                log.info("status: " + EOperationStatus.NOTYET.getStatus());
+                log.info("to: " + popup.getOperationStatus().toString());
+            } else if (popup.getCloseDate().isBefore(LocalDate.now())) { // 운영 종료
+                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+
+                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+                popup.updateOpStatus(EOperationStatus.TERMINATED.getStatus());
+                log.info("status: " + EOperationStatus.TERMINATED.getStatus());
+                log.info("to: " + popup.getOperationStatus().toString());
+
+                List<Visit> visits = visitRepository.findByPopupId(popup.getId());
+                for (Visit visit : visits) visitRepository.delete(visit);
+            } else { // 운영중
+                log.info("getOpenDate: " + popup.getOpenDate().toString() +", getCloseDate : " + popup.getCloseDate().toString() + ", now: " + LocalDate.now().toString());
+
+                log.info("update: " + popup.getName() +", from : " + popup.getOperationStatus().toString());
+                popup.updateOpStatus(EOperationStatus.OPERATING.getStatus());
+                log.info("status: " + EOperationStatus.OPERATING.getStatus());
+                log.info("to: " + popup.getOperationStatus().toString());
+
+            }
+        }
+
+        popupRepository.saveAll(popups);
+        return "asdf";
+    }
 
     public PopupGuestDetailDto readGuestDetail(String strPopupId) {
         Long popupId = Long.valueOf(strPopupId);
