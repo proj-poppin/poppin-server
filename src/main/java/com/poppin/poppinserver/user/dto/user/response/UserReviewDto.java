@@ -1,9 +1,10 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public record UserReviewDto(
         Long reviewId,
         String popupName,

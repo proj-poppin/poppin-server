@@ -2,9 +2,10 @@ package com.poppin.poppinserver.user.dto.user.response;
 
 import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public record UserNotificationResponseDto(
         List<NotificationResponseDto> popups,
         List<NotificationResponseDto> notices
