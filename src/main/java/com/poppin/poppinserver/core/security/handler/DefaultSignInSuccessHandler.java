@@ -28,7 +28,7 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
 
-        userCommandRepository.updateRefreshTokenAndLoginStatus(userDetails.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshToken(userDetails.getId(), jwtTokenDto.refreshToken());
         setSuccessAppResponse(response, jwtTokenDto);
     }
 

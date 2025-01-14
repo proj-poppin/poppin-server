@@ -43,7 +43,7 @@ public class AdminAuthService {
         }
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
 
         return jwtTokenDto;
     }
@@ -58,7 +58,7 @@ public class AdminAuthService {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
-        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
         return jwtTokenDto;
     }
 
