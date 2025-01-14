@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record PreferredDto(
-        Long id,
         Boolean market,
         Boolean display,
         Boolean experience,
@@ -13,7 +12,6 @@ public record PreferredDto(
 ) {
     public static PreferredDto fromEntity(PreferedPopup preferedPopup) {
         return PreferredDto.builder()
-                .id(preferedPopup.getId())
                 .market(preferedPopup.getMarket())
                 .display(preferedPopup.getDisplay())
                 .experience(preferedPopup.getExperience())

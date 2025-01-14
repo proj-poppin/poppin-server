@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record WhoWithDto(
-        Long id,
         Boolean solo,   // 혼자
         Boolean withFriend, // 친구와 함께
         Boolean withFamily, // 가족과 함께
@@ -13,7 +12,6 @@ public record WhoWithDto(
 ) {
     public static WhoWithDto fromEntity(WhoWithPopup whoWithPopup) {
         return WhoWithDto.builder()
-                .id(whoWithPopup.getId())
                 .solo(whoWithPopup.getSolo())
                 .withFriend(whoWithPopup.getWithFriend())
                 .withFamily(whoWithPopup.getWithFamily())
