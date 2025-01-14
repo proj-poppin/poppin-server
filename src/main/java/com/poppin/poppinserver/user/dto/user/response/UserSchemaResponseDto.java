@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
 import com.poppin.poppinserver.user.domain.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 
 /**
@@ -18,7 +19,7 @@ import lombok.Builder;
  *
  * @author wonjun
  */
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public record UserSchemaResponseDto(
         String userImageUrl,
         String email,

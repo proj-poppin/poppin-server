@@ -3,8 +3,10 @@ package com.poppin.poppinserver.user.service;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,13 @@ public class UserQueryService implements UserQueryUseCase {
     @Override
     public User findUserById(Long userId) {
         return userQueryRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+    }
+
+    // User PK로 유저 조회 메서드
+    @Override
+    public User findUserByEmail(String email) {
+        return userQueryRepository.findByEmail(email)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
     }
 
@@ -50,5 +59,11 @@ public class UserQueryService implements UserQueryUseCase {
         if (userQueryRepository.existsByNickname(nickname)) {
             throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
         }
+    }
+
+    // 유저 이메일과 권한으로 조회 메서드
+    @Override
+    public Optional<User> findUserByEmailAndRole(String email, EUserRole role) {
+        return userQueryRepository.findByEmailAndRole(email, role);
     }
 }

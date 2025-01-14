@@ -1,28 +1,15 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
-import com.poppin.poppinserver.alarm.domain.InformAlarm;
-import com.poppin.poppinserver.alarm.domain.InformIsRead;
-import com.poppin.poppinserver.alarm.domain.PopupAlarm;
-import com.poppin.poppinserver.alarm.domain.type.ENotificationCategory;
-import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
-import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
-import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.popup.domain.Waiting;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
-import com.poppin.poppinserver.popup.repository.WaitingRepository;
+import com.poppin.poppinserver.popup.service.BlockedPopupService;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
@@ -40,18 +27,13 @@ import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
 import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
-import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import com.poppin.poppinserver.visit.domain.Visit;
-import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,44 +42,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AuthService {
     private final UserQueryRepository userQueryRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
     private final UserAlarmSettingService userAlarmSettingService;
     private final UserPreferenceSettingService userPreferenceSettingService;
     private final InformIsReadRepository informIsReadRepository;
-    private final PopupAlarmRepository popupAlarmRepository;
-    private final InterestRepository interestRepository;
     private final UserCommandRepository userCommandRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
-    private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final UserQueryUseCase userQueryUseCase;
     private final TokenCommandUseCase tokenCommandUseCase;
-    private final VisitRepository visitRepository;
-    private final WaitingRepository waitingRepository;
 
-    // 유저 이메일 중복 확인 메서드
-    private void checkDuplicatedEmail(String email) {
-        userQueryRepository.findByEmail(email)
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
-                });
-    }
+    // 차단
+    private final BlockUserService blockUserService;
+    private final BlockedPopupService blockPopupService;
 
-    // 유저 비밀번호 및 비밀번호 확인 일치 여부 검증 메서드
-    private void checkPasswordMatch(String password, String passwordConfirm) {
-        if (!password.equals(passwordConfirm)) {
-            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
-    }
-
-    // 유저 닉네임 중복 확인 메서드
-    private void checkDuplicatedNickname(String nickname) {
-        userQueryRepository.findByNickname(nickname)
-                .ifPresent(user -> {
-                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
-                });
-    }
+    // 유저의 활동 내역
+    private final UserActivityService userActivityService;
 
 //    @Transactional
 //    public UserInfoResponseDto socialSignUp(String accessToken,
@@ -165,8 +124,8 @@ public class AuthService {
         String fcmToken = fcmTokenRequestDto.fcmToken();
 
         Long userId = jwtUtil.getUserIdFromToken(token);
-        User user = userQueryRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+        User user = userQueryUseCase.findUserById(userId);
+
         if (!user.getRefreshToken().equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
@@ -176,7 +135,7 @@ public class AuthService {
 
         // FCM 토큰 검증
         tokenCommandUseCase.refreshToken(user.getId(), fcmToken);
-        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
 
         boolean isPreferenceSettingCreated = userPreferenceSettingService
                 .readUserPreferenceSettingCreated(user.getId());
@@ -185,105 +144,30 @@ public class AuthService {
         );
 
         // 유저가 읽은 공지사항 알람 리스트 조회
-        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(
-                fcmToken).stream().map(
-                Object::toString
-        ).toList();
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(fcmToken)
+                .stream()
+                .map(Object::toString)
+                .toList();
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
-        String informLastCheckedTime = informIsReadRepository.findLastReadTimeByFcmToken(
-                fcmToken);
+        String informLastCheckedTime = informIsReadRepository
+                .findLastReadTimeByFcmToken(fcmToken);
 
-        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto.builder()
-                .lastCheck(informLastCheckedTime)
-                .checkedNoticeIds(checkedNoticeIds)
-                .build();
+        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto
+                .of(informLastCheckedTime, checkedNoticeIds);
 
-        // TODO: 여기부터 수정 필요
-        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
-                null, null, null, null,
-                null, null, null, null, null
-        );
-
-        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(fcmToken);
-        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(fcmToken);
-
-        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
-                popupAlarm -> NotificationResponseDto.fromProperties(
-                        String.valueOf(popupAlarm.getId()), String.valueOf(user.getId()), null,
-                        String.valueOf(ENotificationCategory.POPUP),
-                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
-                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
-                        destinationResponseDto
-                )
-        ).toList();
-
-        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
-                .map(informIsRead -> {
-                    InformAlarm informAlarm = informIsRead.getInformAlarm();
-                    Boolean isRead = informIsRead.getIsRead();
-
-                    return NotificationResponseDto.fromProperties(
-                            String.valueOf(informAlarm.getId()),
-                            String.valueOf(user.getId()),
-                            null,
-                            String.valueOf(ENotificationCategory.NOTICE),
-                            informAlarm.getTitle(),
-                            informAlarm.getBody(),
-                            null,
-                            isRead,
-                            String.valueOf(informAlarm.getCreatedAt()),
-                            null,
-                            String.valueOf(informAlarm.getId()),
-                            destinationResponseDto
-                    );
-                }).toList();
-
-        UserNotificationResponseDto userNotificationResponseDto = UserNotificationResponseDto.fromDtoList(
-                popupNotificationResponseDtoList,
-                noticeNotificationResponseDtoList
-        );
-
-        List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
-
-        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
-                PopupScrapDto::fromInterest
-        ).toList();
-
-        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(userId);
-
-        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
-                .map(
-                        v -> VisitDto.fromEntity(
-                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
-                        )
-                ).toList();
-
-        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(userId);
-        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
-                .map(
-                        pw -> PopupWaitingDto.fromEntity(
-                                pw.getId(), pw.getPopup().getId()
-                        )
-                ).toList();
-
-        PopupActivityResponseDto popupActivityResponseDto = PopupActivityResponseDto
-                .fromProperties(popupScrapDtoList, userVisitedPopupDtoList, userWaitingPopupDtoList);
+        UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
+                user, fcmToken);
+        PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(user);
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
                 popupActivityResponseDto,
                 userNotificationResponseDto
         );
 
-        List<String> blockedPopups = blockedPopupRepository.findAllByUserId(user).stream()
-                .map(blockedPopup -> blockedPopup.getId().toString())
-                .toList();
-        List<String> blockedUsers = blockedUserQueryRepository.findAllByUserId(user).stream()
-                .map(blockedUser -> blockedUser.getId().toString())
-                .toList();
+        List<String> blockedPopups = blockPopupService.findBlockedPopupList(user);
+        List<String> blockedUsers = blockUserService.findBlockedUserList(user);
         UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
-
-        // TODO: 여기까지 수정 필요
 
         return UserInfoResponseDto.fromUserEntity(
                 user,

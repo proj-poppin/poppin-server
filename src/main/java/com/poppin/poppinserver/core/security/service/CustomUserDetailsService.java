@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserByUserId(Long userId) {
-        User user = userQueryRepository.findByIdAndIsLoginAndRefreshTokenNotNull(userId, true)
+        User user = userQueryRepository.findByIdAndRefreshTokenNotNull(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
         return CustomUserDetails.create(user);
     }

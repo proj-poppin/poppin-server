@@ -3,9 +3,10 @@ package com.poppin.poppinserver.user.dto.user.response;
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public record UserInfoResponseDto(
         UserNotificationSettingResponseDto userNotificationSetting,
         UserSchemaResponseDto user,

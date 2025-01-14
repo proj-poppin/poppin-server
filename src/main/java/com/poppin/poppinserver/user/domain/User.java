@@ -9,16 +9,27 @@ import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -45,9 +56,6 @@ public class User {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "is_login", columnDefinition = "TINYINT(1)", nullable = false)
-    private Boolean isLogin;
 
     @Column(name = "agreed_to_privacy_policy", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean agreedToPrivacyPolicy;
@@ -116,7 +124,6 @@ public class User {
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
         this.agreedToServiceTerms = agreedToServiceTerms;
         this.createdAt = LocalDateTime.now();
-        this.isLogin = false;
         this.refreshToken = null;
         this.deletedAt = null;
         this.isDeleted = false;
@@ -153,14 +160,14 @@ public class User {
                 .build();
     }
 
+    // TODO: LEGACY CODE
     public void register(String nickname) {
         this.nickname = nickname;
         this.role = EUserRole.USER;
     }
 
-    public void updateRefreshTokenAndLoginStatus(String refreshToken) {
+    public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-        this.isLogin = true;
     }
 
     public void updatePassword(String password) {

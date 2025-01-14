@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -45,6 +46,7 @@ public class AlarmSetting {
     private Boolean changeInfoYn; // 관심 팝업 정보 변경 알림 on off
 
 
+    @Builder(access = AccessLevel.PRIVATE)
     public AlarmSetting(String token,
                         Boolean pushYn,
                         Boolean pushNightYn,
@@ -59,6 +61,18 @@ public class AlarmSetting {
         this.openYn = openYn;
         this.magamYn = magamYn;
         this.changeInfoYn = changeInfoYn;
+    }
+
+    public static AlarmSetting createAlarmSetting(String token) {
+        return AlarmSetting.builder()
+                .token(token)
+                .pushYn(true)
+                .pushNightYn(true)
+                .hoogiYn(true)
+                .openYn(true)
+                .magamYn(true)
+                .changeInfoYn(true)
+                .build();
     }
 
 }

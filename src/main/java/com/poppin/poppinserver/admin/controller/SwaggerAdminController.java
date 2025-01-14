@@ -3,6 +3,8 @@ package com.poppin.poppinserver.admin.controller;
 import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationDetailResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationListResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.core.constant.Constant;
@@ -15,8 +17,6 @@ import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListRespo
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
-import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -63,7 +63,7 @@ public interface SwaggerAdminController {
 
     @Operation(summary = "회원 목록 조회", description = "관리자가 회원 목록을 조회합니다.")
     @GetMapping("/users")
-    ResponseDto<UserListDto> readUsers(
+    ResponseDto<UserAdministrationListResponseDto> readUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "44") int size,
             @RequestParam(value = "care") Boolean care
@@ -71,11 +71,11 @@ public interface SwaggerAdminController {
 
     @Operation(summary = "회원 상세 조회", description = "특정 회원의 상세 정보를 조회합니다.")
     @GetMapping("/users/{userId}")
-    ResponseDto<UserAdministrationDetailDto> readUserDetail(@PathVariable Long userId);
+    ResponseDto<UserAdministrationDetailResponseDto> readUserDetail(@PathVariable Long userId);
 
     @Operation(summary = "회원 검색", description = "특정 조건을 사용하여 회원을 검색합니다.")
     @GetMapping("/users/search")
-    ResponseDto<UserListDto> searchUsers(@RequestParam("text") String text);
+    ResponseDto<UserAdministrationListResponseDto> searchUsers(@RequestParam("text") String text);
 
     @Operation(summary = "회원 후기 조회", description = "특정 회원이 작성한 후기 목록을 조회합니다.")
     @GetMapping("/users/{userId}/reviews")

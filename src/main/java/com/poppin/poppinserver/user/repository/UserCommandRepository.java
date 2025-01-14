@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserCommandRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE User u SET u.refreshToken = :refreshToken, u.isLogin = :loginStatus WHERE u.id = :id")
-    void updateRefreshTokenAndLoginStatus(Long id, String refreshToken, boolean loginStatus);
+    @Query("UPDATE User u SET u.refreshToken = :refreshToken WHERE u.id = :id")
+    void updateRefreshToken(Long id, String refreshToken);
 }

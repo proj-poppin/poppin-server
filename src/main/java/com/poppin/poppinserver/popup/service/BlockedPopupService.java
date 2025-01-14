@@ -8,6 +8,7 @@ import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,4 +42,12 @@ public class BlockedPopupService {
 
         return BlockedPopupDto.fromEntity(blockedPopup);
     } // 부트스트랩
+
+    // 차단한 팝업 ID 리스트 조회
+    public List<String> findBlockedPopupList(User user) {
+        return blockedPopupRepository.findAllByUserId(user)
+                .stream()
+                .map(blockedPopup -> blockedPopup.getId().toString())
+                .toList();
+    }
 }

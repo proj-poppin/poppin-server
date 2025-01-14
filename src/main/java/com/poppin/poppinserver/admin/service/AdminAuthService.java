@@ -9,7 +9,8 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
-import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminAuthService {
-    private final UserQueryRepository userQueryRepository;
+    private final UserQueryUseCase userQueryUseCase;
+    private final UserCommandUseCase userCommandUseCase;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final UserCommandRepository userCommandRepository;
@@ -32,18 +34,21 @@ public class AdminAuthService {
         String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
         String email = decoded[0];
         String password = decoded[1];
-        User user = userQueryRepository.findByEmail(email)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        User user = userQueryUseCase.findUserByEmail(email);
 
         if (!user.getRole().equals(EUserRole.ADMIN)) {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
+
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(ErrorCode.INVALID_LOGIN);
         }
 
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        // user.updateRefreshToken(jwtTokenDto.refreshToken());
+        // userCommandRepository.save(user);
+        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
 
         return jwtTokenDto;
     }
@@ -52,13 +57,14 @@ public class AdminAuthService {
     public JwtTokenDto refresh(@NotNull String refreshToken) {
         String token = refineToken(refreshToken);
         Long userId = jwtUtil.getUserIdFromToken(token);
-        User user = userQueryRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+        User user = userQueryUseCase.findUserById(userId);
+
         if (!user.getRefreshToken().equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
-        userCommandRepository.updateRefreshTokenAndLoginStatus(user.getId(), jwtTokenDto.refreshToken(), true);
+        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
         return jwtTokenDto;
     }
 

@@ -1,9 +1,10 @@
 package com.poppin.poppinserver.user.dto.user.response;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
+import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public record UserNotificationSettingResponseDto(
         Boolean appPush,    // 앱 푸시 알림 수신 자체에 대한 설정
         Boolean nightPush,  // 야간 푸쉬알림

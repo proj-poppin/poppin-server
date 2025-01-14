@@ -36,8 +36,8 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.role = :role")
     Optional<User> findByEmailAndRole(String email, EUserRole role);
 
-    @Query("SELECT u FROM User u WHERE u.id = :id AND u.isLogin = :isLogin AND u.refreshToken IS NOT NULL")
-    Optional<User> findByIdAndIsLoginAndRefreshTokenNotNull(Long id, boolean isLogin);
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.refreshToken IS NOT NULL")
+    Optional<User> findByIdAndRefreshTokenNotNull(Long id);
 
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NOT NULL AND u.isDeleted = true")
     List<User> findAllByDeletedAtIsNotNullAndIsDeleted();
@@ -52,6 +52,6 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     Page<User> findByRequiresSpecialCareOrderByNicknameAsc(boolean requiresSpecialCare, Pageable pageable);
 
     boolean existsByEmail(@Param("email") String email);
-    
+
     boolean existsByNickname(@Param("nickname") String nickname);
 }

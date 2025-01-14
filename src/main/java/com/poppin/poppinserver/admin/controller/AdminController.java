@@ -3,6 +3,8 @@ package com.poppin.poppinserver.admin.controller;
 import com.poppin.poppinserver.admin.dto.request.AdminFaqRequestDto;
 import com.poppin.poppinserver.admin.dto.response.AdminFaqResponseDto;
 import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationDetailResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationListResponseDto;
 import com.poppin.poppinserver.admin.service.AdminAuthService;
 import com.poppin.poppinserver.admin.service.AdminFAQService;
 import com.poppin.poppinserver.admin.service.AdminReportService;
@@ -22,8 +24,6 @@ import com.poppin.poppinserver.report.dto.report.response.ReportedPopupListRespo
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewInfoDto;
 import com.poppin.poppinserver.report.dto.report.response.ReportedReviewListResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
-import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -91,21 +91,22 @@ public class AdminController implements SwaggerAdminController {
 
     /* 회원 관리 목록 조회 */
     @GetMapping("/users")
-    public ResponseDto<UserListDto> readUsers(@RequestParam(required = false, defaultValue = "0") int page,
-                                              @RequestParam(required = false, defaultValue = "44") int size,
-                                              @RequestParam(value = "care") Boolean care) {
+    public ResponseDto<UserAdministrationListResponseDto> readUsers(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "44") int size,
+            @RequestParam(value = "care") Boolean care) {
         return ResponseDto.ok(adminService.readUsers(page, size, care));
     }
 
     /* 회원 상세 조회 */
     @GetMapping("/users/{userId}")
-    public ResponseDto<UserAdministrationDetailDto> readUserDetail(@PathVariable Long userId) {
+    public ResponseDto<UserAdministrationDetailResponseDto> readUserDetail(@PathVariable Long userId) {
         return ResponseDto.ok(adminService.readUserDetail(userId));
     }
 
     /* 회원 검색 */
     @GetMapping("/users/search")
-    public ResponseDto<UserListDto> searchUsers(@RequestParam("text") String text) {
+    public ResponseDto<UserAdministrationListResponseDto> searchUsers(@RequestParam("text") String text) {
         return ResponseDto.ok(adminService.searchUsers(text));
     }
 
