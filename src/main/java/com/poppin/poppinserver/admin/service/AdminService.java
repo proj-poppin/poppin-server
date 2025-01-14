@@ -1,6 +1,9 @@
 package com.poppin.poppinserver.admin.service;
 
 import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationDetailResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationListResponseDto;
+import com.poppin.poppinserver.admin.dto.response.UserAdministrationResponseDto;
 import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.InformAlarmImage;
@@ -19,9 +22,6 @@ import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDetailDto;
-import com.poppin.poppinserver.user.dto.user.response.UserAdministrationDto;
-import com.poppin.poppinserver.user.dto.user.response.UserListDto;
 import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
@@ -56,7 +56,7 @@ public class AdminService {
 
     private final VisitQueryUseCase visitQueryUseCase;
 
-    public UserListDto readUsers(int page, int size, boolean care) {
+    public UserAdministrationListResponseDto readUsers(int page, int size, boolean care) {
         Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage;
         if (care) {
@@ -65,8 +65,8 @@ public class AdminService {
             userPage = userQueryRepository.findAllByOrderByNicknameAsc(pageable);
         }
 
-        List<UserAdministrationDto> userAdministrationDtoList = userPage.getContent().stream()
-                .map(user -> UserAdministrationDto.builder()
+        List<UserAdministrationResponseDto> userAdministrationResponseDtoList = userPage.getContent().stream()
+                .map(user -> UserAdministrationResponseDto.builder()
                         .id(user.getId())
                         .email(user.getEmail())
                         .nickname(user.getNickname())
@@ -75,29 +75,29 @@ public class AdminService {
                 .collect(Collectors.toList());
         Long userCnt = userPage.getTotalElements();
 
-        return UserListDto.builder()
-                .userList(userAdministrationDtoList)
+        return UserAdministrationListResponseDto.builder()
+                .userList(userAdministrationResponseDtoList)
                 .userCnt(userCnt)
                 .build();
     }
 
-    public UserAdministrationDetailDto readUserDetail(Long userId) {
+    public UserAdministrationDetailResponseDto readUserDetail(Long userId) {
         User user = userQueryRepository.findByUserId(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        UserAdministrationDetailDto userAdministrationDetailDto;
+        UserAdministrationDetailResponseDto userAdministrationDetailResponseDto;
 
         if (user.getIsDeleted() && user.getDeletedAt() != null) {
-            userAdministrationDetailDto = createDeletedUserDetailDto(user);
+            userAdministrationDetailResponseDto = createDeletedUserDetailDto(user);
         } else {
             Long hiddenReviewCount = reviewRepository.countByUserIdAndIsVisibleFalse(userId);
-            userAdministrationDetailDto = createActiveUserDetailDto(user, hiddenReviewCount);
+            userAdministrationDetailResponseDto = createActiveUserDetailDto(user, hiddenReviewCount);
         }
 
-        return userAdministrationDetailDto;
+        return userAdministrationDetailResponseDto;
     }
 
-    private UserAdministrationDetailDto createActiveUserDetailDto(User user, Long hiddenReviewCount) {
-        return UserAdministrationDetailDto.builder()
+    private UserAdministrationDetailResponseDto createActiveUserDetailDto(User user, Long hiddenReviewCount) {
+        return UserAdministrationDetailResponseDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .userImageUrl(user.getProfileImageUrl())
@@ -108,8 +108,8 @@ public class AdminService {
                 .build();
     }
 
-    private UserAdministrationDetailDto createDeletedUserDetailDto(User user) {
-        return UserAdministrationDetailDto.builder()
+    private UserAdministrationDetailResponseDto createDeletedUserDetailDto(User user) {
+        return UserAdministrationDetailResponseDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .userImageUrl(null)
@@ -120,20 +120,20 @@ public class AdminService {
                 .build();
     }
 
-    public UserListDto searchUsers(String text) {
+    public UserAdministrationListResponseDto searchUsers(String text) {
         List<User> userList = userQueryRepository.findByNicknameContainingOrEmailContainingOrderByNickname(text, text);
-        List<UserAdministrationDto> userAdministrationDtoList = new ArrayList<>();
+        List<UserAdministrationResponseDto> userAdministrationResponseDtoList = new ArrayList<>();
         for (User user : userList) {
-            userAdministrationDtoList.add(UserAdministrationDto.builder()
+            userAdministrationResponseDtoList.add(UserAdministrationResponseDto.builder()
                     .id(user.getId())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
                     .requiresSpecialCare(user.getRequiresSpecialCare())
                     .build());
         }
-        Long userCnt = (long) userAdministrationDtoList.size();
-        return UserListDto.builder()
-                .userList(userAdministrationDtoList)
+        Long userCnt = (long) userAdministrationResponseDtoList.size();
+        return UserAdministrationListResponseDto.builder()
+                .userList(userAdministrationResponseDtoList)
                 .userCnt(userCnt)
                 .build();
     }

@@ -1,9 +1,9 @@
-package com.poppin.poppinserver.user.dto.user.response;
+package com.poppin.poppinserver.admin.dto.response;
 
 import lombok.Builder;
 
 @Builder
-public record UserAdministrationDto(
+public record UserAdministrationResponseDto(
         Long id,
         String email,
         String nickname,

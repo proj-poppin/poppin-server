@@ -1,10 +1,10 @@
-package com.poppin.poppinserver.user.dto.user.response;
+package com.poppin.poppinserver.admin.dto.response;
 
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import lombok.Builder;
 
 @Builder
-public record UserAdministrationDetailDto(
+public record UserAdministrationDetailResponseDto(
         Long id,
         String userImageUrl,
         String email,
