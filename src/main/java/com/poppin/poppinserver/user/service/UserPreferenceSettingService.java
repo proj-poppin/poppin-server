@@ -90,7 +90,7 @@ public class UserPreferenceSettingService {
                 createUserTasteDto.taste().kpop(),
                 createUserTasteDto.taste().alcohol(),
                 createUserTasteDto.taste().animalPlant(),
-                null);
+                false);
         tastePopupRepository.save(tastePopup);
 
         WhoWithPopup whoWithPopup = user.getWhoWithPopup();
@@ -168,6 +168,7 @@ public class UserPreferenceSettingService {
                 .kpop(false)
                 .alcohol(false)
                 .animalPlant(false)
+                .etc(false)
                 .build();
     }
 
