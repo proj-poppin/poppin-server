@@ -54,6 +54,7 @@ public enum ErrorCode {
     TOKEN_GENERATION_ERROR("40107", HttpStatus.UNAUTHORIZED, "토큰 생성에 실패하였습니다."),
     TOKEN_UNKNOWN_ERROR("40108", HttpStatus.UNAUTHORIZED, "알 수 없는 토큰입니다."),
     EMPTY_AUTHENTICATION("40109", HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."),
+    INVALID_AUTHORIZATION_HEADER("40110", HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 헤더입니다."),
 
 
     // Access Denied Error

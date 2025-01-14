@@ -14,12 +14,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserQueryRepository extends JpaRepository<User, Long> {
+    // 회원 탈퇴하지 않은 유저 전용 쿼리
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isDeleted = false")
     Optional<User> findByEmail(String email);
 
     // 회원 탈퇴하지 않은 유저 전용 쿼리
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false AND u.deletedAt IS NULL")
     Optional<User> findById(Long id);
+
+    // 회원 탈퇴하지 않은 유저 전용 쿼리
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.role = :role AND u.isDeleted = false")
+    User findByEmailAndRole(String email, EUserRole role);
 
     // 탈퇴 유저 포함 검색
     @Query("SELECT u FROM User u WHERE u.id = :id")
@@ -32,9 +37,6 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.provider = :eLoginProvider")
     Optional<User> findByEmailAndELoginProvider(String email, ELoginProvider eLoginProvider);
-
-    @Query("SELECT u FROM User u WHERE u.email = :email AND u.role = :role")
-    Optional<User> findByEmailAndRole(String email, EUserRole role);
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.refreshToken IS NOT NULL")
     Optional<User> findByIdAndRefreshTokenNotNull(Long id);

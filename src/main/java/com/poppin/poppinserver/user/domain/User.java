@@ -8,7 +8,6 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
-import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -148,17 +147,17 @@ public class User {
 //                .build();
 //    }
 
-    public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword,
-                                     ELoginProvider eLoginProvider) {
-        return User.builder()
-                .email(oAuth2UserInfo.email())
-                .password(encodedPassword)
-                .eLoginProvider(eLoginProvider)
-                .role(EUserRole.GUEST)
-                .agreedToPrivacyPolicy(true)
-                .agreedToServiceTerms(true)
-                .build();
-    }
+//    public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword,
+//                                     ELoginProvider eLoginProvider) {
+//        return User.builder()
+//                .email(oAuth2UserInfo.email())
+//                .password(encodedPassword)
+//                .eLoginProvider(eLoginProvider)
+//                .role(EUserRole.GUEST)
+//                .agreedToPrivacyPolicy(true)
+//                .agreedToServiceTerms(true)
+//                .build();
+//    }
 
     // TODO: LEGACY CODE
     public void register(String nickname) {
