@@ -205,13 +205,14 @@ public class PopupService {
     } // 팝업 상세조회
 
     // 재오픈 신청
-    public PopupWaitingDto waiting(Long userId, String SpopupId) throws FirebaseMessagingException {
+    public PopupReopenDto waiting(Long userId, String SpopupId) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(SpopupId);
 
         User user = userQueryUseCase.findUserById(userId);
 
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+
 
         if (!popup.getOperationStatus().equals("TERMINATED")){ // 운영 종료 상태인지 확인
             throw new CommonException(ErrorCode.SERVER_ERROR);
@@ -232,8 +233,22 @@ public class PopupService {
         log.info("재오픈 신청 시 FCM TOPIC 등록");
         topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.REOPEN);
 
+
+        VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
+
+        Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+
+        Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+
+        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+
+        PopupStoreDto popupStoreDto = PopupStoreDto.fromEntity(popup, visitorDataDto, visitorCnt, idBlocked, interestCreatedAt);
+
+
+        PopupWaitingDto popupWaitingDto = PopupWaitingDto.fromEntity(waiting.getId(), popupId);
+
         // DTO 반환
-        return PopupWaitingDto.fromEntity(waiting.getId(), popupId);
+        return PopupReopenDto.fromEntity(popupStoreDto, popupWaitingDto);
 
     }
 
