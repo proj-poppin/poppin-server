@@ -9,4 +9,5 @@ public interface UserCommandUseCase {
     User createUserByDefaultSignUp(AuthSignUpRequestDto authSignUpRequestDto);
 
     User createUserBySocialSignUp(AuthSignUpRequestDto authSignUpRequestDto);
+
 }

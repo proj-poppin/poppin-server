@@ -6,6 +6,7 @@ import com.poppin.poppinserver.user.domain.BlockedUser;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,5 +41,13 @@ public class BlockUserService {
                 .blockedUserId(blockedUser)
                 .build();
         blockedUserQueryRepository.save(createBlockedUser);
+    }
+
+    // 차단한 유저 ID 리스트 조회
+    public List<String> findBlockedUserList(User user) {
+        return blockedUserQueryRepository.findAllByUserId(user)
+                .stream()
+                .map(blockedUser -> blockedUser.getId().toString())
+                .toList();
     }
 }

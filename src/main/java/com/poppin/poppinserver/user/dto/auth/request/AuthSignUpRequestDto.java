@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-// 프론트 단에서 검증, 서버 단 5종 회원가입 통합으로 인해 검증 불가
+// 프론트 단에서 검증, 서버 단 5종 회원가입 통합으로 인해 DTO단 검증 불가
 public record AuthSignUpRequestDto(
         // 이메일
         // @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "올바른 이메일 형식이 아닙니다.")

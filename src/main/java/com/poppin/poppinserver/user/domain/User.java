@@ -57,9 +57,6 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-//    @Column(name = "is_login", columnDefinition = "TINYINT(1)", nullable = false)
-//    private Boolean isLogin;
-
     @Column(name = "agreed_to_privacy_policy", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean agreedToPrivacyPolicy;
 
@@ -127,7 +124,6 @@ public class User {
         this.agreedToPrivacyPolicy = agreedToPrivacyPolicy;
         this.agreedToServiceTerms = agreedToServiceTerms;
         this.createdAt = LocalDateTime.now();
-        //this.isLogin = false;
         this.refreshToken = null;
         this.deletedAt = null;
         this.isDeleted = false;
@@ -172,7 +168,6 @@ public class User {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-        // this.isLogin = true;
     }
 
     public void updatePassword(String password) {

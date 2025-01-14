@@ -1,0 +1,135 @@
+package com.poppin.poppinserver.user.service;
+
+import com.poppin.poppinserver.alarm.domain.InformAlarm;
+import com.poppin.poppinserver.alarm.domain.InformIsRead;
+import com.poppin.poppinserver.alarm.domain.PopupAlarm;
+import com.poppin.poppinserver.alarm.domain.type.ENotificationCategory;
+import com.poppin.poppinserver.alarm.dto.DestinationResponseDto;
+import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
+import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
+import com.poppin.poppinserver.interest.domain.Interest;
+import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.domain.Waiting;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
+import com.poppin.poppinserver.popup.repository.WaitingRepository;
+import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+/**
+ * 유저의 알람 내역, 방문 팝업, 관심 팝업, 오픈 대기 팝업 정보를 조회
+ */
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserActivityService {
+    private final PopupAlarmRepository popupAlarmRepository;
+    private final InformIsReadRepository informIsReadRepository;
+    private final InterestRepository interestRepository;
+    private final VisitRepository visitRepository;
+    private final WaitingRepository waitingRepository;
+
+    public PopupActivityResponseDto getPopupActivity(User user) {
+        // 유저가 등록한 관심 팝업 조회
+        List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
+        List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
+                PopupScrapDto::fromInterest
+        ).toList();
+
+        // 유저가 방문한 팝업 조회
+        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(user.getId());
+        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
+                .map(
+                        v -> VisitDto.fromEntity(
+                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
+                        )
+                ).toList();
+
+        // 유저가 등록한 오픈 대기 중인 팝업 조회
+        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(user.getId());
+        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
+                .map(
+                        pw -> PopupWaitingDto.fromEntity(
+                                pw.getId(), pw.getPopup().getId()
+                        )
+                ).toList();
+
+        return PopupActivityResponseDto.fromProperties(
+                popupScrapDtoList,
+                userVisitedPopupDtoList,
+                userWaitingPopupDtoList
+        );
+    }
+
+    public UserNotificationResponseDto getUserNotificationActivity(User user, String fcmToken) {
+        DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
+                null, null, null, null,
+                null, null, null, null, null
+        );
+
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(fcmToken);
+        List<InformIsRead> userInformIsRead = informIsReadRepository.findAllByFcmToken(fcmToken);
+
+        // 유저의 팝업 관련 알람 조회
+        List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
+                popupAlarm -> NotificationResponseDto.fromProperties(
+                        String.valueOf(popupAlarm.getId()), String.valueOf(user.getId()), null,
+                        String.valueOf(ENotificationCategory.POPUP),
+                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopupId()), null,
+                        destinationResponseDto
+                )
+        ).toList();
+
+        // 유저의 공지 관련 알람 조회
+        List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformIsRead.stream()
+                .map(informIsRead -> {
+                    InformAlarm informAlarm = informIsRead.getInformAlarm();
+                    Boolean isRead = informIsRead.getIsRead();
+
+                    return NotificationResponseDto.fromProperties(
+                            String.valueOf(informAlarm.getId()),
+                            String.valueOf(user.getId()),
+                            null,
+                            String.valueOf(ENotificationCategory.NOTICE),
+                            informAlarm.getTitle(),
+                            informAlarm.getBody(),
+                            null,
+                            isRead,
+                            String.valueOf(informAlarm.getCreatedAt()),
+                            null,
+                            String.valueOf(informAlarm.getId()),
+                            destinationResponseDto
+                    );
+                }).toList();
+
+        return UserNotificationResponseDto.fromDtoList(
+                popupNotificationResponseDtoList,
+                noticeNotificationResponseDtoList
+        );
+    }
+
+    public UserNoticeResponseDto getUserNotificationStatus(String fcmToken) {
+        // 유저가 읽은 공지사항 알람 리스트 조회
+        List<String> checkedNoticeIds = informIsReadRepository.findReadInformAlarmIdsByFcmToken(fcmToken)
+                .stream()
+                .map(Object::toString)
+                .toList();
+
+        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
+        String informLastCheckedTime = informIsReadRepository
+                .findLastReadTimeByFcmToken(fcmToken);
+
+        return UserNoticeResponseDto.of(informLastCheckedTime, checkedNoticeIds);
+    }
+}
