@@ -13,8 +13,12 @@ import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.popup.domain.Waiting;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
+import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
 import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.WaitingRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
@@ -28,7 +32,11 @@ import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import com.poppin.poppinserver.visit.domain.Visit;
+import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
+import com.poppin.poppinserver.visit.repository.VisitRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,40 +57,23 @@ public class AuthSignUpService {
     private final InterestRepository interestRepository;
     private final BlockedPopupRepository blockedPopupRepository;
     private final BlockedUserQueryRepository blockedUserQueryRepository;
-
     private final TokenCommandUseCase tokenCommandUseCase;
-
-    // 유저 이메일 중복 확인 메서드
-//    private void checkDuplicatedEmail(String email) {
-//        userQueryRepository.findByEmail(email)
-//                .ifPresent(user -> {
-//                    throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
-//                });
-//    }
-
-    // 유저 비밀번호 및 비밀번호 확인 일치 여부 검증 메서드
-//    private void checkPasswordMatch(String password, String passwordConfirm) {
-//        if (!password.equals(passwordConfirm)) {
-//            throw new CommonException(ErrorCode.PASSWORD_NOT_MATCH);
-//        }
-//    }
-
-    // 유저 닉네임 중복 확인 메서드
-//    private void checkDuplicatedNickname(String nickname) {
-//        userQueryRepository.findByNickname(nickname)
-//                .ifPresent(user -> {
-//                    throw new CommonException(ErrorCode.DUPLICATED_NICKNAME);
-//                });
-//    }
+    private final VisitRepository visitRepository;
+    private final WaitingRepository waitingRepository;
 
     public UserInfoResponseDto handleSignUp(AuthSignUpRequestDto authSignUpRequestDto) {
-        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.password().isEmpty()) {
-            // 소셜 로그인 로직 처리
-            return socialSignUp(authSignUpRequestDto);
-        } else {
-            // 자체 로그인 로직 처리
-            return defaultSignUp(authSignUpRequestDto);
-        }
+//        if (authSignUpRequestDto.password() == null || authSignUpRequestDto.password().isEmpty()) {
+//            // 소셜 로그인 로직 처리
+//            return socialSignUp(authSignUpRequestDto);
+//        } else {
+//            // 자체 로그인 로직 처리
+//            return defaultSignUp(authSignUpRequestDto);
+//        }
+
+        return Optional.ofNullable(authSignUpRequestDto.password())
+                .filter(password -> !password.isEmpty())
+                .map(password -> defaultSignUp(authSignUpRequestDto))
+                .orElseGet(() -> socialSignUp(authSignUpRequestDto));
     }
 
     // 자체 회원가입
@@ -98,13 +89,6 @@ public class AuthSignUpService {
 
         // 유저 생성, 패스워드 암호화
         User newUser = userCommandUseCase.createUserByDefaultSignUp(authSignUpRequestDto);
-//        User newUser = userQueryRepository.save(
-//                User.toUserEntity(
-//                        authSignUpRequestDto,
-//                        bCryptPasswordEncoder.encode(authSignUpRequestDto.password()),
-//                        ELoginProvider.DEFAULT
-//                )
-//        );
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
@@ -119,7 +103,9 @@ public class AuthSignUpService {
         newUser.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
         //userCommandUseCase.updateRefreshTokenAndLoginStatus(newUser.getId(), jwtToken.refreshToken(), true);
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+        boolean isPreferenceSettingCreated = userPreferenceSettingService
+                .readUserPreferenceSettingCreated(newUser.getId());
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreference(
                 newUser.getId()
         );
 
@@ -189,8 +175,28 @@ public class AuthSignUpService {
                 PopupScrapDto::fromInterest
         ).toList();
 
+        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(newUser.getId());
+
+        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
+                .map(
+                        v -> VisitDto.fromEntity(
+                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
+                        )
+                ).toList();
+
+        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(newUser.getId());
+        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
+                .map(
+                        pw -> PopupWaitingDto.fromEntity(
+                                pw.getId(), pw.getPopup().getId()
+                        )
+                ).toList();
+
+        PopupActivityResponseDto popupActivityResponseDto = PopupActivityResponseDto
+                .fromProperties(popupScrapDtoList, userVisitedPopupDtoList, userWaitingPopupDtoList);
+
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
+                popupActivityResponseDto,
                 userNotificationResponseDto
         );
 
@@ -211,7 +217,8 @@ public class AuthSignUpService {
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
                 userActivities,
-                userRelationDto
+                userRelationDto,
+                isPreferenceSettingCreated
         );
     }
 
@@ -228,12 +235,6 @@ public class AuthSignUpService {
 
         // 유저 생성, 패스워드 암호화
         User newUser = userCommandUseCase.createUserBySocialSignUp(authSignUpRequestDto);
-//        userQueryRepository.save(
-//                User.toUserEntity(
-//                        authSignUpRequestDto, bCryptPasswordEncoder.encode(PasswordUtil.generateRandomPassword()),
-//                        provider
-//                )
-//        );
 
         // 알람 setting 객체 반환
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(authSignUpRequestDto.fcmToken());
@@ -248,7 +249,9 @@ public class AuthSignUpService {
         // 리프레시 토큰 업데이트 및 로그인 상태 변경
         newUser.updateRefreshTokenAndLoginStatus(jwtToken.refreshToken());
 
-        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
+        boolean isPreferenceSettingCreated = userPreferenceSettingService
+                .readUserPreferenceSettingCreated(newUser.getId());
+        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreference(
                 newUser.getId()
         );
 
@@ -318,8 +321,28 @@ public class AuthSignUpService {
                 PopupScrapDto::fromInterest
         ).toList();
 
+        List<Visit> userVisitedPopupList = visitRepository.findAllByUserId(newUser.getId());
+
+        List<VisitDto> userVisitedPopupDtoList = userVisitedPopupList.stream()
+                .map(
+                        v -> VisitDto.fromEntity(
+                                v.getId(), v.getPopup().getId(), v.getUser().getId(), v.getCreatedAt().toString()
+                        )
+                ).toList();
+
+        List<Waiting> userWaitingPopupList = waitingRepository.findAllByUserId(newUser.getId());
+        List<PopupWaitingDto> userWaitingPopupDtoList = userWaitingPopupList.stream()
+                .map(
+                        pw -> PopupWaitingDto.fromEntity(
+                                pw.getId(), pw.getPopup().getId()
+                        )
+                ).toList();
+
+        PopupActivityResponseDto popupActivityResponseDto = PopupActivityResponseDto
+                .fromProperties(popupScrapDtoList, userVisitedPopupDtoList, userWaitingPopupDtoList);
+
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
-                popupScrapDtoList,
+                popupActivityResponseDto,
                 userNotificationResponseDto
         );
 
@@ -340,7 +363,8 @@ public class AuthSignUpService {
                 userPreferenceSettingDto,
                 userNoticeResponseDto,
                 userActivities,
-                userRelationDto
+                userRelationDto,
+                isPreferenceSettingCreated
         );
     }
 

@@ -8,7 +8,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserTasteResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +43,7 @@ public interface SwaggerUserController {
 
     @Operation(summary = "사용자 취향 수정", description = "사용자의 취향을 수정합니다.")
     @PutMapping("/popup-taste")
-    ResponseDto<UserTasteResponseDto> updateUserTaste(
+    ResponseDto<UserPreferenceUpdateResponseDto> updateUserTaste(
             @Parameter(hidden = true) Long userId,
             @RequestBody CreateUserTasteDto userTasteDto
     );

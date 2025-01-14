@@ -3,10 +3,9 @@ package com.poppin.poppinserver.popup.dto.popup.response;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import lombok.Builder;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record AdminPopupDto(
@@ -34,7 +33,7 @@ public record AdminPopupDto(
         String closeTime,
         String operationExcept,
         String operationStatus,
-        PreferedDto prefered,
+        PreferredDto prefered,
         TasteDto taste,
         List<String> posterList,
         List<String> keywordList
@@ -43,9 +42,9 @@ public record AdminPopupDto(
 
         // 각 nullable 부분들에 대해 예외처리
 
-        PreferedDto preferedDto = null;
+        PreferredDto preferredDto = null;
         if (popup.getPreferedPopup() != null) {
-            preferedDto = PreferedDto.fromEntity(popup.getPreferedPopup());
+            preferredDto = PreferredDto.fromEntity(popup.getPreferedPopup());
         }
 
         String openDate = null;
@@ -119,7 +118,7 @@ public record AdminPopupDto(
                 .closeTime(closeTime)
                 .operationExcept(popup.getOperationExcept())
                 .operationStatus(popup.getOperationStatus())
-                .prefered(preferedDto)
+                .prefered(preferredDto)
                 .taste(tasteDto)
                 .posterList(posterList)
                 .keywordList(keywordList)

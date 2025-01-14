@@ -5,7 +5,6 @@ import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.response.InterestedPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
@@ -19,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -113,16 +110,16 @@ public class ListingPopupService {
         }
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
-        List<String> selectedPrefered = selectRandomUtil.selectPreference(preferedPopup);
-        for (String prefered : selectedPrefered) {
+        List<String> selectedPreferred = selectRandomUtil.selectPreference(preferedPopup);
+        for (String preferred : selectedPreferred) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(prefered, true))
+            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(preferred, true))
                     .and(PopupSpecification.isOperating());
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
-                selectedList.add(prefered);
+                selectedList.add(preferred);
                 popups.add(popupList);
             }
         }

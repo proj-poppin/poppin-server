@@ -4,15 +4,15 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import lombok.Builder;
 
 @Builder
-public record PreferedDto(
+public record PreferredDto(
         Long id,
         Boolean market,
         Boolean display,
         Boolean experience,
         Boolean wantFree
 ) {
-    public static PreferedDto fromEntity(PreferedPopup preferedPopup) {
-        return PreferedDto.builder()
+    public static PreferredDto fromEntity(PreferedPopup preferedPopup) {
+        return PreferredDto.builder()
                 .id(preferedPopup.getId())
                 .market(preferedPopup.getMarket())
                 .display(preferedPopup.getDisplay())

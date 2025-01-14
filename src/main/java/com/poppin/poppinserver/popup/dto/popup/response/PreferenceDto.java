@@ -5,12 +5,12 @@ import lombok.Builder;
 
 @Builder
 public record PreferenceDto(
-        PreferedDto preferencePopupStore,
+        PreferredDto preferencePopupStore,
         TasteDto preferenceCategory
 ) {
     public static PreferenceDto fromPopup(Popup popup) {
         return PreferenceDto.builder()
-                .preferencePopupStore(PreferedDto.fromEntity(popup.getPreferedPopup()))
+                .preferencePopupStore(PreferredDto.fromEntity(popup.getPreferedPopup()))
                 .preferenceCategory(TasteDto.fromEntity(popup.getTastePopup()))
                 .build();
     }
