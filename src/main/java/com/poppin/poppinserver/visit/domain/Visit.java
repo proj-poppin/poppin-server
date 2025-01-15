@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "visit")
+@Table(name = "visit", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "popup_id"})
+})
 public class Visit {
 
     @Id
@@ -23,7 +25,6 @@ public class Visit {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @ManyToOne
