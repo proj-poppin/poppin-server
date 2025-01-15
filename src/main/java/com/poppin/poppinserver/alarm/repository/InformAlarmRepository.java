@@ -1,12 +1,13 @@
 package com.poppin.poppinserver.alarm.repository;
 
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InformAlarmRepository extends JpaRepository<InformAlarm, Long> {
@@ -14,8 +15,8 @@ public interface InformAlarmRepository extends JpaRepository<InformAlarm, Long> 
     @Query(value = "SELECT * FROM inform_alarm ORDER BY ID DESC LIMIT 1", nativeQuery = true)
     InformAlarm findInformAlarmOrderByIdDesc();
 
-    @Query("SELECT a FROM InformAlarm a JOIN InformIsRead isRead ON a.id = isRead.informAlarm.id WHERE isRead.fcmToken.token = :fcmToken ORDER BY a.id desc")
-    List<InformAlarm> findByKeywordOrderByIdDesc(@Param("fcmToken") String fcmToken);
+    @Query("SELECT a FROM InformAlarm a JOIN UserInformAlarm isRead ON a.id = isRead.informAlarm.id WHERE isRead.user.id = :userId ORDER BY a.id desc")
+    List<InformAlarm> findByKeywordOrderByIdDesc(@Param("userId") Long userId);
 
     Optional<InformAlarm> findById(Long id);
 

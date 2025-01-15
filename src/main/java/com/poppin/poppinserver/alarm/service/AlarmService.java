@@ -1,21 +1,19 @@
 package com.poppin.poppinserver.alarm.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.poppin.poppinserver.alarm.domain.InformIsRead;
+import com.poppin.poppinserver.alarm.domain.Alarm;
+import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.PopupAlarm;
-import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmStatusResponseDto;
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
-import com.poppin.poppinserver.alarm.repository.InformAlarmRepository;
-import com.poppin.poppinserver.alarm.repository.InformIsReadRepository;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.alarm.domain.UserInformAlarm;
+import com.poppin.poppinserver.alarm.dto.alarm.request.NotificationRequestDto;
+import com.poppin.poppinserver.alarm.repository.AlarmRepository;
+import com.poppin.poppinserver.alarm.repository.UserInformAlarmRepository;
+import com.poppin.poppinserver.core.exception.CommonException;
+import com.poppin.poppinserver.core.exception.ErrorCode;
+import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service
@@ -23,38 +21,50 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AlarmService {
 
-    private final AmazonS3Client s3Client;
+    private final AlarmRepository alarmRepository;
+    private final UserInformAlarmRepository userInformAlarmRepository;
+    private final UserQueryUseCase userQueryUseCase;
 
-    private final PopupAlarmRepository popupAlarmRepository;
-    private final PopupRepository popupRepository;
-    private final InformAlarmRepository informAlarmRepository;
-    private final InformIsReadRepository informIsReadRepository;
-    private final FCMTokenRepository fcmTokenRepository;
+    // 알림 읽음 처리
+    public String checkNotification(Long userId, NotificationRequestDto notificationRequestDto){
 
-    @Value("${cloud.aws.s3.alarm.bucket.name}")
-    private String alarmBucket;
-
-    /**
-     * 홈 화면 진입 시 읽지 않은 공지 여부 판단
-     *
-     * @param fcmRequestDto :  FCM Token request dto
-     * @return : UnreadAlarmResponseDto
-     */
-    //TODO : 삭제 예정
-    public AlarmStatusResponseDto readAlarm(AlarmTokenRequestDto fcmRequestDto) {
-        AlarmStatusResponseDto responseDto;
-
-        List<InformIsRead> informAlarms = informIsReadRepository.findUnreadInformAlarms(fcmRequestDto.fcmToken()); // 공지
-        List<PopupAlarm> popupAlarms = popupAlarmRepository.findUnreadPopupAlarms(fcmRequestDto.fcmToken()); // 팝업
-
-        if (!informAlarms.isEmpty() || !popupAlarms.isEmpty()) {
-            responseDto = AlarmStatusResponseDto.fromEntity(true);
-        } else {
-            responseDto = AlarmStatusResponseDto.fromEntity(false);
+        Long alarmId;
+        try {
+            alarmId = Long.parseLong(notificationRequestDto.notificationId());
+        } catch (NumberFormatException e) {
+            throw new CommonException(ErrorCode.INVALID_PARAMETER);
         }
-        return responseDto;
-    }
 
+        Alarm alarm = alarmRepository.findById(alarmId)
+                .orElseThrow(()-> new CommonException(ErrorCode.NOT_FOUND_ALARM));
+
+        User user = userQueryUseCase.findUserById(userId);
+
+        if (alarm instanceof InformAlarm) {
+
+            InformAlarm informAlarm = (InformAlarm) alarm;
+
+            UserInformAlarm userInformAlarm = userInformAlarmRepository.findByUserAndInformAlarm(user, informAlarm)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ALARM));
+
+            if (!userInformAlarm.getIsRead()) {
+                userInformAlarm.markAsRead();
+                userInformAlarmRepository.save(userInformAlarm);
+            }
+
+        } else if (alarm instanceof PopupAlarm) {
+            PopupAlarm popupAlarm = (PopupAlarm) alarm;
+
+            if (popupAlarm.getUser().equals(user) && !popupAlarm.getIsRead()) {
+                popupAlarm.markAsRead();
+                alarmRepository.save(popupAlarm);
+            }
+        } else {
+            throw new CommonException(ErrorCode.NOT_FOUND_ALARM_TYPE);
+        }
+
+        return "읽음 처리 완료";
+    }
 }
 
 

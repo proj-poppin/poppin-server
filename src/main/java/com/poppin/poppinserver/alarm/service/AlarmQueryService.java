@@ -26,7 +26,7 @@ public class AlarmQueryService implements AlarmQueryUseCase {
         FCMToken fcmToken = tokenQueryUseCase.findTokenByUserId(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_FCM_TOKEN));
 
-        List<InformAlarm> informAlarms = informAlarmRepository.findByKeywordOrderByIdDesc(fcmToken.getToken());
+        List<InformAlarm> informAlarms = informAlarmRepository.findByKeywordOrderByIdDesc(userId);
         return informAlarms;
     }
 }

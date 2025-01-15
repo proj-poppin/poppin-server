@@ -22,7 +22,7 @@ public record InformAlarmListResponseDto(
                 .id(String.valueOf(alarm.getId()))
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
-                .createdAt(alarm.getCreatedAt())
+                .createdAt(alarm.getCreatedAt().toLocalDate())
                 .iconUrl(alarm.getIcon())
                 .isRead(isRead)
                 .build();

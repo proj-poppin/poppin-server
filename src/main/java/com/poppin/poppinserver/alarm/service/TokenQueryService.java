@@ -6,11 +6,12 @@ import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -50,6 +51,11 @@ public class TokenQueryService implements TokenQueryUseCase {
     @Override
     public List<FCMToken> findAll() {
         return fcmTokenRepository.findAll();
+    }
+
+    @Override
+    public User findUserByToken(String token) {
+        return fcmTokenRepository.findUserByToken(token);
     }
 
 }

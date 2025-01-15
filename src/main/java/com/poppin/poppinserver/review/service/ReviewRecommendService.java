@@ -72,7 +72,7 @@ public class ReviewRecommendService {
         reviewRepository.save(review);
         reviewRecommendCommandRepository.save(reviewRecommend);
 
-        sendAlarmCommandUseCase.sendChoochunAlarm(popup, review, EPushInfo.CHOOCHUN); // 알림
+        sendAlarmCommandUseCase.sendChoochunAlarm(user, popup, review, EPushInfo.CHOOCHUN); // 알림
 
         return "정상적으로 반환되었습니다";
 

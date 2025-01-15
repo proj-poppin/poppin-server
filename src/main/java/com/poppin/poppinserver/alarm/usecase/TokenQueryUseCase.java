@@ -18,4 +18,6 @@ public interface TokenQueryUseCase {
     FCMToken findByUser(User user);
 
     List<FCMToken> findAll();
+
+    User findUserByToken(String token);
 }

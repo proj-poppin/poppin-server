@@ -10,6 +10,7 @@ import com.poppin.poppinserver.core.annotation.UseCase;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.user.domain.User;
 
 import java.util.List;
 
@@ -23,7 +24,9 @@ public interface SendAlarmCommandUseCase {
     void sendScheduledPopupAlarm(List<Popup> popupList,
                                  EPushInfo info);
 
-    void sendChoochunAlarm(Popup popup,
+    void sendChoochunAlarm(
+                           User user,
+                           Popup popup,
                            Review review,
                            EPushInfo info);
 

@@ -20,10 +20,10 @@ public record PopupAlarmResponseDto(
 
         return PopupAlarmResponseDto.builder()
                 .alarmId(String.valueOf(alarm.getId()))
-                .id(String.valueOf(alarm.getPopupId().getId()))
+                .id(String.valueOf(alarm.getId()))
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
-                .createdAt(alarm.getCreatedAt())
+                .createdAt(alarm.getCreatedAt().toLocalDate())
                 .iconUrl(alarm.getIcon())
                 .isRead(alarm.getIsRead())
                 .build();

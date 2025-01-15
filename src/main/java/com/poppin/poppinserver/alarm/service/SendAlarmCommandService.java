@@ -12,8 +12,8 @@ import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestD
 import com.poppin.poppinserver.alarm.dto.fcm.request.FCMRequestDto;
 import com.poppin.poppinserver.alarm.dto.popupAlarm.request.PopupAlarmDto;
 import com.poppin.poppinserver.alarm.usecase.AlarmCommandUseCase;
-import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.alarm.usecase.AlarmListQueryUseCase;
+import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.config.APNsConfiguration;
 import com.poppin.poppinserver.core.config.AndroidConfiguration;
@@ -24,11 +24,13 @@ import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
+import com.poppin.poppinserver.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.poppin.poppinserver.core.util.FCMRefreshUtil.refreshToken;
@@ -52,7 +54,10 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendInformationAlarm(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
         for (FCMToken token : tokenList) {
 
-            int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
+            User user = tokenQueryUseCase.findUserByToken(token.getToken());
+            Long userId = user.getId();
+
+            int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
 
             log.info("token : " + token.getToken());
             Message message = Message.builder()
@@ -87,8 +92,11 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
         List<FCMToken> tokenList = tokenQueryUseCase.findAll();
 
         for (FCMToken token : tokenList) {
-            log.info("token : " + token.getToken());
-            int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
+
+            User user = tokenQueryUseCase.findUserByToken(token.getToken());
+            Long userId = user.getId();
+
+            int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
             Message message = Message.builder()
                     .setNotification(Notification.builder()
                             .setTitle(info.getTitle())
@@ -107,18 +115,18 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
                 refreshToken(token);
 
                 // 팝업 알림 등록(리스트)
-                for (Popup p : popupList) {
+                for (Popup popup : popupList) {
                     // 파라미터 EPushInfo에 따라 재오픈, 인기 토픽 지정
                     EPopupTopic topic = (info.equals(EPushInfo.REOPEN)) ? EPopupTopic.REOPEN : EPopupTopic.HOT;
 
                     PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
-                            p,
-                            token.getToken(),
+                            popup,
+                            user,
                             info.getTitle(),
                             info.getBody(),
                             topic
                     );
-                    alarmCommandUseCase.insertPopupAlarm(popupAlarmDto);
+                    alarmCommandUseCase.insertPopupAlarm(popupAlarmDto); // user, popup 추가 해야 함
                 }
 
             } catch (FirebaseMessagingException e) {
@@ -128,8 +136,10 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     }
 
     @Override
-    public void sendChoochunAlarm(Popup popup, Review review, EPushInfo info) {
-        int badge = alarmListQueryUseCase.countUnreadAlarms(review.getToken());
+    public void sendChoochunAlarm(User user, Popup popup, Review review, EPushInfo info) {
+
+        Long userId = user.getId();
+        int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
 
         Message message = Message.builder()
                 .setNotification(Notification.builder()
@@ -156,7 +166,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
         PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
                 popup,
-                review.getToken(),
+                user,
                 info.getTitle(),
                 info.getBody(),
                 EPopupTopic.CHOOCHUN
@@ -169,7 +179,10 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendKeywordAlarm(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
 
-        int badge = alarmListQueryUseCase.countUnreadAlarms(token.getToken());
+        User user = tokenQueryUseCase.findUserByToken(token.getToken());
+        Long userId = user.getId();
+
+        int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(requestDto.title())
@@ -194,19 +207,26 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendPopupTopicAlarm(List<FCMRequestDto> fcmRequestDtoList) {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
-            int badge = alarmListQueryUseCase.countUnreadAlarms(fcmRequestDto.token());
+            User user = tokenQueryUseCase.findUserByToken(fcmRequestDto.token());
+            Long userId = user.getId();
 
-            Message message;
-            //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
+            int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
+
+            // 팝업 정보 조회
             Popup popup = popupRepository.findById(Long.valueOf(fcmRequestDto.popupId()))
                     .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-            message = Message.builder()
+            // EPopupTopic과 EPushInfo 매핑
+            EPopupTopic topic = fcmRequestDto.topic();
+            EPushInfo info = findMatchingInfo(topic);
+
+            // 알림 메시지 생성
+            Message message = Message.builder()
                     .setNotification(Notification.builder()
-                            .setTitle(fcmRequestDto.title())
-                            .setBody("[" + popup.getName() + "] " + fcmRequestDto.body())
+                            .setTitle(info.getTitle())
+                            .setBody("[" + popup.getName() + "] " + info.getBody())
                             .build())
-                    .setTopic(String.valueOf(fcmRequestDto.topic()))
+                    .setTopic(topic.name())
                     .setAndroidConfig(androidConfiguration.androidConfig())
                     .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                     .putData("id", String.valueOf(fcmRequestDto.popupId()))
@@ -215,12 +235,22 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
             log.info("TOPIC message sending...");
             try {
-
                 String result = firebaseMessaging.send(message);
                 log.debug("Successfully sent message: " + result);
 
+                // 토큰 갱신
                 FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
-                refreshToken(token); // 토큰 갱신
+                refreshToken(token);
+
+                // 팝업 알림 저장
+                PopupAlarmDto popupAlarmDto = PopupAlarmDto.fromEntity(
+                        popup,
+                        user,
+                        info.getTitle(),
+                        info.getBody(),
+                        topic
+                );
+                alarmCommandUseCase.insertPopupAlarm(popupAlarmDto);
 
             } catch (FirebaseMessagingException e) {
                 log.error("Failed to send message: " + e.getMessage());
@@ -228,5 +258,14 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
         }
     }
 
+    /**
+     * EPopupTopic과 EPushInfo를 매핑
+     */
+    private EPushInfo findMatchingInfo(EPopupTopic topic) {
+        return Arrays.stream(EPushInfo.values())
+                .filter(info -> info.name().equalsIgnoreCase(topic.name()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No matching EPushInfo for topic: " + topic.name()));
+    }
 
 }

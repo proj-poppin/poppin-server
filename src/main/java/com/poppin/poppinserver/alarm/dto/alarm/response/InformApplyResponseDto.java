@@ -21,7 +21,7 @@ public record InformApplyResponseDto(
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .informId(String.valueOf(alarm.getId())) // 공지사항 id
-                .createdAt(alarm.getCreatedAt())
+                .createdAt(alarm.getCreatedAt().toLocalDate())
                 .iconUrl(alarm.getIcon())
                 .posterUrl(posterUrl)
                 .build();

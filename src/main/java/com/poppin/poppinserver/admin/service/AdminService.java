@@ -26,10 +26,6 @@ import com.poppin.poppinserver.user.dto.user.response.UserReviewDto;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +33,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -179,25 +180,27 @@ public class AdminService {
 
         try {
 
+            // 이미지 저장
+            List<String> fileUrls = s3Service.uploadInformationPoster(images);
+
             // Alarm 객체 저장
             log.info("INFORM ALARM Entity Saving");
 
-            InformAlarm informAlarm = alarmCommandUseCase.insertInformAlarm(requestDto);
+            InformAlarm informAlarm = alarmCommandUseCase.insertInformAlarm(requestDto, fileUrls.get(0));
 
             // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
+            List<User> users = userQueryRepository.findAll();
             List<FCMToken> tokenList = tokenQueryUseCase.findAll();
-            for (FCMToken token : tokenList) {
-                alarmCommandUseCase.insertInformIsRead(token, informAlarm);
-            }
 
-            // 이미지 저장
-            List<String> fileUrls = s3Service.uploadInformationPoster(images);
+            for (User user : users) {
+                alarmCommandUseCase.insertUserInform(user, informAlarm);
+            }
 
             List<InformAlarmImage> informAlarmImages = new ArrayList<>();
             for (String url : fileUrls) {
                 InformAlarmImage informAlarmImage = InformAlarmImage.builder()
                         .informAlarm(informAlarm)
-                        .posterUrl(url)
+                        .imageUrl(url)
                         .build();
                 informAlarmImages.add(informAlarmImage);
             }

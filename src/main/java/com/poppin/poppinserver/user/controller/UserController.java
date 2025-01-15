@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.user.controller;
 
+import com.poppin.poppinserver.alarm.dto.alarm.request.NotificationRequestDto;
+import com.poppin.poppinserver.alarm.service.AlarmService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
@@ -12,36 +14,23 @@ import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
-import com.poppin.poppinserver.user.service.BlockUserService;
-import com.poppin.poppinserver.user.service.UserFaqService;
-import com.poppin.poppinserver.user.service.UserHardDeleteService;
-import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
-import com.poppin.poppinserver.user.service.UserProfileImageService;
-import com.poppin.poppinserver.user.service.UserService;
+import com.poppin.poppinserver.user.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 @Slf4j
 public class UserController implements SwaggerUserController {
+    private final AlarmService alarmService;
     private final UserService userService;
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
@@ -127,5 +116,10 @@ public class UserController implements SwaggerUserController {
     public ResponseDto<String> createBlockedUser(@UserId Long userId, @PathVariable Long blockUserId) {
         blockUserService.createBlockedUser(userId, blockUserId);
         return ResponseDto.ok("차단 완료되었습니다.");
+    }
+
+    @PatchMapping("/notifications/check")
+    public ResponseDto<String> checkNotification(@UserId Long userId, @RequestBody NotificationRequestDto notificationRequestDto){
+        return ResponseDto.ok(alarmService.checkNotification(userId, notificationRequestDto));
     }
 }

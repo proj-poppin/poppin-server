@@ -7,13 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "info_alarm_images")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "inform_alarm_image")
 public class InformAlarmImage {
 
     @Id
@@ -22,23 +20,17 @@ public class InformAlarmImage {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "alarm_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "inform_alarm_id", nullable = false)
     private InformAlarm informAlarm;
 
-    @Column(name = "poster_url")
-    private String posterUrl;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "edited_at")
-    private LocalDateTime editedAt;
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
 
     @Builder
-    public InformAlarmImage(String posterUrl, InformAlarm informAlarm) {
+    public InformAlarmImage(InformAlarm informAlarm, String imageUrl) {
         this.informAlarm = informAlarm;
-        this.posterUrl = posterUrl;
-        this.createdAt = LocalDateTime.now();
-        this.editedAt = LocalDateTime.now();
+        this.imageUrl = imageUrl;
     }
 }
+
+

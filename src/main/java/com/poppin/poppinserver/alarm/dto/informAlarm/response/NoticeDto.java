@@ -18,7 +18,7 @@ public record NoticeDto(
 ) {
     public static NoticeDto fromEntity(InformAlarm informAlarm) {
         List<String> imageUrls = new ArrayList<>();
-        imageUrls.add(informAlarm.getInformAlarmImage().getPosterUrl());
+        imageUrls.add(informAlarm.getInformAlarmImage().getImageUrl());
         String informAlarmId = String.valueOf(informAlarm.getId());
 
         return NoticeDto.builder()

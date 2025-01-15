@@ -2,8 +2,6 @@ package com.poppin.poppinserver.alarm.controller;
 
 import com.poppin.poppinserver.alarm.controller.swagger.SwaggerAlarmController;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmTokenRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarm.request.InformDetailDto;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmKeywordService;
 import com.poppin.poppinserver.alarm.service.AlarmListService;
@@ -13,15 +11,7 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -36,28 +26,28 @@ public class AlarmController implements SwaggerAlarmController {
 
     // TODO : 삭제 예정
     // 알림 안읽은 것 여부
-    @PostMapping("/unread")
-    public ResponseDto<?> readAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
-        return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
-    }
+//    @PostMapping("/unread")
+//    public ResponseDto<?> readAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
+//        return ResponseDto.ok(alarmService.readAlarm(alarmTokenRequestDto));
+//    }
 
     // 팝업 알림 보여주기(1 depth)
-    @PostMapping("/popup")
-    public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
-        return ResponseDto.ok(alarmListService.readPopupAlarmList(alarmTokenRequestDto));
-    }
-
-    // 공지사항 알림 보여주기(1 depth)
-    @PostMapping("/info")
-    public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto) {
-        return ResponseDto.ok(alarmListService.readInformAlarmList(requestDto));
-    }
-
-    // 공지사항 디테일 (2 depth)
-    @PostMapping("/info/detail")
-    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto) {
-        return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
-    }
+//    @PostMapping("/popup")
+//    public ResponseDto<?> readPopupAlarm(@RequestBody AlarmTokenRequestDto alarmTokenRequestDto) {
+//        return ResponseDto.ok(alarmListService.readPopupAlarmList(alarmTokenRequestDto));
+//    }
+//
+//    // 공지사항 알림 보여주기(1 depth)
+//    @PostMapping("/info")
+//    public ResponseDto<?> readInfoAlarm(@RequestBody AlarmTokenRequestDto requestDto) {
+//        return ResponseDto.ok(alarmListService.readInformAlarmList(requestDto));
+//    }
+//
+//    // 공지사항 디테일 (2 depth)
+//    @PostMapping("/info/detail")
+//    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto) {
+//        return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
+//    }
 
     @PutMapping("/settings")
     public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {

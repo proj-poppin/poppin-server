@@ -85,6 +85,8 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW_REPORT("40421", HttpStatus.NOT_FOUND, "해당 리뷰 신고 내역을 찾을 수 없습니다."),
     NOT_FOUND_FCM_TOKEN("40422", HttpStatus.NOT_FOUND, "해당 유저의 fcm 토큰을 찾을 수 없습니다."),
     NOT_FOUND_INTEREST("40423", HttpStatus.NOT_FOUND, "해당 관심 저장 정보를 찾을 수 없습니다."),
+    NOT_FOUND_ALARM("40424", HttpStatus.NOT_FOUND, "알림 정보를 찾을 수 없습니다."),
+    NOT_FOUND_ALARM_TYPE("40425", HttpStatus.NOT_FOUND, "알림 타입을 확인할 수 없습니다."),
 
     // UnsupportedMediaType Error
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
