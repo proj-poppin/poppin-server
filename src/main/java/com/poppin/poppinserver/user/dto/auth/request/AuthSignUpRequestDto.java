@@ -27,8 +27,11 @@ public record AuthSignUpRequestDto(
         @Pattern(regexp = "^(?=.*[가-힣A-Za-z])[가-힣A-Za-z\\s]*$", message = "올바른 닉네임 형식이 아닙니다.")
         String nickname,
 
-        // FCM 토큰
         @NotNull(message = "fcmToken is required.")
+        @Pattern(
+                regexp = "^[a-zA-Z0-9\\-_:]{120,}$",
+                message = "올바른 FCM 토큰 형식이 아닙니다."
+        )
         String fcmToken,
 
         // KAKAO, NAVER, GOOGLE, APPLE, DEFAULT
