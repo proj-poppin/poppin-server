@@ -25,6 +25,7 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.user.domain.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -203,6 +204,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
         }
     }
 
+    @Transactional
     @Override
     public void sendPopupTopicAlarm(List<FCMRequestDto> fcmRequestDtoList) {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {

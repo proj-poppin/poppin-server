@@ -42,6 +42,7 @@ public enum ErrorCode {
     ALREADY_EXIST_FCM_TOKEN("40031", HttpStatus.BAD_REQUEST, "중복된 FCM 토큰입니다."),
     INVALID_CATEGORY_STRING("40032", HttpStatus.BAD_REQUEST, "유효한 카테고리를 하나 이상 요청 해야 합니다."),
     DUPLICATED_REVIEW("40033", HttpStatus.BAD_REQUEST, "팝업 스토어에는 하나의 후기만 작성 가능 합니다."),
+    ALARM_CHECK("40034", HttpStatus.BAD_REQUEST, "알림 읽음 요청이 실패 하였습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),

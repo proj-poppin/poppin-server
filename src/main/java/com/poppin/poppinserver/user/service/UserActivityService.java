@@ -81,7 +81,7 @@ public class UserActivityService {
 
         Long userId = user.getId();
 
-        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findByFcmToken(userId);
+        List<PopupAlarm> userPopupAlarm = popupAlarmRepository.findAllByUser(userId);
         List<UserInformAlarm> userInformAlarm = userInformAlarmRepository.findAllByUser(userId);
 
         // 유저의 팝업 관련 알람 조회

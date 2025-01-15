@@ -18,7 +18,7 @@ public class PopupAlarm extends Alarm {
     @JoinColumn(name = "popup_id", nullable = false)
     private Popup popup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

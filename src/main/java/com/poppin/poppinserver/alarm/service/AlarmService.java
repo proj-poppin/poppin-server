@@ -11,6 +11,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class AlarmService {
     private final UserQueryUseCase userQueryUseCase;
 
     // 알림 읽음 처리
+    @Transactional
     public String checkNotification(Long userId, NotificationRequestDto notificationRequestDto){
 
         Long alarmId;
@@ -55,13 +57,20 @@ public class AlarmService {
         } else if (alarm instanceof PopupAlarm) {
             PopupAlarm popupAlarm = (PopupAlarm) alarm;
 
-            if (popupAlarm.getUser().equals(user) && !popupAlarm.getIsRead()) {
+            log.info("PopupAlarm user: {}", popupAlarm.getUser());
+            log.info("PopupAlarm isRead: {}", popupAlarm.getIsRead());
+
+            if (popupAlarm.getUser() != null && popupAlarm.getUser().equals(user) && !popupAlarm.getIsRead()) {
+                log.info("조건 만족 - 알림 읽음 처리");
                 popupAlarm.markAsRead();
                 alarmRepository.save(popupAlarm);
+            } else {
+                throw new CommonException(ErrorCode.ALARM_CHECK);
             }
         } else {
             throw new CommonException(ErrorCode.NOT_FOUND_ALARM_TYPE);
         }
+
 
         return "읽음 처리 완료";
     }
