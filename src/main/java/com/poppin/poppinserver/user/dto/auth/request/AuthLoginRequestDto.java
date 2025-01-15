@@ -12,8 +12,13 @@ public record AuthLoginRequestDto(
 
         @NotBlank(message = "password is required.")
         String password,
-        
+
+        // FCM 토큰 형식 검증
         @NotNull(message = "fcmToken is required.")
+        @Pattern(
+                regexp = "^[a-zA-Z0-9\\-_:]{120,}$",
+                message = "올바른 FCM 토큰 형식이 아닙니다."
+        )
         String fcmToken
 ) {
 }
