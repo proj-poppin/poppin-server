@@ -238,7 +238,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
             log.info("TOPIC message sending...");
             try {
                 String result = firebaseMessaging.send(message);
-                log.debug("Successfully sent message: " + result);
+                log.info("Successfully sent message: " + result);
 
                 // 토큰 갱신
                 FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
