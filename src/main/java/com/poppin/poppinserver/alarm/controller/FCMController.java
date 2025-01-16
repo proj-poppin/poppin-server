@@ -19,14 +19,13 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/noti")
+@RequestMapping("/api/v1/fcm")
 public class FCMController {
-
     //TODO: 삭제 예정
-      private final FCMTokenRepository fcmTokenRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
-      private final TopicQueryUseCase topicQueryUseCase;
-      private final TopicCommandUseCase topicCommandUseCase;
+    private final TopicQueryUseCase topicQueryUseCase;
+    private final TopicCommandUseCase topicCommandUseCase;
 
 
     // 데이터베이스 초기화 시 토큰 팝업 구독 해제
