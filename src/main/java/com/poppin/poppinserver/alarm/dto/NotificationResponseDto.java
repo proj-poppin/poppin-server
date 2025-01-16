@@ -11,6 +11,7 @@ public record NotificationResponseDto(
         String title,
         String content,
         String detail,
+        String iconUrl,
         Boolean checked,
         String createdAt,
         String popupId,
@@ -19,7 +20,7 @@ public record NotificationResponseDto(
 ) {
     public static NotificationResponseDto fromProperties(String id, String userId, String type, String category,
                                                          String title,
-                                                         String content, String detail, Boolean checked,
+                                                         String content, String detail, String iconUrl, Boolean checked,
                                                          String createdAt,
                                                          String popupId, String notificationId,
                                                          DestinationResponseDto destination) {
@@ -31,6 +32,7 @@ public record NotificationResponseDto(
                 .title(title)
                 .content(content)
                 .detail(detail)
+                .iconUrl(iconUrl)
                 .checked(checked)
                 .createdAt(createdAt)
                 .popupId(popupId)

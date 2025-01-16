@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.user.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.PopupAlarm;
 import com.poppin.poppinserver.alarm.domain.UserInformAlarm;
@@ -23,6 +24,7 @@ import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,11 +37,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UserActivityService {
+
     private final PopupAlarmRepository popupAlarmRepository;
     private final UserInformAlarmRepository userInformAlarmRepository;
     private final InterestRepository interestRepository;
     private final VisitRepository visitRepository;
     private final WaitingRepository waitingRepository;
+
+    private final AmazonS3Client s3Client;
+    @Value("${cloud.aws.s3.alarm.bucket.name}")
+    private String alarmBucket;
 
     public PopupActivityResponseDto getPopupActivity(User user) {
         // 유저가 등록한 관심 팝업 조회
@@ -87,13 +94,22 @@ public class UserActivityService {
         // 유저의 팝업 관련 알람 조회
         List<NotificationResponseDto> popupNotificationResponseDtoList = userPopupAlarm.stream().map(
                 popupAlarm -> NotificationResponseDto.fromProperties(
-                        String.valueOf(popupAlarm.getId()), String.valueOf(user.getId()), null,
+                        String.valueOf(popupAlarm.getId()),
+                        String.valueOf(user.getId()),
+                        null,
                         String.valueOf(ENotificationCategory.POPUP),
-                        popupAlarm.getTitle(), popupAlarm.getBody(), null, popupAlarm.getIsRead(),
-                        String.valueOf(popupAlarm.getCreatedAt()), String.valueOf(popupAlarm.getPopup().getId()), null,
+                        popupAlarm.getTitle(),
+                        popupAlarm.getBody(),
+                        null,
+                        popupAlarm.getIcon(),
+                        popupAlarm.getIsRead(),
+                        String.valueOf(popupAlarm.getCreatedAt()),
+                        String.valueOf(popupAlarm.getPopup().getId()),
+                        null,
                         destinationResponseDto
                 )
         ).toList();
+
 
         // 유저의 공지 관련 알람 조회
         List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformAlarm.stream()
@@ -109,6 +125,7 @@ public class UserActivityService {
                             informAlarm.getTitle(),
                             informAlarm.getBody(),
                             null,
+                            informAlarm.getIcon(),
                             isRead,
                             String.valueOf(informAlarm.getCreatedAt()),
                             null,
