@@ -106,6 +106,7 @@ public class AuthController implements SwaggerAuthController {
     public ResponseDto<?> appleSocialLogin(
             @RequestBody @Valid AppleUserIdRequestDto appleUserIdRequestDto
     ) {
+        log.info("apple login fcm token: {}", appleUserIdRequestDto.fcmToken());
         return ResponseDto.ok(authLoginService.appleSocialLogin(appleUserIdRequestDto));
     }
 
