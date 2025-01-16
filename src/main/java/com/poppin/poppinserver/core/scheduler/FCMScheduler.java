@@ -33,26 +33,26 @@ public class FCMScheduler {
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
 
-    @Scheduled(cron = "0 0 */3 * * *")
-    private void reopenPopup() {
-
-        /**
-         * 재오픈 수요 팝업 재오픈 알림
-         * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
-         * 2.재오픈을 눌러놨던 유저의 토큰을 모두 가져와서 전송
-         */
-        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-        LocalDate now = zonedDateTime.toLocalDate();
-        log.info("REOPEN popup scheduler start");
-
-        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
-        if (reopenPopup.isEmpty()) {
-            log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
-        } else {
-            sendAlarmCommandUseCase.sendScheduledPopupAlarm(reopenPopup, EPushInfo.REOPEN);
-        }
-    }
+//    @Scheduled(cron = "0 0 */3 * * *")
+//    private void reopenPopup() {
+//
+//        /**
+//         * 재오픈 수요 팝업 재오픈 알림
+//         * 1. popup 을 추출(조건 : 오픈일자가 현재보다 같거나 이후)
+//         * 2.재오픈을 눌러놨던 유저의 토큰을 모두 가져와서 전송
+//         */
+//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+//        LocalDate now = zonedDateTime.toLocalDate();
+//        log.info("REOPEN popup scheduler start");
+//
+//        List<Popup> reopenPopup = popupRepository.findReopenPopupWithDemand(now); // null, 1, many
+//        if (reopenPopup.isEmpty()) {
+//            log.info("사용자가 재오픈 수요 체크한 팝업 중 재오픈한 팝업이 없습니다."); // null 처리
+//        } else {
+//            sendAlarmCommandUseCase.sendScheduledPopupAlarm(reopenPopup, EPushInfo.REOPEN);
+//        }
+//    }
 
     @Scheduled(cron = "0 0 9 * * *")
     private void magamPopup() {
