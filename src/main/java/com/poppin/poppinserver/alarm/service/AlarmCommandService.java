@@ -51,10 +51,7 @@ public class AlarmCommandService implements AlarmCommandUseCase {
                     .icon(icon)
                     .build();
 
-            informAlarmRepository.save(alarm);
-            InformAlarm informAlarm = informAlarmRepository.findInformAlarmOrderByIdDesc();
-
-            return informAlarm;
+            return informAlarmRepository.save(alarm);
 
         } catch (CommonException e) {
             log.error("ERROR during saving alarm : " + e.getMessage());

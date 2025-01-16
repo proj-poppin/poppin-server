@@ -199,6 +199,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
             String result = firebaseMessaging.send(message);
             log.info("Successfully sent message: " + result);
             refreshToken(token); // 토큰일자 갱신
+
         } catch (FirebaseMessagingException e) {
             log.error("Failed to send message: " + e.getMessage());
         }

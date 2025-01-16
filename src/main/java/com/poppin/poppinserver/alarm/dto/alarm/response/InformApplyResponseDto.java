@@ -16,14 +16,16 @@ public record InformApplyResponseDto(
         String iconUrl,
         List<String> posterUrl
 ) {
-    public static InformApplyResponseDto fromEntity(InformAlarm alarm, List<String> posterUrl) {
+    public static InformApplyResponseDto fromEntity(InformAlarm alarm, List<String> fileUrls) {
+
         return InformApplyResponseDto.builder()
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
                 .informId(String.valueOf(alarm.getId())) // 공지사항 id
-                .createdAt(alarm.getCreatedAt().toLocalDate())
+                .createdAt(alarm.getCreatedAt() != null ? alarm.getCreatedAt().toLocalDate() : null)
                 .iconUrl(alarm.getIcon())
-                .posterUrl(posterUrl)
+                .posterUrl(fileUrls)
                 .build();
     }
+
 }

@@ -1,13 +1,10 @@
 package com.poppin.poppinserver.alarm.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "inform_alarm")
 public class InformAlarm extends Alarm {

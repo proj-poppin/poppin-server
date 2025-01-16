@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface InformAlarmRepository extends JpaRepository<InformAlarm, Long> {
 
-    @Query(value = "SELECT * FROM inform_alarm ORDER BY ID DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT a FROM InformAlarm a ORDER BY a.id desc ")
     InformAlarm findInformAlarmOrderByIdDesc();
 
     @Query("SELECT a FROM InformAlarm a JOIN UserInformAlarm isRead ON a.id = isRead.informAlarm.id WHERE isRead.user.id = :userId ORDER BY a.id desc")
