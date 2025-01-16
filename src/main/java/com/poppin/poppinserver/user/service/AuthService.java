@@ -1,8 +1,6 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
-import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
-import com.poppin.poppinserver.alarm.repository.UserInformAlarmRepository;
 import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.constant.Constant;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -14,37 +12,43 @@ import com.poppin.poppinserver.popup.service.BlockedPopupService;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
-import com.poppin.poppinserver.user.dto.auth.request.*;
+import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
+import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
-import com.poppin.poppinserver.user.repository.UserCommandRepository;
-import com.poppin.poppinserver.user.repository.UserQueryRepository;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
-    private final UserQueryRepository userQueryRepository;
-    private final JwtUtil jwtUtil;
     private final MailService mailService;
-    private final UserAlarmSettingService userAlarmSettingService;
-    private final UserPreferenceSettingService userPreferenceSettingService;
-    private final UserInformAlarmRepository userInformAlarmRepository;
-    private final PopupAlarmRepository popupAlarmRepository;
-    private final UserCommandRepository userCommandRepository;
     private final UserQueryUseCase userQueryUseCase;
+
+    // JWT, FCM 토큰 관련 서비스
     private final TokenCommandUseCase tokenCommandUseCase;
+    private final JwtUtil jwtUtil;
+
+    // 유저 알람 설정 서비스
+    private final UserAlarmSettingService userAlarmSettingService;
+
+    // 유저 취향 설정 서비스
+    private final UserPreferenceSettingService userPreferenceSettingService;
 
     // 차단
     private final BlockUserService blockUserService;
@@ -52,38 +56,6 @@ public class AuthService {
 
     // 유저의 활동 내역
     private final UserActivityService userActivityService;
-
-//    @Transactional
-//    public UserInfoResponseDto socialSignUp(String accessToken,
-//                                            SocialRegisterRequestDto socialRegisterRequestDto) {  // 소셜 로그인 후 회원 등록 및 토큰 발급
-//        String token = refineToken(accessToken);    // poppin access token
-//
-//        Long userId = jwtUtil.getUserIdFromToken(token);    // 토큰으로부터 id 추출
-//
-//        // 소셜 회원가입 시, id와 provider로 유저 정보를 찾음
-//        User user = userRepository.findByIdAndELoginProvider(userId,
-//                        ELoginProvider.valueOf(socialRegisterRequestDto.provider()))
-//                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-//
-//        // 닉네임 등록 -> 소셜 회원가입 완료
-//        user.register(socialRegisterRequestDto.nickname());
-//
-//        final JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
-//        user.updateRefreshToken(jwtTokenDto.refreshToken());
-//        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(socialRegisterRequestDto.fcmToken());
-//
-//        UserPreferenceSettingDto userPreferenceSettingDto = userPreferenceSettingService.readUserPreferenceSettingCreated(
-//                user.getId()
-//        );
-//
-//        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.fromUserEntity(
-//                user,
-//                alarmSetting,
-//                jwtTokenDto,
-//                userPreferenceSettingDto
-//        );
-//        return userInfoResponseDto;
-//    }
 
     // 이메일 확인 코드 전송 메서드
     public AuthCodeResponseDto sendEmailVerificationCode(EmailVerificationRequestDto emailVerificationRequestDto) {
@@ -100,7 +72,7 @@ public class AuthService {
     }
 
     private void validateEmail(EVerificationType verificationType, String email) {
-        boolean userExists = userQueryRepository.findByEmail(email).isPresent();
+        boolean userExists = userQueryUseCase.findUserByEmailOptional(email).isPresent();
 
         if (verificationType.equals(EVerificationType.SIGN_UP) && userExists) {
             // 회원가입 시에 이메일 중복 -> 중복 이메일 Exception 반환
@@ -129,7 +101,7 @@ public class AuthService {
 
         // FCM 토큰 검증
         tokenCommandUseCase.refreshToken(user.getId(), fcmToken);
-        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         boolean isPreferenceSettingCreated = userPreferenceSettingService
                 .readUserPreferenceSettingCreated(user.getId());
@@ -137,27 +109,12 @@ public class AuthService {
                 user.getId()
         );
 
-        // 유저가 읽은 공지사항+팝업 알림 리스트 조회
-        Long checkedPopupIds = popupAlarmRepository.readPopupAlarms(userId);
-        List<String> checkedNoticeIds = userInformAlarmRepository.findReadInformAlarmIdsByUserId(userId)
-                .stream()
-                .map(Object::toString)
-                .toList();
-
-        if (checkedPopupIds != null) {
-            checkedNoticeIds = new ArrayList<>(checkedNoticeIds);
-            checkedNoticeIds.add(checkedPopupIds.toString());
-        }
-
-        // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
-        String informLastCheckedTime = userInformAlarmRepository
-                .findLastReadTimeByUser(userId);
-
-        UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto
-                .of(informLastCheckedTime, checkedNoticeIds);
+        UserNoticeResponseDto userNoticeResponseDto = userActivityService.getUserNotificationStatus(user.getId());
 
         UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
-                user, fcmToken);
+                user, fcmToken
+        );
+
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(user);
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
@@ -167,6 +124,7 @@ public class AuthService {
 
         List<String> blockedPopups = blockPopupService.findBlockedPopupList(user);
         List<String> blockedUsers = blockUserService.findBlockedUserList(user);
+
         UserRelationDto userRelationDto = UserRelationDto.ofBlockedUserIdsAndPopupIds(blockedUsers, blockedPopups);
 
         return UserInfoResponseDto.fromUserEntity(
@@ -196,25 +154,18 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
-        Optional<User> user = userQueryRepository.findByEmail(accountRequestDto.email());
-        EAccountStatus accountStatus;
-        if (user.isPresent()) {
-            accountStatus = EAccountStatus.LOGIN;
-        } else {
-            accountStatus = EAccountStatus.SIGNUP;
-        }
-        return AccountStatusResponseDto.fromEnum(accountStatus);
+        return determineAccountStatus(accountRequestDto.email());
     }
 
     @Transactional(readOnly = true)
     public AccountStatusResponseDto getAppleAccountStatus(AppleUserIdRequestDto appleUserIdRequestDto) {
-        Optional<User> user = userQueryRepository.findByEmail(appleUserIdRequestDto.appleUserId());
-        EAccountStatus accountStatus;
-        if (user.isPresent()) {
-            accountStatus = EAccountStatus.LOGIN;
-        } else {
-            accountStatus = EAccountStatus.SIGNUP;
-        }
+        return determineAccountStatus(appleUserIdRequestDto.appleUserId());
+    }
+
+    private AccountStatusResponseDto determineAccountStatus(String email) {
+        EAccountStatus accountStatus = userQueryUseCase.findUserByEmailOptional(email)
+                .map(user -> EAccountStatus.LOGIN)
+                .orElse(EAccountStatus.SIGNUP);
         return AccountStatusResponseDto.fromEnum(accountStatus);
     }
 
