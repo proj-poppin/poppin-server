@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -150,7 +151,7 @@ public class AuthService {
         }
 
         // 유저가 가장 최근에 읽은 공지사항 알람 시간 조회
-        String informLastCheckedTime = userInformAlarmRepository
+        LocalDateTime informLastCheckedTime = userInformAlarmRepository
                 .findLastReadTimeByUser(userId);
 
         UserNoticeResponseDto userNoticeResponseDto = UserNoticeResponseDto
