@@ -110,7 +110,6 @@ public class AuthService {
         );
 
         UserNoticeResponseDto userNoticeResponseDto = userActivityService.getUserNotificationStatus(user.getId());
-
         UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
                 user, fcmToken
         );

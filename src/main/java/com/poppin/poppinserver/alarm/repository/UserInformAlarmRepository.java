@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public interface UserInformAlarmRepository extends JpaRepository<UserInformAlarm
     @Query("SELECT MAX(userInformAlarm.readAt) " +
             "FROM UserInformAlarm userInformAlarm " +
             "WHERE userInformAlarm.user.id = :userId AND userInformAlarm.isRead = true")
-    String findLastReadTimeByUser(@Param("userId") Long userId);
+    LocalDateTime findLastReadTimeByUser(@Param("userId") Long userId);
 
     @Query("SELECT userInformAlarm FROM UserInformAlarm userInformAlarm WHERE userInformAlarm.user.id = :userId")
     List<UserInformAlarm> findAllByUser(@Param("userId") Long userId);
