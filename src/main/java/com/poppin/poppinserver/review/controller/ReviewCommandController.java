@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //후기
@@ -32,8 +33,10 @@ public class ReviewCommandController implements SwaggerReviewCommandController {
             @RequestParam("visitDate") String visitDate,
             @RequestParam("satisfaction") String satisfaction,
             @RequestParam("congestion") String congestion,
-            @RequestPart(value = "images") List<MultipartFile> images) {
-
+            @RequestPart(value = "images" ,required = false) List<MultipartFile> images) {
+        if (images == null) {
+            images = new ArrayList<>();
+        }
         return ResponseDto.ok(reviewCommandService.writeReview(userId, popupId, text, visitDate, satisfaction, congestion, images));
     }
 

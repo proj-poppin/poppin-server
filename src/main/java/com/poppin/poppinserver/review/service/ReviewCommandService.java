@@ -77,7 +77,9 @@ public class ReviewCommandService {
         Review review = createReview(user, token, popup, text, isCertified);
 
         // 이미지 처리
-        handleReviewImages(images, review);
+        if (images != null && !images.isEmpty()) {
+            handleReviewImages(images, review);
+        }
 
         // 방문 데이터 저장
         VisitorData visitorData = new VisitorData(
