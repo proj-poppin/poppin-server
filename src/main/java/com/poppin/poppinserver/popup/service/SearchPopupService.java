@@ -49,10 +49,12 @@ public class SearchPopupService {
             taste = List.of("market", "display", "experience");
         }
 
-        log.info("prepered: " + prepered.size());
         if (Objects.equals(prepered.get(0), "")) {
             prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
+
+        // 카테고리 입력값 유효성 검사
+        validateInput(filteringThreeCategories, filteringFourteenCategories);
 
         // 팝업 형태 3개
         Boolean market = taste.contains("market") ? true : null;
@@ -133,5 +135,36 @@ public class SearchPopupService {
         return PagingResponseDto.fromEntityAndPageInfo(popupStoreDtos, pageInfoDto);
     } // 로그인 팝업 검색
 
+    private void validateInput(String filteringThreeCategories, String filteringFourteenCategories) {
+        // 허용된 카테고리 리스트
+        List<String> validThreeCategories = List.of("market", "display", "experience");
+        List<String> validFourteenCategories = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni",
+                "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
 
+        // filteringThreeCategories 유효성 검사
+        if (filteringThreeCategories != null && !filteringThreeCategories.isEmpty()) {
+            List<String> threeCategories = Arrays.stream(filteringThreeCategories.split(","))
+                    .filter(category -> !category.isBlank()) // 빈 문자열 무시
+                    .toList();
+
+            for (String category : threeCategories) {
+                if (!validThreeCategories.contains(category)) {
+                    throw new CommonException(ErrorCode.INVALID_THREE_CATEGORY);
+                }
+            }
+        }
+
+        // filteringFourteenCategories 유효성 검사
+        if (filteringFourteenCategories != null && !filteringFourteenCategories.isEmpty()) {
+            List<String> fourteenCategories = Arrays.stream(filteringFourteenCategories.split(","))
+                    .filter(category -> !category.isBlank()) // 빈 문자열 무시
+                    .toList();
+
+            for (String category : fourteenCategories) {
+                if (!validFourteenCategories.contains(category)) {
+                    throw new CommonException(ErrorCode.INVALID_FOURTEEN_CATEGORY);
+                }
+            }
+        }
+    }
 }
