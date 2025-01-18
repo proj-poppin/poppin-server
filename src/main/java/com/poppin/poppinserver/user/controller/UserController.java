@@ -90,15 +90,15 @@ public class UserController implements SwaggerUserController {
     /*마이페이지 - 일반후기 팝업 검색*/
     @GetMapping("/popup/search")
     public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> searchPopupName(@RequestParam("text") String text,
-                                                                               @RequestParam("taste") String taste,
-                                                                               @RequestParam("prepered") String prepered,
+                                                                               @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+                                                                               @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
                                                                                @RequestParam("oper") EOperationStatus oper,
                                                                                @RequestParam("order") EPopupSort order,
                                                                                @RequestParam("page") int page,
                                                                                @RequestParam("size") int size,
                                                                                HttpServletRequest request) {
         return ResponseDto.ok(
-                searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, request));
+                searchPopupService.readSearchingList(text, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size, request));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/
