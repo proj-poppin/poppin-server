@@ -58,12 +58,12 @@ public interface SwaggerPopupQueryController {
             @Parameter(hidden = true) Long userId
     );
 
-    @Operation(summary = "팝업 검색", description = "로그인된 사용자가 팝업을 검색합니다.")
+    @Operation(summary = "팝업 검색", description = "사용자가 팝업을 검색합니다.")
     @GetMapping("/search")
     ResponseDto<PagingResponseDto<List<PopupStoreDto>>> readSearchList(
             @RequestParam("searchName") String searchName,
-            @RequestParam("filteringThreeCategories") String filteringThreeCategories,
-            @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
+            @Parameter(example = "market,display,experience") @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+            @Parameter(example = "fashionBeauty,characters,foodBeverage,webtoonAni,interiorThings,movie,musical,sports,game,itTech,kpop,alcohol,animalPlant,etc") @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
             @RequestParam("operationStatus") EOperationStatus oper,
             @RequestParam("order") EPopupSort order,
             @RequestParam("page") int page,

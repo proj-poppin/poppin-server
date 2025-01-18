@@ -86,8 +86,8 @@ public interface SwaggerUserController {
     @GetMapping("/popup/search")
     ResponseDto<PagingResponseDto<List<PopupStoreDto>>> searchPopupName(
             @RequestParam("text") String text,
-            @RequestParam("taste") String taste,
-            @RequestParam("prepered") String prepered,
+            @Parameter(example = "market,display,experience") @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+            @Parameter(example = "fashionBeauty,characters,foodBeverage,webtoonAni,interiorThings,movie,musical,sports,game,itTech,kpop,alcohol,animalPlant,etc") @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
             @RequestParam("oper") EOperationStatus oper,
             @RequestParam("order") EPopupSort order,
             @RequestParam("page") int page,

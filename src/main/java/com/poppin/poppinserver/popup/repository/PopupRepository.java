@@ -73,7 +73,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
             "LEFT JOIN blocked_popup bp ON p.id = bp.popup_id AND bp.user_id = :userId " +
             "WHERE bp.popup_id IS NULL " +
-            "AND (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+            "AND (" +
+            "(:preparedText IS NULL OR :preparedText = '' OR MATCH(p.introduce) AGAINST (:preparedText IN BOOLEAN MODE)) " +
+            "OR (:text IS NULL OR p.name LIKE CONCAT('%', COALESCE(:text, ''), '%'))) " +
             "AND p.operation_status = :oper " +
             "AND (" +
             "(tp.fashion_beauty = :fashionBeauty) " +
@@ -90,7 +92,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "OR (tp.alcohol = :alcohol) " +
             "OR (tp.animal_plant = :animalPlant) " +
             "OR (tp.etc = :etc)) " +
-            "AND ( " +
+            "AND (" +
             "(pp.market = :market) " +
             "OR (pp.display = :display) " +
             "OR (pp.experience = :experience))",
@@ -99,7 +101,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
                     "LEFT JOIN blocked_popup bp ON p.id = bp.popup_id AND bp.user_id = :userId " +
                     "WHERE bp.popup_id IS NULL " +
-                    "AND (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
+                    "AND (" +
+                    "(:preparedText IS NULL OR :preparedText = '' OR MATCH(p.introduce) AGAINST (:preparedText IN BOOLEAN MODE)) " +
+                    "OR (:text IS NULL OR p.name LIKE CONCAT('%', COALESCE(:text, ''), '%'))) " +
                     "AND p.operation_status = :oper " +
                     "AND (" +
                     "(tp.fashion_beauty = :fashionBeauty) " +
@@ -116,12 +120,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "OR (tp.alcohol = :alcohol) " +
                     "OR (tp.animal_plant = :animalPlant) " +
                     "OR (tp.etc = :etc)) " +
-                    "AND ( " +
+                    "AND (" +
                     "(pp.market = :market) " +
                     "OR (pp.display = :display) " +
                     "OR (pp.experience = :experience))",
             nativeQuery = true)
-    Page<Popup> findByTextInNameOrIntroduceByBlackList(String text, Pageable pageable,
+    Page<Popup> findByTextInNameOrIntroduceByBlackList(String text, String preparedText, Pageable pageable,
                                                        Boolean market, Boolean display, Boolean experience,
                                                        Boolean fashionBeauty, Boolean characters, Boolean foodBeverage,
                                                        Boolean webtoonAni, Boolean interiorThings, Boolean movie,
@@ -129,13 +133,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                                        Boolean itTech, Boolean kpop, Boolean alcohol,
                                                        Boolean animalPlant, Boolean etc, String oper, Long userId);
 
-
-    //비로그인 팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
             "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
             "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
-            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = :oper  " +
+            "WHERE ((:preparedText IS NULL OR :preparedText = '' OR MATCH(p.introduce) AGAINST (:preparedText IN BOOLEAN MODE)) " +
+            "       OR (:text IS NULL OR p.name LIKE CONCAT('%', COALESCE(:text, ''), '%'))) " +
+            "AND p.operation_status = :oper " +
             "AND (" +
             "(tp.fashion_beauty = :fashionBeauty) " +
             "OR (tp.characters = :characters) " +
@@ -151,15 +154,15 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "OR (tp.alcohol = :alcohol) " +
             "OR (tp.animal_plant = :animalPlant) " +
             "OR (tp.etc = :etc)) " +
-            "AND ( " +
+            "AND (" +
             "(pp.market = :market) " +
             "OR (pp.display = :display) " +
             "OR (pp.experience = :experience))",
             countQuery = "SELECT COUNT(*) FROM popups p " +
                     "LEFT JOIN prefered_popup pp ON p.prefered_id = pp.id " +
                     "LEFT JOIN taste_popup tp ON p.taste_id = tp.id " +
-                    "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) "
-                    +
+                    "WHERE ((:preparedText IS NULL OR :preparedText = '' OR MATCH(p.introduce) AGAINST (:preparedText IN BOOLEAN MODE)) " +
+                    "       OR (:text IS NULL OR p.name LIKE CONCAT('%', COALESCE(:text, ''), '%'))) " +
                     "AND p.operation_status = :oper " +
                     "AND (" +
                     "(tp.fashion_beauty = :fashionBeauty) " +
@@ -176,18 +179,19 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                     "OR (tp.alcohol = :alcohol) " +
                     "OR (tp.animal_plant = :animalPlant) " +
                     "OR (tp.etc = :etc)) " +
-                    "AND ( " +
+                    "AND (" +
                     "(pp.market = :market) " +
                     "OR (pp.display = :display) " +
                     "OR (pp.experience = :experience))",
             nativeQuery = true)
-    Page<Popup> findByTextInNameOrIntroduce(String text, Pageable pageable,
+    Page<Popup> findByTextInNameOrIntroduce(String text, String preparedText, Pageable pageable,
                                             Boolean market, Boolean display, Boolean experience,
                                             Boolean fashionBeauty, Boolean characters, Boolean foodBeverage,
                                             Boolean webtoonAni, Boolean interiorThings, Boolean movie,
                                             Boolean musical, Boolean sports, Boolean game,
                                             Boolean itTech, Boolean kpop, Boolean alcohol,
                                             Boolean animalPlant, Boolean etc, String oper);
+
 
     @Query(value = "SELECT * FROM popups p " +
             "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +

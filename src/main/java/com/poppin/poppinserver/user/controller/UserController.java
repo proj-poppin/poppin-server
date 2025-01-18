@@ -15,6 +15,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import com.poppin.poppinserver.user.service.*;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -88,16 +89,16 @@ public class UserController implements SwaggerUserController {
 
     /*마이페이지 - 일반후기 팝업 검색*/
     @GetMapping("/popup/search")
-    public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> searchPopupName(@RequestParam("text") String text,
-                                                                               @RequestParam("taste") String taste,
-                                                                               @RequestParam("prepered") String prepered,
-                                                                               @RequestParam("oper") EOperationStatus oper,
+    public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> searchPopupName(@RequestParam("searchName") String searchName,
+                                                                               @RequestParam("filteringThreeCategories") String filteringThreeCategories,
+                                                                               @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
+                                                                               @RequestParam("operationStatus") EOperationStatus oper,
                                                                                @RequestParam("order") EPopupSort order,
                                                                                @RequestParam("page") int page,
                                                                                @RequestParam("size") int size,
                                                                                HttpServletRequest request) {
         return ResponseDto.ok(
-                searchPopupService.readSearchingList(text, taste, prepered, oper, order, page, size, request));
+                searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories, oper, order, page, size, request));
     }
 
     /*마이페이지 - 자주 묻는 질문 조회*/
