@@ -441,6 +441,7 @@ public class AdminPopupService {
             operationStatus = EOperationStatus.TERMINATED.getStatus();
         } else {
             operationStatus = EOperationStatus.OPERATING.getStatus();
+            //TODO: 재오픈 메서드 필요
         }
 
         // 입장료 유무 false일 경우, 입장료 무료
