@@ -45,15 +45,12 @@ public class SearchPopupService {
         List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
 
         // 만약 전부 null(초기화상태)라면, 카테고리 전부 1로 바꿔서 검색어만 검열
-        log.info("taste: " + taste.size());
         if (Objects.equals(taste.get(0), "")) {
-            log.info("isEmpty");
             taste = List.of("market", "display", "experience");
         }
 
         log.info("prepered: " + prepered.size());
         if (Objects.equals(prepered.get(0), "")) {
-            log.info("isEmpty");
             prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
 
@@ -80,11 +77,12 @@ public class SearchPopupService {
 
         // 검색어 토큰화 및 Full Text 와일드 카드 적용
         String searchText = null;
-
         if (text != null) {
             text = text.trim();
             if (!text.isEmpty()) {
                 searchText = prepardSearchUtil.prepareSearchText(text);
+            } else {
+                text = null;
             }
         }
 
