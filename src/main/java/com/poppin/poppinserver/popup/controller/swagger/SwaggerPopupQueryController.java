@@ -58,7 +58,7 @@ public interface SwaggerPopupQueryController {
             @Parameter(hidden = true) Long userId
     );
 
-    @Operation(summary = "팝업 검색", description = "로그인된 사용자가 팝업을 검색합니다.")
+    @Operation(summary = "팝업 검색", description = "사용자가 팝업을 검색합니다.")
     @GetMapping("/search")
     ResponseDto<PagingResponseDto<List<PopupStoreDto>>> readSearchList(
             @RequestParam("searchName") String searchName,

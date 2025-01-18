@@ -58,18 +58,6 @@ public class PopupQueryController implements SwaggerPopupQueryController {
         return ResponseDto.ok(adminPopupService.searchManageList(text, page, size, oper));
     } // 전체팝업관리 - 전체 팝업 검색
 
-//    @GetMapping("/guest/detail")
-//    public ResponseDto<PopupGuestDetailDto> readGuestDetail(@RequestParam("popupId") String popupId) {
-//
-//        return ResponseDto.ok(popupService.readGuestDetail(popupId));
-//    } // 비로그인 상세조회
-//
-//    @GetMapping("/detail")
-//    public ResponseDto<?> readDetail(@RequestParam("popupId") String popupId, @UserId Long userId) {
-//
-//        return ResponseDto.ok(popupService.readDetail(popupId, userId));
-//    } // 로그인 상세조회
-
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
     public ResponseDto<List<PopupSummaryDto>> readHotList() {
         return ResponseDto.ok(listingPopupService.readHotList());
@@ -91,7 +79,7 @@ public class PopupQueryController implements SwaggerPopupQueryController {
         return ResponseDto.ok(listingPopupService.readInterestedPopups(userId));
     }
 
-    @GetMapping("/search") // 로그인 팝업 검색
+    @GetMapping("/search") // 필터링 팝업 검색
     public ResponseDto<PagingResponseDto<List<PopupStoreDto>>> readSearchList(
             @RequestParam("searchName") String searchName,
             @RequestParam("filteringThreeCategories") String filteringThreeCategories,
@@ -105,33 +93,6 @@ public class PopupQueryController implements SwaggerPopupQueryController {
                 searchPopupService.readSearchingList(searchName, filteringThreeCategories, filteringFourteenCategories,
                         oper, order, page, size, request));
     }
-//
-//    @GetMapping("/search/base") // 로그인 팝업 베이스 검색
-//    public ResponseDto<?> readBaseList(@RequestParam("searchName") String searchName,
-//                                       @RequestParam("page") int page,
-//                                       @RequestParam("size") int size,
-//                                       @UserId Long userId) {
-//        return ResponseDto.ok(searchPopupService.readBaseList(searchName, page, size, userId));
-//    }
-//
-//    @GetMapping("/guest/search") // 비로그인 팝업 검색
-//    public ResponseDto<?> readGuestSearchList(@RequestParam("searchName") String searchName,
-//                                              @RequestParam("filteringThreeCategories") String filteringThreeCategories,
-//                                              @RequestParam("filteringFourteenCategories") String filteringFourteenCategories,
-//                                              @RequestParam("operationStatus") EOperationStatus oper,
-//                                              @RequestParam("order") EPopupSort order,
-//                                              @RequestParam("page") int page,
-//                                              @RequestParam("size") int size) {
-//        return ResponseDto.ok(searchPopupService.readGuestSearchingList(searchName, filteringThreeCategories,
-//                filteringFourteenCategories, oper, order, page, size));
-//    }
-//
-//    @GetMapping("/guest/search/base") // 비로그인 팝업 베이스 검색
-//    public ResponseDto<?> readGuestBaseList(@RequestParam("searchName") String searchName,
-//                                            @RequestParam("page") int page,
-//                                            @RequestParam("size") int size) {
-//        return ResponseDto.ok(searchPopupService.readGuestBaseList(searchName, page, size));
-//    }
 
     @GetMapping("/taste-list") // 취향 저격 팝업 목록
     public ResponseDto<PopupTasteDto> readTasteList(@UserId Long userId) {
