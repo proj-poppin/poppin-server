@@ -77,7 +77,7 @@ public class AdminManagerInformService {
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
+                createTasteDto.webtoonAnimation(),
                 createTasteDto.interiorThings(),
                 createTasteDto.movie(),
                 createTasteDto.musical(),
@@ -186,7 +186,7 @@ public class AdminManagerInformService {
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
+                createTasteDto.webtoonAnimation(),
                 createTasteDto.interiorThings(),
                 createTasteDto.movie(),
                 createTasteDto.musical(),
@@ -300,7 +300,8 @@ public class AdminManagerInformService {
     } // 운영자 제보 업로드 승인
 
     @Transactional
-    public PagingResponseDto<List<ManagerInformSummaryDto>> readManagerInformList(int page, int size, EInformProgress progress) {
+    public PagingResponseDto<List<ManagerInformSummaryDto>> readManagerInformList(int page, int size,
+                                                                                  EInformProgress progress) {
         Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page, size),
                 progress);
 

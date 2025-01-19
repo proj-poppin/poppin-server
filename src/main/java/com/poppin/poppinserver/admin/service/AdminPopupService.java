@@ -6,7 +6,11 @@ import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.domain.PopupTopic;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordCreateRequestDto;
-import com.poppin.poppinserver.alarm.repository.*;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
+import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
+import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
+import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
@@ -33,7 +37,11 @@ import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
-import com.poppin.poppinserver.popup.repository.*;
+import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
+import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
@@ -48,6 +56,10 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -55,11 +67,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -119,7 +126,7 @@ public class AdminPopupService {
                 .fasionBeauty(createTasteDto.fashionBeauty())
                 .characters(createTasteDto.characters())
                 .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAni())
+                .webtoonAni(createTasteDto.webtoonAnimation())
                 .interiorThings(createTasteDto.interiorThings())
                 .movie(createTasteDto.movie())
                 .musical(createTasteDto.musical())
@@ -373,7 +380,7 @@ public class AdminPopupService {
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
+                createTasteDto.webtoonAnimation(),
                 createTasteDto.interiorThings(),
                 createTasteDto.movie(),
                 createTasteDto.musical(),

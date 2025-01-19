@@ -75,7 +75,7 @@ public class AdminUserInformService {
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
+                createTasteDto.webtoonAnimation(),
                 createTasteDto.interiorThings(),
                 createTasteDto.movie(),
                 createTasteDto.musical(),
@@ -167,7 +167,7 @@ public class AdminUserInformService {
         tastePopup.update(createTasteDto.fashionBeauty(),
                 createTasteDto.characters(),
                 createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAni(),
+                createTasteDto.webtoonAnimation(),
                 createTasteDto.interiorThings(),
                 createTasteDto.movie(),
                 createTasteDto.musical(),
@@ -267,8 +267,8 @@ public class AdminUserInformService {
 
     @Transactional
     public PagingResponseDto<List<UserInformSummaryDto>> readUserInformList(int page,
-                                                int size,
-                                                EInformProgress progress) {
+                                                                            int size,
+                                                                            EInformProgress progress) {
         Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);

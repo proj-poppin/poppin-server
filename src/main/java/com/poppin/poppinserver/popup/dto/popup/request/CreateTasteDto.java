@@ -10,7 +10,7 @@ public record CreateTasteDto(
         @NotNull
         Boolean foodBeverage,
         @NotNull
-        Boolean webtoonAni,
+        Boolean webtoonAnimation,
         @NotNull
         Boolean interiorThings,
         @NotNull
