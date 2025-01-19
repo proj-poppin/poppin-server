@@ -80,7 +80,7 @@ public class UserPreferenceSettingService {
         tastePopup.update(createUserTasteDto.taste().fashionBeauty(),
                 createUserTasteDto.taste().characters(),
                 createUserTasteDto.taste().foodBeverage(),
-                createUserTasteDto.taste().webtoonAni(),
+                createUserTasteDto.taste().webtoonAnimation(),
                 createUserTasteDto.taste().interiorThings(),
                 createUserTasteDto.taste().movie(),
                 createUserTasteDto.taste().musical(),
