@@ -11,7 +11,15 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
@@ -71,7 +79,7 @@ public class AlarmController implements SwaggerAlarmController {
     @DeleteMapping("/keywords/{keywordId}")
     public ResponseDto<?> deleteAlarmKeyword(@UserId Long userId, @PathVariable(name = "keywordId") Long keywordId) {
         alarmKeywordService.deleteAlarmKeyword(userId, keywordId);
-        return ResponseDto.ok("알람 키워드가 삭제되었습니다.");
+        return ResponseDto.ok(null);
     }
 
     // 마이페이지 > 키워드 알람 > 키워드 활성화/비활성화
