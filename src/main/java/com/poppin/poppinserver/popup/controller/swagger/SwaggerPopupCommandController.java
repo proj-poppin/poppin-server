@@ -28,13 +28,6 @@ public interface SwaggerPopupCommandController {
             @Parameter(hidden = true) Long adminId
     );
 
-    @Operation(summary = "관리자 - 팝업 재오픈", description = "관리자가 팝업을 재오픈 합니다.")
-    @PatchMapping(value = "/admin", consumes = {"application/json", "multipart/form-data"})
-    ResponseDto<String> reopenPopup(
-            @Parameter(hidden = true) Long adminId,
-            @RequestParam("popupId") String popupId
-    );
-
     @Operation(summary = "관리자 - 팝업 삭제", description = "관리자가 특정 팝업을 삭제합니다.")
     @DeleteMapping("/admin")
     ResponseDto<Boolean> removePopup(

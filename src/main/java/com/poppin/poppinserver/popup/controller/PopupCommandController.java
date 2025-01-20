@@ -49,12 +49,6 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     } // 전체팝업관리 - 팝업생성
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(value = "/admin")
-    public ResponseDto<String> reopenPopup(@UserId Long adminId, @RequestParam("popupId") String popupId) {
-        return ResponseDto.ok(adminPopupService.reopenPopup(adminId, popupId));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin")
     public ResponseDto<Boolean> removePopup(@RequestParam("id") Long popupId,
                                             @UserId Long adminId) throws FirebaseMessagingException {

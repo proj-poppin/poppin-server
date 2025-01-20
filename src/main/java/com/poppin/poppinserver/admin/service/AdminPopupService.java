@@ -224,27 +224,6 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
-    public String reopenPopup(Long adminId, String strPopupId) {
-        User admin = userQueryUseCase.findUserById(adminId);
-        Long popupId = Long.valueOf(strPopupId);
-        List<Popup> popupList = new ArrayList<>();
-
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
-
-        if (!popup.getOperationStatus().equals("TERMINATED")) { // 운영 종료 상태인지 확인
-            throw new CommonException(ErrorCode.SERVER_ERROR);
-        }
-
-        popupList.add(popup);
-
-        fcmScheduler.schedulerFcmPopupTopicByType(popupList, EPopupTopic.REOPEN, EPushInfo.REOPEN);
-
-        popup.updateOpStatus(EOperationStatus.OPERATING.getStatus()); // 운영 중으로 변경
-        popupRepository.save(popup);
-
-        return "팝업이 재오픈 되었습니다";
-    }
 
     public AdminPopupDto readPopup(Long popupId) {
         // 팝업 정보 불러오기
