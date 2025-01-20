@@ -1,8 +1,10 @@
 package com.poppin.poppinserver.alarm.service;
 
+import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.AlarmKeywordResponseDto;
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.alarm.repository.UserAlarmKeywordRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AlarmKeywordService {
     private final UserQueryRepository userQueryRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     @Transactional(readOnly = true)
     public List<AlarmKeywordResponseDto> readAlarmKeywords(Long userId) {
@@ -36,6 +39,9 @@ public class AlarmKeywordService {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
+        FCMToken fcmToken = fcmTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_FCM_TOKEN));
+
         Set<UserAlarmKeyword> userAlarmKeywords = userAlarmKeywordRepository.findAllByUser(user);
         String newKeyword = alarmKeywordRequestDto.keyword();
 
@@ -50,7 +56,7 @@ public class AlarmKeywordService {
         UserAlarmKeyword newUserAlarmKeyword = UserAlarmKeyword.builder()
                 .user(user)
                 .keyword(newKeyword)
-                .fcmToken(alarmKeywordRequestDto.fcmToken())
+                .fcmToken(fcmToken.getToken())
                 .build();
 
         // 변경된 UserAlarmKeyword 저장
@@ -66,7 +72,7 @@ public class AlarmKeywordService {
     public void deleteAlarmKeyword(Long userId, Long keywordId) {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
+        
         UserAlarmKeyword userAlarmKeyword = userAlarmKeywordRepository.findById(keywordId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ALARM_KEYWORD));
 
