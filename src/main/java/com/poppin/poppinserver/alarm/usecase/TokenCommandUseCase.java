@@ -8,6 +8,6 @@ import com.poppin.poppinserver.core.annotation.UseCase;
 public interface TokenCommandUseCase {
 
     void applyToken(String token, Long userId);
-    void refreshToken(Long userId, String token);
+    void refreshFCMToken(Long userId, String token);
     void removeToken(FCMToken token) throws FirebaseMessagingException;
 }

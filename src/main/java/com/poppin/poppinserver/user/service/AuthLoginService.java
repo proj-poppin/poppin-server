@@ -168,7 +168,7 @@ public class AuthLoginService {
         Long userId = user.getId();
 
         // FCM 토큰 검증
-        tokenCommandUseCase.refreshToken(userId, fcmToken);
+        tokenCommandUseCase.refreshFCMToken(userId, fcmToken);
 
         // 리프레시 토큰 업데이트
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());

@@ -45,9 +45,8 @@ public class TokenCommandService implements TokenCommandUseCase {
         fcmTokenRepository.save(fcmTokenEntity);
     }
 
-    // FIXME : Token Command, Token Query에 둘다 있음. 하나로 공통화 해야 함
     @Override
-    public void refreshToken(Long userId, String token) {
+    public void refreshFCMToken(Long userId, String token) {
         log.info("verify token : {}", token);
 
         Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);

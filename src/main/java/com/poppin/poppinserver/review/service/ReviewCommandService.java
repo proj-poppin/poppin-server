@@ -93,7 +93,6 @@ public class ReviewCommandService {
 
         // 사용자 리뷰 카운트 증가
         userService.addReviewCnt(user);
-        userService.addVisitedPopupCnt(user);
 
         return ReviewWriteDto.fromEntity(review, visitorData);
     }
