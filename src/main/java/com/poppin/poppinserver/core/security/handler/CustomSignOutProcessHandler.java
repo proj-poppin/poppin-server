@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.core.security.handler;
 
+import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.core.security.info.CustomUserDetails;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +14,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomSignOutProcessHandler implements LogoutHandler {
     private final UserCommandRepository userCommandRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        userCommandRepository.updateRefreshToken(userDetails.getId(), null);
+        processSignOut(userDetails.getId());
+    }
+
+    protected void processSignOut(Long userId) {
+        userCommandRepository.updateRefreshToken(userId, null); // RefreshToken 삭제
+        fcmTokenRepository.findByUserId(userId).ifPresent(fcmTokenRepository::delete);  // FCMToken 삭제
     }
 }

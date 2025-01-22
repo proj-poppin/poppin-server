@@ -18,16 +18,20 @@ import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Base64;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.List;
 
 /**
  * 소셜 로그인과 일반 로그인을 처리하는 서비스
@@ -78,7 +82,7 @@ public class AuthLoginService {
 
         OAuth2UserInfo oAuth2UserInfoDto = getOAuth2UserInfo(loginProvider, accessToken);
 
-        return processUserLogin(oAuth2UserInfoDto, fcmTokenRequestDto.fcmToken());
+        return processUserLogin(oAuth2UserInfoDto, fcmTokenRequestDto.fcmToken(), loginProvider);
     }
 
     // Apple 소셜 로그인
@@ -87,7 +91,7 @@ public class AuthLoginService {
 
         OAuth2UserInfo oAuth2UserInfoDto = new OAuth2UserInfo(appleUserIdRequestDto.appleUserId(), user.getEmail());
 
-        return processUserLogin(oAuth2UserInfoDto, appleUserIdRequestDto.fcmToken());
+        return processUserLogin(oAuth2UserInfoDto, appleUserIdRequestDto.fcmToken(), ELoginProvider.APPLE);
     }
 
     // OAuth2 사용자 정보 가져오기
@@ -101,8 +105,11 @@ public class AuthLoginService {
     }
 
     // 로그인 프로세스
-    private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, String fcmToken) {
+    private Object processUserLogin(OAuth2UserInfo oAuth2UserInfo, String fcmToken, ELoginProvider provider) {
         User user = userQueryUseCase.findUserByEmailAndRole(oAuth2UserInfo.email(), EUserRole.USER);
+        if (user.getProvider() != provider) {
+            throw new CommonException(ErrorCode.DUPLICATED_SOCIAL_ID);
+        }
 
         // 이메일 & USER 권한으로 조회한 결과가 있으면 기존 사용자 로그인
         return handleExistingUserLogin(user, fcmToken);
