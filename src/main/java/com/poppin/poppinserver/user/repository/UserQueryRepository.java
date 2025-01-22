@@ -36,7 +36,7 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdAndELoginProvider(Long id, ELoginProvider eLoginProvider);
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.provider = :eLoginProvider")
-    Optional<User> findByEmailAndELoginProvider(String email, ELoginProvider eLoginProvider);
+    Optional<User> findByEmailAndProvider(String email, ELoginProvider eLoginProvider);
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.refreshToken IS NOT NULL")
     Optional<User> findByIdAndRefreshTokenNotNull(Long id);
