@@ -2,6 +2,7 @@ package com.poppin.poppinserver.user.usecase;
 
 import com.poppin.poppinserver.core.annotation.UseCase;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import java.util.Optional;
 
@@ -33,4 +34,7 @@ public interface UserQueryUseCase {
 
     // 유저 로그인 시 비밀번호 일치 여부 확인 메서드
     // void checkPasswordMatchForLogin(String inputPassword, String userPassword);
+
+    // 유저 이메일과 소셜 로그인 제공자로 조회 메서드
+    Optional<User> findUserByEmailAndProvider(String email, ELoginProvider provider);
 }

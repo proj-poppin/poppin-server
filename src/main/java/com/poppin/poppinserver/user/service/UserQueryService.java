@@ -3,6 +3,7 @@ package com.poppin.poppinserver.user.service;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.domain.type.ELoginProvider;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -70,5 +71,10 @@ public class UserQueryService implements UserQueryUseCase {
     @Override
     public User findUserByEmailAndRole(String email, EUserRole role) {
         return userQueryRepository.findByEmailAndRole(email, role);
+    }
+
+    @Override
+    public Optional<User> findUserByEmailAndProvider(String email, ELoginProvider provider) {
+        return userQueryRepository.findByEmailAndProvider(email, provider);
     }
 }
