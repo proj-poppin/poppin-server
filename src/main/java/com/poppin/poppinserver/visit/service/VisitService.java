@@ -21,6 +21,7 @@ import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class VisitService {
         return Optional.of(realTimeVisitorsCount);
     }
 
+    @Transactional
     /*방문하기 버튼 누를 시*/
     public VisitedPopupDto visit(Long userId, VisitorsInfoDto visitorsInfoDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(visitorsInfoDto.popupId());
@@ -90,6 +92,7 @@ public class VisitService {
                         .build()
         );
 
+        // 사용자 리뷰 카운트 증가
         user.addVisitedPopupCnt();
 
         VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId());

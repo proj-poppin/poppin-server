@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.core.util.RandomNicknameUtil;
-import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +38,4 @@ public class UserService {
         return new UserNicknameResponseDto(randomNickname);
     }
 
-    public void addReviewCnt(User user) {
-        user.addReviewCnt();
-        userQueryRepository.save(user);
-    }
-
-    public void addVisitedPopupCnt(User user) {
-        user.addVisitedPopupCnt();
-        userQueryRepository.save(user);
-    }
 }

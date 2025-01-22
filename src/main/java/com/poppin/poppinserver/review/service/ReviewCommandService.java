@@ -92,7 +92,7 @@ public class ReviewCommandService {
         visitorDataRepository.save(visitorData);
 
         // 사용자 리뷰 카운트 증가
-        userService.addReviewCnt(user);
+        user.addReviewCnt();
 
         return ReviewWriteDto.fromEntity(review, visitorData);
     }
