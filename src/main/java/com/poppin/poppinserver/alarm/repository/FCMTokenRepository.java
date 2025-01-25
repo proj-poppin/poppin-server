@@ -32,6 +32,6 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     FCMToken findByUser(User user);
 
-    @Query("SELECT token.user FROM FCMToken token WHERE token.token = :token")
-    User findUserByToken(String token);
+    @Query("SELECT token.user FROM FCMToken token WHERE token = :fcmToken")
+    User findUserByToken(FCMToken fcmToken);
 }

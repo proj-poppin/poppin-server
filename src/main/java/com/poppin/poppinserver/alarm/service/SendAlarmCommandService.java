@@ -46,19 +46,17 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
     //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
     private final PopupRepository popupRepository;
-
     private final TokenQueryUseCase tokenQueryUseCase;
     private final AlarmListQueryUseCase alarmListQueryUseCase;
     private final AlarmCommandUseCase alarmCommandUseCase;
 
     @Override
-    public void sendInformationAlarm(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
-        for (FCMToken token : tokenList) {
+    public void sendInformationAlarm(List<User> userList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
+        for (User user : userList) {
 
-            User user = tokenQueryUseCase.findUserByToken(token.getToken());
-            Long userId = user.getId();
+            FCMToken token = tokenQueryUseCase.findByUser(user);
 
-            int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
+            int badge = alarmListQueryUseCase.countUnreadAlarms(user.getId());
 
             log.info("token : " + token.getToken());
             Message message = Message.builder()
@@ -94,7 +92,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
         for (FCMToken token : tokenList) {
 
-            User user = tokenQueryUseCase.findUserByToken(token.getToken());
+            User user = tokenQueryUseCase.findUserByToken(token);
             Long userId = user.getId();
 
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -180,7 +178,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendKeywordAlarm(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
 
-        User user = tokenQueryUseCase.findUserByToken(token.getToken());
+        User user = tokenQueryUseCase.findUserByToken(token);
         Long userId = user.getId();
 
         int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -210,7 +208,8 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendPopupTopicAlarm(List<FCMRequestDto> fcmRequestDtoList) {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
-            User user = tokenQueryUseCase.findUserByToken(fcmRequestDto.token());
+            FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
+            User user = tokenQueryUseCase.findUserByToken(token);
             Long userId = user.getId();
 
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -242,7 +241,6 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
                 log.info("Successfully sent message: " + result);
 
                 // 토큰 갱신
-                FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
                 refreshToken(token);
 
                 // 팝업 알림 저장
