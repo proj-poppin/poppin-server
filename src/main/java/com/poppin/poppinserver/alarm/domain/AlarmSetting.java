@@ -25,7 +25,7 @@ public class AlarmSetting {
     private Long id; // seq
 
     @Column(name = "token", nullable = false)
-    private String token;
+    private String token; // 추후 user로 바꾸면 좋겠음
 
     @Column(name = "push_yn", nullable = false)
     private Boolean pushYn; // 푸시 알림 on off

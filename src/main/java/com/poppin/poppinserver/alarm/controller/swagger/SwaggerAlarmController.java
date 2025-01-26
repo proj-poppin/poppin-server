@@ -1,7 +1,6 @@
 package com.poppin.poppinserver.alarm.controller.swagger;
 
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,12 +33,6 @@ public interface SwaggerAlarmController {
 //            @RequestBody AlarmTokenRequestDto dto
 //    );
 
-    @Operation(summary = "알림 설정 수정", description = "사용자의 알림 설정을 수정합니다.")
-    @PutMapping("/settings")
-    ResponseDto<?> createAlarmSetting(
-            @Parameter(hidden = true) Long userId,
-            @RequestBody AlarmSettingRequestDto dto
-    );
 
     @Operation(summary = "알림 키워드 조회", description = "사용자의 알림 키워드를 조회합니다.")
     @GetMapping("/keywords")

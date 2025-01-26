@@ -57,11 +57,6 @@ public class AlarmController implements SwaggerAlarmController {
 //        return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
 //    }
 
-    @PutMapping("/settings")
-    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {
-        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
-    }
-
     // 마이페이지 > 키워드 알람 > 키워드 조회
     @GetMapping("/keywords")
     public ResponseDto<?> readAlarmKeywords(@UserId Long userId) {

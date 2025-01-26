@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.user.controller.swagger;
 
+import com.poppin.poppinserver.alarm.dto.alarm.request.NotificationRequestDto;
+import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EOperationStatus;
@@ -8,22 +10,16 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationSettingResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "사용자", description = "사용자 관련 API")
 public interface SwaggerUserController {
@@ -46,6 +42,20 @@ public interface SwaggerUserController {
     ResponseDto<UserPreferenceUpdateResponseDto> updateUserTaste(
             @Parameter(hidden = true) Long userId,
             @RequestBody CreateUserTasteDto userTasteDto
+    );
+
+    @Operation(summary = "알림 설정 수정", description = "사용자의 알림 설정을 수정합니다.")
+    @PatchMapping("/notifications/settings")
+    ResponseDto<UserNotificationSettingResponseDto> updateAlarmSetting(
+            @Parameter(hidden = true) Long userId,
+            @RequestBody AlarmSettingRequestDto dto
+    );
+
+    @Operation(summary = "알림 설정 수정", description = "사용자의 알림 설정을 수정합니다.")
+    @PatchMapping("/notifications/check")
+    ResponseDto<String> checkNotification(
+            @Parameter(hidden = true) Long userId,
+            @RequestBody NotificationRequestDto dto
     );
 
 //    @Operation(summary = "사용자 프로필 이미지 생성", description = "사용자 프로필 이미지를 생성합니다.")

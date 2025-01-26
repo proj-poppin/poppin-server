@@ -1,21 +1,11 @@
 package com.poppin.poppinserver.alarm.domain;
 
 import com.poppin.poppinserver.user.domain.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -54,9 +44,5 @@ public class FCMToken {
     public void refreshToken() {
         this.mod_dtm = LocalDateTime.now();
         this.exp_dtm = mod_dtm.plusMonths(1); // 1달 갱신
-    }
-
-    public void regenerateToken(FCMToken fcmToken) {
-        this.token = fcmToken.getToken();
     }
 }

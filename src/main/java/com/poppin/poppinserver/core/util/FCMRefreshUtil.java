@@ -24,9 +24,4 @@ public class FCMRefreshUtil implements ApplicationContextAware {
         log.info("refresh token : " + fcmToken.getToken());
         fcmToken.refreshToken();
     }
-
-    public static void regenerateToken(FCMToken fcmToken){
-        log.info("regenerate token : " + fcmToken.getToken());
-        fcmToken.regenerateToken(fcmToken);
-    }
 }

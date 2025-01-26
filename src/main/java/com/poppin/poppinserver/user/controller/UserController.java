@@ -1,7 +1,9 @@
 package com.poppin.poppinserver.user.controller;
 
 import com.poppin.poppinserver.alarm.dto.alarm.request.NotificationRequestDto;
+import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmService;
+import com.poppin.poppinserver.alarm.service.AlarmSettingService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
@@ -11,11 +13,8 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import com.poppin.poppinserver.user.controller.swagger.SwaggerUserController;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
-import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.service.*;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,7 @@ import java.util.List;
 @Slf4j
 public class UserController implements SwaggerUserController {
     private final AlarmService alarmService;
+    private final AlarmSettingService alarmSettingService;
     private final UserService userService;
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
@@ -123,4 +123,10 @@ public class UserController implements SwaggerUserController {
     public ResponseDto<String> checkNotification(@UserId Long userId, @RequestBody NotificationRequestDto notificationRequestDto){
         return ResponseDto.ok(alarmService.checkNotification(userId, notificationRequestDto));
     }
+
+    @PatchMapping("/notifications/settings")
+    public ResponseDto<UserNotificationSettingResponseDto> updateAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {
+        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
+    }
+
 }

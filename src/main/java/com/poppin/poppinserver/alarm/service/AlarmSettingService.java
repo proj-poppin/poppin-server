@@ -2,11 +2,11 @@ package com.poppin.poppinserver.alarm.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarmSetting.response.AlarmSettingResponseDto;
 import com.poppin.poppinserver.alarm.repository.AlarmSettingRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationSettingResponseDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class AlarmSettingService {
     private final AlarmSettingRepository alarmSettingRepository;
     private final UserQueryUseCase userQueryUseCase;
 
-    public AlarmSettingResponseDto updateAlarmSetting(Long userId, AlarmSettingRequestDto reqDto) {
+    public UserNotificationSettingResponseDto updateAlarmSetting(Long userId, AlarmSettingRequestDto reqDto) {
 
         User user = userQueryUseCase.findUserById(userId);
 
@@ -43,6 +43,6 @@ public class AlarmSettingService {
         );
         alarmSettingRepository.save(newAlarmSetting);
 
-        return AlarmSettingResponseDto.fromEntity(newAlarmSetting);
+        return UserNotificationSettingResponseDto.fromEntity(newAlarmSetting);
     }
 }
