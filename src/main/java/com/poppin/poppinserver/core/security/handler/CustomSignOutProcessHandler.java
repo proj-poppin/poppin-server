@@ -27,6 +27,6 @@ public class CustomSignOutProcessHandler implements LogoutHandler {
     protected void processSignOut(Long userId) {
         userCommandRepository.updateRefreshToken(userId, null); // RefreshToken 삭제
         log.info("User {} sign out", userId);
-        fcmTokenRepository.findByUserId(userId).ifPresent(fcmTokenRepository::delete);  // FCMToken 삭제
+        fcmTokenRepository.findByUserId(userId).ifPresent(fcmTokenRepository::delete); // FCMToken 삭제
     }
 }

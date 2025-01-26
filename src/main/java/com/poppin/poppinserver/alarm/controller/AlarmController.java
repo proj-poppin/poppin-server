@@ -3,9 +3,6 @@ package com.poppin.poppinserver.alarm.controller;
 import com.poppin.poppinserver.alarm.controller.swagger.SwaggerAlarmController;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmKeywordService;
-import com.poppin.poppinserver.alarm.service.AlarmListService;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.AlarmSettingService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alarm")
 public class AlarmController implements SwaggerAlarmController {
-
-    private final AlarmService alarmService;
-    private final AlarmListService alarmListService;
-    private final AlarmSettingService alarmSettingService;
     private final AlarmKeywordService alarmKeywordService;
 
     // TODO : 삭제 예정

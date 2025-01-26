@@ -5,6 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record AlarmSettingRequestDto(
+        @NotNull String lastCheck,
+        String lastUpdatedAt,
         @NotNull Boolean appPush,
         @NotNull Boolean nightPush,
         @NotNull Boolean helpfulReviewPush,

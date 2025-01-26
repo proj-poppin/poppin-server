@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,6 +51,12 @@ public class AlarmSetting {
     @Column(name = "change_info_yn", nullable = false)
     private Boolean changeInfoYn; // 관심 팝업 정보 변경 알림 on off
 
+    @Column(name = "last_checked_at")
+    private String lastCheckedAt;   // 마지막으로 알람을 확인한 시간
+
+    @Column(name = "last_updated_at")
+    private String lastUpdatedAt;   // 마지막으로 알람 설정을 변경한 시간
+
 
     @Builder(access = AccessLevel.PRIVATE)
     public AlarmSetting(
@@ -83,14 +90,17 @@ public class AlarmSetting {
     }
 
     public void updateAlarmSetting(
+            String lastCheckedAt,
             Boolean pushYn, Boolean pushNightYn, Boolean hoogiYn,
             Boolean openYn, Boolean magamYn, Boolean changeInfoYn
     ) {
+        this.lastCheckedAt = lastCheckedAt;
         this.pushYn = pushYn;
         this.pushNightYn = pushNightYn;
         this.hoogiYn = hoogiYn;
         this.openYn = openYn;
         this.magamYn = magamYn;
         this.changeInfoYn = changeInfoYn;
+        this.lastUpdatedAt = LocalDateTime.now().toString();
     }
 }

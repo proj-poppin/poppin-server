@@ -3,7 +3,6 @@ package com.poppin.poppinserver.user.controller;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.NotificationRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.AlarmSettingService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
@@ -18,6 +17,7 @@ import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationSettingResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
+import com.poppin.poppinserver.user.service.UserAlarmSettingService;
 import com.poppin.poppinserver.user.service.UserFaqService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
@@ -48,7 +48,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class UserController implements SwaggerUserController {
     private final AlarmService alarmService;
-    private final AlarmSettingService alarmSettingService;
     private final UserService userService;
     private final SearchPopupService searchPopupService;
     private final BlockUserService blockUserService;
@@ -56,6 +55,7 @@ public class UserController implements SwaggerUserController {
     private final UserProfileImageService userProfileImageService;
     private final UserHardDeleteService userHardDeleteService;
     private final UserFaqService userFaqService;
+    private final UserAlarmSettingService userAlarmSettingService;
 
     /**
      * 마이페이지 - 취향 설정 수정
@@ -156,12 +156,11 @@ public class UserController implements SwaggerUserController {
     /**
      * 알람 설정 수정
      */
-    @PatchMapping("/notifications/settings")
+    @PatchMapping("/notifications/setting")
     public ResponseDto<UserNotificationSettingResponseDto> updateAlarmSetting(
             @UserId Long userId,
             @RequestBody AlarmSettingRequestDto dto
     ) {
-        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
+        return ResponseDto.ok(userAlarmSettingService.updateAlarmSetting(userId, dto));
     }
-
 }
