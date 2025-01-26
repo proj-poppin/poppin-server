@@ -2,7 +2,6 @@ package com.poppin.poppinserver.alarm.controller;
 
 import com.poppin.poppinserver.alarm.controller.swagger.SwaggerAlarmController;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmKeywordService;
 import com.poppin.poppinserver.alarm.service.AlarmListService;
 import com.poppin.poppinserver.alarm.service.AlarmService;

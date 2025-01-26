@@ -133,38 +133,6 @@ public class User {
         this.reportedCnt = 0;
     }
 
-    // TODO: 삭제 예정
-//    public static User toUserEntity(AuthSignUpRequestDto authSignUpRequestDto, String encodedPassword,
-//                                    ELoginProvider eLoginProvider) {
-//        return User.builder()
-//                .email(authSignUpRequestDto.email())
-//                .password(encodedPassword)
-//                .nickname(authSignUpRequestDto.nickname())
-//                .eLoginProvider(eLoginProvider)
-//                .role(EUserRole.USER)
-//                .agreedToPrivacyPolicy(authSignUpRequestDto.agreedToPrivacyPolicy())
-//                .agreedToServiceTerms(authSignUpRequestDto.agreedToServiceTerms())
-//                .build();
-//    }
-
-//    public static User toGuestEntity(OAuth2UserInfo oAuth2UserInfo, String encodedPassword,
-//                                     ELoginProvider eLoginProvider) {
-//        return User.builder()
-//                .email(oAuth2UserInfo.email())
-//                .password(encodedPassword)
-//                .eLoginProvider(eLoginProvider)
-//                .role(EUserRole.GUEST)
-//                .agreedToPrivacyPolicy(true)
-//                .agreedToServiceTerms(true)
-//                .build();
-//    }
-
-    // TODO: LEGACY CODE
-    public void register(String nickname) {
-        this.nickname = nickname;
-        this.role = EUserRole.USER;
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

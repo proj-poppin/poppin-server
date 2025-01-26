@@ -9,16 +9,20 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 소셜 회원가입과 일반 회원가입을 처리하는 서비스
@@ -98,7 +102,7 @@ public class AuthSignUpService {
         String fcmToken = authSignUpRequestDto.fcmToken();
 
         // 알람 setting 객체 반환
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(newUser);
 
         // FCM 토큰 등록
         tokenCommandUseCase.applyToken(fcmToken, newUser.getId());

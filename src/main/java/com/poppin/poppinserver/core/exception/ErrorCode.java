@@ -39,7 +39,7 @@ public enum ErrorCode {
     ALREADY_BLOCKED_USER("40028", HttpStatus.BAD_REQUEST, "이미 차단된 사용자입니다."),
     DUPLICATED_ALARM_KEYWORD("40029", HttpStatus.BAD_REQUEST, "이미 등록된 알람 키워드입니다."),
     NOT_FOUND_ALARM_KEYWORD("40030", HttpStatus.BAD_REQUEST, "존재하지 않는 알람 키워드입니다."),
-    // ALREADY_EXIST_FCM_TOKEN("40031", HttpStatus.BAD_REQUEST, "중복된 FCM 토큰입니다."),
+    ALREADY_EXIST_FCM_TOKEN("40031", HttpStatus.BAD_REQUEST, "중복된 FCM 토큰입니다."),
     INVALID_CATEGORY_STRING("40032", HttpStatus.BAD_REQUEST, "유효한 카테고리를 하나 이상 요청 해야 합니다."),
     DUPLICATED_REVIEW("40033", HttpStatus.BAD_REQUEST, "팝업 스토어에는 하나의 후기만 작성 가능 합니다."),
     ALARM_CHECK("40034", HttpStatus.BAD_REQUEST, "알림 읽음 요청이 실패 하였습니다."),

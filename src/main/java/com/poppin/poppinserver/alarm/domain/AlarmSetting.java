@@ -1,10 +1,14 @@
 package com.poppin.poppinserver.alarm.domain;
 
+import com.poppin.poppinserver.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,8 +28,9 @@ public class AlarmSetting {
     @Column(name = "id")
     private Long id; // seq
 
-    @Column(name = "token", nullable = false)
-    private String token; // 추후 user로 바꾸면 좋겠음
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "push_yn", nullable = false)
     private Boolean pushYn; // 푸시 알림 on off
@@ -47,14 +52,16 @@ public class AlarmSetting {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    public AlarmSetting(String token,
-                        Boolean pushYn,
-                        Boolean pushNightYn,
-                        Boolean hoogiYn,
-                        Boolean openYn,
-                        Boolean magamYn,
-                        Boolean changeInfoYn) {
-        this.token = token;
+    public AlarmSetting(
+            User user,
+            Boolean pushYn,
+            Boolean pushNightYn,
+            Boolean hoogiYn,
+            Boolean openYn,
+            Boolean magamYn,
+            Boolean changeInfoYn
+    ) {
+        this.user = user;
         this.pushYn = pushYn;
         this.pushNightYn = pushNightYn;
         this.hoogiYn = hoogiYn;
@@ -63,9 +70,9 @@ public class AlarmSetting {
         this.changeInfoYn = changeInfoYn;
     }
 
-    public static AlarmSetting createAlarmSetting(String token) {
+    public static AlarmSetting createAlarmSetting(User user) {
         return AlarmSetting.builder()
-                .token(token)
+                .user(user)
                 .pushYn(true)
                 .pushNightYn(true)
                 .hoogiYn(true)
@@ -75,4 +82,15 @@ public class AlarmSetting {
                 .build();
     }
 
+    public void updateAlarmSetting(
+            Boolean pushYn, Boolean pushNightYn, Boolean hoogiYn,
+            Boolean openYn, Boolean magamYn, Boolean changeInfoYn
+    ) {
+        this.pushYn = pushYn;
+        this.pushNightYn = pushNightYn;
+        this.hoogiYn = hoogiYn;
+        this.openYn = openYn;
+        this.magamYn = magamYn;
+        this.changeInfoYn = changeInfoYn;
+    }
 }

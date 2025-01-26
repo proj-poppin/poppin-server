@@ -12,7 +12,8 @@ public record UserNotificationSettingResponseDto(
         Boolean interestedPopupOpenPush,    // 관심 팝업 오픈 알림
         Boolean interestedPopupDeadlinePush,    // 관심 팝업 마감 D-1 알림
         Boolean interestedPopupInfoUpdatedPush,  // 관심 팝업 정보 변경 알림
-        String fcmToken    // fcm 토큰
+        String lastCheck,
+        String lastUpdatedAt
 ) {
     public static UserNotificationSettingResponseDto fromEntity(AlarmSetting alarmSetting) {
         return UserNotificationSettingResponseDto.builder()
@@ -22,7 +23,6 @@ public record UserNotificationSettingResponseDto(
                 .interestedPopupOpenPush(alarmSetting.getOpenYn())
                 .interestedPopupDeadlinePush(alarmSetting.getMagamYn())
                 .interestedPopupInfoUpdatedPush(alarmSetting.getChangeInfoYn())
-                .fcmToken(alarmSetting.getToken())
                 .build();
     }
 }
