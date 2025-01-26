@@ -12,8 +12,8 @@ public record UserNotificationSettingResponseDto(
         Boolean interestedPopupOpenPush,    // 관심 팝업 오픈 알림
         Boolean interestedPopupDeadlinePush,    // 관심 팝업 마감 D-1 알림
         Boolean interestedPopupInfoUpdatedPush,  // 관심 팝업 정보 변경 알림
-        String lastCheck,
-        String lastUpdatedAt
+        String lastCheck,   // 마지막으로 알람을 확인한 시간
+        String lastUpdatedAt    // 마지막으로 알람 설정을 변경한 시간
 ) {
     public static UserNotificationSettingResponseDto fromEntity(AlarmSetting alarmSetting) {
         return UserNotificationSettingResponseDto.builder()
@@ -23,6 +23,8 @@ public record UserNotificationSettingResponseDto(
                 .interestedPopupOpenPush(alarmSetting.getOpenYn())
                 .interestedPopupDeadlinePush(alarmSetting.getMagamYn())
                 .interestedPopupInfoUpdatedPush(alarmSetting.getChangeInfoYn())
+                .lastCheck(alarmSetting.getLastCheckedAt() == null ? "" : alarmSetting.getLastCheckedAt())
+                .lastUpdatedAt(alarmSetting.getLastUpdatedAt() == null ? "" : alarmSetting.getLastUpdatedAt())
                 .build();
     }
 }

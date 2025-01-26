@@ -31,19 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "사용자", description = "사용자 관련 API")
 public interface SwaggerUserController {
 
-//    @Operation(summary = "사용자 취향 생성", description = "사용자의 취향을 생성합니다.")
-//    @PostMapping("/popup-taste")
-//    ResponseDto<?> createUserTaste(
-//            @Parameter(hidden = true) Long userId,
-//            @RequestBody CreateUserTasteDto userTasteDto
-//    );
-
-//    @Operation(summary = "사용자 취향 조회", description = "사용자의 취향을 조회합니다.")
-//    @GetMapping("/popup-taste")
-//    ResponseDto<?> readUserTaste(
-//            @Parameter(hidden = true) Long userId
-//    );
-
     @Operation(summary = "사용자 취향 수정", description = "사용자의 취향을 수정합니다.")
     @PutMapping("/popup-taste")
     ResponseDto<UserPreferenceUpdateResponseDto> updateUserTaste(
@@ -52,7 +39,7 @@ public interface SwaggerUserController {
     );
 
     @Operation(summary = "알림 설정 수정", description = "사용자의 알림 설정을 수정합니다.")
-    @PatchMapping("/notifications/settings")
+    @PatchMapping("/notifications/setting")
     ResponseDto<UserNotificationSettingResponseDto> updateAlarmSetting(
             @Parameter(hidden = true) Long userId,
             @RequestBody AlarmSettingRequestDto dto
@@ -64,13 +51,6 @@ public interface SwaggerUserController {
             @Parameter(hidden = true) Long userId,
             @RequestBody NotificationRequestDto dto
     );
-
-//    @Operation(summary = "사용자 프로필 이미지 생성", description = "사용자 프로필 이미지를 생성합니다.")
-//    @PostMapping("/image")
-//    ResponseDto<String> createUserProfileImage(
-//            @Parameter(hidden = true) Long userId,
-//            @RequestPart(value = "profileImage") MultipartFile profileImage
-//    );
 
     @Operation(summary = "사용자 프로필 수정", description = "사용자 프로필을 수정합니다.")
     @PatchMapping(value = "/profile", consumes = {"application/json", "multipart/form-data"})
@@ -85,13 +65,6 @@ public interface SwaggerUserController {
     ResponseDto<String> deleteUserProfileImage(
             @Parameter(hidden = true) Long userId
     );
-
-//    @Operation(summary = "사용자 닉네임 수정", description = "사용자의 닉네임을 수정합니다.")
-//    @PutMapping("/settings")
-//    ResponseDto<UserProfileDto> updateUserNickname(
-//            @Parameter(hidden = true) Long userId,
-//            @RequestBody UpdateUserInfoDto updateUserInfoDto
-//    );
 
     @Operation(summary = "회원 탈퇴", description = "사용자가 회원 탈퇴를 진행합니다.")
     @DeleteMapping("/withdrawal")
