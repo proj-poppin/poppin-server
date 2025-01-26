@@ -18,16 +18,20 @@ import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Base64;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.List;
 
 /**
  * 소셜 로그인과 일반 로그인을 처리하는 서비스
@@ -166,7 +170,7 @@ public class AuthLoginService {
     }
 
     private UserInfoResponseDto buildUserInfoResponse(User user, String fcmToken) {
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(user);
 
         Long userId = user.getId();
 
