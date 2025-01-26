@@ -138,6 +138,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendChoochunAlarm(User user, Popup popup, Review review, EPushInfo info) {
 
         Long userId = user.getId();
+        FCMToken fcmToken = tokenQueryUseCase.findByUser(review.getUser());
         int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
 
         Message message = Message.builder()
@@ -147,7 +148,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
                         .build())
                 .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                 .setAndroidConfig(androidConfiguration.androidConfig())
-                .setToken(review.getToken())
+                .setToken(fcmToken.getToken())
                 .putData("id", review.getPopup().getId().toString())
                 .putData("type", "popup")
                 .build();
@@ -156,7 +157,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
             String result = firebaseMessaging.send(message);
             log.info("Successfully sent message: " + result);
 
-            FCMToken token = tokenQueryUseCase.findByToken(review.getToken());
+            FCMToken token = tokenQueryUseCase.findByUser(user);
             refreshToken(token);
 
         } catch (FirebaseMessagingException e) {
