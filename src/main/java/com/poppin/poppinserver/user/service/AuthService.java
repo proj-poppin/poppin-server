@@ -92,7 +92,7 @@ public class AuthService {
         AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
 
         // FCM 토큰 검증
-        tokenCommandUseCase.refreshFCMToken(user.getId(), fcmToken);
+        tokenCommandUseCase.refreshFCMToken(user, fcmToken);
         user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         boolean isPreferenceSettingCreated = userPreferenceSettingService

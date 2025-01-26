@@ -46,9 +46,9 @@ public class TokenCommandService implements TokenCommandUseCase {
     }
 
     @Override
-    public void refreshFCMToken(Long userId, String token) {
+    public void refreshFCMToken(User user, String token) {
         log.info("verify token : {}", token);
-
+        Long userId = user.getId();
         Optional<FCMToken> fcmTokenOptional = fcmTokenRepository.findByUserId(userId);
         if (fcmTokenOptional.isPresent()) {
             String currentToken = fcmTokenOptional.get().getToken();
@@ -57,6 +57,13 @@ public class TokenCommandService implements TokenCommandUseCase {
                 fcmTokenRepository.save(fcmTokenOptional.get());
                 //TODO: 알림세팅 관련 로직이 필요함:
             }
+        }else {
+            FCMToken newToken = FCMToken.builder()
+                    .user(user)
+                    .token(token)
+                    .mod_dtm(LocalDateTime.now())
+                    .build();
+            fcmTokenRepository.save(newToken);
         }
     }
 
