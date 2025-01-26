@@ -82,17 +82,17 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     }
 
     @Override
-    public void sendScheduledPopupAlarm(List<Popup> popupList, EPushInfo info) {
+    public void sendScheduledPopupAlarm(List<Popup> popupList, EPushInfo info) { // 예시. <인기 팝업 id 리스트, 인기 팝업 알림 정보>
         List<Long> popupIdList = new ArrayList<>();
         for (Popup p : popupList) {
             popupIdList.add(p.getId());
         }
 
-        List<FCMToken> tokenList = tokenQueryUseCase.findAll();
+        List<FCMToken> tokenList = tokenQueryUseCase.findAll(); // 모든 토큰을 찾아서
 
         for (FCMToken token : tokenList) {
 
-            User user = tokenQueryUseCase.findUserByToken(token);
+            User user = tokenQueryUseCase.findUserByToken(token); // 토큰으로 유저 정보를 찾는다 -> 문제. 유니크 아니면 여러 유저가 나온다.-> 에러
             Long userId = user.getId();
 
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);

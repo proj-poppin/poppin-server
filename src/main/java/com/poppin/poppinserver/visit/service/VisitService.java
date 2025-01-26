@@ -81,7 +81,7 @@ public class VisitService {
         if (token.isEmpty()) {
             throw new CommonException(ErrorCode.NOT_FOUND_TOKEN);
         } else {
-            topicCommandUseCase.subscribePopupTopic(token.get(), popup, EPopupTopic.HOOGI);
+            topicCommandUseCase.subscribePopupTopic(user, token.get(), popup, EPopupTopic.HOOGI);
         }
 
 

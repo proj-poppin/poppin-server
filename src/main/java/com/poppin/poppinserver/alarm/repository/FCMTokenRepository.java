@@ -21,13 +21,11 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
     @Query("SELECT token FROM FCMToken token WHERE token.token = :token")
     Optional<FCMToken> findByTokenOpt(@Param("token") String token);
 
-    // 1. 원준 계정으로 로그인 -> FCMToken 레코드 생성
-    // 2. 관심 팝업 누름 -> PopupTopic테이블 레코드 생성
-    // 3. 원준 계정 로그아웃 - > FCMToken테이블 token = null
-    // 4. findTokenIdByTopicAndType 메서드 스케줄러 호출 -> FCMToken 레코드 모음 가져옴
-    // 5.
-    @Query("SELECT DISTINCT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
-    List<FCMToken> findTokenIdByTopicAndType(String code, @Param("popupId") Long popupId);
+    @Query("SELECT ft FROM FCMToken ft " +
+            "JOIN PopupTopic pt ON pt.user = ft.user " +
+            "WHERE pt.topicCode = :topicCode AND pt.popup.id = :popupId")
+    List<FCMToken> findTokenIdByTopicAndType(@Param("topicCode") String topicCode,
+                                             @Param("popupId") Long popupId);
 
     @Query("SELECT token FROM FCMToken token WHERE token.exp_dtm <= :now")
     List<FCMToken> findExpiredTokenList(LocalDateTime now);
