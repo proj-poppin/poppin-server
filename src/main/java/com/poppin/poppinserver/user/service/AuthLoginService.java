@@ -191,9 +191,7 @@ public class AuthLoginService {
         UserNoticeResponseDto userNoticeResponseDto = userActivityService.getUserNotificationStatus(userId);
 
         // 유저 알림 정보 조회
-        UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
-                user, fcmToken
-        );
+        UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(user);
 
         // 유저 팝업 정보 조회
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(user);

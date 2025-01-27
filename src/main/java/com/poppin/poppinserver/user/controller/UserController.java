@@ -14,12 +14,14 @@ import com.poppin.poppinserver.user.controller.swagger.SwaggerUserController;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationSettingResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import com.poppin.poppinserver.user.service.BlockUserService;
 import com.poppin.poppinserver.user.service.UserAlarmSettingService;
 import com.poppin.poppinserver.user.service.UserFaqService;
 import com.poppin.poppinserver.user.service.UserHardDeleteService;
+import com.poppin.poppinserver.user.service.UserNotificationService;
 import com.poppin.poppinserver.user.service.UserPreferenceSettingService;
 import com.poppin.poppinserver.user.service.UserProfileImageService;
 import com.poppin.poppinserver.user.service.UserService;
@@ -56,6 +58,7 @@ public class UserController implements SwaggerUserController {
     private final UserHardDeleteService userHardDeleteService;
     private final UserFaqService userFaqService;
     private final UserAlarmSettingService userAlarmSettingService;
+    private final UserNotificationService userNotificationService;
 
     /**
      * 마이페이지 - 취향 설정 수정
@@ -162,5 +165,13 @@ public class UserController implements SwaggerUserController {
             @RequestBody AlarmSettingRequestDto dto
     ) {
         return ResponseDto.ok(userAlarmSettingService.updateAlarmSetting(userId, dto));
+    }
+
+    /**
+     * 알람 리스트 불러오기
+     */
+    @GetMapping("/notifications")
+    public ResponseDto<UserNotificationResponseDto> getNotifications(@UserId Long userId) {
+        return ResponseDto.ok(userNotificationService.getNotifications(userId));
     }
 }

@@ -126,8 +126,7 @@ public class AuthSignUpService {
 
         // 유저 알림 정보 조회
         UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
-                newUser, fcmToken
-        );
+                newUser);
 
         // 유저 팝업 정보 조회
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(newUser);

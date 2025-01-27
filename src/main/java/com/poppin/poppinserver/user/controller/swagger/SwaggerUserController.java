@@ -10,6 +10,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserFaqResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNicknameResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationSettingResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceUpdateResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,12 @@ public interface SwaggerUserController {
     ResponseDto<String> checkNotification(
             @Parameter(hidden = true) Long userId,
             @RequestBody NotificationRequestDto dto
+    );
+
+    @Operation(summary = "알림 리스트 조회", description = "사용자의 공지, 팝업 알림 리스트를 조회합니다.")
+    @GetMapping("/notifications")
+    ResponseDto<UserNotificationResponseDto> getNotifications(
+            @Parameter(hidden = true) Long userId
     );
 
     @Operation(summary = "사용자 프로필 수정", description = "사용자 프로필을 수정합니다.")
