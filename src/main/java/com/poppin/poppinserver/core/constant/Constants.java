@@ -86,10 +86,10 @@ public class Constants {
     /**
      * 앱 버전 관련 상수
      */
-    public static final String RECENT_VERSION = "1.1.0";
-    public static final String REQUIRED_VERSION = "1.1.1";
-    public static final String REQUIRED_IOS_VERSION = "1.1.1";
-    public static final String REQUIRED_ANDROID_VERSION = "1.1.1";
+    public static final String RECENT_VERSION = "1.4.1";
+    public static final String REQUIRED_VERSION = "1.4.1";
+    public static final String REQUIRED_IOS_VERSION = "1.4.1";
+    public static final String REQUIRED_ANDROID_VERSION = "1.4.1";
 
     /**
      * 앱 다운로드 URL
