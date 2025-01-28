@@ -50,7 +50,7 @@ public class SearchPopupService {
         }
 
         if (Objects.equals(prepered.get(0), "")) {
-            prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
+            prepered = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAnimation", "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
         }
 
         // 카테고리 입력값 유효성 검사
@@ -65,7 +65,7 @@ public class SearchPopupService {
         Boolean fashionBeauty = prepered.contains("fashionBeauty") ? true : null;
         Boolean characters = prepered.contains("characters") ? true : null;
         Boolean foodBeverage = prepered.contains("foodBeverage") ? true : null;
-        Boolean webtoonAni = prepered.contains("webtoonAni") ? true : null;
+        Boolean webtoonAni = prepered.contains("webtoonAnimation") ? true : null;
         Boolean interiorThings = prepered.contains("interiorThings") ? true : null;
         Boolean movie = prepered.contains("movie") ? true : null;
         Boolean musical = prepered.contains("musical") ? true : null;
@@ -138,7 +138,7 @@ public class SearchPopupService {
     private void validateInput(String filteringThreeCategories, String filteringFourteenCategories) {
         // 허용된 카테고리 리스트
         List<String> validThreeCategories = List.of("market", "display", "experience");
-        List<String> validFourteenCategories = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAni",
+        List<String> validFourteenCategories = List.of("fashionBeauty", "characters", "foodBeverage", "webtoonAnimation",
                 "interiorThings", "movie", "musical", "sports", "game", "itTech", "kpop", "alcohol", "animalPlant", "etc");
 
         // filteringThreeCategories 유효성 검사
