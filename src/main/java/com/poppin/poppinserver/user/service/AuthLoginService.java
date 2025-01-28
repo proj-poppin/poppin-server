@@ -2,7 +2,7 @@ package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
@@ -137,7 +137,7 @@ public class AuthLoginService {
     }
 
     private String[] decodeBasicAuth(String authorizationHeader) {
-        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
+        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constants.BASIC_PREFIX);
         String decoded = new String(Base64.getDecoder().decode(encoded));
         String[] credentials = decoded.split(":");
 

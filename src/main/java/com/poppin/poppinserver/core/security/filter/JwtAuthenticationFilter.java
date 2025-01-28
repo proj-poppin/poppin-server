@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.core.security.filter;
 
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.security.JwtAuthenticationToken;
 import com.poppin.poppinserver.core.security.info.JwtUserInfo;
 import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return Constant.NO_NEED_AUTH_URLS.stream().anyMatch(request.getRequestURI()::startsWith);
+        return Constants.NO_NEED_AUTH_URLS.stream().anyMatch(request.getRequestURI()::startsWith);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token)) {
             Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
             JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
-                    .id(claims.get(Constant.USER_ID_CLAIM_NAME, Long.class))
-                    .role(EUserRole.valueOf(claims.get(Constant.USER_ROLE_CLAIM_NAME, String.class)))
+                    .id(claims.get(Constants.USER_ID_CLAIM_NAME, Long.class))
+                    .role(EUserRole.valueOf(claims.get(Constants.USER_ROLE_CLAIM_NAME, String.class)))
                     .build();
 
             JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.id(),

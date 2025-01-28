@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.user.controller;
 
 import com.poppin.poppinserver.core.annotation.UserId;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.user.controller.swagger.SwaggerAuthController;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
@@ -66,24 +66,6 @@ public class AuthController implements SwaggerAuthController {
         return ResponseDto.created(authSignUpService.handleSignUp(authSignUpRequestDto));
     }
 
-    // TODO: 삭제 예정 - 소셜 회원가입 방식 변경
-//    @PostMapping("/register")
-//    public ResponseDto<?> socialRegister(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
-//                                         @RequestBody @Valid SocialRegisterRequestDto socialRegisterRequestDto) {
-//        log.info("socialRegisterRequestDto : " + socialRegisterRequestDto);
-//        return ResponseDto.created(authService.socialRegister(accessToken, socialRegisterRequestDto));
-//    }
-
-    // TODO: body 로그인에서 base64 인코딩 로그인으로 전환 예정
-    // base64 인코딩 로그인
-//    @PostMapping("/sign-in")
-//    public ResponseDto<?> authSignIn(
-//            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader,
-//            @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
-//    ) {
-//        return ResponseDto.ok(authService.authSignIn(authorizationHeader, fcmTokenRequestDto));
-//    }
-
     // body로 email, password 로그인
     @PostMapping("/sign-in")
     public ResponseDto<UserInfoResponseDto> authLogin(
@@ -95,7 +77,7 @@ public class AuthController implements SwaggerAuthController {
     @PostMapping("/login/{provider}")
     public ResponseDto<?> authSocialLogin(
             @PathVariable String provider,
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String accessToken,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String accessToken,
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     ) {
         log.info("accessToken : {}", accessToken);   // 'bearer ' 제거 필요
@@ -112,7 +94,7 @@ public class AuthController implements SwaggerAuthController {
 
     @PostMapping("/refresh")
     public ResponseDto<UserInfoResponseDto> refresh(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String refreshToken,
             @RequestBody @Valid FcmTokenRequestDto fcmTokenRequestDto
     ) {
         return ResponseDto.ok(authService.refresh(refreshToken, fcmTokenRequestDto));
@@ -147,11 +129,4 @@ public class AuthController implements SwaggerAuthController {
             @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {
         return ResponseDto.ok(authService.sendEmailVerificationCode(emailVerificationRequestDto));
     }
-
-    //TODO: 삭제 예정 - API 통합
-    //    @PostMapping("/email/verification/password")
-//    public ResponseDto<?> sendPasswordResetVerificationEmail(
-//            @RequestBody @Valid EmailVerificationRequestDto emailVerificationRequestDto) {
-//        return ResponseDto.ok(authService.sendPasswordResetVerificationEmail(emailVerificationRequestDto));
-//    }
 }

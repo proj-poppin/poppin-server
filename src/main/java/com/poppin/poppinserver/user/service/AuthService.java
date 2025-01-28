@@ -2,7 +2,7 @@ package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.domain.AlarmSetting;
 import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.JwtUtil;
@@ -13,7 +13,6 @@ import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
 import com.poppin.poppinserver.user.dto.auth.request.AccountRequestDto;
-import com.poppin.poppinserver.user.dto.auth.request.AppStartRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.AppleUserIdRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.EmailVerificationRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
@@ -136,19 +135,6 @@ public class AuthService {
         );
     }
 
-    // OS와 앱 버전 확인 메서드
-    public Boolean appStart(AppStartRequestDto appStartRequestDto) {
-        String platform = appStartRequestDto.os();
-        String appVersion = appStartRequestDto.appVersion();
-        if (platform.equals(Constant.iOS) && appVersion.equals(Constant.iOS_APP_VERSION)) {
-            return Boolean.TRUE;
-        }
-        if (platform.equals(Constant.ANDROID) && appVersion.equals(Constant.ANDROID_APP_VERSION)) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
-    }
-
     @Transactional(readOnly = true)
     public AccountStatusResponseDto getAccountStatus(AccountRequestDto accountRequestDto) {
         return determineAccountStatus(accountRequestDto.email());
@@ -167,8 +153,8 @@ public class AuthService {
     }
 
     public String refineToken(String accessToken) {
-        return accessToken.startsWith(Constant.BEARER_PREFIX)
-                ? accessToken.substring(Constant.BEARER_PREFIX.length())
+        return accessToken.startsWith(Constants.BEARER_PREFIX)
+                ? accessToken.substring(Constants.BEARER_PREFIX.length())
                 : accessToken;
     }
 }

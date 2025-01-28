@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.core.util;
 
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import io.jsonwebtoken.Claims;
@@ -39,8 +39,8 @@ public class JwtUtil implements InitializingBean {
 
     public String createToken(String email, EUserRole role, Long expirationPeriod) {
         Claims claims = Jwts.claims();
-        claims.put(Constant.USER_EMAIL_CLAIM_NAME, email);
-        claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
+        claims.put(Constants.USER_EMAIL_CLAIM_NAME, email);
+        claims.put(Constants.USER_ROLE_CLAIM_NAME, role.toString());
 
         Date now = new Date();
         Date tokenValidity = new Date(now.getTime() + expirationPeriod);
@@ -55,8 +55,8 @@ public class JwtUtil implements InitializingBean {
 
     public String createToken(Long id, EUserRole role, Long expirationPeriod) {
         Claims claims = Jwts.claims();
-        claims.put(Constant.USER_ID_CLAIM_NAME, id);
-        claims.put(Constant.USER_ROLE_CLAIM_NAME, role.toString());
+        claims.put(Constants.USER_ID_CLAIM_NAME, id);
+        claims.put(Constants.USER_ROLE_CLAIM_NAME, role.toString());
 
         Date now = new Date();
         Date tokenValidity = new Date(now.getTime() + expirationPeriod);    // 토큰의 만료시간 설정
@@ -85,15 +85,15 @@ public class JwtUtil implements InitializingBean {
     }
 
     public String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader(Constant.AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constant.BEARER_PREFIX)) {
-            return bearerToken.substring(Constant.BEARER_PREFIX.length());
+        String bearerToken = request.getHeader(Constants.AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constants.BEARER_PREFIX)) {
+            return bearerToken.substring(Constants.BEARER_PREFIX.length());
         }
         return null;
     }
 
     public Long getUserIdFromToken(String token) {
         Claims claims = validateAndGetClaimsFromToken(token);
-        return claims.get(Constant.USER_ID_CLAIM_NAME, Long.class);
+        return claims.get(Constants.USER_ID_CLAIM_NAME, Long.class);
     }
 }

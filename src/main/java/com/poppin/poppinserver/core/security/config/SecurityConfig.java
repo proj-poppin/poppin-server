@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.core.security.config;
 
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.security.filter.CustomLogoutFilter;
 import com.poppin.poppinserver.core.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.core.security.filter.JwtExceptionFilter;
@@ -40,7 +40,7 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(Constant.NO_NEED_AUTH_URLS.toArray(new String[0])).permitAll()
+                                .requestMatchers(Constants.NO_NEED_AUTH_URLS.toArray(new String[0])).permitAll()
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -49,7 +49,7 @@ public class SecurityConfig {
                                 .logoutUrl("/api/v1/auth/sign-out")
                                 .addLogoutHandler(customSignOutProcessHandler)
                                 .logoutSuccessHandler(customSignOutResultHandler)
-                                .deleteCookies(Constant.AUTHORIZATION_HEADER, Constant.REAUTHORIZATION))
+                                .deleteCookies(Constants.AUTHORIZATION_HEADER, Constants.REAUTHORIZATION))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil,
                                 new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)),
                         LogoutFilter.class)

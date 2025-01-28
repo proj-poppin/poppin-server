@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.admin.service;
 
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
@@ -30,7 +30,7 @@ public class AdminAuthService {
     private final UserCommandRepository userCommandRepository;
 
     public JwtTokenDto authSignIn(String authorizationHeader) {
-        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constant.BASIC_PREFIX);
+        String encoded = HeaderUtil.refineHeader(authorizationHeader, Constants.BASIC_PREFIX);
         String[] decoded = new String(Base64.getDecoder().decode(encoded)).split(":");
         String email = decoded[0];
         String password = decoded[1];
@@ -69,8 +69,8 @@ public class AdminAuthService {
     }
 
     private String refineToken(String accessToken) {
-        if (accessToken.startsWith(Constant.BEARER_PREFIX)) {
-            return accessToken.substring(Constant.BEARER_PREFIX.length());
+        if (accessToken.startsWith(Constants.BEARER_PREFIX)) {
+            return accessToken.substring(Constants.BEARER_PREFIX.length());
         } else {
             return accessToken;
         }

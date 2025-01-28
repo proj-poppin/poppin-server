@@ -12,7 +12,7 @@ import com.poppin.poppinserver.admin.service.AdminService;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
 import com.poppin.poppinserver.core.annotation.UserId;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -56,7 +56,7 @@ public class AdminController implements SwaggerAdminController {
     /* 관리자용 로그인 */
     @PostMapping("/sign-in")
     public ResponseDto<JwtTokenDto> authSignIn(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String authorizationHeader
     ) {
         return ResponseDto.ok(adminAuthService.authSignIn(authorizationHeader));
     }
@@ -64,7 +64,7 @@ public class AdminController implements SwaggerAdminController {
     /* 관리자용 토큰 재발급 */
     @PostMapping("/refresh")
     public ResponseDto<JwtTokenDto> refresh(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String refreshToken
     ) {
         return ResponseDto.ok(adminAuthService.refresh(refreshToken));
     }

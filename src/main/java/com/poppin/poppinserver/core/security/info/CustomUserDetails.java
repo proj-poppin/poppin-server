@@ -1,6 +1,6 @@
 package com.poppin.poppinserver.core.security.info;
 
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
 
     public static CustomUserDetails create(User user) {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(Constant.ROLE_PREFIX + user.getRole());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(Constants.ROLE_PREFIX + user.getRole());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
         return CustomUserDetails.builder()

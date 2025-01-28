@@ -1,7 +1,7 @@
 package com.poppin.poppinserver.user.domain;
 
 import com.poppin.poppinserver.alarm.domain.UserAlarmKeyword;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
@@ -175,7 +175,7 @@ public class User {
 
     public void softDelete() {
         this.isDeleted = true;
-        this.deletedAt = LocalDateTime.now().plusDays(Constant.MEMBER_INFO_RETENTION_PERIOD);
+        this.deletedAt = LocalDateTime.now().plusDays(Constants.MEMBER_INFO_RETENTION_PERIOD);
     }
 
     public void requiresSpecialCare() {

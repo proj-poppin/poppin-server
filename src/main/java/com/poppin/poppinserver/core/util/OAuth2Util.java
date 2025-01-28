@@ -2,7 +2,7 @@ package com.poppin.poppinserver.core.util;
 
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonParser;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -21,14 +21,14 @@ public class OAuth2Util {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
-        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+        httpHeaders.add(Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX + accessToken);
+        httpHeaders.add(Constants.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<?> kakaoProfileRequest = new HttpEntity<>(httpHeaders);
         log.info("kakaoProfileRequest" + kakaoProfileRequest);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "https://kapi.kakao.com/v2/user/me",
+                Constants.KAKAO_RESOURCE_SERVER_URL,
                 HttpMethod.POST,
                 kakaoProfileRequest,
                 String.class
@@ -48,12 +48,12 @@ public class OAuth2Util {
 
     public OAuth2UserInfo getNaverUserInfo(String accessToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
-        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+        httpHeaders.add(Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX + accessToken);
+        httpHeaders.add(Constants.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<?> naverProfileRequest = new HttpEntity<>(httpHeaders);
         ResponseEntity<String> response = restTemplate.exchange(
-                "https://openapi.naver.com/v1/nid/me",
+                Constants.NAVER_RESOURCE_SERVER_URL,
                 HttpMethod.GET,
                 naverProfileRequest,
                 String.class
@@ -72,12 +72,12 @@ public class OAuth2Util {
 
     public OAuth2UserInfo getGoogleUserInfo(String accessToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(Constant.AUTHORIZATION_HEADER, Constant.BEARER_PREFIX + accessToken);
-        httpHeaders.add(Constant.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+        httpHeaders.add(Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX + accessToken);
+        httpHeaders.add(Constants.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<?> googleProfileRequest = new HttpEntity<>(httpHeaders);
         ResponseEntity<String> response = restTemplate.exchange(
-                "https://www.googleapis.com/oauth2/v3/userinfo",
+                Constants.GOOGLE_RESOURCE_SERVER_URL,
                 HttpMethod.GET,
                 googleProfileRequest,
                 String.class

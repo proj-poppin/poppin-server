@@ -7,7 +7,7 @@ import com.poppin.poppinserver.admin.dto.response.UserAdministrationDetailRespon
 import com.poppin.poppinserver.admin.dto.response.UserAdministrationListResponseDto;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
 import com.poppin.poppinserver.alarm.dto.alarm.response.InformApplyResponseDto;
-import com.poppin.poppinserver.core.constant.Constant;
+import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
@@ -40,11 +40,11 @@ public interface SwaggerAdminController {
     @Operation(summary = "관리자 로그인", description = "관리자 계정을 사용하여 로그인을 수행합니다.")
     @PostMapping("/sign-in")
     ResponseDto<JwtTokenDto> authSignIn(
-            @NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String authorizationHeader);
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String authorizationHeader);
 
     @Operation(summary = "관리자 토큰 재발급", description = "관리자의 Refresh Token을 사용하여 새로운 Access Token을 발급받습니다.")
     @PostMapping("/refresh")
-    ResponseDto<JwtTokenDto> refresh(@NotNull @RequestHeader(Constant.AUTHORIZATION_HEADER) String refreshToken);
+    ResponseDto<JwtTokenDto> refresh(@NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER) String refreshToken);
 
     @Operation(summary = "FAQ 조회", description = "등록된 FAQ 목록을 조회합니다.")
     @GetMapping("/support/faqs")
