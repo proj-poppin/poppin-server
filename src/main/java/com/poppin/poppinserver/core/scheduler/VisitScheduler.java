@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.core.scheduler;
 
 import com.poppin.poppinserver.visit.repository.VisitRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class VisitScheduler {
      * 방문한지 1 주일이 지난 데이터 Visit 테이블에서 삭제
      */
     @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
     public void deleteVisitData() {
 
         log.info("=====   방문일시가 1주일이 지난 데이터 삭제   =====");

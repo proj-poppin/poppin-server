@@ -6,12 +6,14 @@ import com.poppin.poppinserver.user.repository.UserCommandRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class CustomSignOutProcessHandler implements LogoutHandler {
     private final UserCommandRepository userCommandRepository;
     private final FCMTokenRepository fcmTokenRepository;
@@ -24,6 +26,7 @@ public class CustomSignOutProcessHandler implements LogoutHandler {
 
     protected void processSignOut(Long userId) {
         userCommandRepository.updateRefreshToken(userId, null); // RefreshToken 삭제
-        fcmTokenRepository.findByUserId(userId).ifPresent(fcmTokenRepository::delete);  // FCMToken 삭제
+        log.info("User {} sign out", userId);
+        fcmTokenRepository.findByUserId(userId).ifPresent(fcmTokenRepository::delete); // FCMToken 삭제
     }
 }

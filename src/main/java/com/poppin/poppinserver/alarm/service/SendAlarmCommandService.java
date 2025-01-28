@@ -46,19 +46,17 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
     //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
     private final PopupRepository popupRepository;
-
     private final TokenQueryUseCase tokenQueryUseCase;
     private final AlarmListQueryUseCase alarmListQueryUseCase;
     private final AlarmCommandUseCase alarmCommandUseCase;
 
     @Override
-    public void sendInformationAlarm(List<FCMToken> tokenList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
-        for (FCMToken token : tokenList) {
+    public void sendInformationAlarm(List<User> userList, InformAlarmCreateRequestDto requestDto, InformAlarm informAlarm) {
+        for (User user : userList) {
 
-            User user = tokenQueryUseCase.findUserByToken(token.getToken());
-            Long userId = user.getId();
+            FCMToken token = tokenQueryUseCase.findByUser(user);
 
-            int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
+            int badge = alarmListQueryUseCase.countUnreadAlarms(user.getId());
 
             log.info("token : " + token.getToken());
             Message message = Message.builder()
@@ -84,17 +82,17 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     }
 
     @Override
-    public void sendScheduledPopupAlarm(List<Popup> popupList, EPushInfo info) {
+    public void sendScheduledPopupAlarm(List<Popup> popupList, EPushInfo info) { // 예시. <인기 팝업 id 리스트, 인기 팝업 알림 정보>
         List<Long> popupIdList = new ArrayList<>();
         for (Popup p : popupList) {
             popupIdList.add(p.getId());
         }
 
-        List<FCMToken> tokenList = tokenQueryUseCase.findAll();
+        List<FCMToken> tokenList = tokenQueryUseCase.findAll(); // 모든 토큰을 찾아서
 
         for (FCMToken token : tokenList) {
 
-            User user = tokenQueryUseCase.findUserByToken(token.getToken());
+            User user = tokenQueryUseCase.findUserByToken(token); // 토큰으로 유저 정보를 찾는다 -> 문제. 유니크 아니면 여러 유저가 나온다.-> 에러
             Long userId = user.getId();
 
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -140,6 +138,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendChoochunAlarm(User user, Popup popup, Review review, EPushInfo info) {
 
         Long userId = user.getId();
+        FCMToken fcmToken = tokenQueryUseCase.findByUser(review.getUser());
         int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
 
         Message message = Message.builder()
@@ -149,7 +148,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
                         .build())
                 .setApnsConfig(apnsConfiguration.apnsConfig(badge))
                 .setAndroidConfig(androidConfiguration.androidConfig())
-                .setToken(review.getToken())
+                .setToken(fcmToken.getToken())
                 .putData("id", review.getPopup().getId().toString())
                 .putData("type", "popup")
                 .build();
@@ -158,7 +157,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
             String result = firebaseMessaging.send(message);
             log.info("Successfully sent message: " + result);
 
-            FCMToken token = tokenQueryUseCase.findByToken(review.getToken());
+            FCMToken token = tokenQueryUseCase.findByUser(user);
             refreshToken(token);
 
         } catch (FirebaseMessagingException e) {
@@ -180,7 +179,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendKeywordAlarm(FCMToken token, AlarmKeywordCreateRequestDto requestDto, UserAlarmKeyword userAlarmKeyword) {
         log.info("token : " + token.getToken());
 
-        User user = tokenQueryUseCase.findUserByToken(token.getToken());
+        User user = tokenQueryUseCase.findUserByToken(token);
         Long userId = user.getId();
 
         int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -210,7 +209,8 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     public void sendPopupTopicAlarm(List<FCMRequestDto> fcmRequestDtoList) {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
-            User user = tokenQueryUseCase.findUserByToken(fcmRequestDto.token());
+            FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
+            User user = tokenQueryUseCase.findUserByToken(token);
             Long userId = user.getId();
 
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
@@ -242,7 +242,6 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
                 log.info("Successfully sent message: " + result);
 
                 // 토큰 갱신
-                FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
                 refreshToken(token);
 
                 // 팝업 알림 저장

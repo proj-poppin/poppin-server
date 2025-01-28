@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.review.service;
 
-import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,14 +65,7 @@ public class ReviewCommandService {
         // 방문 내역 확인 및 리뷰 생성
         boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
 
-        // 알림 토큰 추출
-        Optional<FCMToken> fcmToken = fcmTokenRepository.findByUserId(userId);
-        if (fcmToken.isEmpty()) {
-            throw new CommonException(ErrorCode.REVIEW_FCM_ERROR);
-        }
-
-        String token = fcmToken.get().getToken();
-        Review review = createReview(user, token, popup, text, isCertified);
+        Review review = createReview(user, popup, text, isCertified);
 
         // 이미지 처리
         if (images != null && !images.isEmpty()) {
@@ -97,10 +88,9 @@ public class ReviewCommandService {
         return ReviewWriteDto.fromEntity(review, visitorData);
     }
 
-    private Review createReview(User user, String token, Popup popup, String text, boolean isCertified) {
+    private Review createReview(User user, Popup popup, String text, boolean isCertified) {
         Review review = Review.builder()
                 .user(user)
-                .token(token)
                 .popup(popup)
                 .text(text)
                 .isCertified(isCertified)

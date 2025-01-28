@@ -13,27 +13,26 @@ import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.repository.*;
+import com.poppin.poppinserver.review.repository.ReviewCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
+import com.poppin.poppinserver.review.repository.ReviewRecommendCommandRepository;
 import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.review.usecase.ReviewQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
-import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class UserHardDeleteService {
-    private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedUserCommandRepository blockedUserCommandRepository;
     private final InterestRepository interestRepository;
     private final ReviewRecommendCommandRepository reviewRecommendRepository;

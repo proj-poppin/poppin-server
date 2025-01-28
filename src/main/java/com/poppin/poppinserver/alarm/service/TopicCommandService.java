@@ -9,6 +9,7 @@ import com.poppin.poppinserver.alarm.repository.PopupTopicRepository;
 import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ public class TopicCommandService implements TopicCommandUseCase {
     private final FirebaseMessaging firebaseMessaging;
 
     @Override
-    public void subscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
+    public void subscribePopupTopic(User user, FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());
 
@@ -33,9 +34,9 @@ public class TopicCommandService implements TopicCommandUseCase {
 
         log.info("subscribe start");
 
-        PopupTopic topicExist = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
+        PopupTopic topicExist = popupTopicRepository.findPopupTopicByTopicCode(user, topic.getCode(), popup);
         if (topicExist == null) {
-            PopupTopic popupTopic = new PopupTopic(token, popup, topic.getCode());
+            PopupTopic popupTopic = new PopupTopic(user, popup, topic.getCode());
             popupTopicRepository.save(popupTopic); // 데이터 저장
 
             response = firebaseMessaging.subscribeToTopic(registrationTokens, topic.toString()); // 구독
@@ -46,13 +47,13 @@ public class TopicCommandService implements TopicCommandUseCase {
     }
 
     @Override
-    public void unsubscribePopupTopic(FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
+    public void unsubscribePopupTopic(User user, FCMToken token, Popup popup, EPopupTopic topic) throws FirebaseMessagingException {
         List<String> registrationTokens = new ArrayList<>();
         registrationTokens.add(token.getToken());
 
         TopicManagementResponse response = null;
 
-        PopupTopic topicExist = popupTopicRepository.findByTokenAndTopic(token, topic.getCode(), popup);
+        PopupTopic topicExist = popupTopicRepository.findPopupTopicByTopicCode(user, topic.getCode(), popup);
         if (topicExist != null) {
             popupTopicRepository.delete(topicExist);
         }

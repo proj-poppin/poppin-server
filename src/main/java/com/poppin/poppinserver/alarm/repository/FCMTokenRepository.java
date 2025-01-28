@@ -21,8 +21,11 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
     @Query("SELECT token FROM FCMToken token WHERE token.token = :token")
     Optional<FCMToken> findByTokenOpt(@Param("token") String token);
 
-    @Query("SELECT DISTINCT t.tokenId FROM PopupTopic t WHERE t.topicCode = :code  AND t.popup.id = :popupId")
-    List<FCMToken> findTokenIdByTopicAndType(String code, @Param("popupId") Long popupId);
+    @Query("SELECT ft FROM FCMToken ft " +
+            "JOIN PopupTopic pt ON pt.user = ft.user " +
+            "WHERE pt.topicCode = :topicCode AND pt.popup.id = :popupId")
+    List<FCMToken> findTokenIdByTopicAndType(@Param("topicCode") String topicCode,
+                                             @Param("popupId") Long popupId);
 
     @Query("SELECT token FROM FCMToken token WHERE token.exp_dtm <= :now")
     List<FCMToken> findExpiredTokenList(LocalDateTime now);
@@ -32,6 +35,6 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     FCMToken findByUser(User user);
 
-    @Query("SELECT token.user FROM FCMToken token WHERE token.token = :token")
-    User findUserByToken(String token);
+    @Query("SELECT token.user FROM FCMToken token WHERE token = :fcmToken")
+    User findUserByToken(FCMToken fcmToken);
 }

@@ -55,8 +55,4 @@ public class FCMToken {
         this.mod_dtm = LocalDateTime.now();
         this.exp_dtm = mod_dtm.plusMonths(1); // 1달 갱신
     }
-
-    public void regenerateToken(FCMToken fcmToken) {
-        this.token = fcmToken.getToken();
-    }
 }

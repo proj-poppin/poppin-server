@@ -36,7 +36,7 @@ public class FCMTokenManagementScheduler {
         List<FCMToken> expiredTokenList = fcmTokenRepository.findExpiredTokenList(now);
 
         for (FCMToken token : expiredTokenList) {
-            tokenCommandUseCase.removeToken(token);
+//            tokenCommandUseCase.removeToken(token);
         }
     }
 }

@@ -53,7 +53,7 @@ public class TokenQueryService implements TokenQueryUseCase {
     }
 
     @Override
-    public User findUserByToken(String token) {
+    public User findUserByToken(FCMToken token) {
         return fcmTokenRepository.findUserByToken(token);
     }
 

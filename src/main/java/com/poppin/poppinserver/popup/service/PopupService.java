@@ -6,7 +6,6 @@ import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.alarm.usecase.TopicCommandUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.interest.repository.InterestRepository;
@@ -29,7 +28,6 @@ import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
-import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.usecase.VisitQueryUseCase;
 import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +37,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -271,7 +268,7 @@ public class PopupService {
 
         // 재오픈 토픽 등록
         log.info("재오픈 신청 시 FCM TOPIC 등록");
-        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.REOPEN);
+        topicCommandUseCase.subscribePopupTopic(user, token, popup, EPopupTopic.REOPEN);
 
 
         PopupStoreDto popupStoreDto = getPopupStoreDto(popup,user.getId());

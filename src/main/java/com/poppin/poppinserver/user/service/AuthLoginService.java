@@ -170,12 +170,12 @@ public class AuthLoginService {
     }
 
     private UserInfoResponseDto buildUserInfoResponse(User user, String fcmToken) {
-        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(fcmToken);
+        AlarmSetting alarmSetting = userAlarmSettingService.getUserAlarmSetting(user);
 
         Long userId = user.getId();
 
         // FCM 토큰 검증
-        tokenCommandUseCase.refreshFCMToken(userId, fcmToken);
+        tokenCommandUseCase.refreshFCMToken(user, fcmToken);
 
         // 리프레시 토큰 업데이트
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
@@ -191,9 +191,7 @@ public class AuthLoginService {
         UserNoticeResponseDto userNoticeResponseDto = userActivityService.getUserNotificationStatus(userId);
 
         // 유저 알림 정보 조회
-        UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(
-                user, fcmToken
-        );
+        UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(user);
 
         // 유저 팝업 정보 조회
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(user);

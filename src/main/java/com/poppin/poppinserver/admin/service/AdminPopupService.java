@@ -285,10 +285,12 @@ public class AdminPopupService {
         List<PopupTopic> topicList = popupTopicRepository.findByPopup(popup);
 
         for (PopupTopic topic : topicList) {
-            FCMToken fcmToken = tokenQueryUseCase.findByToken(topic.getTokenId().getToken());
-            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.MAGAM);
-            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.OPEN);
-            topicCommandUseCase.unsubscribePopupTopic(fcmToken, popup, EPopupTopic.CHANGE_INFO);
+            User user = topic.getUser();
+
+            FCMToken fcmToken = tokenQueryUseCase.findByUser(user);
+            topicCommandUseCase.unsubscribePopupTopic(user, fcmToken, popup, EPopupTopic.MAGAM);
+            topicCommandUseCase.unsubscribePopupTopic(user, fcmToken, popup, EPopupTopic.OPEN);
+            topicCommandUseCase.unsubscribePopupTopic(user, fcmToken, popup, EPopupTopic.CHANGE_INFO);
         }
 
         // 관심 추가 데이터

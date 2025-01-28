@@ -28,8 +28,6 @@ public class Review {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @Column(name = "token", nullable = false)
-    private String token; // 후기 추천용 토큰
 
     @Column(name = "nickname", nullable = false)
     private String nickname;
@@ -60,9 +58,8 @@ public class Review {
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    public Review(User user, String token, Popup popup, String imageUrl, String text, boolean isCertified) {
+    public Review(User user, Popup popup, String imageUrl, String text, boolean isCertified) {
         this.user = user;
-        this.token = token;
         this.nickname = user.getNickname();
         this.popup = popup;
         this.imageUrl = imageUrl;

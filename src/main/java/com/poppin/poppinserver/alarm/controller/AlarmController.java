@@ -2,11 +2,7 @@ package com.poppin.poppinserver.alarm.controller;
 
 import com.poppin.poppinserver.alarm.controller.swagger.SwaggerAlarmController;
 import com.poppin.poppinserver.alarm.dto.alarm.request.AlarmKeywordRequestDto;
-import com.poppin.poppinserver.alarm.dto.alarmSetting.request.AlarmSettingRequestDto;
 import com.poppin.poppinserver.alarm.service.AlarmKeywordService;
-import com.poppin.poppinserver.alarm.service.AlarmListService;
-import com.poppin.poppinserver.alarm.service.AlarmService;
-import com.poppin.poppinserver.alarm.service.AlarmSettingService;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alarm")
 public class AlarmController implements SwaggerAlarmController {
-
-    private final AlarmService alarmService;
-    private final AlarmListService alarmListService;
-    private final AlarmSettingService alarmSettingService;
     private final AlarmKeywordService alarmKeywordService;
 
     // TODO : 삭제 예정
@@ -56,11 +48,6 @@ public class AlarmController implements SwaggerAlarmController {
 //    public ResponseDto<?> readDetailInfoAlarm(@RequestBody InformDetailDto requestDto) {
 //        return ResponseDto.ok(alarmListService.readInformDetail(requestDto));
 //    }
-
-    @PutMapping("/settings")
-    public ResponseDto<?> createAlarmSetting(@UserId Long userId, @RequestBody AlarmSettingRequestDto dto) {
-        return ResponseDto.ok(alarmSettingService.updateAlarmSetting(userId, dto));
-    }
 
     // 마이페이지 > 키워드 알람 > 키워드 조회
     @GetMapping("/keywords")

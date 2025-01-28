@@ -4,7 +4,6 @@ import com.poppin.poppinserver.admin.dto.response.AdminInfoResponseDto;
 import com.poppin.poppinserver.admin.dto.response.UserAdministrationDetailResponseDto;
 import com.poppin.poppinserver.admin.dto.response.UserAdministrationListResponseDto;
 import com.poppin.poppinserver.admin.dto.response.UserAdministrationResponseDto;
-import com.poppin.poppinserver.alarm.domain.FCMToken;
 import com.poppin.poppinserver.alarm.domain.InformAlarm;
 import com.poppin.poppinserver.alarm.domain.InformAlarmImage;
 import com.poppin.poppinserver.alarm.dto.alarm.request.InformAlarmCreateRequestDto;
@@ -190,7 +189,6 @@ public class AdminService {
 
             // Inform 읽음 여부 테이블에 fcm 토큰 정보와 함께 저장
             List<User> users = userQueryRepository.findAll();
-            List<FCMToken> tokenList = tokenQueryUseCase.findAll();
 
             for (User user : users) {
                 alarmCommandUseCase.insertUserInform(user, informAlarm);
@@ -209,7 +207,7 @@ public class AdminService {
             // 저장 성공
             if (informAlarm != null) {
                 // 앱 푸시 발송
-                sendAlarmCommandUseCase.sendInformationAlarm(tokenList, requestDto, informAlarm);
+                sendAlarmCommandUseCase.sendInformationAlarm(users, requestDto, informAlarm);
                 // 푸시 성공
                 InformApplyResponseDto informApplyResponseDto = InformApplyResponseDto.fromEntity(informAlarm,
                         fileUrls);

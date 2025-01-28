@@ -17,7 +17,7 @@ import java.util.List;
 @UseCase
 public interface SendAlarmCommandUseCase {
 
-    void sendInformationAlarm(List<FCMToken> tokenList,
+    void sendInformationAlarm(List<User> userList,
                               InformAlarmCreateRequestDto requestDto,
                               InformAlarm informAlarm);
 

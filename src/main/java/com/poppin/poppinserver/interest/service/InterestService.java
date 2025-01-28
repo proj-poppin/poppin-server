@@ -69,9 +69,9 @@ public class InterestService {
         String fcmToken = tokenQueryUseCase.findByUser(user).getToken();
 
         FCMToken token = tokenQueryUseCase.findByToken(fcmToken);
-        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.MAGAM);
-        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.OPEN);
-        topicCommandUseCase.subscribePopupTopic(token, popup, EPopupTopic.CHANGE_INFO);
+        topicCommandUseCase.subscribePopupTopic(user, token, popup, EPopupTopic.MAGAM);
+        topicCommandUseCase.subscribePopupTopic(user, token, popup, EPopupTopic.OPEN);
+        topicCommandUseCase.subscribePopupTopic(user, token, popup, EPopupTopic.CHANGE_INFO);
 
         VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
 
@@ -105,9 +105,9 @@ public class InterestService {
         String fcmToken = tokenQueryUseCase.findByUser(user).getToken();
 
         FCMToken token = tokenQueryUseCase.findByToken(fcmToken);
-        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.MAGAM);
-        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.OPEN);
-        topicCommandUseCase.unsubscribePopupTopic(token, popup, EPopupTopic.CHANGE_INFO);
+        topicCommandUseCase.unsubscribePopupTopic(user, token, popup, EPopupTopic.MAGAM);
+        topicCommandUseCase.unsubscribePopupTopic(user, token, popup, EPopupTopic.OPEN);
+        topicCommandUseCase.unsubscribePopupTopic(user, token, popup, EPopupTopic.CHANGE_INFO);
 
         return interestDto;
     }

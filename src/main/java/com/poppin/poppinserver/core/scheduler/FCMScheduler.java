@@ -11,15 +11,19 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.user.domain.User;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
-
-import java.time.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -31,7 +35,6 @@ public class FCMScheduler {
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
-
 
 //    @Scheduled(cron = "0 0 */3 * * *")
 //    private void reopenPopup() {
@@ -127,7 +130,7 @@ public class FCMScheduler {
         if (hotPopup.isEmpty()) {
             log.info("인기 팝업이 없습니다");
         } else {
-            for (Popup p : hotPopup){
+            for (Popup p : hotPopup) {
                 log.info("hot popup name {}", p.getName());
             }
             sendAlarmCommandUseCase.sendScheduledPopupAlarm(hotPopup, EPushInfo.HOTPOPUP);
@@ -177,10 +180,10 @@ public class FCMScheduler {
                 log.info("nothing subscribed on : " + topic);
             } else {
                 for (FCMToken token : tokenList) {
-
+                    User user = token.getUser();
                     // 알림 세팅을 "1"이라야 가능하게 함.
                     log.info("token : {}", token.getToken());
-                    AlarmSetting set = alarmSettingRepository.findByToken(token.getToken());
+                    AlarmSetting set = alarmSettingRepository.findByUser(user);
                     log.info("setting : {}", set);
                     Boolean setDefVal = set.getPushYn();
                     Boolean setVal;
@@ -217,7 +220,8 @@ public class FCMScheduler {
                                     "[" + popup.getName() + "] " + info.getTitle(), info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         } else {
-                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(), info.getTitle(),
+                            FCMRequestDto fcmRequestDto = new FCMRequestDto(String.valueOf(popupId), token.getToken(),
+                                    info.getTitle(),
                                     info.getBody(), topic);
                             fcmRequestDtoList.add(fcmRequestDto);
                         }

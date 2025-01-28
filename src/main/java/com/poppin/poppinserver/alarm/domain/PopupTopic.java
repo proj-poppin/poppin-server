@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.alarm.domain;
 
 import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,9 +21,9 @@ public class PopupTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "token_id", nullable = false)
-    private FCMToken tokenId; // 토큰 id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "popup_id", nullable = false)
@@ -32,8 +33,8 @@ public class PopupTopic {
     private String topicCode; // 타입
 
     @Builder
-    public PopupTopic(FCMToken token, Popup popup, String topicCode) {
-        this.tokenId = token;
+    public PopupTopic(User user, Popup popup, String topicCode) {
+        this.user = user;
         this.popup = popup;
         this.topicCode = topicCode;
     }

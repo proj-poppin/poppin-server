@@ -22,14 +22,13 @@ import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDt
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 유저의 알람 내역, 방문 팝업, 관심 팝업, 오픈 대기 팝업 정보를 조회
@@ -81,7 +80,7 @@ public class UserActivityService {
         );
     }
 
-    public UserNotificationResponseDto getUserNotificationActivity(User user, String fcmToken) {
+    public UserNotificationResponseDto getUserNotificationActivity(User user) {
         DestinationResponseDto destinationResponseDto = DestinationResponseDto.fromProperties(
                 null, null, null, null,
                 null, null, null, null, null
@@ -110,7 +109,6 @@ public class UserActivityService {
                         destinationResponseDto
                 )
         ).toList();
-
 
         // 유저의 공지 관련 알람 조회
         List<NotificationResponseDto> noticeNotificationResponseDtoList = userInformAlarm.stream()
