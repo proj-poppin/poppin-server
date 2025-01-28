@@ -234,6 +234,8 @@ public class PopupService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
+        popup.addViewCnt(); // 조회수 + 1
+
         if (userId != null) {
             return getPopupStoreDto(popup, userId);
         } else {
