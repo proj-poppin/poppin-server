@@ -13,6 +13,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
+import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
@@ -46,6 +47,7 @@ public class VisitService {
     private final TokenQueryUseCase tokenQueryUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
     private final InterestQueryUseCase interestQueryUseCase;
+    private final ReviewQueryRepository reviewQueryRepository;
 
     /* 실시간 방문자 조회 */
     public Optional<Integer> showRealTimeVisitors(Long popupId) {
@@ -69,6 +71,11 @@ public class VisitService {
 
         User user = userQueryUseCase.findUserById(userId);
         Popup popup = popupQueryUseCase.findPopupById(popupId);
+
+        // 이미 일반후기를 작성했을 시 에러 처리
+        reviewQueryRepository.findByUserIdAndPopupId(userId, popupId)
+                .ifPresent(review -> { throw new CommonException(ErrorCode.ALREADY_WRITTEN_REVIEW); });
+
 
         // 30분 이내 재 방문 방지
         LocalDateTime thirtyMinutesAgo = LocalDateTime.now().minus(30, ChronoUnit.MINUTES);

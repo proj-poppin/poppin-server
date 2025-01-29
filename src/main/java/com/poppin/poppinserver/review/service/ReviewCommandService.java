@@ -59,8 +59,8 @@ public class ReviewCommandService {
         Popup popup = popupRepository.findById(Long.valueOf(popupId))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        Review writtenReview = reviewQueryRepository.findByUserIdAndPopupId(userId, Long.valueOf(popupId));
-        if (writtenReview != null) throw new CommonException(ErrorCode.DUPLICATED_REVIEW);
+        reviewQueryRepository.findByUserIdAndPopupId(userId, Long.valueOf(popupId))
+                .ifPresent(review -> {throw new CommonException(ErrorCode.DUPLICATED_REVIEW);});
 
         // 방문 내역 확인 및 리뷰 생성
         boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
@@ -84,6 +84,8 @@ public class ReviewCommandService {
 
         // 사용자 리뷰 카운트 증가
         user.addReviewCnt();
+        // 후기 작성하기 감소
+        user.decreaseVisitedPopupCnt();
 
         return ReviewWriteDto.fromEntity(review, visitorData);
     }
