@@ -47,6 +47,7 @@ public enum ErrorCode {
             "filteringThreeCategories는 빈 문자열 이거나 market,display,experience와 같은 형식이어야 합니다."),
     INVALID_FOURTEEN_CATEGORY("40036", HttpStatus.BAD_REQUEST,
             "filteringFourteenCategories는 빈 문자열 이거나 fashionBeauty,characters,foodBeverage,webtoonAni,interiorThings,movie,musical,sports,game,itTech,kpop,alcohol,animalPlant,etc와 같은 형식이어야 합니다."),
+    ALREADY_WRITTEN_REVIEW("40037", HttpStatus.BAD_REQUEST, "이미 후기를 작성한 팝업에는 방문하실 수 없습니다."),
 
     // Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
