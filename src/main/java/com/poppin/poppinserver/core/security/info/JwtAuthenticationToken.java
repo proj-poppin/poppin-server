@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.core.security;
+package com.poppin.poppinserver.core.security.info;
 
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import java.util.Collection;
@@ -6,13 +6,11 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
-    private Long userId;
-    // private String email;
-    private EUserRole role;
+    private final Long userId;
+    private final EUserRole role;
 
     public JwtAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Long id, EUserRole role) {
         super(authorities);
-        // this.email = email;
         this.userId = id;
         this.role = role;
     }
@@ -24,7 +22,6 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        // return this.email;
         return this.userId;
     }
 }

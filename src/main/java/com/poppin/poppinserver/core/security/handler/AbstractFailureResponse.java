@@ -1,13 +1,12 @@
-package com.poppin.poppinserver.core.security;
+package com.poppin.poppinserver.core.security.handler;
 
 import com.poppin.poppinserver.core.dto.ExceptionDto;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
-import net.minidev.json.JSONValue;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import net.minidev.json.JSONValue;
 
 public abstract class AbstractFailureResponse {
     protected void setFailureResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
