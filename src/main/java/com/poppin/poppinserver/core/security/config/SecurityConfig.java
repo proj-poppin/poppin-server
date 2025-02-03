@@ -6,18 +6,20 @@ import com.poppin.poppinserver.core.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.core.security.filter.JwtExceptionFilter;
 import com.poppin.poppinserver.core.security.handler.CustomSignOutProcessHandler;
 import com.poppin.poppinserver.core.security.handler.CustomSignOutResultHandler;
+import com.poppin.poppinserver.core.security.manager.CustomAuthenticationManager;
 import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
-import com.poppin.poppinserver.core.security.service.CustomUserDetailsService;
+import com.poppin.poppinserver.core.security.provider.UsernamePasswordAuthenticationProvider;
 import com.poppin.poppinserver.core.util.JwtUtil;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
@@ -27,10 +29,18 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider;
     private final CustomSignOutProcessHandler customSignOutProcessHandler;
     private final CustomSignOutResultHandler customSignOutResultHandler;
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new CustomAuthenticationManager(Arrays.asList(
+                usernamePasswordAuthenticationProvider,
+                jwtAuthenticationProvider
+        ));
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,9 +60,7 @@ public class SecurityConfig {
                                 .addLogoutHandler(customSignOutProcessHandler)
                                 .logoutSuccessHandler(customSignOutResultHandler)
                                 .deleteCookies(Constants.AUTHORIZATION_HEADER, Constants.REAUTHORIZATION))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil,
-                                new JwtAuthenticationProvider(customUserDetailsService, bCryptPasswordEncoder)),
-                        LogoutFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authenticationManager()), LogoutFilter.class)
                 .addFilterAfter(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(), LogoutFilter.class)
                 .build();
