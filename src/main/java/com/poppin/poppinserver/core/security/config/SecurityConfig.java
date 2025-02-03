@@ -6,6 +6,8 @@ import com.poppin.poppinserver.core.security.filter.JwtAuthenticationFilter;
 import com.poppin.poppinserver.core.security.filter.JwtExceptionFilter;
 import com.poppin.poppinserver.core.security.handler.CustomSignOutProcessHandler;
 import com.poppin.poppinserver.core.security.handler.CustomSignOutResultHandler;
+import com.poppin.poppinserver.core.security.handler.JwtAccessDeniedHandler;
+import com.poppin.poppinserver.core.security.handler.JwtAuthEntryPoint;
 import com.poppin.poppinserver.core.security.manager.CustomAuthenticationManager;
 import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.core.security.provider.UsernamePasswordAuthenticationProvider;
@@ -33,6 +35,8 @@ public class SecurityConfig {
     private final UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider;
     private final CustomSignOutProcessHandler customSignOutProcessHandler;
     private final CustomSignOutResultHandler customSignOutResultHandler;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public AuthenticationManager authenticationManager() {
@@ -54,6 +58,11 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
+                .exceptionHandling((exceptionHandling) ->
+                        exceptionHandling
+                                .authenticationEntryPoint(jwtAuthEntryPoint)
+                                .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
                 .logout(configurer ->
                         configurer
                                 .logoutUrl("/api/v1/auth/sign-out")

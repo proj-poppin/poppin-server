@@ -31,25 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-//        final String token = jwtUtil.getJwtFromRequest(request);
-//        if (StringUtils.hasText(token)) {
-//            Claims claims = jwtUtil.validateAndGetClaimsFromToken(token);
-//            JwtUserInfo jwtUserInfo = JwtUserInfo.builder()
-//                    .id(claims.get(Constants.USER_ID_CLAIM_NAME, Long.class))
-//                    .role(EUserRole.valueOf(claims.get(Constants.USER_ROLE_CLAIM_NAME, String.class)))
-//                    .build();
-//
-//            JwtAuthenticationToken beforeAuthentication = new JwtAuthenticationToken(null, jwtUserInfo.id(),
-//                    jwtUserInfo.role());
-//
-//            UsernamePasswordAuthenticationToken afterAuthentication = (UsernamePasswordAuthenticationToken) jwtAuthenticationProvider.authenticate(
-//                    beforeAuthentication);
-//            afterAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//
-//            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-//            securityContext.setAuthentication(afterAuthentication);
-//            SecurityContextHolder.setContext(securityContext);
-//        }
         final String token = jwtUtil.getJwtFromRequest(request);
         if (StringUtils.hasText(token)) {
             try {
@@ -66,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // AuthenticationManager에 위임
                 Authentication authenticationResult = authenticationManager.authenticate(beforeAuthentication);
-                // authenticationResult.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationResult);
             } catch (Exception ex) {
