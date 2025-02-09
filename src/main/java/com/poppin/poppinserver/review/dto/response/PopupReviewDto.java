@@ -12,6 +12,7 @@ public record PopupReviewDto(
         String profileUrl,
         String reviewId,
         String nickname,
+        Integer reviewCnt,
         String userId,
         String text,
         List<String> imageUrls,
@@ -27,6 +28,7 @@ public record PopupReviewDto(
                 .profileUrl(review.getImageUrl())
                 .reviewId(String.valueOf(review.getId()))
                 .nickname(review.getNickname())
+                .reviewCnt(review.getUser().getReviewCnt())
                 .userId(String.valueOf(review.getUser().getId()))
                 .text(review.getText())
                 .imageUrls(imageUrls)
