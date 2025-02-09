@@ -228,8 +228,16 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
 
 
-    @Query("SELECT p FROM Popup p JOIN Interest i ON p.id = i.popup.id WHERE p.operationStatus != 'TERMINATED' AND p.closeDate BETWEEN :now AND :tomorrow ORDER BY p.id asc")
-    List<Popup> findMagamPopup(@Param("now") LocalDate now, @Param("tomorrow") LocalDate tomorrow);
+    @Query("SELECT p FROM Popup p " +
+            "JOIN PopupTopic pt ON p.id = pt.popup.id " +
+            "WHERE p.operationStatus != 'TERMINATED' " +
+            "AND p.closeDate BETWEEN :now AND :tomorrow " +
+            "AND pt.topicCode = :topicCode " +
+            "ORDER BY p.id ASC")
+    List<Popup> findMagamPopup(@Param("now") LocalDate now,
+                               @Param("tomorrow") LocalDate tomorrow,
+                               @Param("topicCode") String topicCode);
+
 
     @Query("SELECT p FROM Popup p " +
             "JOIN Interest i ON p.id = i.popup.id " +

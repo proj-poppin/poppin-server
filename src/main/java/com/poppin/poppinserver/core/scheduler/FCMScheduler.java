@@ -12,18 +12,15 @@ import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.user.domain.User;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -69,9 +66,10 @@ public class FCMScheduler {
 
         LocalDate now = zonedDateTime.toLocalDate();
         LocalDate tomorrow = zonedDateTime.toLocalDate().plusDays(1);
+        String topicCode = EPopupTopic.MAGAM.getCode();
 
         log.info("MAGAM popup scheduler start");
-        List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow); // null, 1, many
+        List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow, topicCode); // null, 1, many
         if (magamPopup.isEmpty()) {
             log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
         } else {
@@ -184,6 +182,10 @@ public class FCMScheduler {
                     // 알림 세팅을 "1"이라야 가능하게 함.
                     log.info("token : {}", token.getToken());
                     AlarmSetting set = alarmSettingRepository.findByUser(user);
+                    if (set == null) {
+                        log.warn("알림 설정이 존재하지 않는 사용자: {}", user.getId());
+                        continue;
+                    }
                     log.info("setting : {}", set);
                     Boolean setDefVal = set.getPushYn();
                     Boolean setVal;
