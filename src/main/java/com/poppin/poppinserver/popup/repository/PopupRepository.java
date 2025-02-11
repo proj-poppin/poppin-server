@@ -16,7 +16,7 @@ import java.util.List;
 
 @Repository
 public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecificationExecutor<Popup> {
-    //인기 팝업스토어
+    // 비로그인 인기 팝업스토어
     @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
             "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
             "WHERE p.operationStatus = 'OPERATING' " +
@@ -26,17 +26,44 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                                              @Param("endOfDay") LocalDateTime endOfDay,
                                                              Pageable pageable);
 
-    // 새로 오픈 팝업
+    // 로그인 인기 팝업스토어
+    @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
+            "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
+            "LEFT JOIN BlockedPopup bp ON p.id = bp.popupId.id AND bp.userId.id = :userId " +
+            "WHERE p.operationStatus = 'OPERATING' " +
+            "GROUP BY p.id " +
+            "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
+    List<Popup> findTopOperatingPopupsByInterestAndViewCount(@Param("startOfDay") LocalDateTime startOfDay,
+                                                             @Param("endOfDay") LocalDateTime endOfDay,
+                                                             Long userId,
+                                                             Pageable pageable);
+
+    // 비로그인 새로 오픈 팝업
     @Query("SELECT p FROM Popup p " +
             "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.openDate DESC, p.id ")
     List<Popup> findNewOpenPopupByAll(Pageable pageable);
 
-    //종료 임박 팝업
+    // 로그인 새로 오픈 팝업
+    @Query("SELECT p FROM Popup p " +
+            "LEFT JOIN BlockedPopup bp ON p.id = bp.popupId.id AND bp.userId.id = :userId " +
+            "WHERE p.operationStatus = 'OPERATING' " +
+            "ORDER BY p.openDate DESC, p.id ")
+    List<Popup> findNewOpenPopupByAll(Long userId,
+                                      Pageable pageable);
+
+    // 비로그인 종료 임박 팝업
     @Query("SELECT p FROM Popup p " +
             "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Pageable pageable);
+
+    // 로그인 종료 임박 팝업
+    @Query("SELECT p FROM Popup p " +
+            "WHERE p.operationStatus = 'OPERATING' " +
+            "ORDER BY p.closeDate, p.id ")
+    List<Popup> findClosingPopupByAll(Long userId,
+                                      Pageable pageable);
 
     // 로그인 베이스 팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +

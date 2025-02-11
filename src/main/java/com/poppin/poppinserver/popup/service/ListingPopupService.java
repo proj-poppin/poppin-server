@@ -49,8 +49,14 @@ public class ListingPopupService {
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
 
-        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
-                PageRequest.of(0, 5));
+        List<Popup> popups;
+        if (userId != null) {
+            popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, userId,
+                    PageRequest.of(0, 5));
+        } else {
+            popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
+                    PageRequest.of(0, 5));
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 인기 팝업 조회
@@ -58,7 +64,12 @@ public class ListingPopupService {
     public List<PopupSummaryDto> readNewList(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
 
-        List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
+        List<Popup> popups;
+        if (userId != null) {
+            popups = popupRepository.findNewOpenPopupByAll(userId, PageRequest.of(0, 5));
+        } else {
+            popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 새로 오픈 팝업 조회
@@ -66,7 +77,12 @@ public class ListingPopupService {
     public List<PopupSummaryDto> readClosingList(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
 
-        List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
+        List<Popup> popups;
+        if (userId != null) {
+             popups = popupRepository.findClosingPopupByAll(userId, PageRequest.of(0, 5));
+        } else {
+            popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 종료 임박 팝업 조회
