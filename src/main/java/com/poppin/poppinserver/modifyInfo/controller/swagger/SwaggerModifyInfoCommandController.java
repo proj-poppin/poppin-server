@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.modifyInfo.controller.swagger;
 
+import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
@@ -8,6 +9,7 @@ import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,8 +25,7 @@ public interface SwaggerModifyInfoCommandController {
     @PostMapping(value = "", consumes = {"application/json", "multipart/form-data"})
     ResponseDto<ModifyInfoDto> createUserInform(
             @RequestPart(value = "images") List<MultipartFile> images,
-            @RequestParam(value = "popupId") String popupId,
-            @RequestParam(value = "content") String content,
+            @RequestPart(value = "contents") @Valid CreateModifyInfoDto createModifyInfoDto,
             @Parameter(hidden = true) Long userId
     );
 

@@ -51,8 +51,10 @@ public class ModifyInfoService {
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
                                           List<MultipartFile> images,
                                           Long userId) {
+        Long popupId = Long.valueOf(createModifyInfoDto.popupId());
+
         User user = userQueryUseCase.findUserById(userId);
-        Popup popup = popupRepository.findById(createModifyInfoDto.popupId())
+        Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 프록시 팝업 생성

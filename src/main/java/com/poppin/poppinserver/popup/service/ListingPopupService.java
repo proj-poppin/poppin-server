@@ -11,6 +11,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
@@ -37,6 +38,7 @@ public class ListingPopupService {
     private final PopupRepository popupRepository;
 
     private final UserQueryUseCase userQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
     private final PopupService popupService;
 
     private final HeaderUtil headerUtil;
@@ -45,17 +47,11 @@ public class ListingPopupService {
     public List<PopupSummaryDto> readHotList(HttpServletRequest request) {
         Long userId = headerUtil.parseUserId(request);
 
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDateTime startOfDay = yesterday.atStartOfDay();
-        LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
-
         List<Popup> popups;
         if (userId != null) {
-            popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay, userId,
-                    PageRequest.of(0, 5));
+            popups = popupQueryUseCase.findHotPopupList(userId);
         } else {
-            popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
-                    PageRequest.of(0, 5));
+            popups = popupQueryUseCase.findHotPopupList();
         }
 
         return PopupSummaryDto.fromEntityList(popups);
@@ -66,9 +62,9 @@ public class ListingPopupService {
 
         List<Popup> popups;
         if (userId != null) {
-            popups = popupRepository.findNewOpenPopupByAll(userId, PageRequest.of(0, 5));
+            popups = popupQueryUseCase.findNewPopupList(userId);
         } else {
-            popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
+            popups = popupQueryUseCase.findNewPopupList();
         }
 
         return PopupSummaryDto.fromEntityList(popups);
@@ -79,9 +75,9 @@ public class ListingPopupService {
 
         List<Popup> popups;
         if (userId != null) {
-             popups = popupRepository.findClosingPopupByAll(userId, PageRequest.of(0, 5));
+             popups = popupQueryUseCase.findClosingPopupList(userId);
         } else {
-            popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
+            popups = popupQueryUseCase.findClosingPopupList();
         }
 
         return PopupSummaryDto.fromEntityList(popups);
