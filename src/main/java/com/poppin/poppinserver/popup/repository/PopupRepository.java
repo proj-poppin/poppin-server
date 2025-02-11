@@ -31,6 +31,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
             "LEFT JOIN BlockedPopup bp ON p.id = bp.popupId.id AND bp.userId.id = :userId " +
             "WHERE p.operationStatus = 'OPERATING' " +
+            "AND bp IS NULL " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(i) DESC, p.viewCnt DESC")
     List<Popup> findTopOperatingPopupsByInterestAndViewCount(@Param("startOfDay") LocalDateTime startOfDay,
@@ -48,6 +49,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     @Query("SELECT p FROM Popup p " +
             "LEFT JOIN BlockedPopup bp ON p.id = bp.popupId.id AND bp.userId.id = :userId " +
             "WHERE p.operationStatus = 'OPERATING' " +
+            "AND bp IS NULL " +
             "ORDER BY p.openDate DESC, p.id ")
     List<Popup> findNewOpenPopupByAll(Long userId,
                                       Pageable pageable);
@@ -60,7 +62,9 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
 
     // 로그인 종료 임박 팝업
     @Query("SELECT p FROM Popup p " +
+            "LEFT JOIN BlockedPopup bp ON p.id = bp.popupId.id AND bp.userId.id = :userId " +
             "WHERE p.operationStatus = 'OPERATING' " +
+            "AND bp IS NULL " +
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Long userId,
                                       Pageable pageable);

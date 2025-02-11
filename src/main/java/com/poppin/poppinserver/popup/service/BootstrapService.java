@@ -58,14 +58,17 @@ public class BootstrapService {
         }
 
         if (userId != null) { // 로그인 요청일 경우
+            // 인기 top5 조회
             List<PopupStoreDto> popularTop5PopupStores = popupService.getPopupStoreDtos(
                     popupQueryUseCase.findHotPopupList(userId),
                     userId
             );
+            // 새로오픈팝업 top5 조회
             List<PopupStoreDto> newlyOpenedPopupStores = popupService.getPopupStoreDtos(
                     popupQueryUseCase.findNewPopupList(userId),
                     userId
             );
+            // 종료임박팝업 top5 조회
             List<PopupStoreDto> closingSoonPopupStores = popupService.getPopupStoreDtos(
                     popupQueryUseCase.findClosingPopupList(userId),
                     userId
@@ -99,12 +102,15 @@ public class BootstrapService {
                     .notices(notice)
                     .build();
         } else { // 비로그인 요청일 경우 유저 관련 로직 생략
+            // 인기 top5 조회
             List<PopupStoreDto> popularTop5PopupStores = popupService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findHotPopupList()
             );
+            // 새로오픈팝업 top5 조회
             List<PopupStoreDto> newlyOpenedPopupStores = popupService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findNewPopupList()
             );
+            // 종료임박팝업 top5 조회
             List<PopupStoreDto> closingSoonPopupStores = popupService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findClosingPopupList()
             );
@@ -143,8 +149,11 @@ public class BootstrapService {
         List<String> selectedTaste = selectRandomUtil.selectTaste(tastePopup);
         for (String taste : selectedTaste) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(taste, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                            PopupSpecification.hasTaste(taste, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
+
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
@@ -159,8 +168,10 @@ public class BootstrapService {
         List<String> selectedPrefered = selectRandomUtil.selectPreference(preferedPopup);
         for (String prefered : selectedPrefered) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(prefered, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasPrefered(prefered, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 

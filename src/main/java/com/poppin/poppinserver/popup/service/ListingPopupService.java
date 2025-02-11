@@ -118,8 +118,10 @@ public class ListingPopupService {
         List<String> selectedTaste = selectRandomUtil.selectTaste(tastePopup);
         for (String taste : selectedTaste) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(taste, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasTaste(taste, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
@@ -134,8 +136,10 @@ public class ListingPopupService {
         List<String> selectedPreferred = selectRandomUtil.selectPreference(preferedPopup);
         for (String preferred : selectedPreferred) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(preferred, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasPrefered(preferred, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
