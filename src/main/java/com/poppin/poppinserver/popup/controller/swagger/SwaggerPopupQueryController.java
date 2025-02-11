@@ -42,15 +42,15 @@ public interface SwaggerPopupQueryController {
 
     @Operation(summary = "인기 팝업 목록 조회", description = "인기 팝업 목록을 조회합니다.")
     @GetMapping("/hot-list")
-    ResponseDto<List<PopupSummaryDto>> readHotList();
+    ResponseDto<List<PopupSummaryDto>> readHotList(HttpServletRequest request);
 
     @Operation(summary = "새로 오픈 팝업 목록 조회", description = "새로 오픈한 팝업 목록을 조회합니다.")
     @GetMapping("/new-list")
-    ResponseDto<List<PopupSummaryDto>> readNewList();
+    ResponseDto<List<PopupSummaryDto>> readNewList(HttpServletRequest request);
 
     @Operation(summary = "종료 임박 팝업 목록 조회", description = "종료가 임박한 팝업 목록을 조회합니다.")
     @GetMapping("/closing-list")
-    ResponseDto<List<PopupSummaryDto>> readclosingList();
+    ResponseDto<List<PopupSummaryDto>> readclosingList(HttpServletRequest request);
 
     @Operation(summary = "관심 팝업 목록 조회", description = "사용자가 등록한 관심 팝업 목록을 조회합니다.")
     @GetMapping("/interested-list")

@@ -59,18 +59,18 @@ public class PopupQueryController implements SwaggerPopupQueryController {
     } // 전체팝업관리 - 전체 팝업 검색
 
     @GetMapping("/hot-list") // 인기 팝업 목록 조회
-    public ResponseDto<List<PopupSummaryDto>> readHotList() {
-        return ResponseDto.ok(listingPopupService.readHotList());
+    public ResponseDto<List<PopupSummaryDto>> readHotList(HttpServletRequest request) {
+        return ResponseDto.ok(listingPopupService.readHotList(request));
     }
 
     @GetMapping("/new-list") // 새로 오픈 팝업 목록 조회
-    public ResponseDto<List<PopupSummaryDto>> readNewList() {
-        return ResponseDto.ok(listingPopupService.readNewList());
+    public ResponseDto<List<PopupSummaryDto>> readNewList(HttpServletRequest request) {
+        return ResponseDto.ok(listingPopupService.readNewList(request));
     }
 
     @GetMapping("/closing-list") // 종료 임박 팝업 목록 조회
-    public ResponseDto<List<PopupSummaryDto>> readclosingList() {
-        return ResponseDto.ok(listingPopupService.readClosingList());
+    public ResponseDto<List<PopupSummaryDto>> readclosingList(HttpServletRequest request) {
+        return ResponseDto.ok(listingPopupService.readClosingList(request));
     }
 
     @GetMapping("/interested-list") // 관심 팝업 목록 조회

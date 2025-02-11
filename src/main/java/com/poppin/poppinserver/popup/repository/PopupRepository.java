@@ -26,7 +26,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                                                              @Param("endOfDay") LocalDateTime endOfDay,
                                                              Pageable pageable);
 
-    //새로 오픈 팝업
+    // 새로 오픈 팝업
     @Query("SELECT p FROM Popup p " +
             "WHERE p.operationStatus = 'OPERATING' " +
             "ORDER BY p.openDate DESC, p.id ")

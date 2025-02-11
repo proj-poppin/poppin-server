@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.popup.service;
 
+import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,10 +37,14 @@ public class ListingPopupService {
     private final PopupRepository popupRepository;
 
     private final UserQueryUseCase userQueryUseCase;
-    private final SelectRandomUtil selectRandomUtil;
     private final PopupService popupService;
 
-    public List<PopupSummaryDto> readHotList() {
+    private final HeaderUtil headerUtil;
+    private final SelectRandomUtil selectRandomUtil;
+
+    public List<PopupSummaryDto> readHotList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
+
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
@@ -48,14 +55,16 @@ public class ListingPopupService {
         return PopupSummaryDto.fromEntityList(popups);
     } // 인기 팝업 조회
 
-    public List<PopupSummaryDto> readNewList() {
+    public List<PopupSummaryDto> readNewList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
 
         List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 새로 오픈 팝업 조회
 
-    public List<PopupSummaryDto> readClosingList() {
+    public List<PopupSummaryDto> readClosingList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
 
         List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
 
