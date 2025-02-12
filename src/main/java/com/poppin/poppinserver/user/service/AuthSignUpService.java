@@ -5,24 +5,21 @@ import com.poppin.poppinserver.alarm.usecase.TokenCommandUseCase;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import com.poppin.poppinserver.popup.service.BlockedPopupService;
+import com.poppin.poppinserver.review.dto.response.ReviewActivityResponseDto;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.request.AuthSignUpRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
-import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 소셜 회원가입과 일반 회원가입을 처리하는 서비스
@@ -131,9 +128,13 @@ public class AuthSignUpService {
         // 유저 팝업 정보 조회
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(newUser);
 
+        // 유저 추천한 후기 정보 조회
+        ReviewActivityResponseDto reviewActivityResponseDto = userActivityService.getReviewActivity(newUser);
+
         // 유저 활동 정보 조회
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
                 popupActivityResponseDto,
+                reviewActivityResponseDto,
                 userNotificationResponseDto
         );
 
