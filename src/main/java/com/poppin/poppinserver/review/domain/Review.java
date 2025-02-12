@@ -74,6 +74,10 @@ public class Review {
         this.recommendCnt += 1;
     } // 추천 버튼 클릭시
 
+    public void decreaseRecommendCnt() {
+        this.recommendCnt -= 1;
+    } // 추천 버튼 클릭시
+
     public void updateReviewUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
