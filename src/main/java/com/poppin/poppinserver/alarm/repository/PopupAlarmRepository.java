@@ -28,7 +28,7 @@ public interface PopupAlarmRepository extends JpaRepository<PopupAlarm, Long> {
     @Query("SELECT popup.id FROM PopupAlarm popup WHERE popup.user.id = :userId AND popup.isRead = true")
     Long readPopupAlarms(@Param("userId") Long userId);
 
-    void deleteAllByPopupId(Popup popup);
+    void deleteAllByPopup(Popup popup);
 
     @Query("SELECT popupAlarm FROM PopupAlarm popupAlarm WHERE popupAlarm.user.id = :userId")
     List<PopupAlarm> findAllByUser(@Param("userId") Long userId);
