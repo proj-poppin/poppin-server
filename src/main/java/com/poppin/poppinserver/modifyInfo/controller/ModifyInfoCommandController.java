@@ -1,5 +1,7 @@
 package com.poppin.poppinserver.modifyInfo.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
@@ -31,12 +33,16 @@ public class ModifyInfoCommandController implements SwaggerModifyInfoCommandCont
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseDto<ModifyInfoDto> createUserInform(@RequestPart(value = "images") List<MultipartFile> images,
-                                                       @RequestPart(value = "contents") @Valid CreateModifyInfoDto createModifyInfoDto,
-                                                       @UserId Long userId) {
+                                                       @RequestParam(value = "contents") @Valid String contents,
+                                                       @UserId Long userId) throws JsonProcessingException {
 
         if (images.isEmpty()) {
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        CreateModifyInfoDto createModifyInfoDto = objectMapper.readValue(contents, CreateModifyInfoDto.class);
+
 
         return ResponseDto.ok(modifyInfoService.createModifyInfo(createModifyInfoDto, images, userId));
     } // 요청 생성

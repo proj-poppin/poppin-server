@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.modifyInfo.controller.swagger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
@@ -25,9 +26,9 @@ public interface SwaggerModifyInfoCommandController {
     @PostMapping(value = "", consumes = {"application/json", "multipart/form-data"})
     ResponseDto<ModifyInfoDto> createUserInform(
             @RequestPart(value = "images") List<MultipartFile> images,
-            @RequestPart(value = "contents") @Valid CreateModifyInfoDto createModifyInfoDto,
+            @RequestParam(value = "contents") @Valid String contents,
             @Parameter(hidden = true) Long userId
-    );
+    ) throws JsonProcessingException;
 
     @Operation(summary = "관리자 - 정보 수정 요청 임시 저장", description = "관리자가 정보 수정 요청을 임시 저장합니다.")
     @PutMapping(value = "/save", consumes = {"application/json", "multipart/form-data"})
