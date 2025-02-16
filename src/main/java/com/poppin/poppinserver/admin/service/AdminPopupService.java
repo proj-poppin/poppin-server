@@ -36,6 +36,8 @@ import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
 import com.poppin.poppinserver.popup.repository.*;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
@@ -69,8 +71,6 @@ public class AdminPopupService {
     private final ReviewQueryRepository reviewRepository;
     private final ReviewCommandRepository reviewCommandRepository;
     private final PosterImageRepository posterImageRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
@@ -100,41 +100,16 @@ public class AdminPopupService {
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
     private final FCMScheduler fcmScheduler;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
 
     @Transactional
     public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
         User admin = userQueryUseCase.findUserById(adminId);
 
-        //카테고리별 엔티티 정의
-        CreatePreferedDto createPreferedDto = createPopupDto.prefered();
-        PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createPreferedDto.market())
-                .display(createPreferedDto.display())
-                .experience(createPreferedDto.experience())
-                .wantFree(createPreferedDto.wantFree())
-                .build();
-
-        CreateTasteDto createTasteDto = createPopupDto.taste();
-        TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAnimation())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alcohol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
-                .build();
-
         //각 카테고리 저장
-        preferedPopup = preferedPopupRepository.save(preferedPopup);
-        tastePopup = tastePopupRepository.save(tastePopup);
+        PreferedPopup preferedPopup = preferedPopupCommandUseCase.createPreferedPopup(createPopupDto.prefered());
+        TastePopup tastePopup = tastedPopupCommandUseCase.createTastePopup(createPopupDto.taste());
 
         //날짜 요청 유효성 검증
         if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
@@ -349,31 +324,9 @@ public class AdminPopupService {
 
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updatePopupDto.taste();
-        TastePopup tastePopup = popup.getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
-        PreferedPopup preferedPopup = popup.getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(popup.getTastePopup(), updatePopupDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(popup.getPreferedPopup(), updatePopupDto.prefered());
 
         // 기존 이미지 싹 지우기
         List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);

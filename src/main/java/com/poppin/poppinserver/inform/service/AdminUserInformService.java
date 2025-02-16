@@ -15,15 +15,11 @@ import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryD
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.domain.PreferedPopup;
-import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
@@ -43,15 +39,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminUserInformService {
     private final UserInformRepository userInformRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
     private final PosterImageRepository posterImageRepository;
 
     private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
@@ -68,33 +64,12 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
+        // 관리자 검증
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updateUserInformDto.taste();
-        TastePopup tastePopup = userInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updateUserInformDto.prefered();
-        PreferedPopup preferedPopup = userInform.getPopupId().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(userInform.getPopupId().getTastePopup(), updateUserInformDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(userInform.getPopupId().getPreferedPopup(), updateUserInformDto.prefered());
 
         Popup popup = userInform.getPopupId();
 
@@ -160,33 +135,12 @@ public class AdminUserInformService {
         UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
+        // 관리자 검증
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updateUserInformDto.taste();
-        TastePopup tastePopup = userInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updateUserInformDto.prefered();
-        PreferedPopup preferedPopup = userInform.getPopupId().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(userInform.getPopupId().getTastePopup(), updateUserInformDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(userInform.getPopupId().getPreferedPopup(), updateUserInformDto.prefered());
 
         Popup popup = userInform.getPopupId();
 

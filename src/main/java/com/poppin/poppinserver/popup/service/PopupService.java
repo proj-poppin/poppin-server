@@ -49,17 +49,12 @@ import java.util.stream.Collectors;
 public class PopupService {
     private final PopupRepository popupRepository;
 
-    private final ReviewQueryRepository reviewRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final BlockedUserQueryRepository blockedUserQueryRepository;
     private final BlockedPopupRepository blockedPopupRepository;
     private final InterestRepository interestRepository;
 
     private final WaitingCommandUseCase waitingCommandUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
-    private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final UserQueryUseCase userQueryUseCase;
-    private final InterestQueryUseCase interestQueryUseCase;
     private final TokenQueryUseCase tokenQueryUseCase;
     private final VisitQueryUseCase visitQueryUseCase;
     private final VisitorDataQueryUseCase visitorDataQueryUseCase;

@@ -17,9 +17,9 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -37,15 +37,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
+
     private final PopupRepository popupRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
 
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
@@ -58,33 +59,9 @@ public class ModifyInfoService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         // 프록시 팝업 생성
-        PreferedPopup preferedPopup = popup.getPreferedPopup();
-        PreferedPopup proxyPrefered = PreferedPopup.builder()
-                .wantFree(preferedPopup.getWantFree())
-                .market(preferedPopup.getMarket())
-                .experience(preferedPopup.getExperience())
-                .display(preferedPopup.getDisplay())
-                .build();
-        proxyPrefered = preferedPopupRepository.save(proxyPrefered);
+        PreferedPopup proxyPrefered = preferedPopupCommandUseCase.createProxyPreferedPopup(popup.getPreferedPopup());
 
-        TastePopup tastePopup = popup.getTastePopup();
-        TastePopup proxyTaste = TastePopup.builder()
-                .fasionBeauty(tastePopup.getFashionBeauty())
-                .characters(tastePopup.getCharacters())
-                .foodBeverage(tastePopup.getFoodBeverage())
-                .webtoonAni(tastePopup.getWebtoonAni())
-                .interiorThings(tastePopup.getInteriorThings())
-                .movie(tastePopup.getMovie())
-                .musical(tastePopup.getMusical())
-                .sports(tastePopup.getSports())
-                .game(tastePopup.getGame())
-                .itTech(tastePopup.getItTech())
-                .kpop(tastePopup.getKpop())
-                .alcohol(tastePopup.getAlcohol())
-                .animalPlant(tastePopup.getAnimalPlant())
-                .etc(tastePopup.getEtc())
-                .build();
-        proxyTaste = tastePopupRepository.save(proxyTaste);
+        TastePopup proxyTaste = tastedPopupCommandUseCase.createProxyTastePopup(popup.getTastePopup());
 
         Popup proxyPopup = Popup.builder()
                 .homepageLink(popup.getHomepageLink())
@@ -218,8 +195,6 @@ public class ModifyInfoService {
             // proxy popup 삭제
             log.info("delete proxy popup");
             popupRepository.delete(proxyPopup);
-
-
         }
     } // 프록시 팝업 삭제 및 정보수정요청 삭제
 }

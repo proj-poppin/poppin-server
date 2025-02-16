@@ -16,16 +16,12 @@ import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoSummaryDto;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.domain.PreferedPopup;
-import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
@@ -47,14 +43,14 @@ public class AdminModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
     private final PopupRepository popupRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
 
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
@@ -121,31 +117,9 @@ public class AdminModifyInfoService {
         ModifyInfo modifyInfo = modifyInformRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
-        CreateTasteDto createTasteDto = updateModifyInfoDto.taste();
-        TastePopup tastePopup = modifyInfo.getProxyPopup().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
-        PreferedPopup preferedPopup = modifyInfo.getProxyPopup().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(modifyInfo.getProxyPopup().getTastePopup(), updateModifyInfoDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(modifyInfo.getProxyPopup().getPreferedPopup(), updateModifyInfoDto.prefered());
 
         Popup popup = modifyInfo.getProxyPopup();
 
@@ -229,34 +203,12 @@ public class AdminModifyInfoService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
         // 기존 팝업에 수정 사항 덮어 씌우기
-        CreateTasteDto createTasteDto = updateModifyInfoDto.taste();
-        TastePopup tastePopup = modifyInfo.getOriginPopup().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
 
-        CreatePreferedDto createPreferedDto = updateModifyInfoDto.prefered();
-        PreferedPopup preferedPopup = modifyInfo.getOriginPopup().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 덮어 씌우기
+        tastedPopupCommandUseCase.updateTastePopup(modifyInfo.getOriginPopup().getTastePopup(), updateModifyInfoDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(modifyInfo.getOriginPopup().getPreferedPopup(), updateModifyInfoDto.prefered());
 
         // 팝업 이미지 처리 및 저장
-
         // 기존 이미지 싹 지우기
         Popup originPopup = modifyInfo.getOriginPopup();
         List<PosterImage> originImages = posterImageRepository.findByPopupId(originPopup);

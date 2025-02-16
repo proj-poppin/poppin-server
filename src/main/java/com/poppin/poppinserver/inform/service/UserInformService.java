@@ -12,11 +12,9 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
-import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
@@ -35,50 +33,28 @@ public class UserInformService {
     private final UserInformRepository userInformRepository;
 
     private final PopupRepository popupRepository;
-    private final TastePopupRepository tastePopupRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
 
     @Transactional
     public UserInformDto createUserInform(String name, String contactLink, String filteringFourteenCategories,
                                           List<MultipartFile> images, Long userId) {
-        log.info("createUserInform");
-        log.info("filteringFourteenCategories: {}", filteringFourteenCategories);
         User user = userQueryUseCase.findUserById(userId);
 
-        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
-        if (prepered.isEmpty()) {
+        // 프록시 카테고리 생성
+        List<String> taste = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        if (taste.isEmpty()) {
             throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
         }
 
-        TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(prepered.contains("fashionBeauty"))
-                .characters(prepered.contains("characters"))
-                .foodBeverage(prepered.contains("foodBeverage"))
-                .webtoonAni(prepered.contains("webtoonAni"))
-                .interiorThings(prepered.contains("interiorThings"))
-                .movie(prepered.contains("movie"))
-                .musical(prepered.contains("musical"))
-                .sports(prepered.contains("sports"))
-                .game(prepered.contains("game"))
-                .itTech(prepered.contains("itTech"))
-                .kpop(prepered.contains("kpop"))
-                .alcohol(prepered.contains("alcohol"))
-                .animalPlant(prepered.contains("animalPlant"))
-                .etc(prepered.contains("etc"))
-                .build();
-        tastePopupRepository.save(tastePopup);
+        TastePopup tastePopup = tastedPopupCommandUseCase.createTastePopup(taste);
 
-        PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(false)
-                .market(false)
-                .experience(false)
-                .display(false)
-                .build();
-        preferedPopupRepository.save(preferedPopup);
+        PreferedPopup preferedPopup = preferedPopupCommandUseCase.createEmptyPreferedPopup();
 
+        // 프록시 팝업 생성
         Popup popup = Popup.builder()
                 .name(name)
                 .tastePopup(tastePopup)
@@ -112,37 +88,18 @@ public class UserInformService {
 
         log.info("createUserInform");
         log.info("filteringFourteenCategories: {}", filteringFourteenCategories);
-        List<String> prepered = Arrays.stream(filteringFourteenCategories.split(",")).toList();
-        if (prepered.isEmpty()) {
+
+        // 프록시 카테고리 생성
+        List<String> taste = Arrays.stream(filteringFourteenCategories.split(",")).toList();
+        if (taste.isEmpty()) {
             throw new CommonException(ErrorCode.INVALID_CATEGORY_STRING);
         }
 
-        TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(prepered.contains("fashionBeauty"))
-                .characters(prepered.contains("characters"))
-                .foodBeverage(prepered.contains("foodBeverage"))
-                .webtoonAni(prepered.contains("webtoonAni"))
-                .interiorThings(prepered.contains("interiorThings"))
-                .movie(prepered.contains("movie"))
-                .musical(prepered.contains("musical"))
-                .sports(prepered.contains("sports"))
-                .game(prepered.contains("game"))
-                .itTech(prepered.contains("itTech"))
-                .kpop(prepered.contains("kpop"))
-                .alcohol(prepered.contains("alcohol"))
-                .animalPlant(prepered.contains("animalPlant"))
-                .etc(prepered.contains("etc"))
-                .build();
-        tastePopupRepository.save(tastePopup);
+        TastePopup tastePopup = tastedPopupCommandUseCase.createTastePopup(taste);
 
-        PreferedPopup preferedPopup = PreferedPopup.builder()
-                .wantFree(false)
-                .market(false)
-                .experience(false)
-                .display(false)
-                .build();
-        preferedPopupRepository.save(preferedPopup);
+        PreferedPopup preferedPopup = preferedPopupCommandUseCase.createEmptyPreferedPopup();
 
+        // 프록시 팝업 생성
         Popup popup = Popup.builder()
                 .name(name)
                 .tastePopup(tastePopup)
