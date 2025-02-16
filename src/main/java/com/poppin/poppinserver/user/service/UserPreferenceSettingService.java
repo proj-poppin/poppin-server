@@ -5,7 +5,6 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
 import com.poppin.poppinserver.popup.service.BootstrapService;
 import com.poppin.poppinserver.popup.service.PopupService;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
@@ -29,7 +28,6 @@ public class UserPreferenceSettingService {
     private final UserCommandRepository userCommandRepository;
     private final BootstrapService bootstrapService;
     private final PopupService popupService;
-    private final WhoWithPopupRepository whoWithPopupRepository;
 
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
@@ -57,7 +55,7 @@ public class UserPreferenceSettingService {
 
         if (user.getWhoWithPopup() == null) {
             WhoWithPopup whoWithPopup = createDefaultWhoWithPopup();
-            whoWithPopupRepository.save(whoWithPopup);
+            whoWithPopupCommandUseCase.createWhoWithPopup(whoWithPopup);
             user.updatePopupTaste(whoWithPopup);
         }
 
@@ -79,11 +77,7 @@ public class UserPreferenceSettingService {
         tastedPopupCommandUseCase.updateTastePopup(tastePopup, createUserTasteDto.taste());
 
         WhoWithPopup whoWithPopup = user.getWhoWithPopup();
-        whoWithPopup.update(createUserTasteDto.whoWith().solo(),
-                createUserTasteDto.whoWith().withFriend(),
-                createUserTasteDto.whoWith().withFamily(),
-                createUserTasteDto.whoWith().withLover());
-        whoWithPopupRepository.save(whoWithPopup);
+        whoWithPopupCommandUseCase.updateWhoWithPopup(whoWithPopup, createUserTasteDto.whoWith());
 
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
         userCommandRepository.save(user);

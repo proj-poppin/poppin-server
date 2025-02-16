@@ -12,6 +12,7 @@ import java.util.List;
 public interface WhoWithPopupCommandUseCase {
     // WhoWithPopup 생성
     WhoWithPopup createWhoWithPopup(WhoWithPopup whoWithPopup);
-    WhoWithPopup createWhoWithPopup(CreateWhoWithDto createWhoWithDto);
 
+    // WhoWithPopup 수정
+    WhoWithPopup updateWhoWithPopup(WhoWithPopup whoWithPopup, CreateWhoWithDto createWhoWithDto);
 }

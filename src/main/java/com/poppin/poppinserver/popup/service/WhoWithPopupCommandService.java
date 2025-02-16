@@ -1,11 +1,8 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateWhoWithDto;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
-import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
 import com.poppin.poppinserver.popup.usecase.WhoWithPopupCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +14,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WhoWithPopupCommandService implements WhoWithPopupCommandUseCase {
-
+    private final WhoWithPopupRepository whoWithPopupRepository;
     @Override
     public WhoWithPopup createWhoWithPopup(WhoWithPopup whoWithPopup) {
-        return null;
+        return whoWithPopupRepository.save(whoWithPopup);
     }
 
     @Override
-    public WhoWithPopup createWhoWithPopup(CreateWhoWithDto createWhoWithDto) {
-        return null;
+    public WhoWithPopup updateWhoWithPopup(WhoWithPopup whoWithPopup, CreateWhoWithDto createWhoWithDto) {
+        whoWithPopup.update(
+                createWhoWithDto.solo(),
+                createWhoWithDto.withFriend(),
+                createWhoWithDto.withFamily(),
+                createWhoWithDto.withLover()
+        );
+        return whoWithPopupRepository.save(whoWithPopup);
     }
 }
