@@ -100,6 +100,4 @@ public class PopupQueryService implements PopupQueryUseCase {
     public List<Popup> findTastePopupList(Long userId) {
         return List.of();
     }
-
-
 }

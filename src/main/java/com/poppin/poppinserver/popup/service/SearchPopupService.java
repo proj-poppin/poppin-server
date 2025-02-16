@@ -30,10 +30,11 @@ import org.springframework.stereotype.Service;
 public class SearchPopupService {
     private final PopupRepository popupRepository;
 
-    private final PrepardSearchUtil prepardSearchUtil;
-
     private final PopupService popupService;
+
     private final UserQueryUseCase userQueryUseCase;
+
+    private final PrepardSearchUtil prepardSearchUtil;
     private final HeaderUtil headerUtil;
 
     public PagingResponseDto<List<PopupStoreDto>> readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
