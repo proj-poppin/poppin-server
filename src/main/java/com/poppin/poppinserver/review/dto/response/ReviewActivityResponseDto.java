@@ -6,9 +6,9 @@ import java.util.List;
 
 @Builder
 public record ReviewActivityResponseDto(
-        List<Long> recommendReviews
+        List<String> recommendReviews
 ) {
-    public static ReviewActivityResponseDto fromProperties(List<Long> recommendReviews){
+    public static ReviewActivityResponseDto fromProperties(List<String> recommendReviews){
         return ReviewActivityResponseDto.builder()
                 .recommendReviews(recommendReviews)
                 .build();

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 유저의 알람 내역, 방문 팝업, 관심 팝업, 오픈 대기 팝업 정보를 조회
@@ -145,7 +146,11 @@ public class UserActivityService {
     }
 
     public ReviewActivityResponseDto getReviewActivity(User user){
-        List<Long> reviewIdList = reviewRecommendQueryRepository.recommendReviewList(user.getId());
+        List<Long> reviews = reviewRecommendQueryRepository.recommendReviewList(user.getId());
+        List<String> reviewIdList = reviews.stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+
         return ReviewActivityResponseDto.fromProperties(reviewIdList);
     }
 
