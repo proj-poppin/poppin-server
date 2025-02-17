@@ -37,6 +37,28 @@ public class PosterImageCommandService implements PosterImageCommandUseCase {
     }
 
     @Override
+    public List<PosterImage> copyPosterList(Popup popup, Popup proxyPopup) {
+        List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
+        List<String> posterUrls = posterImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+
+        List<String> proxyUrls = s3Service.copyImageListToAnotherFolder(posterUrls, proxyPopup.getId());
+
+        List<PosterImage> proxyImages = new ArrayList<>();
+        for (String proxyUrl : proxyUrls) {
+            PosterImage proxyImage = PosterImage.builder()
+                    .posterUrl(proxyUrl)
+                    .popup(proxyPopup)
+                    .build();
+            proxyImages.add(proxyImage);
+        }
+        posterImageRepository.saveAll(proxyImages);
+
+        return posterImages;
+    }
+
+    @Override
     public void deletePosterList(Popup popup) {
         List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
         List<String> fileUrls = posterImages.stream()

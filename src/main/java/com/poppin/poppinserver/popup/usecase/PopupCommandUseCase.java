@@ -16,6 +16,9 @@ public interface PopupCommandUseCase {
     Popup createPopup(CreateManagerInformDto createManagerInformDto, String operationStatus, TastePopup tastePopup, PreferedPopup preferedPopup);
     Popup createPopup(CreateUserInformDto createUserInformDto, String operationStatus, TastePopup tastePopup, PreferedPopup preferedPopup);
 
+    // 기존 팝업으로부터 프록시 팝업 생성
+    Popup copyPopup(Popup popup, PreferedPopup proxyPrefered, TastePopup proxyTaste, String operationStatus);
+
     // 프록시 팝업 업데이트
     void updatePopup(Popup popup, UpdateManagerInformDto updateManagerInformDto, String operationStatus, User agent);
 

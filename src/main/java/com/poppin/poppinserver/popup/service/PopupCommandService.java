@@ -39,7 +39,7 @@ public class PopupCommandService implements PopupCommandUseCase {
                         .openDate(createManagerInformDto.openDate())
                         .openTime(createManagerInformDto.openTime())
                         .operationExcept(createManagerInformDto.operationExcept())
-                        .operationStatus(EOperationStatus.EXECUTING.getStatus())
+                        .operationStatus(operationStatus)
                         .parkingAvailable(createManagerInformDto.parkingAvailable())
                         .latitude(createManagerInformDto.latitude())
                         .longitude(createManagerInformDto.longitude())
@@ -57,7 +57,35 @@ public class PopupCommandService implements PopupCommandUseCase {
                         .tastePopup(tastePopup)
                         .preferedPopup(preferedPopup)
                         .entranceRequired(true)
-                        .operationStatus(EOperationStatus.EXECUTING.getStatus())
+                        .operationStatus(operationStatus)
+                        .build()
+        );
+    }
+
+    @Override
+    public Popup copyPopup(Popup popup, PreferedPopup proxyPrefered, TastePopup proxyTaste, String operationStatus) {
+        return popupRepository.save(
+                Popup.builder()
+                        .homepageLink(popup.getHomepageLink())
+                        .name(popup.getName())
+                        .availableAge(popup.getAvailableAge())
+                        .closeDate(popup.getCloseDate())
+                        .closeTime(popup.getCloseTime())
+                        .entranceRequired(popup.getEntranceRequired())
+                        .entranceFee(popup.getEntranceFee())
+                        .resvRequired(popup.getResvRequired())
+                        .introduce(popup.getIntroduce())
+                        .address(popup.getAddress())
+                        .addressDetail(popup.getAddressDetail())
+                        .openDate(popup.getOpenDate())
+                        .openTime(popup.getOpenTime())
+                        .latitude(popup.getLatitude())
+                        .longitude(popup.getLongitude())
+                        .operationExcept(popup.getOperationExcept())
+                        .operationStatus(operationStatus)
+                        .parkingAvailable(popup.getParkingAvailable())
+                        .preferedPopup(proxyPrefered)
+                        .tastePopup(proxyTaste)
                         .build()
         );
     }

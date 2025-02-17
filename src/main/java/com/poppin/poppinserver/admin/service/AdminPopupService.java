@@ -320,8 +320,6 @@ public class AdminPopupService {
         posterImageCommandUseCase.deletePosterList(popup);
 
         //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
-
         // 팝업 이미지 처리 및 저장
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
