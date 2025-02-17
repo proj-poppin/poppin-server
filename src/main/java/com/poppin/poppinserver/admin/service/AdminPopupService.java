@@ -21,6 +21,8 @@ import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
 import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
+import com.poppin.poppinserver.inform.usecase.UserInformCommandUseCase;
 import com.poppin.poppinserver.interest.usercase.InterestCommandUseCase;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -45,6 +47,8 @@ import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendCommandRepository;
 import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
+import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
+import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
@@ -66,6 +70,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminPopupService {
     private final PopupRepository popupRepository;
+
     private final ReviewQueryRepository reviewRepository;
     private final ReviewCommandRepository reviewCommandRepository;
     private final FCMTokenRepository fcmTokenRepository;
@@ -73,12 +78,9 @@ public class AdminPopupService {
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final ReviewImageCommandRepository reviewImageCommandRepository;
     private final VisitRepository visitRepository;
-    private final ManagerInformRepository managerInformRepository;
-    private final UserInformRepository userInformRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final ReviewRecommendCommandRepository reviewRecommendRepository;
     private final PopupTopicRepository popupTopicRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
@@ -98,6 +100,9 @@ public class AdminPopupService {
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
     private final PopupCommandUseCase popupCommandUseCase;
+    private final ManagerInformCommandUseCase managerInformCommandUseCase;
+    private final UserInformCommandUseCase userInformCommandUseCase;
+    private final BlockedPopupCommandUseCase blockedPopupCommandUseCase;
 
     private final FCMScheduler fcmScheduler;
 
@@ -268,9 +273,9 @@ public class AdminPopupService {
         // 제보 관련 데이터
         log.info("delete inform data");
         // 운영자 제보
-        managerInformRepository.deleteAllByPopupId(popup);
+        managerInformCommandUseCase.deleteAllManagerInformByPopup(popup);
         // 사용자 제보
-        userInformRepository.deleteAllByPopupId(popup);
+        userInformCommandUseCase.deleteAllUserInformByPopup(popup);
 
         // 정보수정요청 관련 데이터
         log.info("delete modify info data");
@@ -291,7 +296,7 @@ public class AdminPopupService {
         popupTopicRepository.deleteAllByPopup(popup);
 
         log.info("delete blocked popup");
-        blockedPopupRepository.deleteAllByPopupId(popup);
+        blockedPopupCommandUseCase.deleteAllBlockedPopupByPopup(popup);
 
         log.info("delete popup");
         popupRepository.delete(popup);
