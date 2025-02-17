@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.inform.service;
 
-import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
@@ -13,7 +12,7 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
@@ -33,12 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ManagerInformService {
     private final ManagerInformRepository managerInformRepository;
-    private final PopupRepository popupRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
 
     @Transactional
     public ManagerInformDto createManagerInform(CreateManagerInformDto createManagerInformDto,
@@ -59,36 +58,13 @@ public class ManagerInformService {
         PreferedPopup preferedPopup = preferedPopupCommandUseCase.createPreferedPopup(prepered);
 
         // 프록시 팝업 생성
-        Popup popup = Popup.builder()
-                .homepageLink(createManagerInformDto.homepageLink())
-                .name(createManagerInformDto.name())
-                .availableAge(createManagerInformDto.availableAge())
-                .closeDate(createManagerInformDto.closeDate())
-                .closeTime(createManagerInformDto.closeTime())
-                .entranceRequired(createManagerInformDto.entranceRequired())
-                .entranceFee(createManagerInformDto.entranceFee())
-                .resvRequired(createManagerInformDto.resvRequired())
-                .introduce(createManagerInformDto.introduce())
-                .address(createManagerInformDto.address())
-                .addressDetail(createManagerInformDto.addressDetail())
-                .openDate(createManagerInformDto.openDate())
-                .openTime(createManagerInformDto.openTime())
-                .operationExcept(createManagerInformDto.operationExcept())
-                .operationStatus(EOperationStatus.EXECUTING.getStatus())
-                .parkingAvailable(createManagerInformDto.parkingAvailable())
-                .latitude(createManagerInformDto.latitude())
-                .longitude(createManagerInformDto.longitude())
-                .preferedPopup(preferedPopup)
-                .tastePopup(tastePopup)
-                .build();
-        popup = popupRepository.save(popup);
-        log.info(popup.toString());
+        Popup popup = popupCommandUseCase.createPopup(createManagerInformDto, EOperationStatus.EXECUTING.getStatus(), tastePopup, preferedPopup);
 
         // 팝업 이미지 처리 및 저장
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
-        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
-        popup = popupRepository.save(popup);
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         ManagerInform managerInform = ManagerInform.builder()
                 .informerId(user)
@@ -118,36 +94,14 @@ public class ManagerInformService {
         TastePopup tastePopup = tastedPopupCommandUseCase.createTastePopup(taste);
         PreferedPopup preferedPopup = preferedPopupCommandUseCase.createPreferedPopup(prepered);
 
-        Popup popup = Popup.builder()
-                .homepageLink(createManagerInformDto.homepageLink())
-                .name(createManagerInformDto.name())
-                .availableAge(createManagerInformDto.availableAge())
-                .closeDate(createManagerInformDto.closeDate())
-                .closeTime(createManagerInformDto.closeTime())
-                .entranceRequired(createManagerInformDto.entranceRequired())
-                .entranceFee(createManagerInformDto.entranceFee())
-                .resvRequired(createManagerInformDto.resvRequired())
-                .introduce(createManagerInformDto.introduce())
-                .address(createManagerInformDto.address())
-                .addressDetail(createManagerInformDto.addressDetail())
-                .openDate(createManagerInformDto.openDate())
-                .openTime(createManagerInformDto.openTime())
-                .operationExcept(createManagerInformDto.operationExcept())
-                .operationStatus(EOperationStatus.EXECUTING.getStatus())
-                .parkingAvailable(createManagerInformDto.parkingAvailable())
-                .latitude(createManagerInformDto.latitude())
-                .longitude(createManagerInformDto.longitude())
-                .preferedPopup(preferedPopup)
-                .tastePopup(tastePopup)
-                .build();
-        popup = popupRepository.save(popup);
-        log.info(popup.toString());
+        // 프록시 팝업 생성
+        Popup popup = popupCommandUseCase.createPopup(createManagerInformDto, EOperationStatus.EXECUTING.getStatus(), tastePopup, preferedPopup);
 
         // 팝업 이미지 처리 및 저장
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
-        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
-        popup = popupRepository.save(popup);
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         ManagerInform managerInform = ManagerInform.builder()
                 .informerId(null)

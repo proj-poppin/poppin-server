@@ -6,6 +6,7 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.dto.response.ReviewListDto;
@@ -35,14 +36,13 @@ public class ReviewService {
 
     private final ReviewQueryRepository reviewQueryRepository;
 
-    private final PopupRepository popupRepository;
     private final VisitRepository visitRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final PosterImageRepository posterImageRepository;
     private final ReviewImageQueryRepository reviewImageQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
-
+    private final PopupQueryUseCase popupQueryUseCase;
 
     public List<ReviewListDto> readReviewList(Long userId) {
 
@@ -85,8 +85,7 @@ public class ReviewService {
         Review review = reviewQueryRepository.findById(reviewId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
 
-        Popup popup = popupRepository.findById(review.getPopup().getId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(review.getPopup().getId());
 
         boolean isCertified = visitRepository.findByUserId(userId, popup.getId()).isPresent();
 

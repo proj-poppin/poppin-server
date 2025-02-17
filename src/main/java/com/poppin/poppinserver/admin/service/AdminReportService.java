@@ -6,6 +6,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreateReportExecContentDto;
@@ -41,10 +42,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminReportService {
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
-    private final PopupRepository popupRepository;
     private final UserQueryRepository userQueryRepository;
     private final ReviewQueryRepository reviewRepository;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
 
     @Transactional(readOnly = true)
     public PagingResponseDto<List<ReportedReviewListResponseDto>> readReviewReports(int page, int size,
@@ -89,8 +90,8 @@ public class AdminReportService {
     public ReportedPopupInfoDto readPopupReportDetail(Long reportId) {
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        Popup popup = popupRepository.findById(reportPopup.getPopupId().getId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Popup popup = popupQueryUseCase.findPopupById(reportPopup.getPopupId().getId());
+
         ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
                 .popupId(popup.getId())
                 .popupName(popup.getName())

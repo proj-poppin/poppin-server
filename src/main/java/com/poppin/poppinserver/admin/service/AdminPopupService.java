@@ -89,19 +89,18 @@ public class AdminPopupService {
     private final S3Service s3Service;
     private final ModifyInfoService modifyInfoService;
 
-    private final UserQueryUseCase userQueryUseCase;
-    private final PopupQueryUseCase popupQueryUseCase;
-    private final InterestCommandUseCase interestCommandUseCase;
-
     private final PrepardSearchUtil prepardSearchUtil;
 
     private final TokenQueryUseCase tokenQueryUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
-
-    private final FCMScheduler fcmScheduler;
+    private final UserQueryUseCase userQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
+    private final InterestCommandUseCase interestCommandUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+
+    private final FCMScheduler fcmScheduler;
 
     @Transactional
     public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {

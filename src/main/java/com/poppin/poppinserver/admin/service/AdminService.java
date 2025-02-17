@@ -50,7 +50,6 @@ public class AdminService {
     private final InformAlarmImageRepository informAlarmImageRepository;
     private final S3Service s3Service;
 
-    private final TokenQueryUseCase tokenQueryUseCase;
     private final AlarmCommandUseCase alarmCommandUseCase;
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 

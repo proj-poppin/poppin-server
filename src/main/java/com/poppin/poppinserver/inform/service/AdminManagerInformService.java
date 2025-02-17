@@ -18,6 +18,7 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -39,9 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminManagerInformService {
-    // 주석
     private final ManagerInformRepository managerInformRepository;
-    private final PopupRepository popupRepository;
     private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
@@ -50,6 +49,7 @@ public class AdminManagerInformService {
     private final UserQueryUseCase userQueryUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
 
     @Transactional
     public ManagerInformDto readManageInform(Long manageInformId) {
@@ -112,29 +112,7 @@ public class AdminManagerInformService {
         }
         popupAlarmKeywordRepository.saveAll(popupAlarmKeywords);
 
-        popup.update(
-                updateManagerInformDto.homepageLink(),
-                updateManagerInformDto.name(),
-                updateManagerInformDto.introduce(),
-                updateManagerInformDto.address(),
-                updateManagerInformDto.addressDetail(),
-                updateManagerInformDto.entranceRequired(),
-                updateManagerInformDto.entranceFee(),
-                updateManagerInformDto.resvRequired(),
-                updateManagerInformDto.availableAge(),
-                updateManagerInformDto.parkingAvailable(),
-                updateManagerInformDto.openDate(),
-                updateManagerInformDto.closeDate(),
-                updateManagerInformDto.openTime(),
-                updateManagerInformDto.closeTime(),
-                updateManagerInformDto.latitude(),
-                updateManagerInformDto.longitude(),
-                updateManagerInformDto.operationExcept(),
-                EOperationStatus.EXECUTING.getStatus(),
-                admin
-        );
-
-        popup = popupRepository.save(popup);
+        popupCommandUseCase.updatePopup(popup, updateManagerInformDto, EOperationStatus.EXECUTING.getStatus(), admin);
 
         managerInform.update(
                 EInformProgress.EXECUTING,

@@ -5,6 +5,7 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EInformProgress;
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.UserInform;
+import com.poppin.poppinserver.inform.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -12,6 +13,7 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
@@ -32,15 +34,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserInformService {
     private final UserInformRepository userInformRepository;
 
-    private final PopupRepository popupRepository;
-
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
 
     @Transactional
-    public UserInformDto createUserInform(String name, String contactLink, String filteringFourteenCategories,
+    public UserInformDto createUserInform(CreateUserInformDto createUserInformDto, String filteringFourteenCategories,
                                           List<MultipartFile> images, Long userId) {
         User user = userQueryUseCase.findUserById(userId);
 
@@ -55,26 +56,18 @@ public class UserInformService {
         PreferedPopup preferedPopup = preferedPopupCommandUseCase.createEmptyPreferedPopup();
 
         // 프록시 팝업 생성
-        Popup popup = Popup.builder()
-                .name(name)
-                .tastePopup(tastePopup)
-                .preferedPopup(preferedPopup)
-                .entranceRequired(true)
-                .operationStatus(EOperationStatus.EXECUTING.getStatus())
-                .build();
-        popup = popupRepository.save(popup);
-        log.info(popup.toString());
+        Popup popup = popupCommandUseCase.createPopup(createUserInformDto, EOperationStatus.EXECUTING.getStatus(), tastePopup, preferedPopup);
 
         // 팝업 이미지 처리 및 저장
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
-        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
-        popup = popupRepository.save(popup);
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         UserInform userInform = UserInform.builder()
                 .informerId(user)
                 .popupId(popup)
-                .contactLink(contactLink)
+                .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
         userInform = userInformRepository.save(userInform);
@@ -83,7 +76,7 @@ public class UserInformService {
     } // 제보 생성
 
     @Transactional
-    public UserInformDto createGuestUserInform(String name, String contactLink, String filteringFourteenCategories,
+    public UserInformDto createGuestUserInform(CreateUserInformDto createUserInformDto, String filteringFourteenCategories,
                                                List<MultipartFile> images) {
 
         log.info("createUserInform");
@@ -100,25 +93,18 @@ public class UserInformService {
         PreferedPopup preferedPopup = preferedPopupCommandUseCase.createEmptyPreferedPopup();
 
         // 프록시 팝업 생성
-        Popup popup = Popup.builder()
-                .name(name)
-                .tastePopup(tastePopup)
-                .preferedPopup(preferedPopup)
-                .operationStatus(EOperationStatus.EXECUTING.getStatus())
-                .build();
-        popup = popupRepository.save(popup);
-        log.info(popup.toString());
+        Popup popup = popupCommandUseCase.createPopup(createUserInformDto, EOperationStatus.EXECUTING.getStatus(), tastePopup, preferedPopup);
 
         // 팝업 이미지 처리 및 저장
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
-        popup.updatePosterUrl(posterImages.get(0).getPosterUrl());
 
-        popup = popupRepository.save(popup);
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         UserInform userInform = UserInform.builder()
                 .informerId(null)
                 .popupId(popup)
-                .contactLink(contactLink)
+                .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
         userInform = userInformRepository.save(userInform);

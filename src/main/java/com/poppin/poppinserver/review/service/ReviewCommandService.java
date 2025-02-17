@@ -9,6 +9,7 @@ import com.poppin.poppinserver.core.type.EVisitDate;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
 import com.poppin.poppinserver.review.dto.response.ReviewWriteDto;
@@ -37,15 +38,14 @@ import java.util.stream.Collectors;
 public class ReviewCommandService {
 
     private final UserQueryRepository userQueryRepository;
-    private final PopupRepository popupRepository;
     private final ReviewCommandRepository reviewCommandRepository;
     private final ReviewQueryRepository reviewQueryRepository;
     private final ReviewImageCommandRepository reviewImageRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final VisitRepository visitRepository;
-    private final FCMTokenRepository fcmTokenRepository;
     private final S3Service s3Service;
-    private final UserService userService;
+
+    private final PopupQueryUseCase popupQueryUseCase;
 
 
     @Transactional
@@ -56,8 +56,7 @@ public class ReviewCommandService {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(Long.valueOf(popupId))
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(Long.valueOf(popupId));
 
         reviewQueryRepository.findByUserIdAndPopupId(userId, Long.valueOf(popupId))
                 .ifPresent(review -> {throw new CommonException(ErrorCode.DUPLICATED_REVIEW);});
