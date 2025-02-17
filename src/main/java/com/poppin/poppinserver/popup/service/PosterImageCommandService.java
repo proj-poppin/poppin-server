@@ -35,4 +35,16 @@ public class PosterImageCommandService implements PosterImageCommandUseCase {
 
         return posterImages;
     }
+
+    @Override
+    public void deletePosterList(Popup popup) {
+        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
+        List<String> fileUrls = posterImages.stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+        if (!fileUrls.isEmpty()) {
+            s3Service.deleteMultipleImages(fileUrls);
+            posterImageRepository.deleteAllByPopupId(popup);
+        }
+    }
 }

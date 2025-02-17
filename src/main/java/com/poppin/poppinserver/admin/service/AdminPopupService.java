@@ -35,9 +35,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
 import com.poppin.poppinserver.popup.repository.*;
 import com.poppin.poppinserver.popup.service.S3Service;
-import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
-import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
-import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.*;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
@@ -70,7 +68,6 @@ public class AdminPopupService {
     private final PopupRepository popupRepository;
     private final ReviewQueryRepository reviewRepository;
     private final ReviewCommandRepository reviewCommandRepository;
-    private final PosterImageRepository posterImageRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
@@ -99,6 +96,8 @@ public class AdminPopupService {
     private final InterestCommandUseCase interestCommandUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
 
     private final FCMScheduler fcmScheduler;
 
@@ -161,18 +160,10 @@ public class AdminPopupService {
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         popup = popupRepository.save(popup);
 
@@ -197,7 +188,6 @@ public class AdminPopupService {
 
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
-
 
     public AdminPopupDto readPopup(Long popupId) {
         // 팝업 정보 불러오기
@@ -292,14 +282,8 @@ public class AdminPopupService {
 
         // 팝업 이미지
         log.info("delete popup image");
-        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
-        List<String> fileUrls = posterImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
-        if (fileUrls.size() != 0) {
-            s3Service.deleteMultipleImages(fileUrls);
-            posterImageRepository.deleteAllByPopupId(popup);
-        }
+        posterImageCommandUseCase.deletePosterList(popup);
+
         log.info("delete popup alarm");
         popupAlarmRepository.deleteAllByPopupId(popup);
 
@@ -328,26 +312,16 @@ public class AdminPopupService {
         preferedPopupCommandUseCase.updatePreferedPopup(popup.getPreferedPopup(), updatePopupDto.prefered());
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
 
         //새로운 이미지 추가
         List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 팝업 이미지 처리 및 저장
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());

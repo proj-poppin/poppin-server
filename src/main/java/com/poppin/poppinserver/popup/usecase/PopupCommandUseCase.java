@@ -21,4 +21,7 @@ public interface PopupCommandUseCase {
 
     // 팝업 대표사진 업데이트
     void updatePopupPosterUrl(Popup popup, PosterImage posterImage);
+
+    // 팝업 삭제
+    void deletePopup(Popup popup);
 }

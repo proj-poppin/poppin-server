@@ -95,4 +95,9 @@ public class PopupCommandService implements PopupCommandUseCase {
 
         popupRepository.save(popup);
     }
+
+    @Override
+    public void deletePopup(Popup popup) {
+        popupRepository.delete(popup);
+    }
 }

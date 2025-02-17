@@ -20,6 +20,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -42,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
     private final ModifyImageReposiroty modifyImageReposiroty;
-    private final PopupRepository popupRepository;
     private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
@@ -51,6 +51,7 @@ public class AdminModifyInfoService {
     private final UserQueryUseCase userQueryUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
 
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
@@ -215,7 +216,7 @@ public class AdminModifyInfoService {
         List<String> originUrls = originImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .collect(Collectors.toList());
-        if (originUrls.size() != 0) {
+        if (!originUrls.isEmpty()) {
             s3Service.deleteMultipleImages(originUrls);
             posterImageRepository.deleteAllByPopupId(originPopup);
         }
@@ -226,7 +227,7 @@ public class AdminModifyInfoService {
         List<String> proxyUrls = proxyImages.stream()
                 .map(PosterImage::getPosterUrl)
                 .toList();
-        if (proxyUrls.size() != 0) {
+        if (!proxyUrls.isEmpty()) {
             s3Service.deleteMultipleImages(proxyUrls);
             posterImageRepository.deleteAllByPopupId(proxyPopup);
         }
@@ -310,7 +311,7 @@ public class AdminModifyInfoService {
         modifyInfo.update(updateModifyInfoDto.info(), true);
         modifyInfo = modifyInformRepository.save(modifyInfo);
 
-        popupRepository.delete(proxyPopup);
+        popupCommandUseCase.deletePopup(proxyPopup);
 
         return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 업로드

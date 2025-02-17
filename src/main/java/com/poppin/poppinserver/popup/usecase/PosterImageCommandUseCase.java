@@ -9,5 +9,9 @@ import java.util.List;
 
 @UseCase
 public interface PosterImageCommandUseCase {
+    // 팝업 이미지 생성
     List<PosterImage> savePosterList(List<MultipartFile> images, Popup popup);
+
+    // 팝업 이미지 삭제
+    void deletePosterList(Popup popup);
 }

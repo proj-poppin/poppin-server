@@ -91,7 +91,6 @@ public class AdminReportService {
         ReportPopup reportPopup = reportPopupRepository.findById(reportId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         Popup popup = popupQueryUseCase.findPopupById(reportPopup.getPopupId().getId());
-
         ReportedPopupDetailDto reportedPopupDetailDto = ReportedPopupDetailDto.builder()
                 .popupId(popup.getId())
                 .popupName(popup.getName())
@@ -127,8 +126,7 @@ public class AdminReportService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
         Review review = reviewRepository.findById(reportReview.getReviewId().getId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
-        Popup popup = popupRepository.findById(review.getPopup().getId())
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE));
+        Popup popup = popupQueryUseCase.findPopupById(review.getPopup().getId());
         ReportedReviewDetailDto reportedReviewDetailDto = ReportedReviewDetailDto.builder()
                 .reviewId(review.getId())
                 .reviewWriter(review.getUser().getNickname())
