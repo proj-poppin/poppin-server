@@ -35,11 +35,10 @@ public class ReviewRecommendService {
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
 
 
-    /*후기 추천 증가*/
-    public String recommendReview(Long userId, String StrReviewId, String StrPopupId) {
-
-        Long reviewId = Long.valueOf(StrReviewId);
-        Long popupId = Long.valueOf(StrPopupId);
+    @Transactional
+    public String recommendReview(Long userId, String strReviewId, String strPopupId) {
+        Long reviewId = Long.parseLong(strReviewId);
+        Long popupId = Long.parseLong(strPopupId);
 
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -47,34 +46,26 @@ public class ReviewRecommendService {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
-        Review review = reviewRepository.findByReviewIdAndPopupId(reviewId, popupId);
+        Review review = Optional.ofNullable(reviewRepository.findByReviewIdAndPopupId(reviewId, popupId))
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));
 
-        // 예외처리
-        if (review == null) {
-            throw new CommonException(ErrorCode.NOT_FOUND_REVIEW);
-        }
         if (review.getUser().getId().equals(userId)) {
             throw new CommonException(ErrorCode.REVIEW_RECOMMEND_ERROR);
         }
 
-        Optional<ReviewRecommend> recommendCnt = reviewRecommendQueryRepository.findByUserAndReview(user, review);
-        if (recommendCnt.isPresent()) {
-            throw new CommonException(ErrorCode.DUPLICATED_RECOMMEND_COUNT); // 2회이상 같은 후기에 대해 추천 증가 방지
-        } else {
-            review.addRecommendCnt();
-        }
-
-        ReviewRecommend reviewRecommend = ReviewRecommend.builder()
-                .user(user)
-                .review(review)
-                .build();
-
-        reviewRepository.save(review);
-        reviewRecommendCommandRepository.save(reviewRecommend);
-
-        sendAlarmCommandUseCase.sendChoochunAlarm(user, popup, review, EPushInfo.CHOOCHUN); // 알림
+        reviewRecommendQueryRepository.findByUserAndReview(user, review).ifPresentOrElse(
+                recommend -> {
+                    reviewRecommendQueryRepository.delete(recommend);
+                    review.decreaseRecommendCnt();
+                },
+                () -> {
+                    review.addRecommendCnt();
+                    reviewRecommendCommandRepository.save(new ReviewRecommend(user, review));
+                    sendAlarmCommandUseCase.sendChoochunAlarm(user, popup, review, EPushInfo.CHOOCHUN);
+                }
+        );
 
         return "정상적으로 반환되었습니다";
-
     }
+
 }

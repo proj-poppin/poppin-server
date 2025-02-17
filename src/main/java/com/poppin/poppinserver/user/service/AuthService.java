@@ -9,6 +9,7 @@ import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.core.util.RandomCodeUtil;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import com.poppin.poppinserver.popup.service.BlockedPopupService;
+import com.poppin.poppinserver.review.dto.response.ReviewActivityResponseDto;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EAccountStatus;
 import com.poppin.poppinserver.user.domain.type.EVerificationType;
@@ -19,18 +20,14 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
-import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
-import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
+import com.poppin.poppinserver.user.dto.user.response.*;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -112,9 +109,11 @@ public class AuthService {
         UserNotificationResponseDto userNotificationResponseDto = userActivityService.getUserNotificationActivity(user);
 
         PopupActivityResponseDto popupActivityResponseDto = userActivityService.getPopupActivity(user);
+        ReviewActivityResponseDto reviewActivityResponseDto = userActivityService.getReviewActivity(user);
 
         UserActivityResponseDto userActivities = UserActivityResponseDto.fromProperties(
                 popupActivityResponseDto,
+                reviewActivityResponseDto,
                 userNotificationResponseDto
         );
 

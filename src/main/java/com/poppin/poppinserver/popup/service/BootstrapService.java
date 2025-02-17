@@ -15,6 +15,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.BootstrapDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,7 @@ public class BootstrapService {
 
     private final UserQueryUseCase userQueryUseCase;
     private final AlarmQueryUseCase alarmQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
@@ -55,25 +57,22 @@ public class BootstrapService {
             throw new CommonException(ErrorCode.ACCESS_DENIED_ERROR);
         }
 
-        // 인기 팝업 조회
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDateTime startOfDay = yesterday.atStartOfDay();
-        LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
-
-        List<Popup> popularTop5Popup = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay,
-                endOfDay,
-                PageRequest.of(0, 5));
-
-        // 새로 오픈 팝업 조회
-        List<Popup> newlyOpenedPopup = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
-
-        // 종료 임박 팝업 조회
-        List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
-
         if (userId != null) { // 로그인 요청일 경우
-            List<PopupStoreDto> popularTop5PopupStores = popupService.getPopupStoreDtos(popularTop5Popup, userId);
-            List<PopupStoreDto> newlyOpenedPopupStores = popupService.getPopupStoreDtos(newlyOpenedPopup, userId);
-            List<PopupStoreDto> closingSoonPopupStores = popupService.getPopupStoreDtos(popups, userId);
+            // 인기 top5 조회
+            List<PopupStoreDto> popularTop5PopupStores = popupService.getPopupStoreDtos(
+                    popupQueryUseCase.findHotPopupList(userId),
+                    userId
+            );
+            // 새로오픈팝업 top5 조회
+            List<PopupStoreDto> newlyOpenedPopupStores = popupService.getPopupStoreDtos(
+                    popupQueryUseCase.findNewPopupList(userId),
+                    userId
+            );
+            // 종료임박팝업 top5 조회
+            List<PopupStoreDto> closingSoonPopupStores = popupService.getPopupStoreDtos(
+                    popupQueryUseCase.findClosingPopupList(userId),
+                    userId
+            );
 
             // 취향 저격 팝업 조회
             List<Popup> recommendPopup = getRecommendPopup(userId);
@@ -103,9 +102,18 @@ public class BootstrapService {
                     .notices(notice)
                     .build();
         } else { // 비로그인 요청일 경우 유저 관련 로직 생략
-            List<PopupStoreDto> popularTop5PopupStores = popupService.guestGetPopupStoreDtos(popularTop5Popup);
-            List<PopupStoreDto> newlyOpenedPopupStores = popupService.guestGetPopupStoreDtos(newlyOpenedPopup);
-            List<PopupStoreDto> closingSoonPopupStores = popupService.guestGetPopupStoreDtos(popups);
+            // 인기 top5 조회
+            List<PopupStoreDto> popularTop5PopupStores = popupService.guestGetPopupStoreDtos(
+                    popupQueryUseCase.findHotPopupList()
+            );
+            // 새로오픈팝업 top5 조회
+            List<PopupStoreDto> newlyOpenedPopupStores = popupService.guestGetPopupStoreDtos(
+                    popupQueryUseCase.findNewPopupList()
+            );
+            // 종료임박팝업 top5 조회
+            List<PopupStoreDto> closingSoonPopupStores = popupService.guestGetPopupStoreDtos(
+                    popupQueryUseCase.findClosingPopupList()
+            );
 
             return BootstrapDto.builder()
                     .popularTop5PopupStores(popularTop5PopupStores)
@@ -141,8 +149,11 @@ public class BootstrapService {
         List<String> selectedTaste = selectRandomUtil.selectTaste(tastePopup);
         for (String taste : selectedTaste) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(taste, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                            PopupSpecification.hasTaste(taste, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
+
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
@@ -157,8 +168,10 @@ public class BootstrapService {
         List<String> selectedPrefered = selectRandomUtil.selectPreference(preferedPopup);
         for (String prefered : selectedPrefered) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(prefered, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasPrefered(prefered, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 

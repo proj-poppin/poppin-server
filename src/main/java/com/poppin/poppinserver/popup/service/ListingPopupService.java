@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.popup.service;
 
+import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -10,6 +11,7 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,30 +38,47 @@ public class ListingPopupService {
     private final PopupRepository popupRepository;
 
     private final UserQueryUseCase userQueryUseCase;
-    private final SelectRandomUtil selectRandomUtil;
+    private final PopupQueryUseCase popupQueryUseCase;
     private final PopupService popupService;
 
-    public List<PopupSummaryDto> readHotList() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDateTime startOfDay = yesterday.atStartOfDay();
-        LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
+    private final HeaderUtil headerUtil;
+    private final SelectRandomUtil selectRandomUtil;
 
-        List<Popup> popups = popupRepository.findTopOperatingPopupsByInterestAndViewCount(startOfDay, endOfDay,
-                PageRequest.of(0, 5));
+    public List<PopupSummaryDto> readHotList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
+
+        List<Popup> popups;
+        if (userId != null) {
+            popups = popupQueryUseCase.findHotPopupList(userId);
+        } else {
+            popups = popupQueryUseCase.findHotPopupList();
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 인기 팝업 조회
 
-    public List<PopupSummaryDto> readNewList() {
+    public List<PopupSummaryDto> readNewList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
 
-        List<Popup> popups = popupRepository.findNewOpenPopupByAll(PageRequest.of(0, 5));
+        List<Popup> popups;
+        if (userId != null) {
+            popups = popupQueryUseCase.findNewPopupList(userId);
+        } else {
+            popups = popupQueryUseCase.findNewPopupList();
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 새로 오픈 팝업 조회
 
-    public List<PopupSummaryDto> readClosingList() {
+    public List<PopupSummaryDto> readClosingList(HttpServletRequest request) {
+        Long userId = headerUtil.parseUserId(request);
 
-        List<Popup> popups = popupRepository.findClosingPopupByAll(PageRequest.of(0, 5));
+        List<Popup> popups;
+        if (userId != null) {
+             popups = popupQueryUseCase.findClosingPopupList(userId);
+        } else {
+            popups = popupQueryUseCase.findClosingPopupList();
+        }
 
         return PopupSummaryDto.fromEntityList(popups);
     } // 종료 임박 팝업 조회
@@ -97,8 +118,10 @@ public class ListingPopupService {
         List<String> selectedTaste = selectRandomUtil.selectTaste(tastePopup);
         for (String taste : selectedTaste) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasTaste(taste, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasTaste(taste, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 
@@ -113,8 +136,10 @@ public class ListingPopupService {
         List<String> selectedPreferred = selectRandomUtil.selectPreference(preferedPopup);
         for (String preferred : selectedPreferred) {
             Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(PopupSpecification.hasPrefered(preferred, true))
-                    .and(PopupSpecification.isOperating());
+            Specification<Popup> combinedSpec = Specification.where(
+                    PopupSpecification.hasPrefered(preferred, true))
+                    .and(PopupSpecification.isOperating())
+                    .and(PopupSpecification.isNotBlockedByUser(userId));
 
             List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
 

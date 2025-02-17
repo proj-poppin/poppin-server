@@ -17,8 +17,6 @@ import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.alarm.usecase.TokenQueryUseCase;
 import com.poppin.poppinserver.core.config.APNsConfiguration;
 import com.poppin.poppinserver.core.config.AndroidConfiguration;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -210,6 +208,11 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
         for (FCMRequestDto fcmRequestDto : fcmRequestDtoList) {
 
             FCMToken token = tokenQueryUseCase.findByToken(fcmRequestDto.token());
+            if (token == null) {
+                log.warn("토큰 정보 없음: {}", fcmRequestDto.token());
+                continue; // 토큰이 없으면 알림을 보낼 수 없음
+            }
+
             User user = tokenQueryUseCase.findUserByToken(token);
             Long userId = user.getId();
 
@@ -217,7 +220,11 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
 
             // 팝업 정보 조회
             Popup popup = popupRepository.findById(Long.valueOf(fcmRequestDto.popupId()))
-                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+                    .orElse(null);
+            if (popup == null) {
+                log.error("존재하지 않는 팝업 ID: {}", fcmRequestDto.popupId());
+                continue;
+            }
 
             // EPopupTopic과 EPushInfo 매핑
             EPopupTopic topic = fcmRequestDto.topic();

@@ -16,19 +16,23 @@ import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupWaitingDto;
 import com.poppin.poppinserver.popup.repository.WaitingRepository;
+import com.poppin.poppinserver.review.dto.response.ReviewActivityResponseDto;
+import com.poppin.poppinserver.review.repository.ReviewRecommendQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
 import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitDto;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 유저의 알람 내역, 방문 팝업, 관심 팝업, 오픈 대기 팝업 정보를 조회
@@ -43,6 +47,8 @@ public class UserActivityService {
     private final InterestRepository interestRepository;
     private final VisitRepository visitRepository;
     private final WaitingRepository waitingRepository;
+
+    private final ReviewRecommendQueryRepository reviewRecommendQueryRepository;
 
     private final AmazonS3Client s3Client;
     @Value("${cloud.aws.s3.alarm.bucket.name}")
@@ -137,6 +143,15 @@ public class UserActivityService {
                 popupNotificationResponseDtoList,
                 noticeNotificationResponseDtoList
         );
+    }
+
+    public ReviewActivityResponseDto getReviewActivity(User user){
+        List<Long> reviews = reviewRecommendQueryRepository.recommendReviewList(user.getId());
+        List<String> reviewIdList = reviews.stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+
+        return ReviewActivityResponseDto.fromProperties(reviewIdList);
     }
 
     public UserNoticeResponseDto getUserNotificationStatus(Long userId) {
