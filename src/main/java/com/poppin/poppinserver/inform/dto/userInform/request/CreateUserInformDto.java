@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record CreateUserInformDto(
         @NotNull
         String name,
-        String contactLink,
-        @NotNull
-        CreateTasteDto taste
+        String contactLink
 ) {
 }

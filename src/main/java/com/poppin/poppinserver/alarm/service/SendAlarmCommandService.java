@@ -21,6 +21,7 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.user.domain.User;
 import jakarta.transaction.Transactional;
@@ -42,8 +43,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
     private final APNsConfiguration apnsConfiguration;
     private final AndroidConfiguration androidConfiguration;
 
-    //TODO: @정구연 popupRepository-> popupUsecase 수정 부탁드립니다.
-    private final PopupRepository popupRepository;
+    private final PopupQueryUseCase popupQueryUseCase;
     private final TokenQueryUseCase tokenQueryUseCase;
     private final AlarmListQueryUseCase alarmListQueryUseCase;
     private final AlarmCommandUseCase alarmCommandUseCase;
@@ -219,8 +219,7 @@ public class SendAlarmCommandService implements SendAlarmCommandUseCase {
             int badge = alarmListQueryUseCase.countUnreadAlarms(userId);
 
             // 팝업 정보 조회
-            Popup popup = popupRepository.findById(Long.valueOf(fcmRequestDto.popupId()))
-                    .orElse(null);
+            Popup popup = popupQueryUseCase.findPopupByIdElseNull(Long.valueOf(fcmRequestDto.popupId()));
             if (popup == null) {
                 log.error("존재하지 않는 팝업 ID: {}", fcmRequestDto.popupId());
                 continue;

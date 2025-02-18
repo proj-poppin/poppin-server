@@ -6,6 +6,7 @@ import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewRecommend;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
@@ -27,13 +28,12 @@ import java.util.Optional;
 public class ReviewRecommendService {
 
     private final UserQueryRepository userQueryRepository;
-    private final PopupRepository popupRepository;
     private final ReviewQueryRepository reviewRepository;
     private final ReviewRecommendCommandRepository reviewRecommendCommandRepository;
     private final ReviewRecommendQueryRepository reviewRecommendQueryRepository;
 
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
-
+    private final PopupQueryUseCase popupQueryUseCase;
 
     @Transactional
     public String recommendReview(Long userId, String strReviewId, String strPopupId) {
@@ -43,8 +43,7 @@ public class ReviewRecommendService {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         Review review = Optional.ofNullable(reviewRepository.findByReviewIdAndPopupId(reviewId, popupId))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_REVIEW));

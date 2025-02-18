@@ -13,7 +13,7 @@ import java.util.List;
 public interface PopupQueryUseCase {
     Popup findPopupById(Long popupId);
 
-    Boolean existsPopupById(Long popupId);
+    Popup findPopupByIdElseNull(Long popupId);
 
     List<Popup> findHotPopupList();
 
@@ -26,8 +26,4 @@ public interface PopupQueryUseCase {
     List<Popup> findClosingPopupList();
 
     List<Popup> findClosingPopupList(Long userId);
-
-    List<Popup> findTastePopupList();
-
-    List<Popup> findTastePopupList(Long userId);
 }

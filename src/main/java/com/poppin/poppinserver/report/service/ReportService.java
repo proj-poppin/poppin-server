@@ -4,6 +4,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;
 import com.poppin.poppinserver.report.dto.report.request.CreatePopupReportDto;
@@ -28,9 +29,9 @@ public class ReportService {
     private final UserQueryRepository userQueryRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
-    private final PopupRepository popupRepository;
 
     private final ReviewQueryUseCase reviewQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
 
     public void createReviewReport(Long userId, CreateReviewReportDto createReviewReportDto) {
         User user = userQueryRepository.findById(userId)
@@ -50,8 +51,7 @@ public class ReportService {
     public void createPopupReport(Long userId, CreatePopupReportDto createPopupReportDto) {
         User user = userQueryRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-        Popup popup = popupRepository.findById(Long.valueOf(createPopupReportDto.popupId()))
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(Long.valueOf(createPopupReportDto.popupId()));
         ReportPopup reportPopup = ReportPopup.builder()
                 .reporterId(user)
                 .popupId(popup)
