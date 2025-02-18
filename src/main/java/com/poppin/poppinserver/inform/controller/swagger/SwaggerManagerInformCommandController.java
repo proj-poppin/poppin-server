@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +26,8 @@ public interface SwaggerManagerInformCommandController {
     @Operation(summary = "운영자 제보 생성", description = "팝업 운영자로부터 제보를 생성합니다.")
     ResponseDto<ManagerInformDto> createUserInform(
             @RequestPart(value = "images") List<MultipartFile> images,
-            @RequestParam("informerCompany") String informerCompany,
-            @RequestParam("informerEmail") String informerEmail,
+            @RequestParam("informerCompany") @NotNull String informerCompany,
+            @RequestParam("informerEmail") @NotNull String informerEmail,
             @RequestParam(value = "storeUrl", required = false) String storeUrl,
             @RequestParam(value = "storeName", required = false) String storeName,
             @RequestParam(value = "storeBriefDescription", required = false) String storeBriefDescription,
@@ -51,14 +53,14 @@ public interface SwaggerManagerInformCommandController {
     @Operation(summary = "관리자 - 운영자 제보 임시저장", description = "운영자 제보를 임시로 저장합니다.")
     ResponseDto<ManagerInformDto> saveManagerInform(
             @RequestPart(value = "images") List<MultipartFile> images,
-            @RequestPart(value = "contents") UpdateManagerInformDto updateManagerInformDto,
+            @RequestPart(value = "contents") @Valid UpdateManagerInformDto updateManagerInformDto,
             @Parameter(hidden = true) Long adminId
     );
 
     @Operation(summary = "관리자 - 운영자 제보 업로드", description = "운영자 제보를 최종 업로드합니다.")
     ResponseDto<ManagerInformDto> uploadManagerInform(
             @RequestPart(value = "images") List<MultipartFile> images,
-            @RequestPart(value = "contents") UpdateManagerInformDto updateManagerInformDto,
+            @RequestPart(value = "contents") @Valid UpdateManagerInformDto updateManagerInformDto,
             @Parameter(hidden = true) Long adminId
     );
 }
