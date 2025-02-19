@@ -4,6 +4,8 @@ import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.popup.domain.Popup;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.poppin.poppinserver.popup.domain.PosterImage;
 import lombok.Builder;
 
 @Builder
@@ -34,7 +36,8 @@ public record PopupDto(
         String operationStatus,
         PreferredDto prefered,
         TasteDto taste,
-        List<String> keywordList
+        List<String> keywordList,
+        List<String> imageUrls
 ) {
     public static PopupDto fromEntity(Popup popup) {
 
@@ -88,6 +91,11 @@ public record PopupDto(
 
         String popupId = String.valueOf(popup.getId());
 
+        List<String> imageUrls = popup.getPosterImages()
+                .stream()
+                .map(PosterImage::getPosterUrl)
+                .toList();
+
         return PopupDto.builder()
                 .id(popupId)
                 .posterUrl(popup.getPosterUrl())
@@ -116,6 +124,7 @@ public record PopupDto(
                 .prefered(preferredDto)
                 .taste(tasteDto)
                 .keywordList(keywordList)
+                .imageUrls(imageUrls)
                 .build();
     }
 }
