@@ -5,11 +5,11 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
-import com.poppin.poppinserver.popup.repository.WhoWithPopupRepository;
 import com.poppin.poppinserver.popup.service.BootstrapService;
 import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.WhoWithPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.dto.user.request.CreateUserTasteDto;
 import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
@@ -26,11 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserPreferenceSettingService {
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandRepository userCommandRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
-    private final WhoWithPopupRepository whoWithPopupRepository;
     private final BootstrapService bootstrapService;
     private final PopupService popupService;
+
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final WhoWithPopupCommandUseCase whoWithPopupCommandUseCase;
 
     public UserPreferenceSettingDto readUserPreference(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
@@ -42,19 +43,19 @@ public class UserPreferenceSettingService {
     public void createDefaultUserTaste(User user) {
         if (user.getPreferedPopup() == null) {
             PreferedPopup preferedPopup = createDefaultPreferedPopup();
-            preferedPopupRepository.save(preferedPopup);
+            preferedPopupCommandUseCase.createPreferedPopup(preferedPopup);
             user.updatePopupTaste(preferedPopup);
         }
 
         if (user.getTastePopup() == null) {
             TastePopup tastePopup = createDefaultTastePopup();
-            tastePopupRepository.save(tastePopup);
+            tastedPopupCommandUseCase.createTastePopup(tastePopup);
             user.updatePopupTaste(tastePopup);
         }
 
         if (user.getWhoWithPopup() == null) {
             WhoWithPopup whoWithPopup = createDefaultWhoWithPopup();
-            whoWithPopupRepository.save(whoWithPopup);
+            whoWithPopupCommandUseCase.createWhoWithPopup(whoWithPopup);
             user.updatePopupTaste(whoWithPopup);
         }
 
@@ -70,35 +71,13 @@ public class UserPreferenceSettingService {
         }
 
         PreferedPopup preferedPopup = user.getPreferedPopup();
-        preferedPopup.update(createUserTasteDto.preference().market(),
-                createUserTasteDto.preference().display(),
-                createUserTasteDto.preference().experience(),
-                createUserTasteDto.preference().wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        preferedPopupCommandUseCase.updatePreferedPopup(preferedPopup, createUserTasteDto.preference());
 
         TastePopup tastePopup = user.getTastePopup();
-        tastePopup.update(createUserTasteDto.taste().fashionBeauty(),
-                createUserTasteDto.taste().characters(),
-                createUserTasteDto.taste().foodBeverage(),
-                createUserTasteDto.taste().webtoonAnimation(),
-                createUserTasteDto.taste().interiorThings(),
-                createUserTasteDto.taste().movie(),
-                createUserTasteDto.taste().musical(),
-                createUserTasteDto.taste().sports(),
-                createUserTasteDto.taste().game(),
-                createUserTasteDto.taste().itTech(),
-                createUserTasteDto.taste().kpop(),
-                createUserTasteDto.taste().alcohol(),
-                createUserTasteDto.taste().animalPlant(),
-                false);
-        tastePopupRepository.save(tastePopup);
+        tastedPopupCommandUseCase.updateTastePopup(tastePopup, createUserTasteDto.taste());
 
         WhoWithPopup whoWithPopup = user.getWhoWithPopup();
-        whoWithPopup.update(createUserTasteDto.whoWith().solo(),
-                createUserTasteDto.whoWith().withFriend(),
-                createUserTasteDto.whoWith().withFamily(),
-                createUserTasteDto.whoWith().withLover());
-        whoWithPopupRepository.save(whoWithPopup);
+        whoWithPopupCommandUseCase.updateWhoWithPopup(whoWithPopup, createUserTasteDto.whoWith());
 
         user.updatePopupTaste(preferedPopup, tastePopup, whoWithPopup);
         userCommandRepository.save(user);

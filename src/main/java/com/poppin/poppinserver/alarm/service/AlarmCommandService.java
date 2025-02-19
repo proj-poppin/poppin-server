@@ -29,8 +29,6 @@ import java.util.Objects;
 public class AlarmCommandService implements AlarmCommandUseCase {
     private final AmazonS3Client s3Client;
 
-    //TODO: @정구연 레포->유스케이스 부탁합니다.
-    private final PopupRepository popupRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final InformAlarmRepository informAlarmRepository;
     private final UserInformAlarmRepository userInformAlarmRepository;

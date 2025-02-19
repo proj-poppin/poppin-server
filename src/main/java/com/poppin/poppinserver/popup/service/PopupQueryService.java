@@ -30,8 +30,9 @@ public class PopupQueryService implements PopupQueryUseCase {
     }
 
     @Override
-    public Boolean existsPopupById(Long popupId) {
-        return popupRepository.existsById(popupId);
+    public Popup findPopupByIdElseNull(Long popupId) {
+        return popupRepository.findById(popupId)
+                .orElse(null);
     }
 
     @Override
@@ -90,16 +91,4 @@ public class PopupQueryService implements PopupQueryUseCase {
                 PageRequest.of(0, 5)
         );
     }
-
-    @Override
-    public List<Popup> findTastePopupList() {
-        return List.of();
-    }
-
-    @Override
-    public List<Popup> findTastePopupList(Long userId) {
-        return List.of();
-    }
-
-
 }

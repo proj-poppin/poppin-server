@@ -4,7 +4,7 @@ import com.poppin.poppinserver.core.annotation.UseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 
 @UseCase
-public interface BlockedPopupQueryUseCase {
-    // 차단 내역이 존재하는지 검색
-    Boolean existBlockedPopupByUserIdAndPopupId(Long userId, Long popupId);
+public interface BlockedPopupCommandUseCase {
+    // 팝업과 관련된 모든 차단내역 삭제
+    void deleteAllBlockedPopupByPopup(Popup popup);
 }

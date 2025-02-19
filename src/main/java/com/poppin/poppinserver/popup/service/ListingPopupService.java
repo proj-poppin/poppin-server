@@ -39,6 +39,7 @@ public class ListingPopupService {
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
+
     private final PopupService popupService;
 
     private final HeaderUtil headerUtil;
