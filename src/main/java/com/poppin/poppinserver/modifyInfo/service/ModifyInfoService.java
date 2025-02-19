@@ -9,6 +9,7 @@ import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
+import com.poppin.poppinserver.modifyInfo.usecase.ModifyImagesCommandUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
@@ -30,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
-    private final ModifyImageReposiroty modifyImageReposiroty;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -41,6 +41,7 @@ public class ModifyInfoService {
     private final PosterImageCommandUseCase posterImageCommandUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
     private final PopupCommandUseCase popupCommandUseCase;
+    private final ModifyImagesCommandUseCase modifyImagesCommandUseCase;
 
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
@@ -85,31 +86,7 @@ public class ModifyInfoService {
                 .build();
         modifyInformRepository.save(modifyInfo);
 
-        // 정보수정요청 이미지 저장
-        String imageStatus = "0";
-
-        List<String> fileUrls = new ArrayList<>();
-        if (!images.get(0).getOriginalFilename().equals("empty")) {
-
-            log.info("images Entity : " + images);
-            log.info("images Size : " + images.size());
-            log.info("images first img name: " + images.get(0).getOriginalFilename());
-
-            imageStatus = "1"; // 이미지가 null 이 아닐때
-
-            // 리뷰 이미지 처리 및 저장
-            fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
-
-            List<ModifyImages> modifyImagesList = new ArrayList<>();
-            for (String url : fileUrls) {
-                ModifyImages modifyImage = ModifyImages.builder()
-                        .modifyId(modifyInfo)
-                        .imageUrl(url)
-                        .build();
-                modifyImagesList.add(modifyImage);
-            }
-            modifyImageReposiroty.saveAll(modifyImagesList);
-        }
+        List<String> fileUrls = modifyImagesCommandUseCase.saveModifyImagerList(images, modifyInfo);
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 사용자 정보수정요청 생성
@@ -126,14 +103,8 @@ public class ModifyInfoService {
             // modify info 삭제
             log.info("delete modify info");
             // modify info 이미지 삭제
-            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
-            List<String> modifyUrls = modifyImages.stream()
-                    .map(ModifyImages::getImageUrl)
-                    .toList();
-            if (modifyUrls.size() != 0) {
-                s3Service.deleteMultipleImages(modifyUrls);
-                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
-            }
+            modifyImagesCommandUseCase.deleteModifyImageList(modifyInfo);
+
             // modify info 삭제
             modifyInformRepository.delete(modifyInfo);
 

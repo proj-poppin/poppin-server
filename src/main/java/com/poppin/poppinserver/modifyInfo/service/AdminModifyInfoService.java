@@ -43,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
-    private final ModifyImageReposiroty modifyImageReposiroty;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -53,6 +52,7 @@ public class AdminModifyInfoService {
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
     private final PopupCommandUseCase popupCommandUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final ModifyImagesQueryService modifyImagesQueryService;
 
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
@@ -61,7 +61,7 @@ public class AdminModifyInfoService {
 
         User user = userQueryUseCase.findUserById(modifyInfo.getUserId().getId());
 
-        List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
+        List<ModifyImages> modifyImageList = modifyImagesQueryService.findModifyImagesByModifyInfo(modifyInfo);
 
         List<String> imageList = new ArrayList<>();
         for (ModifyImages modifyImages : modifyImageList) {
