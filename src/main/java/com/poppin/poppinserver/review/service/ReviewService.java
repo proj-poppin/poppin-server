@@ -7,6 +7,7 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
+import com.poppin.poppinserver.popup.usecase.PosterImageQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.dto.response.ReviewDto;
 import com.poppin.poppinserver.review.dto.response.ReviewListDto;
@@ -38,11 +39,11 @@ public class ReviewService {
 
     private final VisitRepository visitRepository;
     private final VisitorDataRepository visitorDataRepository;
-    private final PosterImageRepository posterImageRepository;
     private final ReviewImageQueryRepository reviewImageQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
+    private final PosterImageQueryUseCase posterImageQueryUseCase;
 
     public List<ReviewListDto> readReviewList(Long userId) {
 
@@ -52,7 +53,7 @@ public class ReviewService {
                 .map(review -> review.getPopup().getId())
                 .collect(Collectors.toList());
 
-        Map<Long, String> popupImageMap = posterImageRepository.findAllByPopupIds(popupIds).stream()
+        Map<Long, String> popupImageMap = posterImageQueryUseCase.findAllPosterImageByPopupIds(popupIds).stream()
                 .collect(Collectors.toMap(
                         posterImage -> posterImage.getPopupId().getId(),
                         PosterImage::getPosterUrl,

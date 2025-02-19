@@ -21,6 +21,7 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -42,8 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminModifyInfoService {
     private final ModifyInformRepository modifyInformRepository;
-    private final ModifyImageReposiroty modifyImageReposiroty;
-    private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -52,6 +51,8 @@ public class AdminModifyInfoService {
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
     private final PopupCommandUseCase popupCommandUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final ModifyImagesQueryService modifyImagesQueryService;
 
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
@@ -60,7 +61,7 @@ public class AdminModifyInfoService {
 
         User user = userQueryUseCase.findUserById(modifyInfo.getUserId().getId());
 
-        List<ModifyImages> modifyImageList = modifyImageReposiroty.findByModifyId(modifyInfo);
+        List<ModifyImages> modifyImageList = modifyImagesQueryService.findModifyImagesByModifyInfo(modifyInfo);
 
         List<String> imageList = new ArrayList<>();
         for (ModifyImages modifyImages : modifyImageList) {
@@ -127,30 +128,15 @@ public class AdminModifyInfoService {
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        if (originUrls.size() != 0) {
-            s3Service.deleteMultipleImages(originUrls);
-            posterImageRepository.deleteAllByPopupId(popup);
-        }
+        posterImageCommandUseCase.deletePosterList(popup);
 
         //새로운 이미지 추가
-        List<String> fileUrls = new ArrayList<>();
         if (images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
-            fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+            // 팝업 이미지 처리 및 저장
+            List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
-            List<PosterImage> posterImages = new ArrayList<>();
-            for (String url : fileUrls) {
-                PosterImage posterImage = PosterImage.builder()
-                        .posterUrl(url)
-                        .popup(popup)
-                        .build();
-                posterImages.add(posterImage);
-            }
-            posterImageRepository.saveAll(posterImages);
-            popup.updatePosterUrl(fileUrls.get(0));
+            // 대표사진 저장
+            popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
         }
 
         // 기존 키워드 삭제 및 다시 저장
@@ -212,41 +198,19 @@ public class AdminModifyInfoService {
         // 팝업 이미지 처리 및 저장
         // 기존 이미지 싹 지우기
         Popup originPopup = modifyInfo.getOriginPopup();
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(originPopup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        if (!originUrls.isEmpty()) {
-            s3Service.deleteMultipleImages(originUrls);
-            posterImageRepository.deleteAllByPopupId(originPopup);
-        }
+        posterImageCommandUseCase.deletePosterList(originPopup);
 
         // 프록시 이미지 싹 지우기
         Popup proxyPopup = modifyInfo.getProxyPopup();
-        List<PosterImage> proxyImages = posterImageRepository.findByPopupId(proxyPopup);
-        List<String> proxyUrls = proxyImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
-        if (!proxyUrls.isEmpty()) {
-            s3Service.deleteMultipleImages(proxyUrls);
-            posterImageRepository.deleteAllByPopupId(proxyPopup);
-        }
+        posterImageCommandUseCase.deletePosterList(originPopup);
 
         //새로운 이미지 추가
-        List<String> fileUrls = new ArrayList<>();
         if (images.get(0).getOriginalFilename() != "") { // 이미지가 비었을 시 넘어감
-            fileUrls = s3Service.uploadPopupPoster(images, originPopup.getId());
+            // 팝업 이미지 처리 및 저장
+            List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, originPopup);
 
-            List<PosterImage> posterImages = new ArrayList<>();
-            for (String url : fileUrls) {
-                PosterImage posterImage = PosterImage.builder()
-                        .posterUrl(url)
-                        .popup(originPopup)
-                        .build();
-                posterImages.add(posterImage);
-            }
-            posterImageRepository.saveAll(posterImages);
-            originPopup.updatePosterUrl(fileUrls.get(0));
+            // 대표사진 저장
+            popupCommandUseCase.updatePopupPosterUrl(originPopup, posterImages.get(0));
         }
 
         // 기존 키워드 삭제 및 다시 저장

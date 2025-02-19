@@ -19,6 +19,7 @@ import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -41,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminManagerInformService {
     private final ManagerInformRepository managerInformRepository;
-    private final PosterImageRepository posterImageRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -50,6 +50,7 @@ public class AdminManagerInformService {
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
     private final PopupCommandUseCase popupCommandUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
 
     @Transactional
     public ManagerInformDto readManageInform(Long manageInformId) {
@@ -79,26 +80,13 @@ public class AdminManagerInformService {
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
 
-        //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+        // 팝업 이미지 처리 및 저장
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
@@ -145,26 +133,14 @@ public class AdminManagerInformService {
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
 
-        //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 팝업 이미지 처리 및 저장
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
+
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());

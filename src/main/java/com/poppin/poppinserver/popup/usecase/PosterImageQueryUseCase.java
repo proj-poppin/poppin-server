@@ -8,5 +8,5 @@ import java.util.List;
 
 @UseCase
 public interface PosterImageQueryUseCase {
-    List<PosterImage> findAllPosterImageByPopupId(long popupId);
+    List<PosterImage> findAllPosterImageByPopupIds(List<Long> popupIds);
 }
