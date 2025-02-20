@@ -116,7 +116,7 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus(), userId); // 운영 상태
 
-            popupStoreDtos = popupService.getPopupStoreDtos(popups, userId);
+            popupStoreDtos = popupService.getPopupStoreDtos(popups.getContent(), userId);
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         } else {
             Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, searchText, PageRequest.of(page, size, sort),
@@ -128,7 +128,7 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus()); // 운영 상태
 
-            popupStoreDtos = popupService.guestGetPopupStoreDtos(popups);
+            popupStoreDtos = popupService.guestGetPopupStoreDtos(popups.getContent());
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         }
 
