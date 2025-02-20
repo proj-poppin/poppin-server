@@ -100,16 +100,6 @@ public record PopupStoreDto(
         return popupDtos;
     }
 
-    public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt, List<Boolean> isBlocked) {
-        List<PopupStoreDto> popupDtos = new ArrayList<>();
-
-        for (int i = 0; i < popups.size(); i++) {
-            popupDtos.add(fromEntity(popups.get(i), visitorDataDto.get(i), visitorCnt.get(i), isBlocked.get(i), null));
-        }
-
-        return popupDtos;
-    }
-
     public static List<PopupStoreDto> fromEntities(List<Popup> popups, List<VisitorDataInfoDto> visitorDataDto,  List<Optional<Integer>> visitorCnt) {
         List<PopupStoreDto> popupDtos = new ArrayList<>();
 

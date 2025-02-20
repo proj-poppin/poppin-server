@@ -6,6 +6,7 @@
 //import com.poppin.poppinserver.popup.domain.PosterImage;
 //import com.poppin.poppinserver.popup.dto.popup.response.PopupDetailDto;
 //import com.poppin.poppinserver.popup.dto.popup.response.PopupGuestDetailDto;
+//import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 //import com.poppin.poppinserver.review.domain.Review;
 //import com.poppin.poppinserver.review.domain.ReviewImage;
 //import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
@@ -14,6 +15,7 @@
 //import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
 //import org.springframework.transaction.annotation.Transactional;
 //
+//import java.time.LocalDateTime;
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.Optional;
@@ -143,4 +145,54 @@
 //                    false, isBlocked); // 방문 한적 없음
 //        }
 //    } // 로그인 상세조회
+//
+//    public List<PopupStoreDto> guestGetPopupStoreDtos(List<Popup> popups) {
+//        if (popups == null || popups.isEmpty()) {
+//            return null;
+//        }
+//        // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
+//        List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
+//        List<Optional<Integer>> visitorCntList = new ArrayList<>();
+//
+//        // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
+//        for (Popup popup : popups) {
+//            VisitorDataInfoDto visitorDataDto = visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
+//            visitorDataInfoDtos.add(visitorDataDto);
+//
+//            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+//            visitorCntList.add(visitorCnt);
+//        }
+//
+//        // PopupStoreDto 리스트를 생성하여 반환
+//        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList);
+//    }
+//
+//    public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups, Long userId) {
+//        if (popups == null || popups.isEmpty()) {
+//            return null;
+//        }
+//        // 방문자 데이터 리스트 및 실시간 방문자 수 리스트 생성
+//        List<VisitorDataInfoDto> visitorDataInfoDtos = new ArrayList<>();
+//        List<Optional<Integer>> visitorCntList = new ArrayList<>();
+//        List<Boolean> isBlockedList = new ArrayList<>();
+//        List<LocalDateTime> interestCreatedAtList = new ArrayList<>();
+//
+//        // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
+//        for (Popup popup : popups) {
+//            VisitorDataInfoDto visitorDataDto =  visitorDataQueryUseCase.findVisitorData(popup.getId()); // 방문자 데이터
+//            visitorDataInfoDtos.add(visitorDataDto);
+//
+//            Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자 수
+//            visitorCntList.add(visitorCnt);
+//
+//            Boolean idBlocked = blockedPopupRepository.existsByPopupIdAndUserId(popup.getId(), userId);
+//            isBlockedList.add(idBlocked);
+//
+//            LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+//            interestCreatedAtList.add(interestCreatedAt);
+//        }
+//
+//        // PopupStoreDto 리스트를 생성하여 반환
+//        return PopupStoreDto.fromEntities(popups, visitorDataInfoDtos, visitorCntList, isBlockedList, interestCreatedAtList);
+//    }
 //}
