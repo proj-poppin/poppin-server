@@ -7,6 +7,7 @@ import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.service.BootstrapService;
 import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.WhoWithPopupCommandUseCase;
@@ -26,12 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserPreferenceSettingService {
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandRepository userCommandRepository;
-    private final BootstrapService bootstrapService;
+
     private final PopupService popupService;
 
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
     private final WhoWithPopupCommandUseCase whoWithPopupCommandUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
 
     public UserPreferenceSettingDto readUserPreference(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
@@ -88,7 +90,7 @@ public class UserPreferenceSettingService {
                 );
 
         // 취향 저격 팝업 조회
-        List<Popup> recommendPopup = bootstrapService.getRecommendPopup(userId);
+        List<Popup> recommendPopup = popupQueryUseCase.findRecommandPopupList(userId);
         List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
 
         return UserPreferenceUpdateResponseDto.fromDtos(userPreferenceSettingDto, recommendedPopupStores);

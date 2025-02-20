@@ -39,8 +39,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BootstrapService {
-    private final PopupRepository popupRepository;
-
     private final PopupService popupService;
 
     private final UserQueryUseCase userQueryUseCase;
@@ -48,7 +46,6 @@ public class BootstrapService {
     private final PopupQueryUseCase popupQueryUseCase;
 
     private final HeaderUtil headerUtil;
-    private final SelectRandomUtil selectRandomUtil;
 
     @Transactional(readOnly = true)
     public BootstrapDto bootstrap(HttpServletRequest request) {
@@ -75,7 +72,7 @@ public class BootstrapService {
             );
 
             // 취향 저격 팝업 조회
-            List<Popup> recommendPopup = getRecommendPopup(userId);
+            List<Popup> recommendPopup = popupQueryUseCase.findRecommandPopupList(userId);
             List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
 
             // 관심 저장 팝업 조회
@@ -126,69 +123,4 @@ public class BootstrapService {
         }
 
     } // 부트스트랩 로딩 api
-
-    @Transactional
-    public List<Popup> getRecommendPopup(Long userId) {
-        // 사용자가 설정한 태그의 팝업들 5개씩 다 가져오기
-        // 태그의 개수만큼 랜덤 변수 생성해서 하나 뽑기
-        // 5개 선정
-        // 관심 테이블에서
-
-        User user = userQueryUseCase.findUserById(userId);
-
-        //취향설정이 되지 않은 유저의 경우
-        if (user.getTastePopup() == null || user.getPreferedPopup() == null || user.getWhoWithPopup() == null) {
-            return null;
-        }
-
-        List<List<Popup>> popups = new ArrayList<>();
-        List<String> selectedList = new ArrayList<>();
-
-        // 사용자가 설정한 카테고리에 해당하는 팝업들을 카테고리 별로 5개씩 리스트에 저장
-        TastePopup tastePopup = user.getTastePopup();
-        List<String> selectedTaste = selectRandomUtil.selectTaste(tastePopup);
-        for (String taste : selectedTaste) {
-            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(
-                            PopupSpecification.hasTaste(taste, true))
-                    .and(PopupSpecification.isOperating())
-                    .and(PopupSpecification.isNotBlockedByUser(userId));
-
-
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
-
-            if (!popupList.isEmpty()) {
-                selectedList.add(taste);
-                popups.add(popupList);
-            }
-
-        }
-
-        PreferedPopup preferedPopup = user.getPreferedPopup();
-        List<String> selectedPrefered = selectRandomUtil.selectPreference(preferedPopup);
-        for (String prefered : selectedPrefered) {
-            Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "viewCnt"));
-            Specification<Popup> combinedSpec = Specification.where(
-                    PopupSpecification.hasPrefered(prefered, true))
-                    .and(PopupSpecification.isOperating())
-                    .and(PopupSpecification.isNotBlockedByUser(userId));
-
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
-
-            if (!popupList.isEmpty()) {
-                selectedList.add(prefered);
-                popups.add(popupList);
-            }
-        }
-
-        if (selectedList.isEmpty()) {
-            return null;
-        }
-        Random random = new Random();
-        Integer randomIndex = random.nextInt(selectedList.size());
-
-        log.info("취향 저격 " + selectedList.get(randomIndex));
-
-        return popups.get(randomIndex);
-    } // 취향저격 팝업 조회
 }
