@@ -1,5 +1,6 @@
 package com.poppin.poppinserver.inform.controller;
 
+import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.type.EInformProgress;
@@ -35,7 +36,8 @@ public class ManagerInformQueryController implements SwaggerManagerInformQueryCo
     @GetMapping("/list") // 운영자 제보 목록 조회
     public ResponseDto<PagingResponseDto<List<ManagerInformSummaryDto>>> readManagerInformList(@RequestParam(value = "page") int page,
                                                                                                @RequestParam(value = "size") int size,
-                                                                                               @RequestParam(value = "prog") EInformProgress progress) {
+                                                                                               @RequestParam(value = "prog") EInformProgress progress
+    ) {
         return ResponseDto.ok(adminManagerInformService.readManagerInformList(page, size, progress));
     }
 }

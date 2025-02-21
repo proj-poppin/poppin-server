@@ -30,8 +30,6 @@ public class Constants {
             "/api/v1/popup/guest/detail",                                   // 팝업 비로그인 상세 조회
             "/api/v1/popup/search",                                   // 비로그인 팝업 검색
             "/api/v1/popup/guest/search/base",                              // 비로그인 팝업 베이스 검색
-            "/api/v1/manager-inform",                                 // 비로그인 운영자 팝업 제보
-            "/api/v1/user-inform",                             // 비로그인 이용자 팝업 제보
 
             // 로그인
             "/api/v1/auth/sign-in",

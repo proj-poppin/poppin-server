@@ -290,7 +290,7 @@ public class AdminPopupService {
         posterImageCommandUseCase.deletePosterList(popup);
 
         log.info("delete popup alarm");
-        popupAlarmRepository.deleteAllByPopupId(popup);
+        popupAlarmRepository.deleteAllByPopup(popup);
 
         log.info("delete popup topic");
         popupTopicRepository.deleteAllByPopup(popup);
