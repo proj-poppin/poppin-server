@@ -12,10 +12,9 @@ import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryDto;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.inform.repository.UserInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
@@ -25,7 +24,7 @@ import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminUserInformService {
-    private final UserInformRepository userInformRepository;
+    private final UserInformQueryRepository userInformQueryRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -50,7 +49,7 @@ public class AdminUserInformService {
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
-        UserInform userInform = userInformRepository.findById(userInformId)
+        UserInform userInform = userInformQueryRepository.findById(userInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
         return UserInformDto.fromEntity(userInform);
@@ -60,7 +59,7 @@ public class AdminUserInformService {
     public UserInformDto updateUserInform(UpdateUserInformDto updateUserInformDto,
                                           List<MultipartFile> images,
                                           Long adminId) {
-        UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
+        UserInform userInform = userInformQueryRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
         // 관리자 검증
@@ -116,7 +115,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTING);
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformQueryRepository.save(userInform);
         log.info(userInform.getProgress().toString());
 
         return UserInformDto.fromEntity(userInform);
@@ -126,7 +125,7 @@ public class AdminUserInformService {
     public UserInformDto uploadPopup(UpdateUserInformDto updateUserInformDto,
                                      List<MultipartFile> images,
                                      Long adminId) {
-        UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
+        UserInform userInform = userInformQueryRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
         // 관리자 검증
@@ -204,7 +203,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTED);
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformQueryRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 최종 업로그
@@ -213,7 +212,7 @@ public class AdminUserInformService {
     public PagingResponseDto<List<UserInformSummaryDto>> readUserInformList(int page,
                                                                             int size,
                                                                             EInformProgress progress) {
-        Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);
+        Page<UserInform> userInforms = userInformQueryRepository.findAllByProgress(PageRequest.of(page, size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);
         List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(

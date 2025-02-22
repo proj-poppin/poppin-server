@@ -3,12 +3,10 @@ package com.poppin.poppinserver.modifyInfo.service;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.type.EOperationStatus;
-import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
-import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
 import com.poppin.poppinserver.modifyInfo.usecase.ModifyImagesCommandUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -30,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class ModifyInfoService {
-    private final ModifyInformRepository modifyInformRepository;
+    private final ModifyInfoRepository modifyInfoRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -84,7 +82,7 @@ public class ModifyInfoService {
                 .proxyPopup(proxyPopup)
                 .originPopup(popup)
                 .build();
-        modifyInformRepository.save(modifyInfo);
+        modifyInfoRepository.save(modifyInfo);
 
         List<String> fileUrls = modifyImagesCommandUseCase.saveModifyImagerList(images, modifyInfo);
 
@@ -94,7 +92,7 @@ public class ModifyInfoService {
     @Transactional
     public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
         log.info("delete modify info data");
-        List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
+        List<ModifyInfo> modifyInfoList = modifyInfoRepository.findAllByOriginPopupId(popupId);
 
         for (ModifyInfo modifyInfo : modifyInfoList) {
             // proxy popup 삭제
@@ -106,7 +104,7 @@ public class ModifyInfoService {
             modifyImagesCommandUseCase.deleteModifyImageList(modifyInfo);
 
             // modify info 삭제
-            modifyInformRepository.delete(modifyInfo);
+            modifyInfoRepository.delete(modifyInfo);
 
             // proxy popup 이미지 삭제
             posterImageCommandUseCase.deletePosterList(proxyPopup);

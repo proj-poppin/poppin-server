@@ -19,8 +19,6 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
 import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
 import com.poppin.poppinserver.inform.usecase.UserInformCommandUseCase;
 import com.poppin.poppinserver.interest.usercase.InterestCommandUseCase;
@@ -30,8 +28,6 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
@@ -47,8 +43,6 @@ import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.review.repository.ReviewRecommendCommandRepository;
 import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
-import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;
@@ -63,7 +57,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -296,7 +289,7 @@ public class AdminPopupService {
         popupTopicRepository.deleteAllByPopup(popup);
 
         log.info("delete blocked popup");
-        blockedPopupCommandUseCase.deleteAllBlockedPopupByPopup(popup);
+        blockedPopupCommandUseCase.deleteAllBlockedPopup(popup);
 
         log.info("delete popup");
         popupRepository.delete(popup);

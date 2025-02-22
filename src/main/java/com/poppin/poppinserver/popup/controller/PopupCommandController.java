@@ -12,7 +12,7 @@ import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.request.VisitorsInfoDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupReopenDto;
-import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.service.PopupDetailService;
 import com.poppin.poppinserver.visit.dto.visit.response.VisitedPopupDto;
 import com.poppin.poppinserver.visit.service.VisitService;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/popup")
 public class PopupCommandController implements SwaggerPopupCommandController {
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
 
     private final AdminPopupService adminPopupService;
     private final VisitService visitService;
@@ -77,7 +77,7 @@ public class PopupCommandController implements SwaggerPopupCommandController {
     @PostMapping("/waiting") // 재오픈 신청
     public ResponseDto<PopupReopenDto> waiting(@UserId Long userId, @RequestParam("popupId") String popupId)
             throws FirebaseMessagingException {
-        return ResponseDto.ok(popupService.waiting(userId, popupId));
+        return ResponseDto.ok(popupDetailService.waiting(userId, popupId));
     }
 
 }

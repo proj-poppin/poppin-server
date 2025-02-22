@@ -14,8 +14,7 @@ import com.poppin.poppinserver.popup.repository.specification.PopupSpecification
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,7 +39,7 @@ public class ListingPopupService {
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
 
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
@@ -94,7 +93,7 @@ public class ListingPopupService {
                 .map(Interest::getPopup)
                 .toList();
 
-        return popupService.getPopupStoreDtos(interestedPopup, userId);
+        return popupDetailService.getPopupStoreDtos(interestedPopup, userId);
     } // 관심 팝업 목록 조회
 
     @Transactional

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 public class SearchPopupService {
     private final PopupRepository popupRepository;
 
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
 
     private final UserQueryUseCase userQueryUseCase;
 
@@ -116,7 +116,7 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus(), userId); // 운영 상태
 
-            popupStoreDtos = popupService.getPopupStoreDtos(popups.getContent(), userId);
+            popupStoreDtos = popupDetailService.getPopupStoreDtos(popups.getContent(), userId);
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         } else {
             Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, searchText, PageRequest.of(page, size, sort),
@@ -128,7 +128,7 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus()); // 운영 상태
 
-            popupStoreDtos = popupService.guestGetPopupStoreDtos(popups.getContent());
+            popupStoreDtos = popupDetailService.guestGetPopupStoreDtos(popups.getContent());
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         }
 

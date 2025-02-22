@@ -7,19 +7,18 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.inform.repository.UserInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class UserInformService {
-    private final UserInformRepository userInformRepository;
+    private final UserInformQueryRepository userInformQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
@@ -70,7 +69,7 @@ public class UserInformService {
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformQueryRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 생성
@@ -107,7 +106,7 @@ public class UserInformService {
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformQueryRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 생성

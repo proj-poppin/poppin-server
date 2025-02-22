@@ -6,40 +6,27 @@ import com.poppin.poppinserver.alarm.usecase.AlarmQueryUseCase;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
-import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.domain.PreferedPopup;
-import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.response.BootstrapDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BootstrapService {
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
 
     private final UserQueryUseCase userQueryUseCase;
     private final AlarmQueryUseCase alarmQueryUseCase;
@@ -56,24 +43,24 @@ public class BootstrapService {
 
         if (userId != null) { // 로그인 요청일 경우
             // 인기 top5 조회
-            List<PopupStoreDto> popularTop5PopupStores = popupService.getPopupStoreDtos(
+            List<PopupStoreDto> popularTop5PopupStores = popupDetailService.getPopupStoreDtos(
                     popupQueryUseCase.findHotPopupList(userId),
                     userId
             );
             // 새로오픈팝업 top5 조회
-            List<PopupStoreDto> newlyOpenedPopupStores = popupService.getPopupStoreDtos(
+            List<PopupStoreDto> newlyOpenedPopupStores = popupDetailService.getPopupStoreDtos(
                     popupQueryUseCase.findNewPopupList(userId),
                     userId
             );
             // 종료임박팝업 top5 조회
-            List<PopupStoreDto> closingSoonPopupStores = popupService.getPopupStoreDtos(
+            List<PopupStoreDto> closingSoonPopupStores = popupDetailService.getPopupStoreDtos(
                     popupQueryUseCase.findClosingPopupList(userId),
                     userId
             );
 
             // 취향 저격 팝업 조회
             List<Popup> recommendPopup = popupQueryUseCase.findRecommandPopupList(userId);
-            List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
+            List<PopupStoreDto> recommendedPopupStores = popupDetailService.getPopupStoreDtos(recommendPopup, userId);
 
             // 관심 저장 팝업 조회
             User user = userQueryUseCase.findUserById(userId);
@@ -83,7 +70,7 @@ public class BootstrapService {
                     .map(Interest::getPopup)
                     .toList();
 
-            List<PopupStoreDto> interestedPopupStores = popupService.getPopupStoreDtos(interestedPopup, userId);
+            List<PopupStoreDto> interestedPopupStores = popupDetailService.getPopupStoreDtos(interestedPopup, userId);
 
             // 공지 조회
             List<InformAlarm> informAlarms = alarmQueryUseCase.getInformAlarms(userId);
@@ -100,15 +87,15 @@ public class BootstrapService {
                     .build();
         } else { // 비로그인 요청일 경우 유저 관련 로직 생략
             // 인기 top5 조회
-            List<PopupStoreDto> popularTop5PopupStores = popupService.guestGetPopupStoreDtos(
+            List<PopupStoreDto> popularTop5PopupStores = popupDetailService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findHotPopupList()
             );
             // 새로오픈팝업 top5 조회
-            List<PopupStoreDto> newlyOpenedPopupStores = popupService.guestGetPopupStoreDtos(
+            List<PopupStoreDto> newlyOpenedPopupStores = popupDetailService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findNewPopupList()
             );
             // 종료임박팝업 top5 조회
-            List<PopupStoreDto> closingSoonPopupStores = popupService.guestGetPopupStoreDtos(
+            List<PopupStoreDto> closingSoonPopupStores = popupDetailService.guestGetPopupStoreDtos(
                     popupQueryUseCase.findClosingPopupList()
             );
 
