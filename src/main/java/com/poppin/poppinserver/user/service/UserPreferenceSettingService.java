@@ -5,8 +5,7 @@ import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.domain.WhoWithPopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.service.BootstrapService;
-import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.service.PopupDetailService;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
@@ -28,7 +27,7 @@ public class UserPreferenceSettingService {
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandRepository userCommandRepository;
 
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
 
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
     private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
@@ -91,7 +90,7 @@ public class UserPreferenceSettingService {
 
         // 취향 저격 팝업 조회
         List<Popup> recommendPopup = popupQueryUseCase.findRecommandPopupList(userId);
-        List<PopupStoreDto> recommendedPopupStores = popupService.getPopupStoreDtos(recommendPopup, userId);
+        List<PopupStoreDto> recommendedPopupStores = popupDetailService.getPopupStoreDtos(recommendPopup, userId);
 
         return UserPreferenceUpdateResponseDto.fromDtos(userPreferenceSettingDto, recommendedPopupStores);
     }

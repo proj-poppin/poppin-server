@@ -7,4 +7,7 @@ import com.poppin.poppinserver.popup.domain.Popup;
 public interface ManagerInformCommandUseCase {
     // 팝업과 관련된 모든 운영자 제보 삭제
     void deleteAllManagerInformByPopup(Popup popup);
+
+    // 유저와 관련된 모든 운영자 제보 삭제
+    void deleteAllManagerInformByUserId(Long userId);
 }

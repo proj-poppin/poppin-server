@@ -16,7 +16,12 @@ public class BlockedPopupCommandService implements BlockedPopupCommandUseCase {
     private final BlockedPopupRepository blockedPopupRepository;
 
     @Override
-    public void deleteAllBlockedPopupByPopup(Popup popup) {
+    public void deleteAllBlockedPopup(Popup popup) {
         blockedPopupRepository.deleteAllByPopupId(popup);
+    }
+
+    @Override
+    public void deleteAllBlockedPopup(Long userId) {
+        blockedPopupRepository.deleteAllByUserId(userId);
     }
 }

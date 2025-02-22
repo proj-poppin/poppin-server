@@ -1,6 +1,7 @@
 package com.poppin.poppinserver.inform.service;
 
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
+import com.poppin.poppinserver.inform.repository.ManagerInformCommandRepository;
+import com.poppin.poppinserver.inform.repository.ManagerInformQueryRepository;
 import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,15 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class ManagerInformCommandService implements ManagerInformCommandUseCase {
-    private final ManagerInformRepository managerInformRepository;
+    private final ManagerInformCommandRepository managerInformCommandRepository;
 
     @Override
     public void deleteAllManagerInformByPopup(Popup popup) {
-        managerInformRepository.deleteAllByPopupId(popup);
+        managerInformCommandRepository.deleteAllByPopupId(popup);
+    }
+
+    @Override
+    public void deleteAllManagerInformByUserId(Long userId) {
+        managerInformCommandRepository.deleteAllByInformerId(userId);
     }
 }

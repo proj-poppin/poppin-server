@@ -7,7 +7,7 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
+import com.poppin.poppinserver.inform.repository.ManagerInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
@@ -18,7 +18,7 @@ import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class ManagerInformService {
-    private final ManagerInformRepository managerInformRepository;
+    private final ManagerInformQueryRepository managerInformQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
@@ -73,7 +73,7 @@ public class ManagerInformService {
                 .affiliation(createManagerInformDto.affiliation())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        managerInform = managerInformRepository.save(managerInform);
+        managerInform = managerInformQueryRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } //운영자 제보 생성
@@ -110,7 +110,7 @@ public class ManagerInformService {
                 .affiliation(createManagerInformDto.affiliation())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        managerInform = managerInformRepository.save(managerInform);
+        managerInform = managerInformQueryRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } //운영자 제보 생성

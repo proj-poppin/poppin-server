@@ -12,11 +12,9 @@ import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformSummaryDto;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
+import com.poppin.poppinserver.inform.repository.ManagerInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
@@ -28,7 +26,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,7 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminManagerInformService {
-    private final ManagerInformRepository managerInformRepository;
+    private final ManagerInformQueryRepository managerInformQueryRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -54,7 +52,7 @@ public class AdminManagerInformService {
 
     @Transactional
     public ManagerInformDto readManageInform(Long manageInformId) {
-        ManagerInform managerInform = managerInformRepository.findById(manageInformId)
+        ManagerInform managerInform = managerInformQueryRepository.findById(manageInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
         return ManagerInformDto.fromEntity(managerInform);
@@ -64,7 +62,7 @@ public class AdminManagerInformService {
     public ManagerInformDto updateManageInform(UpdateManagerInformDto updateManagerInformDto,
                                                List<MultipartFile> images,
                                                Long adminId) {
-        ManagerInform managerInform = managerInformRepository.findById(
+        ManagerInform managerInform = managerInformQueryRepository.findById(
                         Long.valueOf(updateManagerInformDto.managerInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
@@ -107,7 +105,7 @@ public class AdminManagerInformService {
                 updateManagerInformDto.affiliation(),
                 updateManagerInformDto.informerEmail()
         );
-        managerInform = managerInformRepository.save(managerInform);
+        managerInform = managerInformQueryRepository.save(managerInform);
         log.info(managerInform.getProgress().toString());
 
         return ManagerInformDto.fromEntity(managerInform);
@@ -117,7 +115,7 @@ public class AdminManagerInformService {
     public ManagerInformDto uploadPopup(UpdateManagerInformDto updateManagerInformDto,
                                         List<MultipartFile> images,
                                         Long adminId) {
-        ManagerInform managerInform = managerInformRepository.findById(
+        ManagerInform managerInform = managerInformQueryRepository.findById(
                         Long.valueOf(updateManagerInformDto.managerInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MANAGE_INFORM));
 
@@ -203,7 +201,7 @@ public class AdminManagerInformService {
                 updateManagerInformDto.affiliation(),
                 updateManagerInformDto.informerEmail()
         );
-        managerInform = managerInformRepository.save(managerInform);
+        managerInform = managerInformQueryRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } // 운영자 제보 업로드 승인
@@ -211,7 +209,7 @@ public class AdminManagerInformService {
     @Transactional
     public PagingResponseDto<List<ManagerInformSummaryDto>> readManagerInformList(int page, int size,
                                                                                   EInformProgress progress) {
-        Page<ManagerInform> managerInforms = managerInformRepository.findAllByProgress(PageRequest.of(page, size),
+        Page<ManagerInform> managerInforms = managerInformQueryRepository.findAllByProgress(PageRequest.of(page, size),
                 progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(managerInforms);

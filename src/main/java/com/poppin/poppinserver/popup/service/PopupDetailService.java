@@ -8,24 +8,14 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.util.HeaderUtil;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.Waiting;
 import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
 import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.WaitingCommandUseCase;
-import com.poppin.poppinserver.review.domain.Review;
-import com.poppin.poppinserver.review.domain.ReviewImage;
-import com.poppin.poppinserver.review.dto.response.ReviewInfoDto;
-import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
-import com.poppin.poppinserver.review.usecase.ReviewImageQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.BlockedUserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.dto.visitorData.response.VisitorDataInfoDto;
@@ -34,9 +24,7 @@ import com.poppin.poppinserver.visit.usecase.VisitorDataQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PopupService {
+public class PopupDetailService {
     private final PopupRepository popupRepository;
 
     private final WaitingCommandUseCase waitingCommandUseCase;

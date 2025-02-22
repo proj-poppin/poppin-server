@@ -1,4 +1,4 @@
-package com.poppin.poppinserver.inform.repository;
+package com.poppin.poppinserver.modifyInfo.repository;
 
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import org.springframework.data.domain.Page;
@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ModifyInformRepository extends JpaRepository<ModifyInfo, Long> {
+public interface ModifyInfoRepository extends JpaRepository<ModifyInfo, Long> {
     @Query("select m from ModifyInfo m where m.isExecuted = :isExecuted")
     Page<ModifyInfo> findAllByIsExecuted(Pageable pageable, @Param("isExecuted") Boolean isExecuted);
 
