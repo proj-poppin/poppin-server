@@ -3,7 +3,7 @@ name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches:
-      - dev
+      - dev-deploy-test
 
 jobs:
   deploy:
@@ -42,7 +42,8 @@ jobs:
               {
                 "ContainerPort": "8080"
               }
-            ]
+            ],
+          "Logging": "/var/log/nginx"
           }' > Dockerrun.aws.json
 
       - name: Set Deployment Version
