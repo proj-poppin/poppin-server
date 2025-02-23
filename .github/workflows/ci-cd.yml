@@ -1,4 +1,4 @@
-name: Deploy Poppin Dev.
+name: Deploy Poppin Dev
 
 on:
   push:
@@ -43,7 +43,13 @@ jobs:
                 "ContainerPort": "8080"
               }
             ],
-          "Logging": "/var/log/nginx"
+            "Logging": "/var/log/nginx",
+            "Environment": [
+              {
+                "Name": "FIREBASE_CONFIG",
+                "Value": "${{ secrets.FIREBASE_KEY }}"
+              }
+            ]
           }' > Dockerrun.aws.json
 
       - name: Set Deployment Version
