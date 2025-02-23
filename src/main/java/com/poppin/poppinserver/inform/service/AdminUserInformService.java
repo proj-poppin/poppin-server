@@ -12,6 +12,7 @@ import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryDto;
+import com.poppin.poppinserver.inform.repository.UserInformCommandRepository;
 import com.poppin.poppinserver.inform.repository.UserInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -38,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminUserInformService {
     private final UserInformQueryRepository userInformQueryRepository;
+    private final UserInformCommandRepository userInformCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -115,7 +117,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTING);
-        userInform = userInformQueryRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
         log.info(userInform.getProgress().toString());
 
         return UserInformDto.fromEntity(userInform);
@@ -203,7 +205,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTED);
-        userInform = userInformQueryRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 최종 업로그

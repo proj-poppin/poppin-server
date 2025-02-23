@@ -10,7 +10,7 @@ import com.poppin.poppinserver.alarm.usecase.SendAlarmCommandUseCase;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class FCMScheduler {
 
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final AlarmSettingRepository alarmSettingRepository;
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
@@ -69,7 +69,7 @@ public class FCMScheduler {
         String topicCode = EPopupTopic.MAGAM.getCode();
 
         log.info("MAGAM popup scheduler start");
-        List<Popup> magamPopup = popupRepository.findMagamPopup(now, tomorrow, topicCode); // null, 1, many
+        List<Popup> magamPopup = popupQueryRepository.findMagamPopup(now, tomorrow, topicCode); // null, 1, many
         if (magamPopup.isEmpty()) {
             log.info("사용자가 관심 팝업 등록한 팝업 중 마감 임박한 팝업이 없습니다."); // null 처리
         } else {
@@ -97,7 +97,7 @@ public class FCMScheduler {
         log.info("timeNow : " + timeNow);
         log.info("timeBefore : " + timeBefore);
 
-        List<Popup> openPopup = popupRepository.findOpenPopup(date, timeNow, timeBefore);
+        List<Popup> openPopup = popupQueryRepository.findOpenPopup(date, timeNow, timeBefore);
 
         if (openPopup.isEmpty()) {
             log.info("관심 팝업 등록된 팝업 중 오픈된 팝업이 존재하지 않습니다.");
@@ -123,7 +123,7 @@ public class FCMScheduler {
         LocalDateTime startOfLastWeek = weekAgo.atStartOfDay();
         LocalDateTime endOfLastWeek = startOfLastWeek.plusDays(7);
 
-        List<Popup> hotPopup = popupRepository.findHotPopup(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
+        List<Popup> hotPopup = popupQueryRepository.findHotPopup(startOfLastWeek, endOfLastWeek, PageRequest.of(0, 5));
 
         if (hotPopup.isEmpty()) {
             log.info("인기 팝업이 없습니다");
@@ -148,7 +148,7 @@ public class FCMScheduler {
         LocalDateTime threeHoursAgo = now.minusHours(3);
 
         log.info("hoogi scheduler start");
-        List<Popup> hoogiList = popupRepository.findHoogi(threeHoursAndMin, threeHoursAgo);
+        List<Popup> hoogiList = popupQueryRepository.findHoogi(threeHoursAndMin, threeHoursAgo);
         if (hoogiList.isEmpty()) {
             log.info("후기 요청을 보낼 팝업이 없습니다.");
         } else {

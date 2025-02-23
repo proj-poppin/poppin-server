@@ -3,9 +3,7 @@ package com.poppin.poppinserver.user.service;
 import com.poppin.poppinserver.alarm.repository.NotificationRepository;
 import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
 import com.poppin.poppinserver.inform.usecase.UserInformCommandUseCase;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
-import com.poppin.poppinserver.modifyInfo.service.ModifyImagesCommandService;
+import com.poppin.poppinserver.interest.repository.InterestQueryRepository;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoCommandService;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupCommandUseCase;
@@ -34,7 +32,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserHardDeleteService {
     private final BlockedUserCommandRepository blockedUserCommandRepository;
-    private final InterestRepository interestRepository;
+    private final InterestQueryRepository interestQueryRepository;
     private final ReviewRecommendCommandRepository reviewRecommendRepository;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
@@ -63,7 +61,7 @@ public class UserHardDeleteService {
     public void deleteAllRelatedInfo(User user) {
         Long userId = user.getId();
         visitRepository.deleteAllByUserId(userId);  // 유저 팝업 방문 삭제
-        interestRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
+        interestQueryRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
         reviewRecommendRepository.deleteAllByUserId(userId);    // 유저가 누른 모든 추천 삭제
         deleteUserReports(userId);   // 유저가 남긴 모든 신고 삭제
         deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제

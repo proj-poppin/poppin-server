@@ -1,6 +1,5 @@
 package com.poppin.poppinserver.popup.service;
 
-import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.request.CreateUserInformDto;
@@ -8,7 +7,8 @@ import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.PopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PopupCommandService implements PopupCommandUseCase {
-    private final PopupRepository popupRepository;
+    private final PopupCommandRepository popupCommandRepository;
 
     @Override
     public Popup createPopup(CreateManagerInformDto createManagerInformDto, String operationStatus, TastePopup tastePopup, PreferedPopup preferedPopup) {
-        return popupRepository.save(
+        return popupCommandRepository.save(
                 Popup.builder()
                         .homepageLink(createManagerInformDto.homepageLink())
                         .name(createManagerInformDto.name())
@@ -51,7 +51,7 @@ public class PopupCommandService implements PopupCommandUseCase {
 
     @Override
     public Popup createPopup(CreateUserInformDto createUserInformDto, String operationStatus, TastePopup tastePopup, PreferedPopup preferedPopup) {
-        return popupRepository.save(
+        return popupCommandRepository.save(
                 Popup.builder()
                         .name(createUserInformDto.name())
                         .tastePopup(tastePopup)
@@ -64,7 +64,7 @@ public class PopupCommandService implements PopupCommandUseCase {
 
     @Override
     public Popup copyPopup(Popup popup, PreferedPopup proxyPrefered, TastePopup proxyTaste, String operationStatus) {
-        return popupRepository.save(
+        return popupCommandRepository.save(
                 Popup.builder()
                         .homepageLink(popup.getHomepageLink())
                         .name(popup.getName())
@@ -114,18 +114,18 @@ public class PopupCommandService implements PopupCommandUseCase {
                 agent
         );
 
-        popupRepository.save(popup);
+        popupCommandRepository.save(popup);
     }
 
     @Override
     public void updatePopupPosterUrl(Popup popup, PosterImage posterImage) {
         popup.updatePosterUrl(posterImage.getPosterUrl());
 
-        popupRepository.save(popup);
+        popupCommandRepository.save(popup);
     }
 
     @Override
     public void deletePopup(Popup popup) {
-        popupRepository.delete(popup);
+        popupCommandRepository.delete(popup);
     }
 }

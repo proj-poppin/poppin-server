@@ -12,6 +12,7 @@ import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.UpdateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformSummaryDto;
+import com.poppin.poppinserver.inform.repository.ManagerInformCommandRepository;
 import com.poppin.poppinserver.inform.repository.ManagerInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -40,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminManagerInformService {
     private final ManagerInformQueryRepository managerInformQueryRepository;
+    private final ManagerInformCommandRepository managerInformCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final S3Service s3Service;
@@ -105,7 +107,7 @@ public class AdminManagerInformService {
                 updateManagerInformDto.affiliation(),
                 updateManagerInformDto.informerEmail()
         );
-        managerInform = managerInformQueryRepository.save(managerInform);
+        managerInform = managerInformCommandRepository.save(managerInform);
         log.info(managerInform.getProgress().toString());
 
         return ManagerInformDto.fromEntity(managerInform);
@@ -201,7 +203,7 @@ public class AdminManagerInformService {
                 updateManagerInformDto.affiliation(),
                 updateManagerInformDto.informerEmail()
         );
-        managerInform = managerInformQueryRepository.save(managerInform);
+        managerInform = managerInformCommandRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } // 운영자 제보 업로드 승인

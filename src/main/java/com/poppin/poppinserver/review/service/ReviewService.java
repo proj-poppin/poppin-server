@@ -4,8 +4,6 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.PosterImageQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;

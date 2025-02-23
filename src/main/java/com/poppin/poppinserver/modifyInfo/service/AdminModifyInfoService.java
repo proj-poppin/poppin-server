@@ -7,6 +7,7 @@ import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EOperationStatus;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoCommandRepository;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoQueryRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
@@ -40,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminModifyInfoService {
     private final ModifyInfoQueryRepository modifyInfoQueryRepository;
+    private final ModifyInfoCommandRepository modifyInfoCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final UserQueryUseCase userQueryUseCase;
@@ -170,7 +172,7 @@ public class AdminModifyInfoService {
 
         modifyInfo.update(updateModifyInfoDto.info());
 
-        modifyInfo = modifyInfoQueryRepository.save(modifyInfo);
+        modifyInfo = modifyInfoCommandRepository.save(modifyInfo);
 
         return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 임시 저장
@@ -268,7 +270,7 @@ public class AdminModifyInfoService {
         );
 
         modifyInfo.update(updateModifyInfoDto.info(), true);
-        modifyInfo = modifyInfoQueryRepository.save(modifyInfo);
+        modifyInfo = modifyInfoCommandRepository.save(modifyInfo);
 
         popupCommandUseCase.deletePopup(proxyPopup);
 

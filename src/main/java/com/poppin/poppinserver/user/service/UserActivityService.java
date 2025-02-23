@@ -10,7 +10,7 @@ import com.poppin.poppinserver.alarm.dto.NotificationResponseDto;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmRepository;
 import com.poppin.poppinserver.alarm.repository.UserInformAlarmRepository;
 import com.poppin.poppinserver.interest.domain.Interest;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.interest.repository.InterestQueryRepository;
 import com.poppin.poppinserver.popup.domain.Waiting;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupActivityResponseDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupScrapDto;
@@ -44,7 +44,7 @@ public class UserActivityService {
 
     private final PopupAlarmRepository popupAlarmRepository;
     private final UserInformAlarmRepository userInformAlarmRepository;
-    private final InterestRepository interestRepository;
+    private final InterestQueryRepository interestQueryRepository;
     private final VisitRepository visitRepository;
     private final WaitingRepository waitingRepository;
 
@@ -56,7 +56,7 @@ public class UserActivityService {
 
     public PopupActivityResponseDto getPopupActivity(User user) {
         // 유저가 등록한 관심 팝업 조회
-        List<Interest> userInterestPopupList = interestRepository.findByUserId(user.getId());
+        List<Interest> userInterestPopupList = interestQueryRepository.findByUserId(user.getId());
         List<PopupScrapDto> popupScrapDtoList = userInterestPopupList.stream().map(
                 PopupScrapDto::fromInterest
         ).toList();

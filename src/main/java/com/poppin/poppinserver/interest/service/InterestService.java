@@ -10,7 +10,8 @@ import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.interest.domain.Interest;
 import com.poppin.poppinserver.interest.dto.interest.request.InterestRequestDto;
 import com.poppin.poppinserver.interest.dto.interest.response.InterestDto;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
+import com.poppin.poppinserver.interest.repository.InterestCommandRepository;
+import com.poppin.poppinserver.interest.repository.InterestQueryRepository;
 import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
@@ -33,7 +34,8 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class InterestService {
-    private final InterestRepository interestRepository;
+    private final InterestQueryRepository interestQueryRepository;
+    private final InterestCommandRepository interestCommandRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
@@ -48,7 +50,7 @@ public class InterestService {
     public InterestDto userAddInterest(Long userId, InterestRequestDto requestDto) throws FirebaseMessagingException {
         Long popupId = Long.valueOf(requestDto.popupId());
 
-        interestRepository.findByUserIdAndPopupId(userId, popupId)
+        interestQueryRepository.findByUserIdAndPopupId(userId, popupId)
                 .ifPresent(interest -> {
                     throw new CommonException(ErrorCode.DUPLICATED_INTEREST);
                 });
@@ -61,7 +63,7 @@ public class InterestService {
                 .popup(popup)
                 .build();
 
-        interestRepository.save(interest);
+        interestCommandRepository.save(interest);
 
         popup.addInterestCnt();
 
@@ -77,7 +79,7 @@ public class InterestService {
 
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
-        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+        LocalDateTime interestCreatedAt = interestQueryRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
         Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
 
         return InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, isVisited, interestCreatedAt);
@@ -96,11 +98,11 @@ public class InterestService {
         Optional<Integer> visitorCnt = visitQueryUseCase.getRealTimeVisitors(popup.getId()); // 실시간 방문자
         Boolean isBlocked = blockedPopupQueryUseCase.existBlockedPopupByUserIdAndPopupId(popup.getId(), userId);
         Boolean isVisited = visitQueryUseCase.findByUserId(userId, popup.getId()).isPresent();
-        LocalDateTime interestCreatedAt = interestRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
+        LocalDateTime interestCreatedAt = interestQueryRepository.findCreatedAtByUserIdAndPopupId(userId, popup.getId());
 
         InterestDto interestDto = InterestDto.fromEntity(interest, popup, visitorDataDto, visitorCnt, isBlocked, isVisited, interestCreatedAt);
 
-        interestRepository.delete(interest);
+        interestCommandRepository.delete(interest);
 
         String fcmToken = tokenQueryUseCase.findByUser(user).getToken();
 

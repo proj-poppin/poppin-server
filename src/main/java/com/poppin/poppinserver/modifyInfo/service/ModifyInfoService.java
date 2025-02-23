@@ -3,6 +3,7 @@ package com.poppin.poppinserver.modifyInfo.service;
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
 import com.poppin.poppinserver.core.type.EOperationStatus;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoCommandRepository;
 import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoQueryRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ModifyInfoService {
     private final ModifyInfoQueryRepository modifyInfoQueryRepository;
+    private final ModifyInfoCommandRepository modifyInfoCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
     private final UserQueryUseCase userQueryUseCase;
@@ -80,7 +82,7 @@ public class ModifyInfoService {
                 .proxyPopup(proxyPopup)
                 .originPopup(popup)
                 .build();
-        modifyInfoQueryRepository.save(modifyInfo);
+        modifyInfoCommandRepository.save(modifyInfo);
 
         List<String> fileUrls = modifyImagesCommandUseCase.saveModifyImagerList(images, modifyInfo);
 
@@ -102,7 +104,7 @@ public class ModifyInfoService {
             modifyImagesCommandUseCase.deleteModifyImageList(modifyInfo);
 
             // modify info 삭제
-            modifyInfoQueryRepository.delete(modifyInfo);
+            modifyInfoCommandRepository.delete(modifyInfo);
 
             // proxy popup 이미지 삭제
             posterImageCommandUseCase.deletePosterList(proxyPopup);

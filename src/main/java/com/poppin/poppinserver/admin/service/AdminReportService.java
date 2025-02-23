@@ -5,7 +5,6 @@ import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.report.domain.ReportPopup;
 import com.poppin.poppinserver.report.domain.ReportReview;

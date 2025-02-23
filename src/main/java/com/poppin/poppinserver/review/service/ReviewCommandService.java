@@ -1,13 +1,11 @@
 package com.poppin.poppinserver.review.service;
 
-import com.poppin.poppinserver.alarm.repository.FCMTokenRepository;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.ECongestion;
 import com.poppin.poppinserver.core.type.ESatisfaction;
 import com.poppin.poppinserver.core.type.EVisitDate;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.review.domain.Review;
@@ -18,7 +16,6 @@ import com.poppin.poppinserver.review.repository.ReviewImageCommandRepository;
 import com.poppin.poppinserver.review.repository.ReviewQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.repository.UserQueryRepository;
-import com.poppin.poppinserver.user.service.UserService;
 import com.poppin.poppinserver.visit.domain.VisitorData;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import com.poppin.poppinserver.visit.repository.VisitorDataRepository;

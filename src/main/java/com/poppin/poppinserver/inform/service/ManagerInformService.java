@@ -7,6 +7,7 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.ManagerInform;
 import com.poppin.poppinserver.inform.dto.managerInform.request.CreateManagerInformDto;
 import com.poppin.poppinserver.inform.dto.managerInform.response.ManagerInformDto;
+import com.poppin.poppinserver.inform.repository.ManagerInformCommandRepository;
 import com.poppin.poppinserver.inform.repository.ManagerInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ManagerInformService {
     private final ManagerInformQueryRepository managerInformQueryRepository;
+    private final ManagerInformCommandRepository managerInformCommandRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
@@ -73,7 +75,7 @@ public class ManagerInformService {
                 .affiliation(createManagerInformDto.affiliation())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        managerInform = managerInformQueryRepository.save(managerInform);
+        managerInform = managerInformCommandRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } //운영자 제보 생성
@@ -110,7 +112,7 @@ public class ManagerInformService {
                 .affiliation(createManagerInformDto.affiliation())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        managerInform = managerInformQueryRepository.save(managerInform);
+        managerInform = managerInformCommandRepository.save(managerInform);
 
         return ManagerInformDto.fromEntity(managerInform);
     } //운영자 제보 생성

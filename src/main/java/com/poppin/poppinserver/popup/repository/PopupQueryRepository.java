@@ -15,7 +15,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Repository
-public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecificationExecutor<Popup> {
+public interface PopupQueryRepository extends JpaRepository<Popup, Long>, JpaSpecificationExecutor<Popup> {
     // 비로그인 인기 팝업스토어
     @Query("SELECT p FROM Popup p LEFT JOIN p.interest i " +
             "ON i.createdAt >= :startOfDay AND i.createdAt < :endOfDay " +
@@ -68,35 +68,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
             "ORDER BY p.closeDate, p.id ")
     List<Popup> findClosingPopupByAll(Long userId,
                                       Pageable pageable);
-
-    // 로그인 베이스 팝업 검색
-    @Query(value = "SELECT p.* FROM popups p " +
-            "LEFT JOIN blocked_popup bp ON p.id = bp.popup_id AND bp.user_id = :userId " +
-            "WHERE bp.popup_id IS NULL " +
-            "AND (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = 'OPERATING' " +
-            "ORDER BY p.open_date DESC, p.id",
-            countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "LEFT JOIN blocked_popup bp ON p.id = bp.popup_id AND bp.user_id = :userId " +
-                    "WHERE bp.popup_id IS NULL " +
-                    "AND (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = 'OPERATING' " +
-                    "ORDER BY p.open_date DESC, p.id",
-            nativeQuery = true)
-    Page<Popup> findByTextInNameOrIntroduceBaseByBlackList(String text, Pageable pageable, Long userId);
-
-    // 비로그인 베이스 팝업 검색
-    @Query(value = "SELECT p.* FROM popups p " +
-            "WHERE (:text IS NULL OR :text = '' OR MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-            "AND p.operation_status = 'OPERATING' " +
-            "ORDER BY p.open_date DESC, p.id",
-            countQuery = "SELECT COUNT(*) FROM popups p " +
-                    "WHERE MATCH(p.name, p.introduce) AGAINST (:text IN BOOLEAN MODE)) " +
-                    "AND p.operation_status = 'OPERATING' " +
-                    "ORDER BY p.open_date DESC, p.id",
-            nativeQuery = true)
-    Page<Popup> findByTextInNameOrIntroduceBase(String text, Pageable pageable);
-
 
     // 로그인 팝업 검색
     @Query(value = "SELECT p.* FROM popups p " +
@@ -280,13 +251,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
                               @Param("timeNow") LocalTime timeNow,
                               @Param("timeBefore") LocalTime timeBefore);
 
-
-    @Query("SELECT p FROM Popup p " +
-            "JOIN Interest i ON p.id = i.popup.id " +
-            "JOIN User u ON i.user.id = u.id " +
-            "WHERE MOD(DATEDIFF(CURRENT_DATE(), u.createdAt), 7) = 0")
-    List<Popup> findHotPopup();
-
     @Query("SELECT p FROM Popup p " +
             "JOIN Visit v ON p.id = v.popup.id " +
             "JOIN User u ON v.user.id = u.id " +
@@ -306,5 +270,4 @@ public interface PopupRepository extends JpaRepository<Popup, Long>, JpaSpecific
     List<Popup> findHotPopup(@Param("startOfWeek") LocalDateTime startOfWeek,
                              @Param("endOfWeek") LocalDateTime endOfWeek,
                              Pageable pageable);
-
 }

@@ -7,6 +7,7 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
+import com.poppin.poppinserver.inform.repository.UserInformCommandRepository;
 import com.poppin.poppinserver.inform.repository.UserInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserInformService {
     private final UserInformQueryRepository userInformQueryRepository;
+    private final UserInformCommandRepository userInformCommandRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
@@ -69,7 +71,7 @@ public class UserInformService {
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        userInform = userInformQueryRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 생성
@@ -106,7 +108,7 @@ public class UserInformService {
                 .contactLink(createUserInformDto.contactLink())
                 .progress(EInformProgress.NOTEXECUTED)
                 .build();
-        userInform = userInformQueryRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 생성
