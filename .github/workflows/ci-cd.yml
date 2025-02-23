@@ -19,6 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Create Firebase Key File
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
+
       - name: Build with Gradle
         run: ./gradlew build -x test
 
@@ -29,10 +34,6 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest
-
-      - name: Process Firebase Config
-        run: |
-          echo '${{ secrets.FIREBASE_CONFIG }}' | sed ':a;N;$!ba;s/\n/\\n/g' > firebase_config.json
 
       - name: Generate Dockerrun.aws.json
         run: |
@@ -47,13 +48,7 @@ jobs:
                 "ContainerPort": "8080"
               }
             ],
-            "Logging": "/var/log/nginx",
-            "Environment": [
-              {
-                "Name": "FIREBASE_CONFIG",
-                "Value": "'$(cat firebase_config.json)'"
-              }
-            ]
+            "Logging": "/var/log/nginx"
           }' > Dockerrun.aws.json
 
       - name: Set Deployment Version
