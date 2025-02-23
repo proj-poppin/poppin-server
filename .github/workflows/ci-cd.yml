@@ -30,6 +30,10 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest
 
+      - name: Process Firebase Config
+        run: |
+          echo '${{ secrets.FIREBASE_CONFIG }}' | sed ':a;N;$!ba;s/\n/\\n/g' > firebase_config.json
+
       - name: Generate Dockerrun.aws.json
         run: |
           echo '{
@@ -47,7 +51,7 @@ jobs:
             "Environment": [
               {
                 "Name": "FIREBASE_CONFIG",
-                "Value": "${{ secrets.FIREBASE_KEY }}"
+                "Value": "'$(cat firebase_config.json)'"
               }
             ]
           }' > Dockerrun.aws.json
