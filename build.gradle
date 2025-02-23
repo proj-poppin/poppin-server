@@ -76,6 +76,7 @@ dependencies {
 
 	// ETC
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 }
 
