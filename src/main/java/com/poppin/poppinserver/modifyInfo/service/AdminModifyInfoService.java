@@ -7,7 +7,7 @@ import com.poppin.poppinserver.core.dto.PagingResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EOperationStatus;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoRepository;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoQueryRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.dto.request.UpdateModifyInfoDto;
@@ -39,10 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminModifyInfoService {
-    private final ModifyInfoRepository modifyInfoRepository;
+    private final ModifyInfoQueryRepository modifyInfoQueryRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
-
-    private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
@@ -53,12 +51,12 @@ public class AdminModifyInfoService {
 
     @Transactional
     public AdminModifyInfoDto readModifyInfo(Long modifyInfoId, Long adminId) {
-        ModifyInfo modifyInfo = modifyInfoRepository.findById(modifyInfoId)
+        ModifyInfo modifyInfo = modifyInfoQueryRepository.findById(modifyInfoId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
         User user = userQueryUseCase.findUserById(modifyInfo.getUserId().getId());
 
-        List<ModifyImages> modifyImageList = modifyImagesQueryService.findModifyImagesByModifyInfo(modifyInfo);
+        List<ModifyImages> modifyImageList = modifyImagesQueryService.findModifyImagesAll(modifyInfo);
 
         List<String> imageList = new ArrayList<>();
         for (ModifyImages modifyImages : modifyImageList) {
@@ -97,7 +95,7 @@ public class AdminModifyInfoService {
 
     @Transactional
     public PagingResponseDto<List<ModifyInfoSummaryDto>> readModifyInfoList(int page, int size, Boolean isExec) {
-        Page<ModifyInfo> modifyInfoList = modifyInfoRepository.findAllByIsExecuted(PageRequest.of(page, size),
+        Page<ModifyInfo> modifyInfoList = modifyInfoQueryRepository.findAllByIsExecuted(PageRequest.of(page, size),
                 isExec);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(modifyInfoList);
@@ -113,7 +111,7 @@ public class AdminModifyInfoService {
                                                Long adminId) {
         User admin = userQueryUseCase.findUserById(adminId);
 
-        ModifyInfo modifyInfo = modifyInfoRepository.findById(updateModifyInfoDto.modifyInfoId())
+        ModifyInfo modifyInfo = modifyInfoQueryRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
         // 카테고리 업데이트
@@ -172,7 +170,7 @@ public class AdminModifyInfoService {
 
         modifyInfo.update(updateModifyInfoDto.info());
 
-        modifyInfo = modifyInfoRepository.save(modifyInfo);
+        modifyInfo = modifyInfoQueryRepository.save(modifyInfo);
 
         return AdminModifyInfoDto.fromEntity(modifyInfo, null);
     } // 임시 저장
@@ -183,7 +181,7 @@ public class AdminModifyInfoService {
                                                Long adminId) {
         User admin = userQueryUseCase.findUserById(adminId);
 
-        ModifyInfo modifyInfo = modifyInfoRepository.findById(updateModifyInfoDto.modifyInfoId())
+        ModifyInfo modifyInfo = modifyInfoQueryRepository.findById(updateModifyInfoDto.modifyInfoId())
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MODIFY_INFO));
 
         // 기존 팝업에 수정 사항 덮어 씌우기
@@ -270,7 +268,7 @@ public class AdminModifyInfoService {
         );
 
         modifyInfo.update(updateModifyInfoDto.info(), true);
-        modifyInfo = modifyInfoRepository.save(modifyInfo);
+        modifyInfo = modifyInfoQueryRepository.save(modifyInfo);
 
         popupCommandUseCase.deletePopup(proxyPopup);
 

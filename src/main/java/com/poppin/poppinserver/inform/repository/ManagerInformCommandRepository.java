@@ -13,8 +13,6 @@ import org.springframework.data.repository.query.Param;
 public interface ManagerInformCommandRepository extends JpaRepository<ManagerInform, Long> {
     void deleteAllByPopupId(Popup popup);
 
-    Page<ManagerInform> findAllByProgress(Pageable pageable, EInformProgress progress);
-
     @Modifying
     @Query("DELETE FROM ManagerInform mi WHERE mi.informerId.id = :informerId")
     void deleteAllByInformerId(@Param("informerId") Long informerId);

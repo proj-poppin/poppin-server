@@ -7,11 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
-public interface ModifyImageReposiroty extends JpaRepository<ModifyImages, Long> {
-    List<ModifyImages> findByModifyId(ModifyInfo modifyId);
-
+public interface ModifyImageCommandRepository extends JpaRepository<ModifyImages, Long> {
     void deleteAllByModifyId(ModifyInfo modifyId);
 
     @Modifying

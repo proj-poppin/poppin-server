@@ -2,9 +2,10 @@ package com.poppin.poppinserver.modifyInfo.service;
 
 import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyImageCommandRepository;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyImageQueryRepository;
 import com.poppin.poppinserver.modifyInfo.usecase.ModifyImagesCommandUseCase;
-import com.poppin.poppinserver.popup.domain.Popup;
+import com.poppin.poppinserver.modifyInfo.usecase.ModifyImagesQueryUseCase;
 import com.poppin.poppinserver.popup.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ModifyImagesCommandService implements ModifyImagesCommandUseCase {
-    private final ModifyImageReposiroty modifyImageReposiroty;
+    private final ModifyImageCommandRepository modifyImageCommandRepository;
+
+    private final ModifyImagesQueryUseCase modifyImagesQueryUseCase;
 
     private final S3Service s3Service;
 
@@ -34,20 +37,20 @@ public class ModifyImagesCommandService implements ModifyImagesCommandUseCase {
                     .build();
             modifyImagesList.add(modifyImage);
         }
-        modifyImageReposiroty.saveAll(modifyImagesList);
+        modifyImageCommandRepository.saveAll(modifyImagesList);
 
         return fileUrls;
     }
 
     @Override
     public void deleteModifyImageList(ModifyInfo modifyInfo) {
-        List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
+        List<ModifyImages> modifyImages = modifyImagesQueryUseCase.findModifyImagesAll(modifyInfo);
         List<String> modifyUrls = modifyImages.stream()
                 .map(ModifyImages::getImageUrl)
                 .toList();
         if (modifyUrls.size() != 0) {
             s3Service.deleteMultipleImages(modifyUrls);
-            modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
+            modifyImageCommandRepository.deleteAllByModifyId(modifyInfo);
         }
     }
 }
