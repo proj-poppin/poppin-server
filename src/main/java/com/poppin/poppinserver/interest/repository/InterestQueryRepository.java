@@ -1,15 +1,14 @@
 package com.poppin.poppinserver.interest.repository;
 
 import com.poppin.poppinserver.interest.domain.Interest;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InterestQueryRepository extends JpaRepository<Interest, Interest.InterestId> {
@@ -22,4 +21,6 @@ public interface InterestQueryRepository extends JpaRepository<Interest, Interes
 
     @Query("SELECT i.createdAt FROM Interest i WHERE i.id.userId = :userId AND i.id.popupId = :popupId")
     LocalDateTime findCreatedAtByUserIdAndPopupId(@Param("userId") Long userId, @Param("popupId") Long popupId);
+
+    void deleteAllByUserId(Long userId);
 }
