@@ -2,7 +2,8 @@ package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
+import com.poppin.poppinserver.popup.repository.PreferedPopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.PreferedPopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PreferedPopupCommandService implements PreferedPopupCommandUseCase {
-    private final PreferedPopupRepository preferedPopupRepository;
+    private final PreferedPopupCommandRepository preferedPopupCommandRepository;
 
     @Override
     public PreferedPopup createProxyPreferedPopup(PreferedPopup preferedPopup) {
-        return preferedPopupRepository.save(
+        return preferedPopupCommandRepository.save(
                 PreferedPopup.builder()
                 .wantFree(preferedPopup.getWantFree())
                 .market(preferedPopup.getMarket())
@@ -30,12 +31,12 @@ public class PreferedPopupCommandService implements PreferedPopupCommandUseCase 
 
     @Override
     public PreferedPopup createPreferedPopup(PreferedPopup preferedPopup) {
-        return preferedPopupRepository.save(preferedPopup);
+        return preferedPopupCommandRepository.save(preferedPopup);
     }
 
     @Override
     public PreferedPopup createPreferedPopup(CreatePreferedDto createPreferedDto) {
-        return preferedPopupRepository.save(
+        return preferedPopupCommandRepository.save(
                 PreferedPopup.builder()
                         .market(createPreferedDto.market())
                         .display(createPreferedDto.display())
@@ -47,7 +48,7 @@ public class PreferedPopupCommandService implements PreferedPopupCommandUseCase 
 
     @Override
     public PreferedPopup createPreferedPopup(List<String> prepered) {
-        return preferedPopupRepository.save(
+        return preferedPopupCommandRepository.save(
                 PreferedPopup.builder()
                         .market(prepered.contains("market"))
                         .experience(prepered.contains("experience"))
@@ -58,7 +59,7 @@ public class PreferedPopupCommandService implements PreferedPopupCommandUseCase 
 
     @Override
     public PreferedPopup createEmptyPreferedPopup() {
-        return preferedPopupRepository.save(
+        return preferedPopupCommandRepository.save(
                 PreferedPopup.builder()
                         .wantFree(false)
                         .market(false)
@@ -74,6 +75,6 @@ public class PreferedPopupCommandService implements PreferedPopupCommandUseCase 
                 createPreferedDto.display(),
                 createPreferedDto.experience(),
                 createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        preferedPopupCommandRepository.save(preferedPopup);
     }
 }

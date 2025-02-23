@@ -2,7 +2,8 @@ package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
+import com.poppin.poppinserver.popup.repository.TastePopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.TastePopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TastedPopupCommandService implements TastedPopupCommandUseCase {
-    private final TastePopupRepository tastePopupRepository;
+    private final TastePopupQueryRepository tastePopupQueryRepository;
+    private final TastePopupCommandRepository tastePopupCommandRepository;
+
     @Override
     public TastePopup createProxyTastePopup(TastePopup tastePopup) {
-        return tastePopupRepository.save(
+        return tastePopupCommandRepository.save(
                 TastePopup.builder()
                         .fasionBeauty(tastePopup.getFashionBeauty())
                         .characters(tastePopup.getCharacters())
@@ -39,12 +42,12 @@ public class TastedPopupCommandService implements TastedPopupCommandUseCase {
 
     @Override
     public TastePopup createTastePopup(TastePopup tastePopup) {
-        return tastePopupRepository.save(tastePopup);
+        return tastePopupCommandRepository.save(tastePopup);
     }
 
     @Override
     public TastePopup createTastePopup(CreateTasteDto createTasteDto) {
-        return tastePopupRepository.save(
+        return tastePopupCommandRepository.save(
                 TastePopup.builder()
                 .fasionBeauty(createTasteDto.fashionBeauty())
                 .characters(createTasteDto.characters())
@@ -66,7 +69,7 @@ public class TastedPopupCommandService implements TastedPopupCommandUseCase {
 
     @Override
     public TastePopup createTastePopup(List<String> taste) {
-        return tastePopupRepository.save(
+        return tastePopupCommandRepository.save(
                 TastePopup.builder()
                 .fasionBeauty(taste.contains("fashionBeauty"))
                 .characters(taste.contains("characters"))
@@ -102,6 +105,6 @@ public class TastedPopupCommandService implements TastedPopupCommandUseCase {
                 createTasteDto.alcohol(),
                 createTasteDto.animalPlant(),
                 createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
+        tastePopupCommandRepository.save(tastePopup);
     }
 }
