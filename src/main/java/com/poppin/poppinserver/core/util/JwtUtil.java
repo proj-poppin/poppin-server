@@ -1,39 +1,31 @@
 package com.poppin.poppinserver.core.util;
 
+import com.poppin.poppinserver.core.config.JwtProperties;
 import com.poppin.poppinserver.core.constant.Constants;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import java.security.Key;
-import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.security.Key;
+import java.util.Date;
+
 @Component
+@RequiredArgsConstructor
 public class JwtUtil implements InitializingBean {
-    @Value("${jwt.secret}")
-    private String secretKey;
-
-    @Value("${jwt.access-token-validity-in-milli-seconds}")
-    private Long accessTokenExpirationPeriod;
-
-    @Value("${jwt.refresh-token-validity-in-milli-seconds}")
-    private Long refreshTokenExpirationPeriod;
+    private final JwtProperties jwtProperties;
 
     private Key key;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -70,13 +62,13 @@ public class JwtUtil implements InitializingBean {
     }
 
     public JwtTokenDto generateToken(String email, EUserRole role) {
-        return new JwtTokenDto(createToken(email, role, accessTokenExpirationPeriod),
-                createToken(email, role, refreshTokenExpirationPeriod));
+        return new JwtTokenDto(createToken(email, role, jwtProperties.getAccessTokenValidityInMilliSeconds()),
+                createToken(email, role, jwtProperties.getRefreshTokenValidityInMilliSeconds()));
     }
 
     public JwtTokenDto generateToken(Long id, EUserRole role) {
-        return new JwtTokenDto(createToken(id, role, accessTokenExpirationPeriod),
-                createToken(id, role, refreshTokenExpirationPeriod));
+        return new JwtTokenDto(createToken(id, role, jwtProperties.getAccessTokenValidityInMilliSeconds()),
+                createToken(id, role, jwtProperties.getRefreshTokenValidityInMilliSeconds()));
     }
 
     public Claims validateAndGetClaimsFromToken(String token) throws JwtException {
