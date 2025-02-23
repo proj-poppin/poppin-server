@@ -6,5 +6,5 @@ import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import java.util.List;
 
 public interface ModifyImagesQueryUseCase {
-    List<ModifyImages> findModifyImagesByModifyInfo(ModifyInfo modifyInfo);
+    List<ModifyImages> findModifyImagesAll(ModifyInfo modifyInfo);
 }

@@ -62,7 +62,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminPopupService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
 
     private final ReviewQueryRepository reviewRepository;
     private final ReviewCommandRepository reviewCommandRepository;
@@ -154,7 +154,7 @@ public class AdminPopupService {
 
         popup.updateAgent(admin);
 
-        popup = popupRepository.save(popup);
+        popup = popupQueryRepository.save(popup);
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
@@ -163,7 +163,7 @@ public class AdminPopupService {
         // 대표사진 저장
         popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
-        popup = popupRepository.save(popup);
+        popup = popupQueryRepository.save(popup);
 
         log.info(popup.getName() + " 팝업생성");
 
@@ -195,14 +195,14 @@ public class AdminPopupService {
     } // 전체 팝업 관리 - 팝업 조회
 
     public PagingResponseDto<ManageListDto> readManageList(Long adminId, EOperationStatus oper, int page, int size) {
-        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
+        Page<Popup> popups = popupQueryRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
                 oper.getStatus());
 
         // 각 운영상태별로 팝업 개수 반환
         Long num = switch (oper) {
-            case NOTYET -> popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
-            case TERMINATED -> popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
-            case OPERATING -> popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
+            case NOTYET -> popupQueryRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
+            case TERMINATED -> popupQueryRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
+            case OPERATING -> popupQueryRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
             default -> 0L;
         };
 
@@ -292,7 +292,7 @@ public class AdminPopupService {
         blockedPopupCommandUseCase.deleteAllBlockedPopup(popup);
 
         log.info("delete popup");
-        popupRepository.delete(popup);
+        popupQueryRepository.delete(popup);
 
         return true;
     } // 전체 팝업 관리 - 팝업 삭제
@@ -375,7 +375,7 @@ public class AdminPopupService {
                 admin
         );
 
-        popupRepository.save(popup);
+        popupQueryRepository.save(popup);
 
         // 팝업 정보 변경 시 앱푸시 보내기
         if (!EOperationStatus.OPERATING.getStatus().equals(operationStatus)) {
@@ -393,10 +393,10 @@ public class AdminPopupService {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size),
+        Page<Popup> popups = popupQueryRepository.findByTextInName(searchText, PageRequest.of(page, size),
                 oper.getStatus()); // 운영 상태
 
-        Long num = popupRepository.countByOperationStatus(oper.getStatus());
+        Long num = popupQueryRepository.countByOperationStatus(oper.getStatus());
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);

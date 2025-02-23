@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface TastePopupRepository extends JpaRepository<TastePopup, Long> {
-    Optional<TastePopup> findById(Long id);
+public interface TastePopupCommandRepository extends JpaRepository<TastePopup, Long> {
 }

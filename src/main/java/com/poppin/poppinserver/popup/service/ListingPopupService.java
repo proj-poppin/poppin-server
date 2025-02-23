@@ -9,7 +9,7 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ListingPopupService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
@@ -123,7 +123,7 @@ public class ListingPopupService {
                     .and(PopupSpecification.isOperating())
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(taste);
@@ -141,7 +141,7 @@ public class ListingPopupService {
                     .and(PopupSpecification.isOperating())
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(preferred);

@@ -6,10 +6,7 @@ import com.poppin.poppinserver.core.util.SelectRandomUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
-import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -32,7 +29,7 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class PopupQueryService implements PopupQueryUseCase {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
 
@@ -40,13 +37,13 @@ public class PopupQueryService implements PopupQueryUseCase {
 
     @Override
     public Popup findPopupById(Long popupId) {
-        return popupRepository.findById(popupId)
+        return popupQueryRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
     }
 
     @Override
     public Popup findPopupByIdElseNull(Long popupId) {
-        return popupRepository.findById(popupId)
+        return popupQueryRepository.findById(popupId)
                 .orElse(null);
     }
 
@@ -56,7 +53,7 @@ public class PopupQueryService implements PopupQueryUseCase {
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
 
-        return popupRepository.findTopOperatingPopupsByInterestAndViewCount(
+        return popupQueryRepository.findTopOperatingPopupsByInterestAndViewCount(
                 startOfDay,
                 endOfDay,
                 PageRequest.of(0, 5)
@@ -69,7 +66,7 @@ public class PopupQueryService implements PopupQueryUseCase {
         LocalDateTime startOfDay = yesterday.atStartOfDay();
         LocalDateTime endOfDay = yesterday.plusDays(1).atStartOfDay();
 
-        return popupRepository.findTopOperatingPopupsByInterestAndViewCount(
+        return popupQueryRepository.findTopOperatingPopupsByInterestAndViewCount(
                 startOfDay,
                 endOfDay,
                 userId,
@@ -79,14 +76,14 @@ public class PopupQueryService implements PopupQueryUseCase {
 
     @Override
     public List<Popup> findNewPopupList() {
-        return popupRepository.findNewOpenPopupByAll(
+        return popupQueryRepository.findNewOpenPopupByAll(
                 PageRequest.of(0, 5)
         );
     }
 
     @Override
     public List<Popup> findNewPopupList(Long userId) {
-        return popupRepository.findNewOpenPopupByAll(
+        return popupQueryRepository.findNewOpenPopupByAll(
                 userId,
                 PageRequest.of(0, 5)
         );
@@ -94,14 +91,14 @@ public class PopupQueryService implements PopupQueryUseCase {
 
     @Override
     public List<Popup> findClosingPopupList() {
-        return popupRepository.findClosingPopupByAll(
+        return popupQueryRepository.findClosingPopupByAll(
                 PageRequest.of(0, 5)
         );
     }
 
     @Override
     public List<Popup> findClosingPopupList(Long userId) {
-        return popupRepository.findClosingPopupByAll(
+        return popupQueryRepository.findClosingPopupByAll(
                 userId,
                 PageRequest.of(0, 5)
         );
@@ -135,7 +132,7 @@ public class PopupQueryService implements PopupQueryUseCase {
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(taste);
@@ -153,7 +150,7 @@ public class PopupQueryService implements PopupQueryUseCase {
                     .and(PopupSpecification.isOperating())
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(prefered);

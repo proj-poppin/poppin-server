@@ -1,10 +1,9 @@
 package com.poppin.poppinserver.popup.service;
 
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.BlockedPopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.BlockedPopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupCommandUseCase;
-import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
-import com.poppin.poppinserver.user.repository.BlockedUserCommandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,15 +12,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BlockedPopupCommandService implements BlockedPopupCommandUseCase {
-    private final BlockedPopupRepository blockedPopupRepository;
+    private final BlockedPopupCommandRepository blockedPopupCommandRepository;
 
     @Override
     public void deleteAllBlockedPopup(Popup popup) {
-        blockedPopupRepository.deleteAllByPopupId(popup);
+        blockedPopupCommandRepository.deleteAllByPopupId(popup);
     }
 
     @Override
     public void deleteAllBlockedPopup(Long userId) {
-        blockedPopupRepository.deleteAllByUserId(userId);
+        blockedPopupCommandRepository.deleteAllByUserId(userId);
     }
 }

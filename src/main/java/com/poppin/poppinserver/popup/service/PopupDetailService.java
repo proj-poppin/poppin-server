@@ -12,7 +12,8 @@ import com.poppin.poppinserver.interest.usercase.InterestQueryUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.Waiting;
 import com.poppin.poppinserver.popup.dto.popup.response.*;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.BlockedPopupQueryUseCase;
 import com.poppin.poppinserver.popup.usecase.WaitingCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
@@ -36,7 +37,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PopupDetailService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
+    private final PopupCommandRepository popupCommandRepository;
 
     private final WaitingCommandUseCase waitingCommandUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
@@ -53,11 +55,11 @@ public class PopupDetailService {
         Long popupId = Long.valueOf(strPopupId);
 
         Long userId = headerUtil.parseUserId(request);
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupQueryRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
         popup.addViewCnt(); // 조회수 + 1
-        popupRepository.save(popup);
+        popupQueryRepository.save(popup);
 
         if (userId != null) {
             return getPopupStoreDto(popup, userId);
@@ -72,7 +74,7 @@ public class PopupDetailService {
 
         User user = userQueryUseCase.findUserById(userId);
 
-        Popup popup = popupRepository.findById(popupId)
+        Popup popup = popupQueryRepository.findById(popupId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
 
 
@@ -89,7 +91,7 @@ public class PopupDetailService {
 
         // Popup 업데이트 및 저장
         popup.addreopenDemandCnt();
-        popupRepository.save(popup);
+        popupCommandRepository.save(popup);
 
         // 재오픈 토픽 등록
         log.info("재오픈 신청 시 FCM TOPIC 등록");
@@ -116,7 +118,7 @@ public class PopupDetailService {
                 .collect(Collectors.toList());
 
         log.info("visited popup ids: {}" , visitedPopupIds);
-        List<Popup> unreviewedPopups = popupRepository.findUnreviewedPopups(visitedPopupIds, userId);
+        List<Popup> unreviewedPopups = popupQueryRepository.findUnreviewedPopups(visitedPopupIds, userId);
 
 
         if (unreviewedPopups.isEmpty()) {

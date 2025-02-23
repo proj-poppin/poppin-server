@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ModifyInfoRepository extends JpaRepository<ModifyInfo, Long> {
+public interface ModifyInfoCommandRepository extends JpaRepository<ModifyInfo, Long> {
     @Query("select m from ModifyInfo m where m.isExecuted = :isExecuted")
     Page<ModifyInfo> findAllByIsExecuted(Pageable pageable, @Param("isExecuted") Boolean isExecuted);
 

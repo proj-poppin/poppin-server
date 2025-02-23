@@ -2,7 +2,7 @@ package com.poppin.poppinserver.core.scheduler;
 
 import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.popup.domain.Popup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.visit.domain.Visit;
 import com.poppin.poppinserver.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 public class PopupScheduler {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
 
     private final VisitRepository visitRepository;
 
     // 자정마다 팝업 상태 변경
     @Scheduled(cron = "0 0 0 * * *")
     public void changePopupOperatingStatus() {
-        List<Popup> popups = popupRepository.findAllByOpStatusIsNotyetOrOperating();
+        List<Popup> popups = popupQueryRepository.findAllByOpStatusIsNotyetOrOperating();
 
         for (Popup popup : popups) {
             //현재 운영상태 수정
@@ -38,6 +38,6 @@ public class PopupScheduler {
             }
         }
 
-        popupRepository.saveAll(popups);
+        popupQueryRepository.saveAll(popups);
     }
 }

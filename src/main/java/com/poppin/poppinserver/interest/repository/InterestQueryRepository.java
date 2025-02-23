@@ -12,16 +12,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InterestRepository extends JpaRepository<Interest, Interest.InterestId> {
+public interface InterestQueryRepository extends JpaRepository<Interest, Interest.InterestId> {
     Optional<Interest> findByUserIdAndPopupId(Long userId, Long popupId);
 
     Boolean existsByUserIdAndPopupId(Long userId, Long popupId);
-
-    void deleteAllByPopupId(Long popupId);
-
-    @Modifying
-    @Query("DELETE FROM Interest i WHERE i.user.id = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT i FROM Interest i WHERE i.user.id = :userId")
     List<Interest> findByUserId(Long userId);
