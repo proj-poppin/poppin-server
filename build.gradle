@@ -79,8 +79,8 @@ dependencies {
 
 	// AWS SM
 	// Spring Cloud AWS 최신 버전 사용
-	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:2.4.4")
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager'
+	implementation("io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4")
+
 
 
 	// ETC
