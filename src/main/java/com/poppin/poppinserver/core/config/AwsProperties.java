@@ -29,15 +29,15 @@ public class AwsProperties {
 
     @PostConstruct
     public void validateProperties() {
+        System.out.println("✅ AWS Credentials 로드 성공!");
+        System.out.println("🔑 AWS Access Key: " + credentials.AWS_ACCESS_KEY_ID);
+        System.out.println("🌍 AWS Region: " + region.AWS_REGION);
+
         if (credentials == null || credentials.AWS_ACCESS_KEY_ID == null || credentials.AWS_SECRET_ACCESS_KEY == null) {
             throw new IllegalStateException("❌ AWS Credentials (Access Key / Secret Key) 가 설정되지 않았습니다!");
         }
         if (region == null || region.AWS_REGION == null) {
             throw new IllegalStateException("❌ AWS Region이 설정되지 않았습니다!");
         }
-
-        System.out.println("✅ AWS Credentials 로드 성공!");
-        System.out.println("🔑 AWS Access Key: " + credentials.AWS_ACCESS_KEY_ID);
-        System.out.println("🌍 AWS Region: " + region.AWS_REGION);
     }
 }
