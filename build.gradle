@@ -78,7 +78,10 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
 	// AWS SM
+	// Spring Cloud AWS 최신 버전 사용
+	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:2.4.4")
 	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager'
+
 
 	// ETC
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
