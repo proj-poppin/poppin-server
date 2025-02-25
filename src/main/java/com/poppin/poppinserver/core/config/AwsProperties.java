@@ -9,35 +9,23 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "cloud.aws")
+@ConfigurationProperties(prefix = "")
 public class AwsProperties {
-    private Credentials credentials;
-    private Region region;
-
-    @Getter
-    @Setter
-    public static class Credentials {
-        private String accessKey;
-        private String secretKey;
-    }
-
-    @Getter
-    @Setter
-    public static class Region {
-        private String staticRegion;
-    }
+    private String AWS_ACCESS_KEY_ID;
+    private String AWS_SECRET_ACCESS_KEY;
+    private String AWS_REGION;
 
     @PostConstruct
     public void validateProperties() {
-        if (credentials == null || credentials.accessKey == null || credentials.secretKey == null) {
+        if (AWS_ACCESS_KEY_ID == null || AWS_SECRET_ACCESS_KEY == null) {
             throw new IllegalStateException("❌ AWS Credentials (Access Key / Secret Key) 가 설정되지 않았습니다!");
         }
-        if (region == null || region.staticRegion == null) {
+        if (AWS_REGION == null) {
             throw new IllegalStateException("❌ AWS Region이 설정되지 않았습니다!");
         }
 
         System.out.println("✅ AWS Credentials 로드 성공!");
-        System.out.println("🔑 AWS Access Key: " + credentials.accessKey);
-        System.out.println("🌍 AWS Region: " + region.staticRegion);
+        System.out.println("🔑 AWS Access Key: " + AWS_ACCESS_KEY_ID);
+        System.out.println("🌍 AWS Region: " + AWS_REGION);
     }
 }

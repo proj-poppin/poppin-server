@@ -77,6 +77,9 @@ dependencies {
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
+	// AWS SM
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager'
+
 	// ETC
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
