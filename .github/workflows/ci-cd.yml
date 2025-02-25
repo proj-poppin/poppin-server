@@ -27,47 +27,19 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build and Push Docker Image
+      - name: Upload to S3
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest
-
-      - name: Generate Dockerrun.aws.json
-        run: |
-          echo '{
-            "AWSEBDockerrunVersion": "1",
-            "Image": {
-              "Name": "${{ secrets.DOCKERHUB_USERNAME }}/poppin-dev:latest",
-              "Update": "true"
-            },
-            "Ports": [
-              {
-                "ContainerPort": "8080"
-              }
-            ],
-            "Logging": "/var/log/nginx"
-          }' > Dockerrun.aws.json
-
-      - name: Set Deployment Version
-        run: echo "DEPLOY_VERSION=ver-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-
-      - name: Deploy to AWS Elastic Beanstalk
+          aws s3 cp target/*.jar s3://$AWS_S3_DEV_BUCKET_NAME/app.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "ap-northeast-2"
-          EB_APPLICATION_NAME: ${{ secrets.EB_APP_NAME }}
-          EB_ENVIRONMENT_NAME: ${{ secrets.EB_ENV_NAME }}
-          S3_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Elastic Beanstalk
         run: |
-          zip -r deploy.zip Dockerrun.aws.json
-          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/deploy.zip
-
-          aws elasticbeanstalk create-application-version --application-name $EB_APPLICATION_NAME \
-            --version-label "$DEPLOY_VERSION" --source-bundle S3Bucket="$S3_BUCKET_NAME",S3Key="deploy.zip"
-
-          aws elasticbeanstalk update-environment --environment-name $EB_ENVIRONMENT_NAME \
-            --version-label "$DEPLOY_VERSION"
+          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label v-${{ github.run_id }} --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key=app.jar
+          aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label v-${{ github.run_id }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
