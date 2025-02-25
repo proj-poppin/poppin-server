@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "")
+@ConfigurationProperties(prefix = "secrets")
 public class AwsProperties {
     private String AWS_ACCESS_KEY_ID;
     private String AWS_SECRET_ACCESS_KEY;
