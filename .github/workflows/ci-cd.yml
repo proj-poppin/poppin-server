@@ -82,9 +82,13 @@ jobs:
           }
           EOF
 
-      - name: Upload Dockerrun.aws.json to S3
+      - name: Package Dockerrun.aws.json into a ZIP file
         run: |
-          aws s3 cp Dockerrun.aws.json s3://$AWS_S3_DEV_BUCKET_NAME/Dockerrun.aws.json
+          zip -r deploy-${{ env.VERSION }}.zip Dockerrun.aws.json
+
+      - name: Upload ZIP file to S3
+        run: |
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://$AWS_S3_DEV_BUCKET_NAME/deploy-${{ env.VERSION }}.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -93,7 +97,7 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=Dockerrun.aws.json
+          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
           aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
