@@ -64,11 +64,7 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": [
-              "sh",
-              "-c",
-              "aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar /app/app.jar && java -Dspring.profiles.active=dev -jar /app/app.jar"
-            ],
+            "Command": "sh -c 'aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar /app/app.jar && java -Dspring.profiles.active=dev -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
