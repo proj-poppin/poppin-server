@@ -34,9 +34,57 @@ jobs:
       - name: Define Version
         run: echo "VERSION=v-${{ github.run_id }}" >> $GITHUB_ENV
 
-      - name: Upload to S3 (with versioning)
+      - name: Upload JAR to S3 (with versioning)
         run: |
-          aws s3 cp build/libs/*.jar s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar
+          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
+
+      - name: Generate Dockerrun.aws.json
+        run: |
+          cat <<EOF > Dockerrun.aws.json
+          {
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+              "Name": "openjdk:17-jdk-slim",
+              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": "8080"
+              }
+            ],
+            "Volumes": [
+              {
+                "HostDirectory": "/var/app/current/",
+                "ContainerDirectory": "/app"
+              }
+            ],
+            "Logging": "/var/log/nginx",
+            "Command": [
+              "sh",
+              "-c",
+              "aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar /app/app.jar && java -Dspring.profiles.active=dev -jar /app/app.jar"
+            ],
+            "Environment": [
+              {
+                "Name": "SPRING_PROFILES_ACTIVE",
+                "Value": "dev"
+              },
+              {
+                "Name": "AWS_REGION",
+                "Value": "$AWS_REGION"
+              }
+            ]
+          }
+          EOF
+
+      - name: Upload Dockerrun.aws.json to S3
+        run: |
+          aws s3 cp Dockerrun.aws.json s3://$AWS_S3_DEV_BUCKET_NAME/Dockerrun.aws.json
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -45,7 +93,7 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=app-${{ env.VERSION }}.jar
+          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=Dockerrun.aws.json
           aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
