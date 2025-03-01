@@ -64,7 +64,7 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": "sh -c 'while ! aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli && while ! aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
