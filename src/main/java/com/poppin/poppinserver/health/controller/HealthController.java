@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 public class HealthController {
-    @GetMapping("/actuator/health")
+    @GetMapping("/")
     public String hello() {
         return "hello world!";
     }
