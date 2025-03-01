@@ -1,4 +1,4 @@
-name: Deploy Poppin Dev v.1
+name: Deploy Poppin Dev
 
 on:
   push:
