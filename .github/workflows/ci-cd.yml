@@ -3,7 +3,7 @@ name: Deploy Poppin Dev
 on:
   push:
     branches:
-      - dev-deploy-test
+      - dev
 
 jobs:
   deploy:
