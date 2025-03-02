@@ -1,0 +1,128 @@
+name: Deploy Poppin Dev
+
+on:
+  push:
+    branches:
+      - dev-deploy-test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Create Firebase Key File
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
+
+      - name: Create yml File
+        run: |
+          echo '${{ secrets.AWS_DEV_PROPERTIES }}' > src/main/resources/application-dev.yml 
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Define Version
+        run: echo "VERSION=v-${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Debug Environment Variables
+        run: |
+          echo "AWS_S3_DEV_BUCKET_NAME is: poppin-dev-deploy-bucket"
+        env:
+          AWS_S3_DEV_BUCKET_NAME: "poppin-dev-deploy-bucket"
+
+      - name: Upload JAR to S3 (with versioning)
+        run: |
+          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-dev-deploy-bucket/app-${{ env.VERSION }}.jar
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Generate Dockerrun.aws.json
+        run: |
+          cat <<EOF > Dockerrun.aws.json
+          {
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+              "Name": "openjdk:17-jdk-slim",
+              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": "8080"
+              }
+            ],
+            "Logging": "/var/log/nginx",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli && while ! aws s3 cp s3://poppin-dev-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
+            "Environment": [
+              {
+                "Name": "SPRING_PROFILES_ACTIVE",
+                "Value": "dev"
+              },
+              {
+                "Name": "AWS_REGION",
+                "Value": "$AWS_REGION"
+              },
+              {
+                "Name": "AWS_ACCESS_KEY_ID",
+                "Value": "$AWS_ACCESS_KEY_ID"
+              },
+              {
+                "Name": "AWS_SECRET_ACCESS_KEY",
+                "Value": "$AWS_SECRET_ACCESS_KEY"
+              }
+            ]
+          }
+          EOF
+
+      - name: Package Dockerrun.aws.json into a ZIP file
+        run: |
+          mkdir -p deploy
+          cp Dockerrun.aws.json deploy/
+          cd deploy
+          zip -r ../deploy-${{ env.VERSION }}.zip .
+
+      - name: Upload ZIP file to S3
+        run: |
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-dev-deploy-bucket/deploy-${{ env.VERSION }}.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Check if ZIP file exists in S3
+        run: |
+          echo "Checking if ZIP file exists in S3..."
+          aws s3 ls s3://$AWS_S3_DEV_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
+
+      - name: Wait for Elastic Beanstalk to Process Application Version
+        run: |
+          echo "Waiting for Elastic Beanstalk to process the new application version..."
+          sleep 30
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
+          aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
