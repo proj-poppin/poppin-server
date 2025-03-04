@@ -12,7 +12,6 @@ import com.poppin.poppinserver.core.security.manager.CustomAuthenticationManager
 import com.poppin.poppinserver.core.security.provider.JwtAuthenticationProvider;
 import com.poppin.poppinserver.core.security.provider.UsernamePasswordAuthenticationProvider;
 import com.poppin.poppinserver.core.util.JwtUtil;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +23,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+
+import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
@@ -56,6 +57,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers(Constants.NO_NEED_AUTH_URLS.toArray(new String[0])).permitAll()
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/actuator/**").permitAll()
                                 .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .exceptionHandling((exceptionHandling) ->

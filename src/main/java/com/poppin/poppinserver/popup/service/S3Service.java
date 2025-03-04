@@ -28,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class S3Service {
     private final InformAlarmImageRepository informAlarmImageRepository;
+
     private final AmazonS3Client s3Client;
     private final ImageUtil imageUtil;
 

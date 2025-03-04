@@ -1,14 +1,12 @@
 package com.poppin.poppinserver.user.service;
 
 import com.poppin.poppinserver.alarm.repository.NotificationRepository;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
-import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
-import com.poppin.poppinserver.interest.repository.InterestRepository;
-import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
+import com.poppin.poppinserver.inform.usecase.UserInformCommandUseCase;
+import com.poppin.poppinserver.interest.repository.InterestQueryRepository;
+import com.poppin.poppinserver.modifyInfo.service.ModifyInfoCommandService;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.BlockedPopupCommandUseCase;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.report.repository.ReportReviewRepository;
 import com.poppin.poppinserver.review.domain.Review;
@@ -34,16 +32,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserHardDeleteService {
     private final BlockedUserCommandRepository blockedUserCommandRepository;
-    private final InterestRepository interestRepository;
+    private final InterestQueryRepository interestQueryRepository;
     private final ReviewRecommendCommandRepository reviewRecommendRepository;
-    private final UserInformRepository userInformRepository;
-    private final ManagerInformRepository managerInformRepository;
-    private final ModifyInformRepository modifyInfoRepository;
-    private final ModifyImageReposiroty modifyImageReposiroty;
     private final ReportReviewRepository reportReviewRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final NotificationRepository notificationRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
     private final S3Service s3Service;
     private final VisitRepository visitRepository;
     private final VisitorDataRepository visitorDataRepository;
@@ -54,6 +47,10 @@ public class UserHardDeleteService {
     private final UserQueryUseCase userQueryUseCase;
     private final ReviewQueryUseCase reviewQueryUseCase;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
+    private final ManagerInformCommandUseCase managerInformCommandUseCase;
+    private final UserInformCommandUseCase userInformCommandUseCase;
+    private final BlockedPopupCommandUseCase blockedPopupCommandUseCase;
+    private final ModifyInfoCommandService modifyInfoCommandService;
 
     public void deleteUser(Long userId) {
         User user = userQueryUseCase.findUserById(userId);
@@ -64,7 +61,7 @@ public class UserHardDeleteService {
     public void deleteAllRelatedInfo(User user) {
         Long userId = user.getId();
         visitRepository.deleteAllByUserId(userId);  // 유저 팝업 방문 삭제
-        interestRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
+        interestQueryRepository.deleteAllByUserId(userId);  // 유저 팝업 관심 등록 전부 삭제
         reviewRecommendRepository.deleteAllByUserId(userId);    // 유저가 누른 모든 추천 삭제
         deleteUserReports(userId);   // 유저가 남긴 모든 신고 삭제
         deleteUserReviews(userId);  // 유저가 남긴 모든 후기 삭제
@@ -127,20 +124,15 @@ public class UserHardDeleteService {
         유저가 작성한 모든 제보 삭제
      */
     private void deleteInformRequests(Long userId) {
-        userInformRepository.deleteAllByInformerId(userId);
-        managerInformRepository.deleteAllByInformerId(userId);
+        userInformCommandUseCase.deleteAllUserInformByUserId(userId);
+        managerInformCommandUseCase.deleteAllManagerInformByUserId(userId);
     }
 
     /*
         유저가 작성한 모든 정보수정요청 삭제
      */
     private void deleteUserModifyInfoRequests(Long userId) {
-        List<ModifyInfo> modifyInfos = modifyInfoRepository.findAllByUserId(userId);
-        for (ModifyInfo modifyInfo : modifyInfos) {
-            Long modifyId = modifyInfo.getId();
-            modifyImageReposiroty.deleteAllByModifyId(modifyId);
-        }
-        modifyInfoRepository.deleteAllByUserId(userId);
+        modifyInfoCommandService.deleteAllModifyInfo(userId);
     }
 
     /*
@@ -170,6 +162,6 @@ public class UserHardDeleteService {
         팝업 차단 목록 삭제
      */
     private void deleteBlockedPopups(Long userId) {
-        blockedPopupRepository.deleteAllByUserId(userId);
+        blockedPopupCommandUseCase.deleteAllBlockedPopup(userId);
     }
 }

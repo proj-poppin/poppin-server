@@ -9,13 +9,12 @@ import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupSummaryDto;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupTasteDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.popup.repository.specification.PopupSpecification;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,11 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ListingPopupService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
-    private final PopupService popupService;
+
+    private final PopupDetailService popupDetailService;
 
     private final HeaderUtil headerUtil;
     private final SelectRandomUtil selectRandomUtil;
@@ -93,7 +93,7 @@ public class ListingPopupService {
                 .map(Interest::getPopup)
                 .toList();
 
-        return popupService.getPopupStoreDtos(interestedPopup, userId);
+        return popupDetailService.getPopupStoreDtos(interestedPopup, userId);
     } // 관심 팝업 목록 조회
 
     @Transactional
@@ -123,7 +123,7 @@ public class ListingPopupService {
                     .and(PopupSpecification.isOperating())
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(taste);
@@ -141,7 +141,7 @@ public class ListingPopupService {
                     .and(PopupSpecification.isOperating())
                     .and(PopupSpecification.isNotBlockedByUser(userId));
 
-            List<Popup> popupList = popupRepository.findAll(combinedSpec, pageable).getContent();
+            List<Popup> popupList = popupQueryRepository.findAll(combinedSpec, pageable).getContent();
 
             if (!popupList.isEmpty()) {
                 selectedList.add(preferred);

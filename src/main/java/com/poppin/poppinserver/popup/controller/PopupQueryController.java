@@ -9,7 +9,7 @@ import com.poppin.poppinserver.core.type.EPopupSort;
 import com.poppin.poppinserver.popup.controller.swagger.SwaggerPopupQueryController;
 import com.poppin.poppinserver.popup.dto.popup.response.*;
 import com.poppin.poppinserver.popup.service.ListingPopupService;
-import com.poppin.poppinserver.popup.service.PopupService;
+import com.poppin.poppinserver.popup.service.PopupDetailService;
 import com.poppin.poppinserver.popup.service.SearchPopupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/popup")
 public class PopupQueryController implements SwaggerPopupQueryController {
-    private final PopupService popupService;
+    private final PopupDetailService popupDetailService;
     private final ListingPopupService listingPopupService;
     private final SearchPopupService searchPopupService;
 
@@ -102,11 +102,11 @@ public class PopupQueryController implements SwaggerPopupQueryController {
 
     @GetMapping("/detail/{popupId}")
     public ResponseDto<PopupStoreDto> readPopup(@PathVariable String popupId, HttpServletRequest request) {
-        return ResponseDto.ok(popupService.readPopupStore(popupId, request));
+        return ResponseDto.ok(popupDetailService.readPopupStore(popupId, request));
     }
 
     @GetMapping("/visited") // 마이 페이지 > 후기 작성하기 > 팝업 리스트
     public ResponseDto<List<VisitedPopupDto>> getVisitedPopupList(@UserId Long userId) {
-        return ResponseDto.ok(popupService.getVisitedPopupList(userId));
+        return ResponseDto.ok(popupDetailService.getVisitedPopupList(userId));
     }
 }

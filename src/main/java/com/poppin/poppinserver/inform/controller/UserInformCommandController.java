@@ -6,6 +6,7 @@ import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.inform.controller.swagger.SwaggerUserInformCommandController;
+import com.poppin.poppinserver.inform.dto.userInform.request.CreateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.service.AdminUserInformService;
@@ -43,14 +44,16 @@ public class UserInformCommandController implements SwaggerUserInformCommandCont
             throw new CommonException(ErrorCode.MISSING_REQUEST_IMAGES);
         }
 
+        CreateUserInformDto createUserInformDto = new CreateUserInformDto(storeName, contactLink);
+
         Long userId = headerUtil.parseUserId(request);
 
         if (userId == null) {
             return ResponseDto.ok(
-                    userInformService.createGuestUserInform(storeName, contactLink, filteringFourteenCategories, images));
+                    userInformService.createGuestUserInform(createUserInformDto, filteringFourteenCategories, images));
         } else {
             return ResponseDto.ok(
-                    userInformService.createUserInform(storeName, contactLink, filteringFourteenCategories, images, userId));
+                    userInformService.createUserInform(createUserInformDto, filteringFourteenCategories, images, userId));
         }
     } // 제보 생성
 

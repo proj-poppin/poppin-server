@@ -24,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminAuthService {
     private final UserQueryUseCase userQueryUseCase;
-    private final UserCommandUseCase userCommandUseCase;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private final JwtUtil jwtUtil;
+
     private final UserCommandRepository userCommandRepository;
 
     public JwtTokenDto authSignIn(String authorizationHeader) {

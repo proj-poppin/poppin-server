@@ -10,7 +10,7 @@ import com.poppin.poppinserver.core.util.HeaderUtil;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.popup.response.PopupStoreDto;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
+import com.poppin.poppinserver.popup.repository.PopupQueryRepository;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +28,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SearchPopupService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
+
+    private final PopupDetailService popupDetailService;
+
+    private final UserQueryUseCase userQueryUseCase;
 
     private final PrepardSearchUtil prepardSearchUtil;
-
-    private final PopupService popupService;
-    private final UserQueryUseCase userQueryUseCase;
     private final HeaderUtil headerUtil;
 
     public PagingResponseDto<List<PopupStoreDto>> readSearchingList(String text, String filteringThreeCategories, String filteringFourteenCategories,
@@ -105,7 +106,7 @@ public class SearchPopupService {
         if (userId != null) {
             User user = userQueryUseCase.findUserById(userId);
 
-            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduceByBlackList(text, searchText,
+            Page<Popup> popups = popupQueryRepository.findByTextInNameOrIntroduceByBlackList(text, searchText,
                     PageRequest.of(page, size, sort),
                     market, display, experience, // 팝업 형태 3개
                     fashionBeauty, characters, foodBeverage, // 팝업 취향 14개
@@ -115,10 +116,10 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus(), userId); // 운영 상태
 
-            popupStoreDtos = popupService.getPopupStoreDtos(popups, userId);
+            popupStoreDtos = popupDetailService.getPopupStoreDtos(popups.getContent(), userId);
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         } else {
-            Page<Popup> popups = popupRepository.findByTextInNameOrIntroduce(text, searchText, PageRequest.of(page, size, sort),
+            Page<Popup> popups = popupQueryRepository.findByTextInNameOrIntroduce(text, searchText, PageRequest.of(page, size, sort),
                     market, display, experience, // 팝업 형태 3개
                     fashionBeauty, characters, foodBeverage, // 팝업 취향 14개
                     webtoonAni, interiorThings, movie,
@@ -127,7 +128,7 @@ public class SearchPopupService {
                     animalPlant, etc,
                     oper.getStatus()); // 운영 상태
 
-            popupStoreDtos = popupService.guestGetPopupStoreDtos(popups);
+            popupStoreDtos = popupDetailService.guestGetPopupStoreDtos(popups.getContent());
             pageInfoDto = PageInfoDto.fromPageInfo(popups);
         }
 

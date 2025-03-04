@@ -2,26 +2,20 @@ package com.poppin.poppinserver.modifyInfo.service;
 
 import com.poppin.poppinserver.alarm.domain.PopupAlarmKeyword;
 import com.poppin.poppinserver.alarm.repository.PopupAlarmKeywordRepository;
-import com.poppin.poppinserver.core.exception.CommonException;
-import com.poppin.poppinserver.core.exception.ErrorCode;
 import com.poppin.poppinserver.core.type.EOperationStatus;
-import com.poppin.poppinserver.inform.repository.ModifyInformRepository;
-import com.poppin.poppinserver.modifyInfo.domain.ModifyImages;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoCommandRepository;
+import com.poppin.poppinserver.modifyInfo.repository.ModifyInfoQueryRepository;
 import com.poppin.poppinserver.modifyInfo.domain.ModifyInfo;
 import com.poppin.poppinserver.modifyInfo.dto.request.CreateModifyInfoDto;
 import com.poppin.poppinserver.modifyInfo.dto.response.ModifyInfoDto;
-import com.poppin.poppinserver.modifyInfo.repository.ModifyImageReposiroty;
+import com.poppin.poppinserver.modifyInfo.usecase.ModifyImagesCommandUseCase;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.repository.PopupRepository;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
+import com.poppin.poppinserver.popup.usecase.*;
 import com.poppin.poppinserver.user.domain.User;
-import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +29,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class ModifyInfoService {
-    private final ModifyInformRepository modifyInformRepository;
-    private final ModifyImageReposiroty modifyImageReposiroty;
-    private final PopupRepository popupRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
-    private final PosterImageRepository posterImageRepository;
+    private final ModifyInfoQueryRepository modifyInfoQueryRepository;
+    private final ModifyInfoCommandRepository modifyInfoCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
 
-    private final S3Service s3Service;
-
     private final UserQueryUseCase userQueryUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
+    private final ModifyImagesCommandUseCase modifyImagesCommandUseCase;
 
     @Transactional
     public ModifyInfoDto createModifyInfo(CreateModifyInfoDto createModifyInfoDto,
@@ -54,80 +48,20 @@ public class ModifyInfoService {
         Long popupId = Long.valueOf(createModifyInfoDto.popupId());
 
         User user = userQueryUseCase.findUserById(userId);
-        Popup popup = popupRepository.findById(popupId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_POPUP));
+        Popup popup = popupQueryUseCase.findPopupById(popupId);
 
         // 프록시 팝업 생성
-        PreferedPopup preferedPopup = popup.getPreferedPopup();
-        PreferedPopup proxyPrefered = PreferedPopup.builder()
-                .wantFree(preferedPopup.getWantFree())
-                .market(preferedPopup.getMarket())
-                .experience(preferedPopup.getExperience())
-                .display(preferedPopup.getDisplay())
-                .build();
-        proxyPrefered = preferedPopupRepository.save(proxyPrefered);
+        PreferedPopup proxyPrefered = preferedPopupCommandUseCase.createProxyPreferedPopup(popup.getPreferedPopup());
 
-        TastePopup tastePopup = popup.getTastePopup();
-        TastePopup proxyTaste = TastePopup.builder()
-                .fasionBeauty(tastePopup.getFashionBeauty())
-                .characters(tastePopup.getCharacters())
-                .foodBeverage(tastePopup.getFoodBeverage())
-                .webtoonAni(tastePopup.getWebtoonAni())
-                .interiorThings(tastePopup.getInteriorThings())
-                .movie(tastePopup.getMovie())
-                .musical(tastePopup.getMusical())
-                .sports(tastePopup.getSports())
-                .game(tastePopup.getGame())
-                .itTech(tastePopup.getItTech())
-                .kpop(tastePopup.getKpop())
-                .alcohol(tastePopup.getAlcohol())
-                .animalPlant(tastePopup.getAnimalPlant())
-                .etc(tastePopup.getEtc())
-                .build();
-        proxyTaste = tastePopupRepository.save(proxyTaste);
+        TastePopup proxyTaste = tastedPopupCommandUseCase.createProxyTastePopup(popup.getTastePopup());
 
-        Popup proxyPopup = Popup.builder()
-                .homepageLink(popup.getHomepageLink())
-                .name(popup.getName())
-                .availableAge(popup.getAvailableAge())
-                .closeDate(popup.getCloseDate())
-                .closeTime(popup.getCloseTime())
-                .entranceRequired(popup.getEntranceRequired())
-                .entranceFee(popup.getEntranceFee())
-                .resvRequired(popup.getResvRequired())
-                .introduce(popup.getIntroduce())
-                .address(popup.getAddress())
-                .addressDetail(popup.getAddressDetail())
-                .openDate(popup.getOpenDate())
-                .openTime(popup.getOpenTime())
-                .latitude(popup.getLatitude())
-                .longitude(popup.getLongitude())
-                .operationExcept(popup.getOperationExcept())
-                .operationStatus(EOperationStatus.EXECUTING.getStatus())
-                .parkingAvailable(popup.getParkingAvailable())
-                .preferedPopup(proxyPrefered)
-                .tastePopup(proxyTaste)
-                .build();
-        proxyPopup = popupRepository.save(proxyPopup);
+        Popup proxyPopup = popupCommandUseCase.copyPopup(popup, proxyPrefered, proxyTaste, EOperationStatus.EXECUTING.getStatus());
 
-        // 프록시 이미지와 생성
-        List<PosterImage> posterImages = posterImageRepository.findByPopupId(popup);
-        List<String> posterUrls = posterImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
+        // 프록시 이미지 복제 및 생성
+        List<PosterImage> proxyImages = posterImageCommandUseCase.copyPosterList(popup, proxyPopup);
 
-        List<String> proxyUrls = s3Service.copyImageListToAnotherFolder(posterUrls, proxyPopup.getId());
-
-        List<PosterImage> proxyImages = new ArrayList<>();
-        for (String proxyUrl : proxyUrls) {
-            PosterImage proxyImage = PosterImage.builder()
-                    .posterUrl(proxyUrl)
-                    .popup(proxyPopup)
-                    .build();
-            proxyImages.add(proxyImage);
-        }
-        posterImageRepository.saveAll(proxyImages);
-        proxyPopup.updatePosterUrl(proxyImages.get(0).getPosterUrl());
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(proxyPopup, proxyImages.get(0));
 
         // 프록시 알람키워드 생성
         List<PopupAlarmKeyword> popupAlarmKeywords = popupAlarmKeywordRepository.findByPopupId(popup);
@@ -148,33 +82,9 @@ public class ModifyInfoService {
                 .proxyPopup(proxyPopup)
                 .originPopup(popup)
                 .build();
-        modifyInformRepository.save(modifyInfo);
+        modifyInfoCommandRepository.save(modifyInfo);
 
-        // 정보수정요청 이미지 저장
-        String imageStatus = "0";
-
-        List<String> fileUrls = new ArrayList<>();
-        if (!images.get(0).getOriginalFilename().equals("empty")) {
-
-            log.info("images Entity : " + images);
-            log.info("images Size : " + images.size());
-            log.info("images first img name: " + images.get(0).getOriginalFilename());
-
-            imageStatus = "1"; // 이미지가 null 이 아닐때
-
-            // 리뷰 이미지 처리 및 저장
-            fileUrls = s3Service.uploadModifyInfo(images, modifyInfo.getId());
-
-            List<ModifyImages> modifyImagesList = new ArrayList<>();
-            for (String url : fileUrls) {
-                ModifyImages modifyImage = ModifyImages.builder()
-                        .modifyId(modifyInfo)
-                        .imageUrl(url)
-                        .build();
-                modifyImagesList.add(modifyImage);
-            }
-            modifyImageReposiroty.saveAll(modifyImagesList);
-        }
+        List<String> fileUrls = modifyImagesCommandUseCase.saveModifyImagerList(images, modifyInfo);
 
         return ModifyInfoDto.fromEntity(modifyInfo, fileUrls);
     } // 사용자 정보수정요청 생성
@@ -182,7 +92,7 @@ public class ModifyInfoService {
     @Transactional
     public void deleteProxyPopupAndModifyInfoByPopupId(Long popupId) {
         log.info("delete modify info data");
-        List<ModifyInfo> modifyInfoList = modifyInformRepository.findAllByOriginPopupId(popupId);
+        List<ModifyInfo> modifyInfoList = modifyInfoQueryRepository.findAllByOriginPopupId(popupId);
 
         for (ModifyInfo modifyInfo : modifyInfoList) {
             // proxy popup 삭제
@@ -191,35 +101,20 @@ public class ModifyInfoService {
             // modify info 삭제
             log.info("delete modify info");
             // modify info 이미지 삭제
-            List<ModifyImages> modifyImages = modifyImageReposiroty.findByModifyId(modifyInfo);
-            List<String> modifyUrls = modifyImages.stream()
-                    .map(ModifyImages::getImageUrl)
-                    .toList();
-            if (modifyUrls.size() != 0) {
-                s3Service.deleteMultipleImages(modifyUrls);
-                modifyImageReposiroty.deleteAllByModifyId(modifyInfo);
-            }
+            modifyImagesCommandUseCase.deleteModifyImageList(modifyInfo);
+
             // modify info 삭제
-            modifyInformRepository.delete(modifyInfo);
+            modifyInfoCommandRepository.delete(modifyInfo);
 
             // proxy popup 이미지 삭제
-            List<PosterImage> proxyImages = posterImageRepository.findAllByPopupId(proxyPopup);
-            List<String> proxyUrls = proxyImages.stream()
-                    .map(PosterImage::getPosterUrl)
-                    .toList();
-            if (proxyUrls.size() != 0) {
-                s3Service.deleteMultipleImages(proxyUrls);
-                posterImageRepository.deleteAllByPopupId(proxyPopup);
-            }
+            posterImageCommandUseCase.deletePosterList(proxyPopup);
 
             // proxy popup 알람 키워드 삭제
             popupAlarmKeywordRepository.deleteAllByPopupId(proxyPopup);
 
             // proxy popup 삭제
             log.info("delete proxy popup");
-            popupRepository.delete(proxyPopup);
-
-
+            popupCommandUseCase.deletePopup(proxyPopup);
         }
     } // 프록시 팝업 삭제 및 정보수정요청 삭제
 }

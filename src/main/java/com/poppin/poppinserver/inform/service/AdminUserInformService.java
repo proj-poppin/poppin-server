@@ -12,24 +12,20 @@ import com.poppin.poppinserver.inform.domain.UserInform;
 import com.poppin.poppinserver.inform.dto.userInform.request.UpdateUserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformDto;
 import com.poppin.poppinserver.inform.dto.userInform.response.UserInformSummaryDto;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.inform.repository.UserInformCommandRepository;
+import com.poppin.poppinserver.inform.repository.UserInformQueryRepository;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.domain.PosterImage;
-import com.poppin.poppinserver.popup.domain.PreferedPopup;
-import com.poppin.poppinserver.popup.domain.TastePopup;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
-import com.poppin.poppinserver.popup.repository.PosterImageRepository;
-import com.poppin.poppinserver.popup.repository.PreferedPopupRepository;
-import com.poppin.poppinserver.popup.repository.TastePopupRepository;
 import com.poppin.poppinserver.popup.service.S3Service;
 import com.poppin.poppinserver.popup.usecase.PosterImageCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.PreferedPopupCommandUseCase;
+import com.poppin.poppinserver.popup.usecase.TastedPopupCommandUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,20 +38,20 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminUserInformService {
-    private final UserInformRepository userInformRepository;
-    private final TastePopupRepository tastePopupRepository;
+    private final UserInformQueryRepository userInformQueryRepository;
+    private final UserInformCommandRepository userInformCommandRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final PosterImageRepository posterImageRepository;
 
     private final S3Service s3Service;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
 
     @Transactional
     public UserInformDto readUserInform(Long userInformId) {
-        UserInform userInform = userInformRepository.findById(userInformId)
+        UserInform userInform = userInformQueryRepository.findById(userInformId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
         return UserInformDto.fromEntity(userInform);
@@ -65,48 +61,22 @@ public class AdminUserInformService {
     public UserInformDto updateUserInform(UpdateUserInformDto updateUserInformDto,
                                           List<MultipartFile> images,
                                           Long adminId) {
-        UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
+        UserInform userInform = userInformQueryRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
+        // 관리자 검증
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updateUserInformDto.taste();
-        TastePopup tastePopup = userInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updateUserInformDto.prefered();
-        PreferedPopup preferedPopup = userInform.getPopupId().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(userInform.getPopupId().getTastePopup(), updateUserInformDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(userInform.getPopupId().getPreferedPopup(), updateUserInformDto.prefered());
 
         Popup popup = userInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
 
         //새로운 이미지 추가
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
@@ -147,7 +117,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTING);
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
         log.info(userInform.getProgress().toString());
 
         return UserInformDto.fromEntity(userInform);
@@ -157,48 +127,23 @@ public class AdminUserInformService {
     public UserInformDto uploadPopup(UpdateUserInformDto updateUserInformDto,
                                      List<MultipartFile> images,
                                      Long adminId) {
-        UserInform userInform = userInformRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
+        UserInform userInform = userInformQueryRepository.findById(Long.valueOf(updateUserInformDto.userInformId()))
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER_INFORM));
 
+        // 관리자 검증
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updateUserInformDto.taste();
-        TastePopup tastePopup = userInform.getPopupId().getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updateUserInformDto.prefered();
-        PreferedPopup preferedPopup = userInform.getPopupId().getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(userInform.getPopupId().getTastePopup(), updateUserInformDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(userInform.getPopupId().getPreferedPopup(), updateUserInformDto.prefered());
 
         Popup popup = userInform.getPopupId();
 
         // 팝업 이미지 처리 및 저장
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
+
 
         //새로운 이미지 추가
         List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
@@ -260,7 +205,7 @@ public class AdminUserInformService {
         );
 
         userInform.update(EInformProgress.EXECUTED);
-        userInform = userInformRepository.save(userInform);
+        userInform = userInformCommandRepository.save(userInform);
 
         return UserInformDto.fromEntity(userInform);
     } // 제보 최종 업로그
@@ -269,7 +214,7 @@ public class AdminUserInformService {
     public PagingResponseDto<List<UserInformSummaryDto>> readUserInformList(int page,
                                                                             int size,
                                                                             EInformProgress progress) {
-        Page<UserInform> userInforms = userInformRepository.findAllByProgress(PageRequest.of(page, size), progress);
+        Page<UserInform> userInforms = userInformQueryRepository.findAllByProgress(PageRequest.of(page, size), progress);
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(userInforms);
         List<UserInformSummaryDto> userInformSummaryDtos = UserInformSummaryDto.fromEntityList(

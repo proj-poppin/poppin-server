@@ -4,7 +4,8 @@ import com.poppin.poppinserver.interest.usercase.InterestCommandUseCase;
 import com.poppin.poppinserver.popup.domain.BlockedPopup;
 import com.poppin.poppinserver.popup.domain.Popup;
 import com.poppin.poppinserver.popup.dto.blockedPopup.response.BlockedPopupDto;
-import com.poppin.poppinserver.popup.repository.BlockedPopupRepository;
+import com.poppin.poppinserver.popup.repository.BlockedPopupCommandRepository;
+import com.poppin.poppinserver.popup.repository.BlockedPopupQueryRepository;
 import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class BlockedPopupService {
-    private final BlockedPopupRepository blockedPopupRepository;
+    private final BlockedPopupQueryRepository blockedPopupQueryRepository;
+    private final BlockedPopupCommandRepository blockedPopupCommandRepository;
 
     private final UserQueryUseCase userQueryUseCase;
     private final PopupQueryUseCase popupQueryUseCase;
@@ -38,14 +40,14 @@ public class BlockedPopupService {
                 .popupId(popup)
                 .build();
 
-        blockedPopup = blockedPopupRepository.save(blockedPopup);
+        blockedPopup = blockedPopupCommandRepository.save(blockedPopup);
 
         return BlockedPopupDto.fromEntity(blockedPopup);
     } // 부트스트랩
 
     // 차단한 팝업 ID 리스트 조회
     public List<String> findBlockedPopupList(User user) {
-        return blockedPopupRepository.findAllByUserId(user)
+        return blockedPopupQueryRepository.findAllByUserId(user)
                 .stream()
                 .map(blockedPopup -> blockedPopup.getId().toString())
                 .toList();

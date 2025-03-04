@@ -19,8 +19,8 @@ import com.poppin.poppinserver.core.type.EOperationStatus;
 import com.poppin.poppinserver.core.type.EPopupTopic;
 import com.poppin.poppinserver.core.type.EPushInfo;
 import com.poppin.poppinserver.core.util.PrepardSearchUtil;
-import com.poppin.poppinserver.inform.repository.ManagerInformRepository;
-import com.poppin.poppinserver.inform.repository.UserInformRepository;
+import com.poppin.poppinserver.inform.usecase.ManagerInformCommandUseCase;
+import com.poppin.poppinserver.inform.usecase.UserInformCommandUseCase;
 import com.poppin.poppinserver.interest.usercase.InterestCommandUseCase;
 import com.poppin.poppinserver.modifyInfo.service.ModifyInfoService;
 import com.poppin.poppinserver.popup.domain.Popup;
@@ -28,14 +28,12 @@ import com.poppin.poppinserver.popup.domain.PosterImage;
 import com.poppin.poppinserver.popup.domain.PreferedPopup;
 import com.poppin.poppinserver.popup.domain.TastePopup;
 import com.poppin.poppinserver.popup.dto.popup.request.CreatePopupDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreatePreferedDto;
-import com.poppin.poppinserver.popup.dto.popup.request.CreateTasteDto;
 import com.poppin.poppinserver.popup.dto.popup.request.UpdatePopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.AdminPopupDto;
 import com.poppin.poppinserver.popup.dto.popup.response.ManageListDto;
 import com.poppin.poppinserver.popup.repository.*;
 import com.poppin.poppinserver.popup.service.S3Service;
-import com.poppin.poppinserver.popup.usecase.PopupQueryUseCase;
+import com.poppin.poppinserver.popup.usecase.*;
 import com.poppin.poppinserver.report.repository.ReportPopupRepository;
 import com.poppin.poppinserver.review.domain.Review;
 import com.poppin.poppinserver.review.domain.ReviewImage;
@@ -59,29 +57,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminPopupService {
-    private final PopupRepository popupRepository;
+    private final PopupQueryRepository popupQueryRepository;
+
     private final ReviewQueryRepository reviewRepository;
     private final ReviewCommandRepository reviewCommandRepository;
-    private final PosterImageRepository posterImageRepository;
-    private final PreferedPopupRepository preferedPopupRepository;
-    private final TastePopupRepository tastePopupRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final PopupAlarmKeywordRepository popupAlarmKeywordRepository;
     private final ReviewImageQueryUseCase reviewImageQueryUseCase;
     private final ReviewImageCommandRepository reviewImageCommandRepository;
     private final VisitRepository visitRepository;
-    private final ManagerInformRepository managerInformRepository;
-    private final UserInformRepository userInformRepository;
     private final ReportPopupRepository reportPopupRepository;
     private final ReviewRecommendCommandRepository reviewRecommendRepository;
     private final PopupTopicRepository popupTopicRepository;
-    private final BlockedPopupRepository blockedPopupRepository;
     private final PopupAlarmRepository popupAlarmRepository;
     private final VisitorDataRepository visitorDataRepository;
     private final UserAlarmKeywordRepository userAlarmKeywordRepository;
@@ -89,15 +81,21 @@ public class AdminPopupService {
     private final S3Service s3Service;
     private final ModifyInfoService modifyInfoService;
 
-    private final UserQueryUseCase userQueryUseCase;
-    private final PopupQueryUseCase popupQueryUseCase;
-    private final InterestCommandUseCase interestCommandUseCase;
-
     private final PrepardSearchUtil prepardSearchUtil;
 
     private final TokenQueryUseCase tokenQueryUseCase;
     private final TopicCommandUseCase topicCommandUseCase;
     private final SendAlarmCommandUseCase sendAlarmCommandUseCase;
+    private final UserQueryUseCase userQueryUseCase;
+    private final PopupQueryUseCase popupQueryUseCase;
+    private final InterestCommandUseCase interestCommandUseCase;
+    private final PreferedPopupCommandUseCase preferedPopupCommandUseCase;
+    private final TastedPopupCommandUseCase tastedPopupCommandUseCase;
+    private final PosterImageCommandUseCase posterImageCommandUseCase;
+    private final PopupCommandUseCase popupCommandUseCase;
+    private final ManagerInformCommandUseCase managerInformCommandUseCase;
+    private final UserInformCommandUseCase userInformCommandUseCase;
+    private final BlockedPopupCommandUseCase blockedPopupCommandUseCase;
 
     private final FCMScheduler fcmScheduler;
 
@@ -105,36 +103,9 @@ public class AdminPopupService {
     public AdminPopupDto createPopup(CreatePopupDto createPopupDto, List<MultipartFile> images, Long adminId) {
         User admin = userQueryUseCase.findUserById(adminId);
 
-        //카테고리별 엔티티 정의
-        CreatePreferedDto createPreferedDto = createPopupDto.prefered();
-        PreferedPopup preferedPopup = PreferedPopup.builder()
-                .market(createPreferedDto.market())
-                .display(createPreferedDto.display())
-                .experience(createPreferedDto.experience())
-                .wantFree(createPreferedDto.wantFree())
-                .build();
-
-        CreateTasteDto createTasteDto = createPopupDto.taste();
-        TastePopup tastePopup = TastePopup.builder()
-                .fasionBeauty(createTasteDto.fashionBeauty())
-                .characters(createTasteDto.characters())
-                .foodBeverage(createTasteDto.foodBeverage())
-                .webtoonAni(createTasteDto.webtoonAnimation())
-                .interiorThings(createTasteDto.interiorThings())
-                .movie(createTasteDto.movie())
-                .musical(createTasteDto.musical())
-                .sports(createTasteDto.sports())
-                .game(createTasteDto.game())
-                .itTech(createTasteDto.itTech())
-                .kpop(createTasteDto.kpop())
-                .alcohol(createTasteDto.alcohol())
-                .animalPlant(createTasteDto.animalPlant())
-                .etc(createTasteDto.etc())
-                .build();
-
         //각 카테고리 저장
-        preferedPopup = preferedPopupRepository.save(preferedPopup);
-        tastePopup = tastePopupRepository.save(tastePopup);
+        PreferedPopup preferedPopup = preferedPopupCommandUseCase.createPreferedPopup(createPopupDto.prefered());
+        TastePopup tastePopup = tastedPopupCommandUseCase.createTastePopup(createPopupDto.taste());
 
         //날짜 요청 유효성 검증
         if (createPopupDto.openDate().isAfter(createPopupDto.closeDate())) {
@@ -183,24 +154,16 @@ public class AdminPopupService {
 
         popup.updateAgent(admin);
 
-        popup = popupRepository.save(popup);
+        popup = popupQueryRepository.save(popup);
         log.info(popup.toString());
 
         // 팝업 이미지 처리 및 저장
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
-        popup = popupRepository.save(popup);
+        popup = popupQueryRepository.save(popup);
 
         log.info(popup.getName() + " 팝업생성");
 
@@ -224,7 +187,6 @@ public class AdminPopupService {
         return AdminPopupDto.fromEntity(popup);
     } // 전체 팝업 관리 - 팝업 생성
 
-
     public AdminPopupDto readPopup(Long popupId) {
         // 팝업 정보 불러오기
         Popup popup = popupQueryUseCase.findPopupById(popupId);
@@ -233,14 +195,14 @@ public class AdminPopupService {
     } // 전체 팝업 관리 - 팝업 조회
 
     public PagingResponseDto<ManageListDto> readManageList(Long adminId, EOperationStatus oper, int page, int size) {
-        Page<Popup> popups = popupRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
+        Page<Popup> popups = popupQueryRepository.findByOperationStatusAndOrderByName(PageRequest.of(page, size),
                 oper.getStatus());
 
         // 각 운영상태별로 팝업 개수 반환
         Long num = switch (oper) {
-            case NOTYET -> popupRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
-            case TERMINATED -> popupRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
-            case OPERATING -> popupRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
+            case NOTYET -> popupQueryRepository.countByOperationStatus(EOperationStatus.NOTYET.getStatus());
+            case TERMINATED -> popupQueryRepository.countByOperationStatus(EOperationStatus.TERMINATED.getStatus());
+            case OPERATING -> popupQueryRepository.countByOperationStatus(EOperationStatus.OPERATING.getStatus());
             default -> 0L;
         };
 
@@ -304,9 +266,9 @@ public class AdminPopupService {
         // 제보 관련 데이터
         log.info("delete inform data");
         // 운영자 제보
-        managerInformRepository.deleteAllByPopupId(popup);
+        managerInformCommandUseCase.deleteAllManagerInformByPopup(popup);
         // 사용자 제보
-        userInformRepository.deleteAllByPopupId(popup);
+        userInformCommandUseCase.deleteAllUserInformByPopup(popup);
 
         // 정보수정요청 관련 데이터
         log.info("delete modify info data");
@@ -318,14 +280,8 @@ public class AdminPopupService {
 
         // 팝업 이미지
         log.info("delete popup image");
-        List<PosterImage> posterImages = posterImageRepository.findAllByPopupId(popup);
-        List<String> fileUrls = posterImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .toList();
-        if (fileUrls.size() != 0) {
-            s3Service.deleteMultipleImages(fileUrls);
-            posterImageRepository.deleteAllByPopupId(popup);
-        }
+        posterImageCommandUseCase.deletePosterList(popup);
+
         log.info("delete popup alarm");
         popupAlarmRepository.deleteAllByPopup(popup);
 
@@ -333,10 +289,10 @@ public class AdminPopupService {
         popupTopicRepository.deleteAllByPopup(popup);
 
         log.info("delete blocked popup");
-        blockedPopupRepository.deleteAllByPopupId(popup);
+        blockedPopupCommandUseCase.deleteAllBlockedPopup(popup);
 
         log.info("delete popup");
-        popupRepository.delete(popup);
+        popupQueryRepository.delete(popup);
 
         return true;
     } // 전체 팝업 관리 - 팝업 삭제
@@ -349,53 +305,19 @@ public class AdminPopupService {
 
         User admin = userQueryUseCase.findUserById(adminId);
 
-        CreateTasteDto createTasteDto = updatePopupDto.taste();
-        TastePopup tastePopup = popup.getTastePopup();
-        tastePopup.update(createTasteDto.fashionBeauty(),
-                createTasteDto.characters(),
-                createTasteDto.foodBeverage(),
-                createTasteDto.webtoonAnimation(),
-                createTasteDto.interiorThings(),
-                createTasteDto.movie(),
-                createTasteDto.musical(),
-                createTasteDto.sports(),
-                createTasteDto.game(),
-                createTasteDto.itTech(),
-                createTasteDto.kpop(),
-                createTasteDto.alcohol(),
-                createTasteDto.animalPlant(),
-                createTasteDto.etc());
-        tastePopupRepository.save(tastePopup);
-
-        CreatePreferedDto createPreferedDto = updatePopupDto.prefered();
-        PreferedPopup preferedPopup = popup.getPreferedPopup();
-        preferedPopup.update(createPreferedDto.market(),
-                createPreferedDto.display(),
-                createPreferedDto.experience(),
-                createPreferedDto.wantFree());
-        preferedPopupRepository.save(preferedPopup);
+        // 카테고리 업데이트
+        tastedPopupCommandUseCase.updateTastePopup(popup.getTastePopup(), updatePopupDto.taste());
+        preferedPopupCommandUseCase.updatePreferedPopup(popup.getPreferedPopup(), updatePopupDto.prefered());
 
         // 기존 이미지 싹 지우기
-        List<PosterImage> originImages = posterImageRepository.findByPopupId(popup);
-        List<String> originUrls = originImages.stream()
-                .map(PosterImage::getPosterUrl)
-                .collect(Collectors.toList());
-        s3Service.deleteMultipleImages(originUrls);
-        posterImageRepository.deleteAllByPopupId(popup);
+        posterImageCommandUseCase.deletePosterList(popup);
 
         //새로운 이미지 추가
-        List<String> fileUrls = s3Service.uploadPopupPoster(images, popup.getId());
+        // 팝업 이미지 처리 및 저장
+        List<PosterImage> posterImages = posterImageCommandUseCase.savePosterList(images, popup);
 
-        List<PosterImage> posterImages = new ArrayList<>();
-        for (String url : fileUrls) {
-            PosterImage posterImage = PosterImage.builder()
-                    .posterUrl(url)
-                    .popup(popup)
-                    .build();
-            posterImages.add(posterImage);
-        }
-        posterImageRepository.saveAll(posterImages);
-        popup.updatePosterUrl(fileUrls.get(0));
+        // 대표사진 저장
+        popupCommandUseCase.updatePopupPosterUrl(popup, posterImages.get(0));
 
         // 기존 키워드 삭제 및 다시 저장
         popupAlarmKeywordRepository.deleteAll(popup.getPopupAlarmKeywords());
@@ -453,7 +375,7 @@ public class AdminPopupService {
                 admin
         );
 
-        popupRepository.save(popup);
+        popupQueryRepository.save(popup);
 
         // 팝업 정보 변경 시 앱푸시 보내기
         if (!EOperationStatus.OPERATING.getStatus().equals(operationStatus)) {
@@ -471,10 +393,10 @@ public class AdminPopupService {
             searchText = prepardSearchUtil.prepareSearchText(text);
         }
 
-        Page<Popup> popups = popupRepository.findByTextInName(searchText, PageRequest.of(page, size),
+        Page<Popup> popups = popupQueryRepository.findByTextInName(searchText, PageRequest.of(page, size),
                 oper.getStatus()); // 운영 상태
 
-        Long num = popupRepository.countByOperationStatus(oper.getStatus());
+        Long num = popupQueryRepository.countByOperationStatus(oper.getStatus());
 
         PageInfoDto pageInfoDto = PageInfoDto.fromPageInfo(popups);
         ManageListDto manageListDto = ManageListDto.fromEntityList(popups.getContent(), num);

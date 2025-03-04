@@ -23,7 +23,10 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
     @Query("SELECT ft FROM FCMToken ft " +
             "JOIN PopupTopic pt ON pt.user = ft.user " +
-            "WHERE pt.topicCode = :topicCode AND pt.popup.id = :popupId")
+            "JOIN Interest it ON ft.user = it.user " +
+            "WHERE pt.topicCode = :topicCode " +
+            "AND pt.popup.id = :popupId " +
+            "AND it.popup.id = :popupId")
     List<FCMToken> findTokenIdByTopicAndType(@Param("topicCode") String topicCode,
                                              @Param("popupId") Long popupId);
 
