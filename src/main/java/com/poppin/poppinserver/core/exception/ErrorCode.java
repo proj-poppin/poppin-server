@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    //Bad Request Error
+    // 400 Bad Request Error
     INVALID_PARAMETER("40000", HttpStatus.BAD_REQUEST, "유효하지 않는 파라미터입니다."),
     MISSING_REQUEST_PARAMETER("40001", HttpStatus.BAD_REQUEST, "필수 파라미터가 누락되었습니다."),
     INVALID_ROLE("40002", HttpStatus.BAD_REQUEST, "유효하지 않은 권한입니다."),
@@ -49,9 +49,8 @@ public enum ErrorCode {
             "filteringFourteenCategories는 빈 문자열 이거나 fashionBeauty,characters,foodBeverage,webtoonAni,interiorThings,movie,musical,sports,game,itTech,kpop,alcohol,animalPlant,etc와 같은 형식이어야 합니다."),
     ALREADY_WRITTEN_REVIEW("40037", HttpStatus.BAD_REQUEST, "이미 후기를 작성한 팝업에는 방문하실 수 없습니다."),
 
-    // Unauthorized Error
+    // 401 Unauthorized Error
     FAILURE_LOGIN("40100", HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
-    FAILURE_LOGOUT("40101", HttpStatus.UNAUTHORIZED, "로그아웃에 실패했습니다."),
     INVALID_TOKEN_ERROR("40102", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN_ERROR("40103", HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     TOKEN_MALFORMED_ERROR("40104", HttpStatus.UNAUTHORIZED, "토큰이 올바르지 않습니다."),
@@ -62,11 +61,11 @@ public enum ErrorCode {
     EMPTY_AUTHENTICATION("40109", HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."),
     INVALID_AUTHORIZATION_HEADER("40110", HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 헤더입니다."),
 
-
-    // Access Denied Error
+    // 403 Access Denied Error
     ACCESS_DENIED_ERROR("40300", HttpStatus.FORBIDDEN, "액세스 권한이 없습니다."),
+    FAILURE_LOGOUT("40301", HttpStatus.FORBIDDEN, "로그아웃에 실패했습니다."),
 
-    // Not Found Error
+    // 404 Not Found Error
     NOT_FOUND_USER("40400", HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
     NOT_FOUND_END_POINT("40401", HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
     NOT_FOUND_RESOURCE("40402", HttpStatus.NOT_FOUND, "요청한 데이터를 찾을 수 없습니다."),
@@ -98,10 +97,7 @@ public enum ErrorCode {
     UNSUPPORTED_MEDIA_TYPE("41500", HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
 
     // Server, File Up/DownLoad Error
-    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    FCM_ERROR("50001", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 중 앱 푸시 알림 오류입니다."),
-    REVIEW_FCM_ERROR("50002", HttpStatus.INTERNAL_SERVER_ERROR, "후기 생성 중 오류가 발생하였습니다:fcm 오류"),
-    INFO_ALARM_ERROR("50003", HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 등록 과정 중 알림 등록 오류 발생하였습니다");
+    SERVER_ERROR("50000", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
