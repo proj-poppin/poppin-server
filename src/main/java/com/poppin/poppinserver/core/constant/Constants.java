@@ -77,7 +77,10 @@ public class Constants {
             "/swagger-ui/**",
             "/api-docs",
             "/api-docs/**",
-            "/v3/api-docs/**"
+            "/v3/api-docs/**",
+
+            // Test
+            "/api/v1/test/redis-test"
     );
 
     public static final String DEFAULT_POSTER = "https://poppin-local-test.s3.ap-northeast-2.amazonaws.com/default/poppin.png";

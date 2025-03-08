@@ -1,81 +1,81 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.0'
-	id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 ext {
-	springCloudVersion = "2023.0.3"
+    springCloudVersion = "2023.0.3"
 }
 
 group = 'com.poppin'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	// Default
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Default
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// JPA
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// MYSQL
-	runtimeOnly 'com.mysql:mysql-connector-j'
+    // MYSQL
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	// TEST
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // TEST
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// Validation
-	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Validation
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// S3
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation 'software.amazon.awssdk:s3:2.20.40'
 	implementation 'software.amazon.awssdk:auth:2.20.40'
 
 
-	// Mail
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-	// Firebase sdk
-	implementation 'com.google.firebase:firebase-admin:7.1.0'
+    // Firebase sdk
+    implementation 'com.google.firebase:firebase-admin:7.1.0'
 
-	// APNs
-	implementation 'com.github.fernandospr:javapns-jdk16:2.4.0' // IOS >= 10
+    // APNs
+    implementation 'com.github.fernandospr:javapns-jdk16:2.4.0' // IOS >= 10
 
-	// OpenFeign
-	 implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
-	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
 	// AWS SM
 	// Spring Cloud AWS 최신 버전 사용
@@ -83,30 +83,33 @@ dependencies {
 
 
 
-	// ETC
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // ETC
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
 bootJar {
-	archiveFileName.set "poppin-server-0.0.1-SNAPSHOT.jar"
+    archiveFileName.set "poppin-server-0.0.1-SNAPSHOT.jar"
 }
 
 jar {
-	enabled = false
+    enabled = false
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
 }

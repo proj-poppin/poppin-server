@@ -9,10 +9,10 @@ import com.poppin.poppinserver.core.annotation.UserId;
 import com.poppin.poppinserver.core.dto.ResponseDto;
 import com.poppin.poppinserver.core.exception.CommonException;
 import com.poppin.poppinserver.core.exception.ErrorCode;
-import com.poppin.poppinserver.user.repository.UserQueryRepository;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 public class TestController {
-    private final UserQueryRepository userQueryRepository;
     private final FCMTokenRepository fcmTokenRepository;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping("/fcm")
     public ResponseDto<?> fcm(
@@ -54,5 +55,13 @@ public class TestController {
             throw new CommonException(ErrorCode.SERVER_ERROR);
         }
         System.out.println("message " + response);
+    }
+
+    @PostMapping("/redis-test")
+    public String redisConnectionTest() {
+        String testKey = "test:ping";
+        String testValue = "pong";
+        redisTemplate.opsForValue().set(testKey, testValue);
+        return "Redis Response: " + redisTemplate.opsForValue().get(testKey);
     }
 }
