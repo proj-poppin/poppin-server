@@ -132,11 +132,11 @@ public class PopupDetailService {
 
     //  PopupStoreDto 반환 메서드
     public List<PopupStoreDto> getPopupStoreDtos(List<Popup> popups, Long userId) {
+        List<PopupStoreDto> popupStoreDtos = new ArrayList<>();
         if (popups == null || popups.isEmpty()) {
-            return null;
+            return popupStoreDtos;
         }
 
-        List<PopupStoreDto> popupStoreDtos = new ArrayList<>();
         for (Popup popup : popups) {
             popupStoreDtos.add(
                     getPopupStoreDto(popup, userId)
@@ -165,10 +165,10 @@ public class PopupDetailService {
     }
 
     public List<PopupStoreDto> guestGetPopupStoreDtos(List<Popup> popups) {
-        if (popups == null || popups.isEmpty()) {
-            return null;
-        }
         List<PopupStoreDto> popupStoreDtos = new ArrayList<>();
+        if (popups == null || popups.isEmpty()) {
+            return popupStoreDtos;
+        }
 
         // 각 Popup에 대해 방문자 데이터 및 실시간 방문자 수를 조회하여 리스트에 추가
         for (Popup popup : popups) {
