@@ -20,14 +20,18 @@ import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.AccountStatusResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.AuthCodeResponseDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +56,7 @@ public class AuthService {
 
     // 유저의 활동 내역
     private final UserActivityService userActivityService;
+    private final RefreshTokenService refreshTokenService;
 
     // 이메일 확인 코드 전송 메서드
     public AuthCodeResponseDto sendEmailVerificationCode(EmailVerificationRequestDto emailVerificationRequestDto) {
@@ -88,7 +93,7 @@ public class AuthService {
         Long userId = jwtUtil.getUserIdFromToken(token);
         User user = userQueryUseCase.findUserById(userId);
 
-        if (!user.getRefreshToken().equals(token)) {
+        if (!refreshTokenService.getRefreshTokenByUserId(userId).equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
 
@@ -97,7 +102,8 @@ public class AuthService {
 
         // FCM 토큰 검증
         tokenCommandUseCase.refreshFCMToken(user, fcmToken);
-        user.updateRefreshToken(jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        //user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         boolean isPreferenceSettingCreated = userPreferenceSettingService
                 .readUserPreferenceSettingCreated(user.getId());

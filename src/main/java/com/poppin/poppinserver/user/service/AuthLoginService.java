@@ -19,16 +19,20 @@ import com.poppin.poppinserver.user.dto.auth.request.AuthLoginRequestDto;
 import com.poppin.poppinserver.user.dto.auth.request.FcmTokenRequestDto;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.dto.auth.response.OAuth2UserInfo;
-import com.poppin.poppinserver.user.dto.user.response.*;
+import com.poppin.poppinserver.user.dto.user.response.UserActivityResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserInfoResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNoticeResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserNotificationResponseDto;
+import com.poppin.poppinserver.user.dto.user.response.UserPreferenceSettingDto;
+import com.poppin.poppinserver.user.dto.user.response.UserRelationDto;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
+import java.util.Base64;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.List;
 
 /**
  * 소셜 로그인과 일반 로그인을 처리하는 서비스
@@ -60,6 +64,8 @@ public class AuthLoginService {
 
     // 유저 활동 정보 서비스
     private final UserActivityService userActivityService;
+
+    private final RefreshTokenService refreshTokenService;
 
     // 로그인 제공자 파싱
     private ELoginProvider parseProvider(String provider) {
@@ -115,7 +121,8 @@ public class AuthLoginService {
     // 기존 사용자 로그인 처리
     private Object handleExistingUserLogin(User user, String fcmToken) {
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), EUserRole.USER);
-        user.updateRefreshToken(jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        // user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         // 로그인 후 필요한 데이터를 생성하고 반환
         return buildUserInfoResponse(user, fcmToken);
@@ -176,7 +183,8 @@ public class AuthLoginService {
 
         // 리프레시 토큰 업데이트
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
-        user.updateRefreshToken(jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(userId, jwtTokenDto.refreshToken());
+        // user.updateRefreshToken(jwtTokenDto.refreshToken());
 
         // 유저 취향 설정 정보 조회
         boolean isPreferenceSettingCreated = userPreferenceSettingService

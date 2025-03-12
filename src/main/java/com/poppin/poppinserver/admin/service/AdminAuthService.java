@@ -8,8 +8,7 @@ import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.user.domain.User;
 import com.poppin.poppinserver.user.domain.type.EUserRole;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
-import com.poppin.poppinserver.user.repository.UserCommandRepository;
-import com.poppin.poppinserver.user.usecase.UserCommandUseCase;
+import com.poppin.poppinserver.user.service.RefreshTokenService;
 import com.poppin.poppinserver.user.usecase.UserQueryUseCase;
 import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
@@ -29,7 +28,9 @@ public class AdminAuthService {
 
     private final JwtUtil jwtUtil;
 
-    private final UserCommandRepository userCommandRepository;
+    // private final UserCommandRepository userCommandRepository;
+
+    private final RefreshTokenService refreshTokenService;
 
     public JwtTokenDto authSignIn(String authorizationHeader) {
         String encoded = HeaderUtil.refineHeader(authorizationHeader, Constants.BASIC_PREFIX);
@@ -50,7 +51,8 @@ public class AdminAuthService {
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getId(), user.getRole());
         // user.updateRefreshToken(jwtTokenDto.refreshToken());
         // userCommandRepository.save(user);
-        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        // userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(user.getId(), jwtTokenDto.refreshToken());
 
         return jwtTokenDto;
     }
@@ -62,11 +64,12 @@ public class AdminAuthService {
 
         User user = userQueryUseCase.findUserById(userId);
 
-        if (!user.getRefreshToken().equals(token)) {
+        if (!refreshTokenService.getRefreshTokenByUserId(userId).equals(token)) {
             throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
         }
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userId, user.getRole());
-        userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        //userCommandRepository.updateRefreshToken(user.getId(), jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(user.getId(), jwtTokenDto.refreshToken());
         return jwtTokenDto;
     }
 

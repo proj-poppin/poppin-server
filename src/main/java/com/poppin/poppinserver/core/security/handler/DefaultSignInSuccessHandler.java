@@ -4,6 +4,7 @@ import com.poppin.poppinserver.core.security.info.CustomUserDetails;
 import com.poppin.poppinserver.core.util.JwtUtil;
 import com.poppin.poppinserver.user.dto.auth.response.JwtTokenDto;
 import com.poppin.poppinserver.user.repository.UserCommandRepository;
+import com.poppin.poppinserver.user.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserCommandRepository userCommandRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -28,7 +30,8 @@ public class DefaultSignInSuccessHandler implements AuthenticationSuccessHandler
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         JwtTokenDto jwtTokenDto = jwtUtil.generateToken(userDetails.getId(), userDetails.getRole());
 
-        userCommandRepository.updateRefreshToken(userDetails.getId(), jwtTokenDto.refreshToken());
+        //userCommandRepository.updateRefreshToken(userDetails.getId(), jwtTokenDto.refreshToken());
+        refreshTokenService.saveRefreshToken(userDetails.getId(), jwtTokenDto.refreshToken());
         setSuccessAppResponse(response, jwtTokenDto);
     }
 
