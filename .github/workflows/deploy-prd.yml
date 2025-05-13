@@ -71,12 +71,10 @@ jobs:
       - name: Show contents of Dockerrun.aws.json
         run: cat Dockerrun.aws.json
 
-      - name: Zip Dockerrun.aws.json
+      - name: Zip Dockerrun.aws.json (fixed structure)
         run: |
-          mkdir -p deploy
-          mv Dockerrun.aws.json deploy/
-          cd deploy
-          zip -r ../deploy-${{ env.VERSION }}.zip .
+          zip deploy-${{ env.VERSION }}.zip Dockerrun.aws.json
+
 
       - name: Upload ZIP to S3
         run: |
