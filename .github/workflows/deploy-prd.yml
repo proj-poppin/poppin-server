@@ -34,7 +34,7 @@ jobs:
 
       - name: Create dev yml File
         run: |
-          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-dev.yml
+          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
