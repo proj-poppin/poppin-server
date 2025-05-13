@@ -24,6 +24,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Create Firebase Key File
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
+
       - name: Create folder
         run: |
           mkdir -p src/main/resources
@@ -32,7 +37,7 @@ jobs:
         run: |
           echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
 
-      - name: Create dev yml File
+      - name: Create production yml File
         run: |
           echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml
 
