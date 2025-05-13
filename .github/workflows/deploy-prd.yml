@@ -1,0 +1,94 @@
+name: Deploy Poppin production
+
+on:
+  push:
+    branches:
+      - prd
+
+jobs:
+  deploy:
+    if: github.repository == 'proj-poppin/poppin-server'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Create Firebase Key File
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
+
+      - name: Create yml File
+        run: |
+          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml 
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Define Version
+        run: echo "VERSION=v-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }} .
+          docker tag ${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }} ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }}
+
+      - name: Push Docker image to Amazon ECR
+        run: |
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }}
+
+      - name: Create Dockerrun.aws.json for ECR image
+        run: |
+          cat <<EOF > Dockerrun.aws.json
+          {
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+              "Name": "public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}",              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": "8080"
+              }
+            ]
+          }
+          EOF
+
+      - name: Zip Dockerrun.aws.json
+        run: |
+          mkdir -p deploy
+          mv Dockerrun.aws.json deploy/
+          cd deploy
+          zip -r ../deploy-${{ env.VERSION }}.zip .
+
+      - name: Upload ZIP to S3
+        run: |
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://${{ secrets.AWS_S3_PRD_BUCKET_NAME }}/deploy-${{ env.VERSION }}.zip
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name ${{ secrets.EB_PRD_APP_NAME }} \
+            --version-label ${{ env.VERSION }} \
+            --source-bundle S3Bucket=${{ secrets.AWS_S3_PRD_BUCKET_NAME }},S3Key=deploy-${{ env.VERSION }}.zip
+
+          aws elasticbeanstalk update-environment \
+            --environment-name ${{ secrets.EB_PRD_ENV_NAME }} \
+            --version-label ${{ env.VERSION }}
