@@ -25,7 +25,7 @@ jobs:
           mkdir -p src/main/resources/firebase
           echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
 
-      - name: Create yml File
+      - name: Create application-prd.yml
         run: |
           echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml 
 
@@ -40,28 +40,27 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1  # 퍼블릭 ECR은 고정 리전
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build Docker image
+      - name: Login to Amazon Public ECR
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }} .
-          docker tag ${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }} ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }}
+          aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS --password-stdin public.ecr.aws
 
-      - name: Push Docker image to Amazon ECR
+      - name: Build & Push Docker image to Public ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ env.VERSION }}
+          docker build -t poppin-prd:${{ env.VERSION }} .
+          docker tag poppin-prd:${{ env.VERSION }} public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
+          docker push public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
 
-      - name: Create Dockerrun.aws.json for ECR image
+      - name: Create Dockerrun.aws.json
         run: |
           cat <<EOF > Dockerrun.aws.json
           {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-              "Name": "public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}",              "Update": "true"
+              "Name": "public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}",
+              "Update": "true"
             },
             "Ports": [
               {
