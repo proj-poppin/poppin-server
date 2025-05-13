@@ -1,9 +1,13 @@
-name: Deploy Poppin production
+name: deploy with eb development
 
 on:
   push:
     branches:
       - prd
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - 'docs/**'
 
 jobs:
   deploy:
@@ -20,14 +24,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create Firebase Key File
+      - name: Create folder
         run: |
-          mkdir -p src/main/resources/firebase
-          echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
+          mkdir -p src/main/resources
 
-      - name: Create application-prd.yml
+      - name: Create application yml File
         run: |
-          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml 
+          echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
+
+      - name: Create dev yml File
+        run: |
+          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-dev.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
@@ -35,58 +42,129 @@ jobs:
       - name: Define Version
         run: echo "VERSION=v-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # 퍼블릭 ECR은 고정 리전
-
-      - name: Login to Amazon Public ECR
+      - name: Debug Environment Variables
         run: |
-          aws ecr-public get-login-password --region us-east-1 | \
-          docker login --username AWS --password-stdin public.ecr.aws
+          echo "AWS_S3_PRD_BUCKET_NAME is: $AWS_S3_PRD_BUCKET_NAME"
+        env:
+          AWS_S3_PRD_BUCKET_NAME: "poppin-deploy-bucket"
 
-      - name: Build & Push Docker image to Public ECR
+      - name: Upload JAR to S3 (with versioning)
         run: |
-          docker build -t poppin-prd:${{ env.VERSION }} .
-          docker tag poppin-prd:${{ env.VERSION }} public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
-          docker push public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
+          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-deploy-bucket/app-${{ env.VERSION }}.jar
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Create Dockerrun.aws.json
+      - name: Generate Dockerrun.aws.json
         run: |
-          echo '{
+          cat <<EOF > Dockerrun.aws.json
+          {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-              "Name": "public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}",
+              "Name": "openjdk:17-jdk-slim",
               "Update": "true"
             },
             "Ports": [
               {
                 "ContainerPort": "8080"
               }
+            ],
+            "Logging": "/var/log/nginx",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && \
+              ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+              echo \"Asia/Seoul\" > /etc/timezone && \
+              dpkg-reconfigure -f noninteractive tzdata && \
+              mkdir -p /app && \
+              while ! aws s3 cp s3://poppin-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do \
+                echo \"Retrying S3 download...\"; sleep 5; done && \
+              java \$JAVA_OPTS -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'"
+            ,
+            "Environment": [
+              {
+                "Name": "SPRING_PROFILES_ACTIVE",
+                "Value": "prd"
+              },
+              {
+                "Name": "TZ",
+                "Value": "Asia/Seoul"
+              },
+              {
+                "Name": "AWS_REGION",
+                "Value": "$AWS_REGION"
+              },
+              {
+                "Name": "AWS_ACCESS_KEY_ID",
+                "Value": "$AWS_ACCESS_KEY_ID"
+              },
+              {
+                "Name": "AWS_SECRET_ACCESS_KEY",
+                "Value": "$AWS_SECRET_ACCESS_KEY"
+              },
+              {
+                "Name": "JAVA_OPTS",
+                "Value": "-Xms512m -Xmx2g"
+              }
             ]
-          }' > Dockerrun.aws.json
+          }
+          EOF
 
-      - name: Show contents of Dockerrun.aws.json
-        run: cat Dockerrun.aws.json
-
-      - name: Zip Dockerrun.aws.json (fixed structure)
+      - name: Package Dockerrun.aws.json into a ZIP file
         run: |
-          zip deploy-${{ env.VERSION }}.zip Dockerrun.aws.json
+          mkdir -p deploy
+          cp Dockerrun.aws.json deploy/
+          cd deploy
+          zip -r ../deploy-${{ env.VERSION }}.zip .
 
-
-      - name: Upload ZIP to S3
+      - name: Upload ZIP file to S3
         run: |
-          aws s3 cp deploy-${{ env.VERSION }}.zip s3://${{ secrets.AWS_S3_PRD_BUCKET_NAME }}/deploy-${{ env.VERSION }}.zip
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-deploy-bucket/deploy-${{ env.VERSION }}.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Check if ZIP file exists in S3
+        run: |
+          echo "Checking if ZIP file exists in S3..."
+          aws s3 ls s3://$AWS_S3_PRD_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
+
+      - name: Wait for Elastic Beanstalk to Process Application Version
+        run: |
+          echo "Waiting for Elastic Beanstalk to process the new application version..."
+          sleep 30
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version \
-            --application-name ${{ secrets.EB_PRD_APP_NAME }} \
-            --version-label ${{ env.VERSION }} \
-            --source-bundle S3Bucket=${{ secrets.AWS_S3_PRD_BUCKET_NAME }},S3Key=deploy-${{ env.VERSION }}.zip
+          aws elasticbeanstalk create-application-version --application-name $EB_PRD_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_PRD_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
+          aws elasticbeanstalk update-environment --environment-name $EB_PRD_ENV_NAME --version-label ${{ env.VERSION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          EB_PRD_APP_NAME: ${{ secrets.EB_PRD_APP_NAME }}
+          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
 
-          aws elasticbeanstalk update-environment \
-            --environment-name ${{ secrets.EB_PRD_ENV_NAME }} \
-            --version-label ${{ env.VERSION }}
+      - name: Verify Deployment
+        run: |
+          echo "Waiting for deployment to complete..."
+          # Sleep to allow deployment to finish
+          sleep 180
+          # Get the environment health status
+          HEALTH=$(aws elasticbeanstalk describe-environments --environment-names $EB_PRD_ENV_NAME --query "Environments[0].Health" --output text)
+          if [ "$HEALTH" != "Green" ]; then
+            echo "Deployment health is not green. Current status: $HEALTH"
+            exit 1
+          fi
+          echo "Deployment successful and environment is healthy!"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
