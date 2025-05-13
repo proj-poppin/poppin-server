@@ -53,22 +53,21 @@ jobs:
           docker tag poppin-prd:${{ env.VERSION }} public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
           docker push public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}
 
-      - name: Create Dockerrun.aws.json
+      - name: Create Dockerrun.aws.json (safe)
         run: |
-          cat <<EOF > Dockerrun.aws.json
-          {
-            "AWSEBDockerrunVersion": "1",
-            "Image": {
-              "Name": "public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}",
-              "Update": "true"
-            },
-            "Ports": [
-              {
-                "ContainerPort": "8080"
-              }
-            ]
-          }
-          EOF
+          echo "{"                                       > Dockerrun.aws.json
+          echo "  \"AWSEBDockerrunVersion\": \"1\","     >> Dockerrun.aws.json
+          echo "  \"Image\": {"                          >> Dockerrun.aws.json
+          echo "    \"Name\": \"public.ecr.aws/o7r7q6j8/poppin-prd:${{ env.VERSION }}\"," >> Dockerrun.aws.json
+          echo "    \"Update\": \"true\""                >> Dockerrun.aws.json
+          echo "  },"                                    >> Dockerrun.aws.json
+          echo "  \"Ports\": [{"                         >> Dockerrun.aws.json
+          echo "    \"ContainerPort\": \"8080\""         >> Dockerrun.aws.json
+          echo "  }]"                                    >> Dockerrun.aws.json
+          echo "}"                                       >> Dockerrun.aws.json
+
+      - name: Show contents of Dockerrun.aws.json
+        run: cat Dockerrun.aws.json
 
       - name: Zip Dockerrun.aws.json
         run: |
