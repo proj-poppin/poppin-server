@@ -69,11 +69,7 @@ jobs:
                 "ContainerPort": "80"
               }
             ],
-            "Command": [
-              "sh",
-              "-c",
-              "apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo 'Asia/Seoul' > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && mkdir -p /app && while ! aws s3 cp s3://poppin-deploy-bucket/app-$VERSION.jar /app/app.jar; do echo 'Retrying S3 download...'; sleep 5; done && java \$JAVA_OPTS -Dserver.port=80 -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar"
-            ],
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && mkdir -p /app && while ! aws s3 cp s3://poppin-deploy-bucket/app-$VERSION.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java \$JAVA_OPTS -Dserver.port=80 -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
             "Logging": "/var/log/nginx",
             "Environment": [
               {
