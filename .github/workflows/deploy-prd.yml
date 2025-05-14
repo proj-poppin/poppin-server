@@ -36,13 +36,13 @@ jobs:
 
       - name: Debug Environment Variables
         run: |
-          echo "AWS_S3_PRD_BUCKET_NAME is: poppin-prd-deploy-bucket"
+          echo "AWS_S3_PRD_BUCKET_NAME is: poppin-deploy-bucket"
         env:
-          AWS_S3_PRD_BUCKET_NAME: "poppin-prd-deploy-bucket"
+          AWS_S3_PRD_BUCKET_NAME: "poppin-deploy-bucket"
 
       - name: Upload JAR to S3 (with versioning)
         run: |
-          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-prd-deploy-bucket/app-${{ env.VERSION }}.jar
+          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-deploy-bucket/app-${{ env.VERSION }}.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -63,7 +63,7 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli && while ! aws s3 cp s3://poppin-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli && while ! aws s3 cp s3://poppin-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload ZIP file to S3
         run: |
-          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-prd-deploy-bucket/deploy-${{ env.VERSION }}.zip
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-deploy-bucket/deploy-${{ env.VERSION }}.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
