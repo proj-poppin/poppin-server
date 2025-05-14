@@ -37,8 +37,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "https://www.bubble-poppin.com",
-                        "https://dev-app-server.site") // vite 로컬 주소, 운영 환경, 개발 환경
+                .allowedOrigins("http://localhost:5173", // vite 로컬 주소
+                        "https://www.bubble-poppin.com","https://bubble-poppin.com", //운영 환경
+                        "https://dev-app-server.site", "https://www.dev-app-server.site") //개발 환경
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
     }
 }
