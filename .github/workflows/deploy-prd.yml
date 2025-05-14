@@ -1,17 +1,12 @@
-name: deploy with eb development
+name: Deploy Poppin Prd
 
 on:
   push:
     branches:
       - prd
-    paths-ignore:
-      - 'README.md'
-      - '.gitignore'
-      - 'docs/**'
 
 jobs:
   deploy:
-    if: github.repository == 'proj-poppin/poppin-server'
     runs-on: ubuntu-latest
 
     steps:
@@ -29,17 +24,9 @@ jobs:
           mkdir -p src/main/resources/firebase
           echo '${{ secrets.FIREBASE_KEY }}' > src/main/resources/firebase/firebase_key.json
 
-      - name: Create folder
+      - name: Create yml File
         run: |
-          mkdir -p src/main/resources
-
-      - name: Create application yml File
-        run: |
-          echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
-
-      - name: Create production yml File
-        run: |
-          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-prd.yml
+          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application-dev.yml 
 
       - name: Build with Gradle
         run: ./gradlew build -x test
@@ -47,9 +34,15 @@ jobs:
       - name: Define Version
         run: echo "VERSION=v-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
+      - name: Debug Environment Variables
+        run: |
+          echo "AWS_S3_PRD_BUCKET_NAME is: poppin-prd-deploy-bucket"
+        env:
+          AWS_S3_PRD_BUCKET_NAME: "poppin-prd-deploy-bucket"
+
       - name: Upload JAR to S3 (with versioning)
         run: |
-          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-deploy-bucket/app-${{ env.VERSION }}.jar
+          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://poppin-prd-deploy-bucket/app-${{ env.VERSION }}.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -66,41 +59,31 @@ jobs:
             },
             "Ports": [
               {
-                "ContainerPort": "80"
+                "ContainerPort": "8080"
               }
             ],
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && mkdir -p /app && while ! aws s3 cp s3://poppin-deploy-bucket/app-$VERSION.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java \$JAVA_OPTS -Dserver.port=80 -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
             "Logging": "/var/log/nginx",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli && while ! aws s3 cp s3://poppin-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
                 "Value": "prd"
               },
               {
-                "Name": "TZ",
-                "Value": "Asia/Seoul"
-              },
-              {
                 "Name": "AWS_REGION",
-                "Value": "${{ secrets.AWS_REGION }}"
+                "Value": "$AWS_REGION"
               },
               {
                 "Name": "AWS_ACCESS_KEY_ID",
-                "Value": "${{ secrets.AWS_ACCESS_KEY_ID }}"
+                "Value": "$AWS_ACCESS_KEY_ID"
               },
               {
                 "Name": "AWS_SECRET_ACCESS_KEY",
-                "Value": "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-              },
-              {
-                "Name": "JAVA_OPTS",
-                "Value": "-Xms512m -Xmx2g"
+                "Value": "$AWS_SECRET_ACCESS_KEY"
               }
             ]
           }
           EOF
-        env:
-          VERSION: ${{ env.VERSION }}
 
       - name: Package Dockerrun.aws.json into a ZIP file
         run: |
@@ -111,7 +94,7 @@ jobs:
 
       - name: Upload ZIP file to S3
         run: |
-          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-deploy-bucket/deploy-${{ env.VERSION }}.zip
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://poppin-prd-deploy-bucket/deploy-${{ env.VERSION }}.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -120,11 +103,12 @@ jobs:
       - name: Check if ZIP file exists in S3
         run: |
           echo "Checking if ZIP file exists in S3..."
-          aws s3 ls s3://poppin-deploy-bucket/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
+          aws s3 ls s3://$AWS_S3_PRD_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
 
       - name: Wait for Elastic Beanstalk to Process Application Version
         run: |
@@ -133,7 +117,7 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_PRD_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=poppin-deploy-bucket,S3Key=deploy-${{ env.VERSION }}.zip
+          aws elasticbeanstalk create-application-version --application-name $EB_PRD_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_PRD_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
           aws elasticbeanstalk update-environment --environment-name $EB_PRD_ENV_NAME --version-label ${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -141,19 +125,4 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           EB_PRD_APP_NAME: ${{ secrets.EB_PRD_APP_NAME }}
           EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
-
-      - name: Verify Deployment
-        run: |
-          echo "Waiting for deployment to complete..."
-          sleep 180
-          HEALTH=$(aws elasticbeanstalk describe-environments --environment-names $EB_PRD_ENV_NAME --query "Environments[0].Health" --output text)
-          if [ "$HEALTH" != "Green" ]; then
-            echo "Deployment health is not green. Current status: $HEALTH"
-            exit 1
-          fi
-          echo "Deployment successful and environment is healthy!"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
